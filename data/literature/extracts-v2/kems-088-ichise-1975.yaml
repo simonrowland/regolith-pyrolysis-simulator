@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/kems-088-ichise-1975.yaml
 observations:
-- observation_id: kems-088-ichise-1975::ichise_1975_epsilon_e_table3
+- observation_id: kems-088-ichise-1975::ichise_1975_epsilon_e_table3::T=1823.15:h=91e4967450a6
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
     quantity:
@@ -20,12 +20,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+      tag: value
+      value: '1823.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'self_interaction_parameter'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -49,6 +48,203 @@ observations:
     table: '3'
     note: Table 3. Interaction parameter of sulfur in liquid iron
   read_from: pdf:kems-088-ichise-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        published_page: 118
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3. Interaction parameter of sulfur in liquid iron
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1550'
+            locator:
+              published_page: 118
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3. Interaction parameter of sulfur in liquid iron
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 118
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3. Interaction parameter of sulfur in liquid iron
+        output_unit: K
+- observation_id: kems-088-ichise-1975::ichise_1975_epsilon_e_table3::T=1873.15:h=4e9b2cc85838
+  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'self_interaction_parameter'
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: '90% confidence intervals of e_S^(S) on p. 119: 1550 C -0.0436 to -0.0688; 1600 C -0.0413 to -0.0608; 1650 C -0.0391
+        to -0.0588. Authors also discuss a possible 10% S-loss bias moving e_S^(S)(1600 C) toward -0.044.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-088-ichise-1975
+  locator:
+    published_page: 118
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3. Interaction parameter of sulfur in liquid iron
+  read_from: pdf:kems-088-ichise-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 118
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3. Interaction parameter of sulfur in liquid iron
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 118
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3. Interaction parameter of sulfur in liquid iron
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 118
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3. Interaction parameter of sulfur in liquid iron
+        output_unit: K
+- observation_id: kems-088-ichise-1975::ichise_1975_epsilon_e_table3::T=1923.15:h=f1825beb3c1b
+  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'self_interaction_parameter'
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1923.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: '90% confidence intervals of e_S^(S) on p. 119: 1550 C -0.0436 to -0.0688; 1600 C -0.0413 to -0.0608; 1650 C -0.0391
+        to -0.0588. Authors also discuss a possible 10% S-loss bias moving e_S^(S)(1600 C) toward -0.044.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-088-ichise-1975
+  locator:
+    published_page: 118
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3. Interaction parameter of sulfur in liquid iron
+  read_from: pdf:kems-088-ichise-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923.15'
+      locator:
+        published_page: 118
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3. Interaction parameter of sulfur in liquid iron
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1650'
+            locator:
+              published_page: 118
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3. Interaction parameter of sulfur in liquid iron
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 118
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3. Interaction parameter of sulfur in liquid iron
+        output_unit: K
 - observation_id: kems-088-ichise-1975::ichise_1975_fe_heat_of_vaporization_fig8
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
@@ -541,7 +737,7 @@ observations:
     figure: '9'
     note: 'Fig. 9. Heating characteristic of the cell holder by a pair of ring filaments (Total emission current: 0.68 A)'
   read_from: pdf:kems-088-ichise-1975
-- observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2
+- observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=1025327dd720
   experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
   identity:
     quantity:
@@ -605,8 +801,617 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, ion_pair, composition_basis,
-      points'
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: S_wt_pct, ln_IFe_over_IS2_1550C, ln_IFe_over_IS2_1600C,
+      ln_IFe_over_IS2_1650C, tangent_of_line_times_1e3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Values from LS lines through Fig. 3 points.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-088-ichise-1975
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Ion intensity ratio obtained from the lines in Fig. 3
+  read_from: pdf:kems-088-ichise-1975
+- observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=37cf613629ad
+  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: S_wt_pct, ln_IFe_over_IS2_1550C, ln_IFe_over_IS2_1600C,
+      ln_IFe_over_IS2_1650C, tangent_of_line_times_1e3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Values from LS lines through Fig. 3 points.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-088-ichise-1975
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Ion intensity ratio obtained from the lines in Fig. 3
+  read_from: pdf:kems-088-ichise-1975
+- observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=39742dcd109b
+  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: S_wt_pct, ln_IFe_over_IS2_1550C, ln_IFe_over_IS2_1600C,
+      ln_IFe_over_IS2_1650C, tangent_of_line_times_1e3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Values from LS lines through Fig. 3 points.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-088-ichise-1975
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Ion intensity ratio obtained from the lines in Fig. 3
+  read_from: pdf:kems-088-ichise-1975
+- observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=5cf5e8b0c795
+  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: S_wt_pct, ln_IFe_over_IS2_1550C, ln_IFe_over_IS2_1600C,
+      ln_IFe_over_IS2_1650C, tangent_of_line_times_1e3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Values from LS lines through Fig. 3 points.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-088-ichise-1975
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Ion intensity ratio obtained from the lines in Fig. 3
+  read_from: pdf:kems-088-ichise-1975
+- observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=896fb761cc0c
+  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: S_wt_pct, ln_IFe_over_IS2_1550C, ln_IFe_over_IS2_1600C,
+      ln_IFe_over_IS2_1650C, tangent_of_line_times_1e3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Values from LS lines through Fig. 3 points.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-088-ichise-1975
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Ion intensity ratio obtained from the lines in Fig. 3
+  read_from: pdf:kems-088-ichise-1975
+- observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=a5f781710581
+  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: S_wt_pct, ln_IFe_over_IS2_1550C, ln_IFe_over_IS2_1600C,
+      ln_IFe_over_IS2_1650C, tangent_of_line_times_1e3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Values from LS lines through Fig. 3 points.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-088-ichise-1975
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Ion intensity ratio obtained from the lines in Fig. 3
+  read_from: pdf:kems-088-ichise-1975
+- observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=f1c8b6d32a02
+  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: S_wt_pct, ln_IFe_over_IS2_1550C, ln_IFe_over_IS2_1600C,
+      ln_IFe_over_IS2_1650C, tangent_of_line_times_1e3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Values from LS lines through Fig. 3 points.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-088-ichise-1975
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Ion intensity ratio obtained from the lines in Fig. 3
+  read_from: pdf:kems-088-ichise-1975
+- observation_id: kems-088-ichise-1975::ichise_1975_ion_ratio_table2::points:h=f4d5b6ef7756
+  experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: S
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-S' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1923.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: S_wt_pct, ln_IFe_over_IS2_1550C, ln_IFe_over_IS2_1600C,
+      ln_IFe_over_IS2_1650C, tangent_of_line_times_1e3'
     approximate: false
   uncertainty:
     kind: printed

@@ -429,7 +429,7 @@ observations:
     table: '2'
     note: Table 2 second-law Delta-H_298 of pure Ag, In, Ga
   read_from: pdf:kems-127-qi-1989
-- observation_id: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits
+- observation_id: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits::rows:h=17c07e6a1a02
   experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
   identity:
     quantity:
@@ -454,8 +454,7 @@ observations:
       reason: qualifier linear_fit does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_current_ratio_linear_fit'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -477,7 +476,289 @@ observations:
     table: '3'
     note: Table 3 log(I_In/I_Ag)=A+B T^-1 10^4 for Ag-In
   read_from: pdf:kems-127-qi-1989
-- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+- observation_id: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits::rows:h=289de5a76c21
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 log(I_In/I_Ag)=A+B T^-1 10^4 for Ag-In
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits::rows:h=95b7eb097e91
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 log(I_In/I_Ag)=A+B T^-1 10^4 for Ag-In
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits::rows:h=a295a7f56b78
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 log(I_In/I_Ag)=A+B T^-1 10^4 for Ag-In
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits::rows:h=bea96844e4e0
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 log(I_In/I_Ag)=A+B T^-1 10^4 for Ag-In
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits::rows:h=d54c79b5af35
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 log(I_In/I_Ag)=A+B T^-1 10^4 for Ag-In
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits::rows:h=fc8ebc2f671e
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 log(I_In/I_Ag)=A+B T^-1 10^4 for Ag-In
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=1050e9ef80ab
   experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
   identity:
     quantity:
@@ -502,8 +783,430 @@ observations:
       reason: qualifier linear_fit does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_current_ratio_linear_fit'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=4a9d3fbf7e40
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=53bc453cee33
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=637ff2055364
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=8ec4037d09b6
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=bc89b303cd72
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=c770d46f5337
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=c9b369f35a0f
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=df12479a76b9
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: least-squares A,B; ion-ratio reproducibility 1%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-127-qi-1989
+  locator:
+    published_page: 578
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 log(I_Ga/I_Ag)=A+B T^-1 10^4 for Ag-Ga
+  read_from: pdf:kems-127-qi-1989
+- observation_id: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits::rows:h=f44af8bff71f
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_linear_fit'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 1400.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier linear_fit does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

@@ -243,7 +243,7 @@ observations:
         pdf_page_index: 3
         section: 1. The Fe-P-Si System
         note: Same ion-ratio data recomputed with Fruehan a_Fe instead of Chipman a_Fe
-- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=2e093e5e18da
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -267,8 +267,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: value
-      value: '1873'
+      tag: unknown
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -307,9 +307,872 @@ observations:
       reason: profile interaction_parameter does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, T_C_as_printed,
-      T_K, T_K_conversion, composition, composition_basis, epsilon_P_Si, epsilon_P_Al, epsilon_P_Ti, epsilon_P_V, epsilon_P_Cr,
-      epsilon_P_Co, epsilon_P_Ni, epsilon_P_Nb, epsilon_P_Mo, rows, e_column_note, al_body_text_disagreement'
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      epsilon_P_Al: '0.7'
+      epsilon_P_Ti: '2'
+      epsilon_P_V: '0.7'
+      epsilon_P_Cr: '0.7'
+      epsilon_P_Co: '0.7'
+      epsilon_P_Ni: '0.7'
+      epsilon_P_Nb: '1.2'
+      epsilon_P_Mo: '0.7'
+      as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5, both adopted as ±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the mole-fraction
+      interaction coefficient; e is the wt% coefficient as printed.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
+          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=3a2f6f3b2dd2
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      epsilon_P_Al: '0.7'
+      epsilon_P_Ti: '2'
+      epsilon_P_V: '0.7'
+      epsilon_P_Cr: '0.7'
+      epsilon_P_Co: '0.7'
+      epsilon_P_Ni: '0.7'
+      epsilon_P_Nb: '1.2'
+      epsilon_P_Mo: '0.7'
+      as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5, both adopted as ±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the mole-fraction
+      interaction coefficient; e is the wt% coefficient as printed.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
+          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=42ffdd4b4865
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      epsilon_P_Al: '0.7'
+      epsilon_P_Ti: '2'
+      epsilon_P_V: '0.7'
+      epsilon_P_Cr: '0.7'
+      epsilon_P_Co: '0.7'
+      epsilon_P_Ni: '0.7'
+      epsilon_P_Nb: '1.2'
+      epsilon_P_Mo: '0.7'
+      as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5, both adopted as ±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the mole-fraction
+      interaction coefficient; e is the wt% coefficient as printed.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
+          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=4ea4788da2bc
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      epsilon_P_Al: '0.7'
+      epsilon_P_Ti: '2'
+      epsilon_P_V: '0.7'
+      epsilon_P_Cr: '0.7'
+      epsilon_P_Co: '0.7'
+      epsilon_P_Ni: '0.7'
+      epsilon_P_Nb: '1.2'
+      epsilon_P_Mo: '0.7'
+      as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5, both adopted as ±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the mole-fraction
+      interaction coefficient; e is the wt% coefficient as printed.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
+          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=79dedb27c3c5
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      epsilon_P_Al: '0.7'
+      epsilon_P_Ti: '2'
+      epsilon_P_V: '0.7'
+      epsilon_P_Cr: '0.7'
+      epsilon_P_Co: '0.7'
+      epsilon_P_Ni: '0.7'
+      epsilon_P_Nb: '1.2'
+      epsilon_P_Mo: '0.7'
+      as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5, both adopted as ±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the mole-fraction
+      interaction coefficient; e is the wt% coefficient as printed.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
+          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=87d39fc22b83
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      epsilon_P_Al: '0.7'
+      epsilon_P_Ti: '2'
+      epsilon_P_V: '0.7'
+      epsilon_P_Cr: '0.7'
+      epsilon_P_Co: '0.7'
+      epsilon_P_Ni: '0.7'
+      epsilon_P_Nb: '1.2'
+      epsilon_P_Mo: '0.7'
+      as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5, both adopted as ±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the mole-fraction
+      interaction coefficient; e is the wt% coefficient as printed.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
+          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=a5281233be84
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      epsilon_P_Al: '0.7'
+      epsilon_P_Ti: '2'
+      epsilon_P_V: '0.7'
+      epsilon_P_Cr: '0.7'
+      epsilon_P_Co: '0.7'
+      epsilon_P_Ni: '0.7'
+      epsilon_P_Nb: '1.2'
+      epsilon_P_Mo: '0.7'
+      as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5, both adopted as ±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the mole-fraction
+      interaction coefficient; e is the wt% coefficient as printed.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
+          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=ac122eb9df56
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      epsilon_P_Al: '0.7'
+      epsilon_P_Ti: '2'
+      epsilon_P_V: '0.7'
+      epsilon_P_Cr: '0.7'
+      epsilon_P_Co: '0.7'
+      epsilon_P_Ni: '0.7'
+      epsilon_P_Nb: '1.2'
+      epsilon_P_Mo: '0.7'
+      as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5, both adopted as ±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the mole-fraction
+      interaction coefficient; e is the wt% coefficient as printed.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
+          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C::rows:h=d946c6e9264f
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      epsilon_uncertainty, e_P_i, method_class, references_as_printed, a_Fe_source'
     approximate: false
   uncertainty:
     kind: printed
@@ -735,7 +1598,7 @@ observations:
         pdf_page_index: 1
         section: II. Experimental / III. Calculations
         note: Apparatus referred to previous papers; ions, T, cell materials and ln K / epsilon_P^P calibration from pp. 51-52.
-- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=0852205bcdc6
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -757,7 +1620,7 @@ observations:
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_purity'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -779,7 +1642,403 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
-- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=1f851d2c4ade
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_purity'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=2e0ce165506f
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_purity'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=4838092db17b
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_purity'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=4d76f844771d
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_purity'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=5f0535da911b
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_purity'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=6f2faf4ccc22
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_purity'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=85e721620149
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_purity'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=ae7b0ae6a7c9
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_purity'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=d7942cbd3fb2
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_purity'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=0d2dda43da54
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
     quantity:
@@ -843,8 +2102,443 @@ observations:
       reason: profile interaction_parameter does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: quantity, method_class, T_C_header_as_printed,
-      rows'
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted Table 2 rows print no ± except this-work rows; none invented
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 comparison rows that are not Present work
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=5092ac3a8fd2
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted Table 2 rows print no ± except this-work rows; none invented
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 comparison rows that are not Present work
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=5853aa774969
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted Table 2 rows print no ± except this-work rows; none invented
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 comparison rows that are not Present work
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=6af031ac0e4e
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted Table 2 rows print no ± except this-work rows; none invented
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 comparison rows that are not Present work
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=8ed286fcfb4f
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted Table 2 rows print no ± except this-work rows; none invented
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 comparison rows that are not Present work
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=feff7bd123f9
+  experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
+  identity:
+    quantity:
+      tag: value
+      value: interaction_parameter
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped interaction_parameter field selected; source fields: solute, epsilon_P_i, epsilon_P_i_as_printed,
+      e_P_i, quoted_from, T_C_as_printed, T_note, method_class'
     approximate: false
   uncertainty:
     kind: printed

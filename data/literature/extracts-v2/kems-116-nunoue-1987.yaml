@@ -444,7 +444,7 @@ observations:
     pdf_page_index: 2
     table: '1'
   read_from: pdf:kems-116-nunoue-1987
-- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1511.0:h=e8577ac383bc
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
@@ -462,12 +462,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1511.0, 1764.0]; no midpoint invented
+      tag: value
+      value: '1511'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'miscibility_gap_temperature'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -489,7 +488,611 @@ observations:
     table: '2'
     note: Table 2. Miscibility gap in Fe-Sn system.
   read_from: pdf:kems-116-nunoue-1987
-- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1511'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1516.0:h=ce7ba418cdbf
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1516'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1516'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1533.0:h=f2019a6768a5
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1533'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1533'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1560.0:h=2163e3af3522
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1560'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1560'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1651.0:h=7102fb70c4dd
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1651'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1651'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1655.0:h=e5a82ba2efac
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1655'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1655'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1658.0:h=b6be0fd42076
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1658'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1658'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1685.0:h=cd1e7b027fcf
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1685'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1685'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1704.0:h=a0b399b32665
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1704'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1704'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1731.0:h=f70225e307dd
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1731'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1731'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1742.0:h=6f6ab8094240
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1742'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1742'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1764.0:h=52faafc0cfe4
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'miscibility_gap_temperature'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1764'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 872
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2. Miscibility gap in Fe-Sn system.
+  read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1764'
+      locator:
+        published_page: 872
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2. Miscibility gap in Fe-Sn system.
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=0a1f4acfd061
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
@@ -514,8 +1117,806 @@ observations:
       reason: qualifier and_raoultian_gamma does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_raoultian_gamma'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=13ffca40b595
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=1d6c03b545f6
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=1e73a0d3a575
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=28f4cde8d9fe
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=380162065ba5
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=533da468af76
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=58c57830b084
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=5924377d4267
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=5d214a92b3bf
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=713fe60db9d4
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=864e0af638aa
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=8f65a097fb9e
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=c8654b9f2ae3
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=cf60314829c5
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=e83d58f19143
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=ec6ebcc388e4
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-116-nunoue-1987
+  locator:
+    published_page: 873
+    pdf_page_index: 6
+    table: '3'
+    note: Table 3. Activities and activity coefficients for Fe-Sn alloys.
+  read_from: pdf:kems-116-nunoue-1987
+- observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=f75d5e4b5d3f
+  experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

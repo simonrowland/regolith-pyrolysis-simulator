@@ -618,7 +618,7 @@ observations:
         published_page: 552
         pdf_page_index: 1
         paragraph: Mo has very low vapor pressure, about 3×10^{-10} atm even at 2000 K
-- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=0b915694fe76
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
     quantity:
@@ -682,8 +682,7 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, lambda_definition,
-      T_Ag_K_rows_1_to_5, T_Ag_K_rows_6_to_16, lambda_bar_note, rows'
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
     approximate: false
   uncertainty:
     kind: printed
@@ -705,7 +704,1297 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=15e7ca45ad79
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=2bd42fc2072f
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=4a3ca738d713
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=61b24c836f3b
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=66a48e1388ad
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=684310f7e4dc
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=75c3e4a3badb
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=75ef3a2396b9
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=766e174dab72
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=892653fc1b69
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=d74913a84e78
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=dde737a1c934
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=ed963f66158d
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=edf168336178
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=f0e43f12761f
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: no, lambda, lambda_bar, used_in'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  read_from: pdf:kems-111-ichise-1982
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=0aa5d604c392
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -769,8 +2058,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      low_Mo_method, high_Mo_method, rows'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
     approximate: false
   uncertainty:
     kind: printed
@@ -803,7 +2091,2142 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table3_phase_boundaries
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=0b1612f96bce
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, a_Fe_as_printed, phases, excluded,
+      exclusion_as_printed'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=144ccc724209
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=151666fae982
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=16677f13bbd8
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=3a82bf182de8
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=49bda492c142
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=4a20038171ab
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=5077fd117e43
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=715db22ad529
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=90124989a607
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=93d287958fee
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=9c4c7e5ebe9d
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=a105c5cc52b0
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=a86848ce17ba
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=b5bb1839d1a0
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=b8d19f4a9d72
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=cf55d502e490
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=db77e6b50fee
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=eef76986c57e
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=f4dc03963140
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=f69b389909e1
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=f932b88a472c
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1823'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase extrapolation; a_Fe=0.551±0.008
+        (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2. Result of activity measurements at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table3_phase_boundaries::rows:h=c62f63e16472
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-phase-boundary-series
   identity:
     quantity:
@@ -825,8 +4248,7 @@ observations:
       value: '1823'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'phase_boundary_composition'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -858,7 +4280,61 @@ observations:
         pdf_page_index: 5
         table: '3'
         note: Table 3. The composition of coexisting phases in the Fe-Mo system at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K
+- observation_id: kems-111-ichise-1982::ichise_1982_table3_phase_boundaries::rows:h=cdfdc1e8caad
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-phase-boundary-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 3 compositions
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 556
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3. The composition of coexisting phases in the Fe-Mo system at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 556
+        pdf_page_index: 5
+        table: '3'
+        note: Table 3. The composition of coexisting phases in the Fe-Mo system at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=160d6dfa656d
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -883,8 +4359,597 @@ observations:
       reason: qualifier and_partial_molar_gibbs does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_partial_molar_gibbs'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=35959eddf993
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=3fa8ffae20cd
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=509f425f66c4
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=6e219ca198ef
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=9415d410a751
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=96600fd53b4a
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=b1463ecc34c6
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=b686ffddf4ee
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=f462c1abad7d
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is +0.26/-0.21; conclusion
+        p.558 prints +0.32/-0.26. Both retained.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-111-ichise-1982
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 557
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+- observation_id: kems-111-ichise-1982::ichise_1982_table4_partial_molar_1823K::rows:h=f610af10bd29
+  experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_partial_molar_gibbs'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_partial_molar_gibbs does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

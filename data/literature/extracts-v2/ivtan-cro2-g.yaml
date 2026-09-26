@@ -154,7 +154,7 @@ observations:
     note: '[82ГУР/ВЕЙ] competing DfH° quoted on this page; not adopted here'
     source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
   read_from: pdf:ivtan-cro2-g
-- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=100.0:h=21ad08ef02bf
   experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
   identity:
     quantity:
@@ -172,12 +172,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [100.0, 6000.0]; no midpoint invented
+      tag: value
+      value: '100'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'tabulated_thermo_functions'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -213,3 +212,4398 @@ observations:
     source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
     record: CrO2(g)
   read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '100'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1000.0:h=1cca17cb64a5
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1100.0:h=d90a2c32de2d
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1100'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1200.0:h=c50d533b484b
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1200'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1300.0:h=307e551ee7c0
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1300'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1400.0:h=90b59e015f76
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1400'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1500.0:h=74d017a76f88
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1600.0:h=006fe10e2fd9
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1600'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1700.0:h=82e4f6f37484
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1700'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1800.0:h=c6504e0c7dcb
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1800'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=1900.0:h=5dd2886354f8
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1900'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=200.0:h=84be8454fd2f
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '200'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '200'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2000.0:h=17820728d991
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2100.0:h=7f87e3c25d2a
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2100'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2200.0:h=30180fe32c75
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2200'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2300.0:h=36d2e70061f0
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2300'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2400.0:h=ca94f9351533
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2400'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2400'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2500.0:h=9451806d1276
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2600.0:h=9cbd4dd54421
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2600'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2600'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2700.0:h=969ad5bbad0e
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2700'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2700'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2800.0:h=6e4a4ee08bdc
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2800'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2800'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=2900.0:h=6a8e46d9e357
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2900'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2900'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=298.15:h=876cb5b80442
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=300.0:h=6922ac6ec52c
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '300'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3000.0:h=ad976d7653c2
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3000'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3100.0:h=a990eb60a205
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3100'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3100'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3200.0:h=74a4e5a85701
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3200'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3200'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3300.0:h=358fa989ac7b
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3300'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3300'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3400.0:h=370094373db0
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3400'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3400'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3500.0:h=d4c460510ed4
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3500'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3600.0:h=362b48e9700a
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3600'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3600'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3700.0:h=8f1c4a6b601f
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3700'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3700'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3800.0:h=c5d53204f584
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3800'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3800'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=3900.0:h=d36eb6eb7f0c
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3900'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3900'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=400.0:h=ecbab2a0afdf
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '400'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '400'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4000.0:h=1da4e6c4b153
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4000'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4100.0:h=2dba35e1d44e
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4100'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4100'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4200.0:h=1671d2b0437d
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4200'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4200'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4300.0:h=c897ba5521c4
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4300'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4300'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4400.0:h=2585143400be
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4400'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4400'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4500.0:h=11e3e293d345
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4500'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4600.0:h=0a734848a94c
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4600'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4600'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4700.0:h=314e48335bf9
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4700'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4700'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4800.0:h=c115918c5961
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4800'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4800'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=4900.0:h=893e29b2f4f1
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '4900'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '4900'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=500.0:h=819d9be97f39
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '500'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5000.0:h=6c23ccc37951
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5000'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5100.0:h=a18af0ff5d8e
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5100'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5100'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5200.0:h=85b236386024
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5200'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5200'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5300.0:h=38d906662450
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5300'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5300'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5400.0:h=ca713c364cc0
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5400'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5400'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5500.0:h=4cee1c97899e
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5500'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5600.0:h=f5cfc0c8ac5e
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5600'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5600'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5700.0:h=8d779f1da18a
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5700'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5700'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5800.0:h=743cd1ac0a4d
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5800'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5800'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=5900.0:h=40ee17625278
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '5900'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '5900'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=600.0:h=a927a8811ecd
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '600'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '600'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=6000.0:h=43eb57e3947d
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '6000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '6000'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=700.0:h=b2572503be1e
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '700'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '700'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=800.0:h=f57d504f0037
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '800'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '800'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions::T=900.0:h=39c6c24b8180
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::ivtan-cro2-g
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'tabulated_thermo_functions'
+    species:
+      formula: CrO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '900'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '900'
+      locator:
+        page: 3
+        pdf_page_index: 3
+        table: '877'
+        note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model)
+          thermodynamic functions, not a measured Psat series.
+
+          '
+        source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+        record: CrO2(g)

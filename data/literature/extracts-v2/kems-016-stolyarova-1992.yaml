@@ -172,7 +172,7 @@ observations:
     line_range: 7-23
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
-- observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1833.0:h=d41ed48ee96c
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
     quantity:
@@ -190,12 +190,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1833.0, 1933.0]; no midpoint invented
+      tag: value
+      value: '1833'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'minus_delta_G_melt_experimental_HTMS'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -217,6 +216,298 @@ observations:
     note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: PDF p. 2 / printed p. 186
+        table: '1'
+        paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+        line_range: 27-45
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=61a64b46c47a
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minus_delta_G_melt_experimental_HTMS'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt_CAS_CMAS_FCMAS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1933'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    page: PDF p. 2 / printed p. 186
+    table: '1'
+    paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+    line_range: 27-45
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: PDF p. 2 / printed p. 186
+        table: '1'
+        paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+        line_range: 27-45
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=7f88e018bbe5
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minus_delta_G_melt_experimental_HTMS'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt_CAS_CMAS_FCMAS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1933'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    page: PDF p. 2 / printed p. 186
+    table: '1'
+    paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+    line_range: 27-45
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: PDF p. 2 / printed p. 186
+        table: '1'
+        paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+        line_range: 27-45
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=bc1e0240dd2b
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minus_delta_G_melt_experimental_HTMS'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt_CAS_CMAS_FCMAS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1933'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    page: PDF p. 2 / printed p. 186
+    table: '1'
+    paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+    line_range: 27-45
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: PDF p. 2 / printed p. 186
+        table: '1'
+        paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+        line_range: 27-45
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=ce7729cbc444
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minus_delta_G_melt_experimental_HTMS'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt_CAS_CMAS_FCMAS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1933'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    page: PDF p. 2 / printed p. 186
+    table: '1'
+    paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+    line_range: 27-45
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: PDF p. 2 / printed p. 186
+        table: '1'
+        paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+        line_range: 27-45
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_gibbs_cas_and_fcm_table1::T=1933.0:h=cf8f46ee9671
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minus_delta_G_melt_experimental_HTMS'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'multicomponent_silicate_melt_CAS_CMAS_FCMAS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1933'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    page: PDF p. 2 / printed p. 186
+    table: '1'
+    paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+    line_range: 27-45
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: PDF p. 2 / printed p. 186
+        table: '1'
+        paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+        line_range: 27-45
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_k2o_in_nks_gibbs_table3
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -301,7 +592,7 @@ observations:
     line_range: 7-23
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
-- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=34e7e4733843
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
     quantity:
@@ -323,7 +614,7 @@ observations:
       reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'chemical_potential_Na2O'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -343,7 +634,175 @@ observations:
     line_range: 65-75
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
-- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=7799edb641d6
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chemical_potential_Na2O'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_B2O3_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    table: '4'
+    paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+    line_range: 65-75
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=913eed662581
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chemical_potential_Na2O'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_B2O3_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    table: '4'
+    paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+    line_range: 65-75
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=94357813a9c8
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chemical_potential_Na2O'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_B2O3_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    table: '4'
+    paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+    line_range: 65-75
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=d10f059ef489
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'chemical_potential_Na2O'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_B2O3_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    table: '4'
+    paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+    line_range: 65-75
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=4b24ac670246
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
     quantity:
@@ -365,7 +824,175 @@ observations:
       reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'minus_delta_G_NKS_melts'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    table: '3'
+    paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+    line_range: 61-70
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=6bb241e026b0
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minus_delta_G_NKS_melts'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_K2O_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    table: '3'
+    paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+    line_range: 61-70
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=7a9a22ce5e1f
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minus_delta_G_NKS_melts'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_K2O_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    table: '3'
+    paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+    line_range: 61-70
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=a3d16fd06d21
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minus_delta_G_NKS_melts'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_K2O_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'kems_effusion'
+    original_method_class: kems_effusion
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-016-stolyarova-1992
+  locator:
+    table: '3'
+    paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+    line_range: 61-70
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  read_from: unknown:kems-016-stolyarova-1992
+- observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=ac35f888d84f
+  experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'minus_delta_G_NKS_melts'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_Na2O_K2O_SiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none

@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/jsc-lunar-catalog-12023.yaml
 observations:
-- observation_id: jsc-lunar-catalog-12023::jsc_12023_carbon_nitrogen_compilation
+- observation_id: jsc-lunar-catalog-12023::jsc_12023_carbon_nitrogen_compilation::rows:row=12023:h=3f4f5545363e
   experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
   identity:
     quantity:
@@ -21,8 +21,167 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'carbon_and_nitrogen_abundance'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed; differing attributed values are retained and not reconciled.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jsc-lunar-catalog-12023
+  locator:
+    pdf_page_index: 3
+    paragraph: reported carbon and nitrogen abundances
+    section: Chemistry
+  read_from: unknown:jsc-lunar-catalog-12023
+- observation_id: jsc-lunar-catalog-12023::jsc_12023_carbon_nitrogen_compilation::rows:row=12023:h=5a454b18e55c
+  experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'carbon_and_nitrogen_abundance'
+    species:
+      formula: '12023'
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_trench_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed; differing attributed values are retained and not reconciled.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jsc-lunar-catalog-12023
+  locator:
+    pdf_page_index: 3
+    paragraph: reported carbon and nitrogen abundances
+    section: Chemistry
+  read_from: unknown:jsc-lunar-catalog-12023
+- observation_id: jsc-lunar-catalog-12023::jsc_12023_carbon_nitrogen_compilation::rows:row=12023:h=63fc06764f7b
+  experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'carbon_and_nitrogen_abundance'
+    species:
+      formula: '12023'
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_trench_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed; differing attributed values are retained and not reconciled.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jsc-lunar-catalog-12023
+  locator:
+    pdf_page_index: 3
+    paragraph: reported carbon and nitrogen abundances
+    section: Chemistry
+  read_from: unknown:jsc-lunar-catalog-12023
+- observation_id: jsc-lunar-catalog-12023::jsc_12023_carbon_nitrogen_compilation::rows:row=12023:h=d70adb77b9a4
+  experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'carbon_and_nitrogen_abundance'
+    species:
+      formula: '12023'
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_trench_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainties printed; differing attributed values are retained and not reconciled.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jsc-lunar-catalog-12023
+  locator:
+    pdf_page_index: 3
+    paragraph: reported carbon and nitrogen abundances
+    section: Chemistry
+  read_from: unknown:jsc-lunar-catalog-12023
+- observation_id: jsc-lunar-catalog-12023::jsc_12023_carbon_nitrogen_compilation::rows:row=12024:h=f9924a208fbd
+  experiment_id: 4016c5a2e0eaba6076e6c9ae49f0f76a91e3c3c1bfa7186638b09aac0719e8cc::jsc-lunar-catalog-12023
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'carbon_and_nitrogen_abundance'
+    species:
+      formula: '12023'
+      phase:
+        tag: unknown
+        reason: phase string 'Apollo_12_lunar_trench_soil' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

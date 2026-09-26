@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/kems-097-ikeda-1978.yaml
 observations:
-- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1::T=2248.0:h=3bd51e102889
   experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
   identity:
     quantity:
@@ -20,12 +20,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2248.0, 2433.0]; no midpoint invented
+      tag: value
+      value: '2248'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'third_law_reaction_enthalpy_298K'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -49,6 +48,464 @@ observations:
     table: '1'
     note: Third-law reaction enthalpy for reaction (1)
   read_from: pdf:kems-097-ikeda-1978
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2248'
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        table: '1'
+        note: Third-law reaction enthalpy for reaction (1)
+- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1::T=2283.0:h=c105d368dccf
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'third_law_reaction_enthalpy_298K'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2283'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_H_298_kcal_mol: '10'
+      as_printed: 732.9 +/- 10 Kcal/mole
+      note: authors average +/- 10 Kcal/mole for reaction (1)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-097-ikeda-1978
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    table: '1'
+    note: Third-law reaction enthalpy for reaction (1)
+  read_from: pdf:kems-097-ikeda-1978
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2283'
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        table: '1'
+        note: Third-law reaction enthalpy for reaction (1)
+- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1::T=2313.0:h=d4afbb4d69c3
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'third_law_reaction_enthalpy_298K'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2313'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_H_298_kcal_mol: '10'
+      as_printed: 732.9 +/- 10 Kcal/mole
+      note: authors average +/- 10 Kcal/mole for reaction (1)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-097-ikeda-1978
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    table: '1'
+    note: Third-law reaction enthalpy for reaction (1)
+  read_from: pdf:kems-097-ikeda-1978
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2313'
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        table: '1'
+        note: Third-law reaction enthalpy for reaction (1)
+- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1::T=2333.0:h=466c48249dc0
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'third_law_reaction_enthalpy_298K'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2333'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_H_298_kcal_mol: '10'
+      as_printed: 732.9 +/- 10 Kcal/mole
+      note: authors average +/- 10 Kcal/mole for reaction (1)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-097-ikeda-1978
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    table: '1'
+    note: Third-law reaction enthalpy for reaction (1)
+  read_from: pdf:kems-097-ikeda-1978
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2333'
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        table: '1'
+        note: Third-law reaction enthalpy for reaction (1)
+- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1::T=2363.0:h=3907b21bd430
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'third_law_reaction_enthalpy_298K'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2363'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_H_298_kcal_mol: '10'
+      as_printed: 732.9 +/- 10 Kcal/mole
+      note: authors average +/- 10 Kcal/mole for reaction (1)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-097-ikeda-1978
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    table: '1'
+    note: Third-law reaction enthalpy for reaction (1)
+  read_from: pdf:kems-097-ikeda-1978
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2363'
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        table: '1'
+        note: Third-law reaction enthalpy for reaction (1)
+- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1::T=2388.0:h=bd6582d6db1d
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'third_law_reaction_enthalpy_298K'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2388'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_H_298_kcal_mol: '10'
+      as_printed: 732.9 +/- 10 Kcal/mole
+      note: authors average +/- 10 Kcal/mole for reaction (1)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-097-ikeda-1978
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    table: '1'
+    note: Third-law reaction enthalpy for reaction (1)
+  read_from: pdf:kems-097-ikeda-1978
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2388'
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        table: '1'
+        note: Third-law reaction enthalpy for reaction (1)
+- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1::T=2413.0:h=473d7d9a26ae
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'third_law_reaction_enthalpy_298K'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2413'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_H_298_kcal_mol: '10'
+      as_printed: 732.9 +/- 10 Kcal/mole
+      note: authors average +/- 10 Kcal/mole for reaction (1)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-097-ikeda-1978
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    table: '1'
+    note: Third-law reaction enthalpy for reaction (1)
+  read_from: pdf:kems-097-ikeda-1978
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2413'
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        table: '1'
+        note: Third-law reaction enthalpy for reaction (1)
+- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1::T=2413.0:h=f173e63adee7
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'third_law_reaction_enthalpy_298K'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2413'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_H_298_kcal_mol: '10'
+      as_printed: 732.9 +/- 10 Kcal/mole
+      note: authors average +/- 10 Kcal/mole for reaction (1)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-097-ikeda-1978
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    table: '1'
+    note: Third-law reaction enthalpy for reaction (1)
+  read_from: pdf:kems-097-ikeda-1978
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2413'
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        table: '1'
+        note: Third-law reaction enthalpy for reaction (1)
+- observation_id: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1::T=2433.0:h=9c80bbdbf7ac
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'third_law_reaction_enthalpy_298K'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2433'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_H_298_kcal_mol: '10'
+      as_printed: 732.9 +/- 10 Kcal/mole
+      note: authors average +/- 10 Kcal/mole for reaction (1)
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: derived_third_law_from_measured_kems_and_janaf_fef
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-097-ikeda-1978
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    table: '1'
+    note: Third-law reaction enthalpy for reaction (1)
+  read_from: pdf:kems-097-ikeda-1978
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2433'
+      locator:
+        published_page: 167
+        pdf_page_index: 9
+        table: '1'
+        note: Third-law reaction enthalpy for reaction (1)
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al2o_psat_figs3to6_figure_only
   experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
   identity:

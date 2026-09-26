@@ -94,7 +94,7 @@ observations:
     table: '1'
     note: Earlier published Mg deoxidation parameters compiled for comparison; these are not measurements made in this paper.
   read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
-- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=10:h=25577a1ba26f
   experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
   identity:
     quantity:
@@ -112,12 +112,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 2023.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'dissolved_Mg_and_O_concentration'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -137,7 +136,1959 @@ observations:
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
-    pdf_page_index: 3
     table: '2'
-    note: Experimental data list concerning Mg deoxidation equilibrium at 1873 K and 2023 K.
+    note: row=10
   read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=10
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=11:h=39e4f430c159
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=11
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=11
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=12:h=248f0fb587bc
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=12
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=12
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=13:h=b3aa0b599cec
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=13
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=13
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=14:h=08d16a08ecd7
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=14
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=14
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=15:h=9943f080c77f
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=15
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=15
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=16:h=d149994c1764
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=16
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=16
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=17:h=d9e4be45dca2
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=17
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=17
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=18:h=e022c4d147e3
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=18
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=18
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=19:h=f38ca5c0ba74
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=19
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=19
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=1:h=fc79e0fda654
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=1
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=1
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=20:h=149127017753
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=20
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=20
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=21:h=7bb9f8c38cf2
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=21
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=21
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=22:h=2cc1e816554d
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=22
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=22
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=23:h=8187a8106a66
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=23
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=23
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=24:h=1b62af315c0e
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=24
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=24
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=25:h=6f9a3d033eb8
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=25
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=25
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=26:h=c08370de53d3
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=26
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=26
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=27:h=fc6d32afff41
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=27
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=27
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=28:h=0738c11d6974
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=28
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=28
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=2:h=87973b8cc3e8
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=2
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=2
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=3:h=94bcce59adeb
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=3
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=3
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=4:h=ae0a99592330
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=4
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=4
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=5:h=99355f179223
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=5
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=5
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=6:h=838a7491f5a7
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=6
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=6
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=7:h=93be1589fc93
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=7
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=7
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=8:h=d5e0b2fa468b
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=8
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=8
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=1873:row=9:h=5e57eb35dd79
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=9
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=9
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=2023:row=29:h=50781f44ac60
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2023'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=29
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=29
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=2023:row=30:h=279dbfb6bc8b
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2023'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=30
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=30
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=2023:row=31:h=3c8c17890fa8
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2023'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=31
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=31
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=2023:row=32:h=dae49d8841cd
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2023'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=32
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=32
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=2023:row=33:h=7276bc3f6ad2
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2023'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=33
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=33
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=2023:row=34:h=a9e99a9b9ed5
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2023'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=34
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=34
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=2023:row=35:h=0ab96ecd4708
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2023'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=35
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=35
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=2023:row=36:h=54049a680ba3
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2023'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=36
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=36
+- observation_id: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations::T=2023:row=37:h=5603f3558f9a
+  experiment_id: 10.2355/tetsutohagane1955.83.10_623::itoh-hino-banya-1997-mg-deoxidation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dissolved_Mg_and_O_concentration'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_iron' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2023'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for Table 2 concentration cells. The authors state samples from two minutes
+        after temperature stabilization were treated as equilibrated; Mg continues to evaporate while O remains approximately
+        constant at fixed Mg concentration.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: itoh-hino-banya-1997-mg-deoxidation
+  locator:
+    published_page: 625
+    table: '2'
+    note: row=37
+  read_from: unknown:itoh-hino-banya-1997-mg-deoxidation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2023'
+      locator:
+        published_page: 625
+        table: '2'
+        note: row=37

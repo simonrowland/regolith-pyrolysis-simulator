@@ -89,14 +89,14 @@ observations:
       of Ca and Al
     note: Vestnik NZ6104 3-page PDF, page 2
   read_from: pdf:kems-029-yakovlev-shornikov-2011
-- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2293.15:row=murchison:h=c45cf192f6ac
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:
     quantity:
       tag: value
       value: p_partial
     species:
-      formula: O2
+      formula: Murchison
       phase:
         tag: unknown
         reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
@@ -113,8 +113,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2293.15, 2621.15]; no midpoint invented
+      tag: value
+      value: '2293.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -152,30 +152,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '2293.15'
-      - '0.00019'
-    - - '2345.15'
-      - '0.00021'
-    - - '2403.15'
-      - '0.0002'
-    - - '2403.15'
-      - '0.0027'
-    - - '2403.15'
-      - '0.045'
-    - - '2453.15'
-      - '0.00063'
-    - - '2478.15'
-      - '0.00048'
-    - - '2478.15'
-      - '0.037'
-    - - '2540.15'
-      - '0.0073'
-    - - '2540.15'
-      - '0.0055'
-    - - '2621.15'
-      - '0.025'
+    kind: point
+    point: '0.00019'
     approximate: false
   uncertainty:
     kind: printed
@@ -201,6 +179,1555 @@ observations:
     table: O2
     note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
   read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2293.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2020'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000019'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2345.15:row=murchison:h=74922dcecaad
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Murchison
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2345.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00021'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2345.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2072'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000021'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2403.15:row=efremovka_type_a:h=b03ef1c4e602
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Efremovka_type_A
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2403.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0027'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2403.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2130'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000027'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2403.15:row=efremovka_type_b:h=2f16e158839d
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Efremovka_type_B
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2403.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.045'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2403.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2130'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000045'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2403.15:row=murchison:h=2b73eca23947
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Murchison
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2403.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0002'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2403.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2130'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000002'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2453.15:row=efremovka_type_a:h=3b806b1f50ca
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Efremovka_type_A
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2453.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00063'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2453.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2180'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000063'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2478.15:row=efremovka_type_a:h=ee9f05acf330
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Efremovka_type_A
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2478.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00048'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2478.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2205'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000048'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2478.15:row=efremovka_type_b:h=077344f03ec6
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Efremovka_type_B
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2478.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.037'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2478.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2205'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000037'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2540.15:row=efremovka_type_a:h=70e13b8ab716
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Efremovka_type_A
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2540.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0073'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2540.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2267'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000073'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2540.15:row=efremovka_type_b:h=3a17d5dcdbca
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Efremovka_type_B
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2540.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0055'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2540.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2267'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000055'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
+- observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_Po2_table_bar_calculated::T=2621.15:row=efremovka_type_a:h=d3fbee262c81
+  experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Efremovka_type_A
+      phase:
+        tag: unknown
+        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2621.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.025'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Calculated p(O2); no numeric uncertainty printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization process proceeded
+      at comparatively high oxygen pressure which was in 10 and 100 times higher then oxygen pressure condition at the Murchison
+      and Krymka high temperature vaporization (table).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-029-yakovlev-shornikov-2011
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+  read_from: pdf:kems-029-yakovlev-shornikov-2011
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2621.15'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        table: O2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2348'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2
+              pdf_page_index: 2
+              table: O2
+              note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+        output_unit: K
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - pdf:kems-029-yakovlev-shornikov-2011
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000025'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 2
+          pdf_page_index: 2
+          table: O2
+          note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+    output_unit: Pa
 - observation_id: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_complementary_vapor_wt_pct
   experiment_id: 10.2205/2011nz000234::experiment::meteorite-and-cai-series
   identity:

@@ -42,14 +42,14 @@ observations:
     equation: '8'
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
   read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
-- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table1_starting_compositions
+- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table1_starting_compositions::rows:row=icb-2:h=ad1af57c31a7
   experiment_id: 10.1016/j.gca.2025.01.020::rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
   identity:
     quantity:
       tag: unknown
       reason: unsupported quantity 'starting_material_composition'
     species:
-      formula: Cl
+      formula: ICB-2
       phase:
         tag: unknown
         reason: phase string 'hydrous_basalt_starting_material' is not in the closed automatic map
@@ -61,8 +61,85 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_material_composition'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+  locator:
+    published_page: 210
+    table: '1'
+    section: Experimental procedure
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+  read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table1_starting_compositions::rows:row=icb-4:h=8389fcfd3446
+  experiment_id: 10.1016/j.gca.2025.01.020::rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_material_composition'
+    species:
+      formula: ICB-4
+      phase:
+        tag: unknown
+        reason: phase string 'hydrous_basalt_starting_material' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+  locator:
+    published_page: 210
+    table: '1'
+    section: Experimental procedure
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+  read_from: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+- observation_id: rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts::rusiecka_wood_2025_table1_starting_compositions::rows:row=icb-8:h=f5c4999474fd
+  experiment_id: 10.1016/j.gca.2025.01.020::rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_material_composition'
+    species:
+      formula: ICB-8
+      phase:
+        tag: unknown
+        reason: phase string 'hydrous_basalt_starting_material' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none

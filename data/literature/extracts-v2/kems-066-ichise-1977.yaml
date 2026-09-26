@@ -2677,7 +2677,7 @@ observations:
     figure: '9'
     note: Fig. 9. Variation of ln gamma_Al^o and epsilon_Al^(Al) with temperature.
   read_from: pdf:kems-066-ichise-1977
-- observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C
+- observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C::T=1873.15:h=2722c1443c7e
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
   identity:
     quantity:
@@ -2699,8 +2699,323 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient_and_self_interaction_parameter';
-      refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted compilation; no uncertainties printed in Table 2.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 422
+    pdf_page_index: 6
+    table: '2'
+    note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 422
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C::T=1873.15:h=5c62e362eada
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient_and_self_interaction_parameter'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted compilation; no uncertainties printed in Table 2.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 422
+    pdf_page_index: 6
+    table: '2'
+    note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 422
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C::T=1873.15:h=73c479bc9547
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient_and_self_interaction_parameter'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted compilation; no uncertainties printed in Table 2.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 422
+    pdf_page_index: 6
+    table: '2'
+    note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 422
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C::T=1873.15:h=78e4f9dbd909
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient_and_self_interaction_parameter'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted compilation; no uncertainties printed in Table 2.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 422
+    pdf_page_index: 6
+    table: '2'
+    note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 422
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 422
+              pdf_page_index: 6
+              table: '2'
+              note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C::T=1873.15:h=bcaed187d243
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient_and_self_interaction_parameter'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

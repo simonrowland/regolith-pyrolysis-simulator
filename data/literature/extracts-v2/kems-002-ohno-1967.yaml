@@ -85,6 +85,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_cr_specific_evaporation_constant::point:1
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -125,6 +154,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_cr_specific_evaporation_constant::point:2
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -165,6 +223,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_cu_olette_alpha_table3
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -246,6 +333,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_cu_specific_evaporation_constant::point:1
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -286,6 +402,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_cu_specific_evaporation_constant::point:2
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -326,6 +471,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_mn_olette_alpha_table3
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -411,6 +585,38 @@ observations:
     line_range: 8157-8200
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        line_range: 8157-8200
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              line_range: 8157-8200
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              line_range: 8157-8200
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_mn_specific_evaporation_constant::point:1
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -452,6 +658,38 @@ observations:
     line_range: 8157-8200
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        line_range: 8157-8200
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              line_range: 8157-8200
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              line_range: 8157-8200
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_mn_specific_evaporation_constant::point:2
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -493,6 +731,38 @@ observations:
     line_range: 8157-8200
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        line_range: 8157-8200
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              line_range: 8157-8200
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              line_range: 8157-8200
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_s_condensation_alpha_table3
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -624,6 +894,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_s_specific_evaporation_constant::point:1
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -664,6 +963,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_s_specific_evaporation_constant::point:2
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -704,6 +1032,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_s_specific_evaporation_constant::point:3
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -744,6 +1101,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_sis_desulfurization_rate_table2::point:0
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -785,6 +1171,38 @@ observations:
     equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '2'
+        equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '2'
+              equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '2'
+              equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_sis_desulfurization_rate_table2::point:1
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -826,6 +1244,38 @@ observations:
     equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '2'
+        equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '2'
+              equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '2'
+              equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_sis_desulfurization_rate_table2::point:2
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -867,6 +1317,38 @@ observations:
     equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '2'
+        equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '2'
+              equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '2'
+              equation: log K_S^S = 0.28×[%Si] − 2.77 (1–3 %Si)
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_sn_olette_alpha_table3
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -949,6 +1431,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_sn_specific_evaporation_constant::point:1
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -989,6 +1500,35 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K
 - observation_id: kems-002-ohno-1967::ohno_1967_sn_specific_evaporation_constant::point:2
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -1029,3 +1569,32 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              table: '1'
+              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
+        output_unit: K

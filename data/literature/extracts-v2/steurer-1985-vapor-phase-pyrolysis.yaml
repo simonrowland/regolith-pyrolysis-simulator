@@ -47,7 +47,7 @@ observations:
     figure: '2'
     note: Figure 2 Partial Pressures of Dissociation Species vs. Temperature; four panels
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_al2o3_model
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_al2o3_model::T=1000.0:h=67fe04e12045
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
@@ -65,12 +65,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1500.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '1000'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'metal_yield_wt_pct_of_oxide'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -92,7 +91,228 @@ observations:
     pdf_page_index: 6
     note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_sio2_model
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_al2o3_model::T=1500.0:h=5fbf10ee3bac
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'metal_yield_wt_pct_of_oxide'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors call these tentative calculations
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_al2o3_model::T=2000.0:h=39a19c1f3d23
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'metal_yield_wt_pct_of_oxide'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors call these tentative calculations
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_al2o3_model::T=2500.0:h=b97e5ef4a91e
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'metal_yield_wt_pct_of_oxide'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors call these tentative calculations
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_al2o3_model::T=3000.0:h=7954f8861b2f
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'metal_yield_wt_pct_of_oxide'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors call these tentative calculations
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3000'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_sio2_model::T=1000.0:h=5bdaa3ef0b37
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
@@ -110,12 +330,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '1000'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'metal_yield_wt_pct_of_oxide'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -137,6 +356,227 @@ observations:
     pdf_page_index: 6
     note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_sio2_model::T=1500.0:h=c029529b686c
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'metal_yield_wt_pct_of_oxide'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors call these tentative calculations
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_sio2_model::T=2000.0:h=a04c0eda2137
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'metal_yield_wt_pct_of_oxide'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors call these tentative calculations
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_sio2_model::T=2500.0:h=3207633ab252
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'metal_yield_wt_pct_of_oxide'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors call these tentative calculations
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_metal_yield_sio2_model::T=3000.0:h=832a8ee7655b
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'metal_yield_wt_pct_of_oxide'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'rapid_cooling_disproportionation_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors call these tentative calculations
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3000'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_sio2_induction_experiment
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
@@ -193,7 +633,7 @@ observations:
         pdf_page_index: 6
         section: Experiments
         note: SiO2 induction-heating feasibility runs at 2650 K; apparatus Fig. 3 p. 129
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=088dd8f83da9
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
@@ -257,8 +697,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, T_K, SiO2_2000K_SiO2_P_torr,
-      caption_as_published, header_as_published, source_of_thermo, rows'
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
     approximate: false
   uncertainty:
     kind: printed
@@ -281,7 +720,964 @@ observations:
     table: '1'
     note: Table 1 vapor pressure of oxide dissociation species vs temperature
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=0c18507bc432
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=3cf0f7f22403
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=3db818677697
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=63c600355a18
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=650e74deff62
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=663a878abd1d
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=7490877bfd4c
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=7bd6207737c4
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=8d329234af4b
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=aa430516b617
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table1_single_oxide_psat::rows:h=af7595db49ee
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped p_partial field selected; source fields: oxide, vapor_species, P_torr'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed; values are calculated from JANAF free energies
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 126
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 vapor pressure of oxide dissociation species vs temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=0709eb58b2d3
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
@@ -345,9 +1741,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, O2_3000K_P_atm,
-      T_K, feedstock_model_mixture_wt_pct, feedstock_locator, activity_assumption_as_printed, rows, mixture_O2_yield_wt_pct_2500_to_3000K,
-      mixture_O2_yield_note'
+    unavailable_reason: pressure value is not numeric
     approximate: false
   uncertainty:
     kind: printed
@@ -370,7 +1764,790 @@ observations:
     table: '2'
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table3_o2_yield_wt_pct
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=0b9faee1ca99
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=14794d7246a9
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=8b76e5891654
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=8f72350044a9
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=a1e4de1aafb1
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=b038d7511379
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=bd9124886c6c
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=d4f34c7c14de
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=ec7f61012f6e
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_representative_of_lunar_basalt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2000.0, 3000.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: pressure value is not numeric
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table3_o2_yield_wt_pct::rows:h=13b3f78a97a6
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
@@ -392,7 +2569,7 @@ observations:
       reason: source T_range_K [1000.0, 3000.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'oxygen_yield_wt_pct'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -415,7 +2592,142 @@ observations:
     table: '3'
     note: Table 3 Oxygen Yield (% by Weight) of Oxides vs Temperature
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
-- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table4_beneficiation_pO2
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table3_o2_yield_wt_pct::rows:h=13d62c1697da
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'oxygen_yield_wt_pct'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1000.0, 3000.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 Oxygen Yield (% by Weight) of Oxides vs Temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table3_o2_yield_wt_pct::rows:h=8df484f8d057
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'oxygen_yield_wt_pct'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1000.0, 3000.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 Oxygen Yield (% by Weight) of Oxides vs Temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table3_o2_yield_wt_pct::rows:h=e30c06850497
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'oxygen_yield_wt_pct'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'single_oxide_JANAF_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1000.0, 3000.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 127
+    pdf_page_index: 5
+    table: '3'
+    note: Table 3 Oxygen Yield (% by Weight) of Oxides vs Temperature
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table4_beneficiation_pO2::T=1000.0:h=3b08fc07be4a
   experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
   identity:
     quantity:
@@ -433,11 +2745,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1000.0, 3000.0]; no midpoint invented
+      tag: value
+      value: '1000'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_pressure_O2'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -460,3 +2772,233 @@ observations:
     table: '4'
     note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table4_beneficiation_pO2::T=1500.0:h=774c240c7b4a
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_O2'
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_with_and_without_Fe_beneficiation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table4_beneficiation_pO2::T=2000.0:h=047e035f5fbe
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_O2'
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_with_and_without_Fe_beneficiation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table4_beneficiation_pO2::T=2500.0:h=e3eeb2bdae9b
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_O2'
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_with_and_without_Fe_beneficiation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2500'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
+- observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table4_beneficiation_pO2::T=3000.0:h=3a849d1684ae
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_O2'
+    species:
+      formula: O2
+      phase:
+        tag: unknown
+        reason: phase string 'ideal_oxide_mixture_with_and_without_Fe_beneficiation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: steurer-1985-vapor-phase-pyrolysis
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
+  read_from: pdf:steurer-1985-vapor-phase-pyrolysis
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3000'
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        table: '4'
+        note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation

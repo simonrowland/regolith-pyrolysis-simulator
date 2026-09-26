@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/kems-069-furukawa-1976.yaml
 observations:
-- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=135aa0f7e390
   experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
@@ -27,8 +27,837 @@ observations:
       reason: qualifier and_activity_coefficient does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=1a97a2ff5279
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=2a2aa410697b
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=40eab40d4e9b
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=63e0284db6c0
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=912f604fd9ff
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=a0e6a2801a0c
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=a3ef365bdfa9
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=aa822894fddf
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=dd20944da2dd
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 Fe columns at 1600 C; liquid Fe reference
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4 Fe columns at 1600 C; liquid Fe reference
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_fe_activity_table4_1600C::T=1873.15:h=e7d535aa51e0
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -402,7 +1231,7 @@ observations:
     figure: '7'
     note: Fig. 7. Relation between log gamma_i and (1-N_i)^2 for the Fe-Ti system at 1600 C
   read_from: pdf:kems-069-furukawa-1976
-- observation_id: kems-069-furukawa-1976::furukawa_1976_gamma_ti_table3_quoted
+- observation_id: kems-069-furukawa-1976::furukawa_1976_gamma_ti_table3_quoted::T=1818.15:h=17984d76fc59
   experiment_id: 10.2355/isijinternational1966.16.382::kems-069-furukawa-1976
   identity:
     quantity:
@@ -420,12 +1249,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1818.15, 1900.15]; no midpoint invented
+      tag: value
+      value: '1818.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -447,6 +1275,436 @@ observations:
     table: '3'
     note: Table 3 comparison of gamma_Ti^o from previous works
   read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1818.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3 comparison of gamma_Ti^o from previous works
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1545'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_gamma_ti_table3_quoted::T=1873.15:h=050ab71dc07d
+  experiment_id: 10.2355/isijinternational1966.16.382::kems-069-furukawa-1976
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_infinite_dilution' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted compilation; no uncertainties printed in Table 3.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 comparison of gamma_Ti^o from previous works
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3 comparison of gamma_Ti^o from previous works
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_gamma_ti_table3_quoted::T=1873.15:h=1927fc97f05a
+  experiment_id: 10.2355/isijinternational1966.16.382::kems-069-furukawa-1976
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_infinite_dilution' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted compilation; no uncertainties printed in Table 3.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 comparison of gamma_Ti^o from previous works
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3 comparison of gamma_Ti^o from previous works
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_gamma_ti_table3_quoted::T=1873.15:h=9c7d863ef0cf
+  experiment_id: 10.2355/isijinternational1966.16.382::kems-069-furukawa-1976
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_infinite_dilution' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted compilation; no uncertainties printed in Table 3.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 comparison of gamma_Ti^o from previous works
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3 comparison of gamma_Ti^o from previous works
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_gamma_ti_table3_quoted::T=1873.15:h=bdb9076bc4b7
+  experiment_id: 10.2355/isijinternational1966.16.382::kems-069-furukawa-1976
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_infinite_dilution' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted compilation; no uncertainties printed in Table 3.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 comparison of gamma_Ti^o from previous works
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3 comparison of gamma_Ti^o from previous works
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_gamma_ti_table3_quoted::T=1900.15:h=73ea42ac66d1
+  experiment_id: 10.2355/isijinternational1966.16.382::kems-069-furukawa-1976
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_infinite_dilution' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1900.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted compilation; no uncertainties printed in Table 3.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3 comparison of gamma_Ti^o from previous works
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '3'
+        note: Table 3 comparison of gamma_Ti^o from previous works
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1627'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '3'
+              note: Table 3 comparison of gamma_Ti^o from previous works
+        output_unit: K
 - observation_id: kems-069-furukawa-1976::furukawa_1976_gamma_ti_table3_this_work_1600C
   experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
@@ -610,7 +1868,7 @@ observations:
               figure: '6'
               note: infinite-dilution heats of solution and maximum H^M from integration of Table 2 slopes via eq (5)
         output_unit: K
-- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=00be6d71cd2e
   experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
@@ -674,8 +1932,791 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, ion_pair, log_base,
-      points'
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice marks.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 384
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+  read_from: pdf:kems-069-furukawa-1976
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=29f3fe40ee2d
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice marks.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 384
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+  read_from: pdf:kems-069-furukawa-1976
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=366de2bfa5eb
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice marks.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 384
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+  read_from: pdf:kems-069-furukawa-1976
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=37c893185332
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice marks.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 384
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+  read_from: pdf:kems-069-furukawa-1976
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=3e2640e027b9
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice marks.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 384
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+  read_from: pdf:kems-069-furukawa-1976
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=74908b60c63d
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice marks.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 384
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+  read_from: pdf:kems-069-furukawa-1976
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=78ce289841c7
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice marks.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 384
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+  read_from: pdf:kems-069-furukawa-1976
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=c7e54bc36248
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice marks.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 384
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+  read_from: pdf:kems-069-furukawa-1976
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=d0f7bdd891b9
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice marks.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 384
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+  read_from: pdf:kems-069-furukawa-1976
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ion_current_ratios_table2::points:h=e24c55e74053
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.15, 1873.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Ti, composition_basis, d_log10_ITi_over_IFe_d_1_over_T,
+      log10_ITi_over_IFe_1600C, log10_ITi_over_IFe_1550C'
     approximate: false
   uncertainty:
     kind: printed
@@ -921,7 +2962,7 @@ observations:
     table: '1'
     note: Table 1. Chemical analysis of the pure materials (ppm)
   read_from: pdf:kems-069-furukawa-1976
-- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=0897d9cca886
   experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
   identity:
     quantity:
@@ -946,8 +2987,847 @@ observations:
       reason: qualifier and_activity_coefficient does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=433cd3f292f7
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=4aaa8035c4ce
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=6d2e0766b765
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=7d7d958d002b
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=8f011b0de08f
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=9936b9ca0beb
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=9e12294a461b
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=b97c7668c0ad
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=d9d514911c98
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the Fig. 2(b) integration
+        plot. Not every row has a printed envelope.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-069-furukawa-1976
+  locator:
+    published_page: 385
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+  read_from: pdf:kems-069-furukawa-1976
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 385
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 385
+              pdf_page_index: 4
+              table: '4'
+              note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and liquid Fe)
+        output_unit: K
+- observation_id: kems-069-furukawa-1976::furukawa_1976_ti_activity_table4_1600C::T=1873.15:h=df37d34754aa
+  experiment_id: 10.2355/isijinternational1966.16.382::experiment::fe-ti-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Ti_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

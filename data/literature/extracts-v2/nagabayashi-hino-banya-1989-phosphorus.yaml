@@ -755,7 +755,7 @@ observations:
     section: 7. Conclusions
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
   read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
-- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results::T=1873.0:h=97fdd6baa54b
   experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::nagabayashi-hino-banya-1989-phosphorus
   identity:
     quantity:
@@ -773,12 +773,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1923.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'phosphorus_distribution_ratio'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -801,3 +800,238 @@ observations:
       and was not digitized.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
   read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 142
+        section: 4. Distribution Ratio of Phosphorus
+        note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point
+          table and was not digitized.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results::T=1873.0:h=9cef82d0c261
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::nagabayashi-hino-banya-1989-phosphorus
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'phosphorus_distribution_ratio'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for the distribution-ratio series; do not infer one from the plots.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 142
+    section: 4. Distribution Ratio of Phosphorus
+    note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point table
+      and was not digitized.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 142
+        section: 4. Distribution Ratio of Phosphorus
+        note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point
+          table and was not digitized.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results::T=1873.0:h=c349642ed837
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::nagabayashi-hino-banya-1989-phosphorus
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'phosphorus_distribution_ratio'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for the distribution-ratio series; do not infer one from the plots.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 142
+    section: 4. Distribution Ratio of Phosphorus
+    note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point table
+      and was not digitized.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 142
+        section: 4. Distribution Ratio of Phosphorus
+        note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point
+          table and was not digitized.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results::T=1873.0:h=ca3348def2dd
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::nagabayashi-hino-banya-1989-phosphorus
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'phosphorus_distribution_ratio'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for the distribution-ratio series; do not infer one from the plots.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 142
+    section: 4. Distribution Ratio of Phosphorus
+    note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point table
+      and was not digitized.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 142
+        section: 4. Distribution Ratio of Phosphorus
+        note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point
+          table and was not digitized.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+- observation_id: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results::T=1873.0:h=e968fb1666db
+  experiment_id: 18759a2d5a208680dd48432f0ff7030e0b32e32a2e5893c1a3abc5e91e6a4743::nagabayashi-hino-banya-1989-phosphorus
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'phosphorus_distribution_ratio'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty is printed for the distribution-ratio series; do not infer one from the plots.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nagabayashi-hino-banya-1989-phosphorus
+  locator:
+    page: 142
+    section: 4. Distribution Ratio of Phosphorus
+    note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point table
+      and was not digitized.
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf
+  read_from: unknown:nagabayashi-hino-banya-1989-phosphorus
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 142
+        section: 4. Distribution Ratio of Phosphorus
+        note: Text reports approximate extrema and trends; the underlying plotted series in Figs. 1-3 has no printed point
+          table and was not digitized.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf

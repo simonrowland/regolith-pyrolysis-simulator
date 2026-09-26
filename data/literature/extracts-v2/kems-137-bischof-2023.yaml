@@ -83,7 +83,7 @@ observations:
     page: 10
     table: '4'
   read_from: pdf:kems-137-bischof-2023
-- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1586.4:h=d7dddfc9ba1e
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
   identity:
     quantity:
@@ -107,8 +107,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1586.4, 1695.4]; no midpoint invented
+      tag: value
+      value: '1586.4'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -146,30 +146,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1586.4'
-      - '0.0000404'
-    - - '1598'
-      - '0.0000437'
-    - - '1608.6'
-      - '0.0000449'
-    - - '1619.2'
-      - '0.0000516'
-    - - '1630.8'
-      - '0.0000645'
-    - - '1642.5'
-      - '0.00011'
-    - - '1653'
-      - '0.0000998'
-    - - '1664.7'
-      - '0.000145'
-    - - '1674.2'
-      - '0.000166'
-    - - '1684.8'
-      - '0.000207'
-    - - '1695.4'
-      - '0.000273'
+    kind: point
+    point: '0.0000404'
     approximate: false
   uncertainty:
     kind: none
@@ -187,6 +165,980 @@ observations:
     pdf_page_index: 2
     table: S1
   read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1586.4'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1598.0:h=2cd4bd7cfe96
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1598'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000437'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1598'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1608.6:h=b9dae2d4d4f2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1608.6'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000449'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1608.6'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1619.2:h=d2f65843657e
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1619.2'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000516'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1619.2'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1630.8:h=32f9208ca45e
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1630.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000645'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1630.8'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1642.5:h=3d5e1b4780de
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1642.5'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00011'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1642.5'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1653.0:h=917fb8de71ee
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1653'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000998'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1653'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1664.7:h=8dd7cd739c2c
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1664.7'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000145'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1664.7'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1674.2:h=937c91dd605a
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1674.2'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000166'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1674.2'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1684.8:h=56d20ce145ed
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1684.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000207'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1684.8'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm::T=1695.4:h=eec90a0eba81
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-1-low
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1695.4'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000273'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1695.4'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_preferred_1700k
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -12723,7 +13675,7 @@ observations:
     page: 10
     table: '4'
   read_from: pdf:kems-137-bischof-2023
-- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1586.4:h=af73d739d4d6
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
@@ -12747,8 +13699,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1586.4, 1695.4]; no midpoint invented
+      tag: value
+      value: '1586.4'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -12786,30 +13738,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1586.4'
-      - '0.0000669'
-    - - '1598'
-      - '0.0000725'
-    - - '1608.6'
-      - '0.0000976'
-    - - '1619.2'
-      - '0.000089'
-    - - '1630.8'
-      - '0.000117'
-    - - '1642.5'
-      - '0.000123'
-    - - '1653'
-      - '0.000146'
-    - - '1664.7'
-      - '0.00016'
-    - - '1674.2'
-      - '0.000197'
-    - - '1684.8'
-      - '0.000207'
-    - - '1695.4'
-      - '0.000234'
+    kind: point
+    point: '0.0000669'
     approximate: false
   uncertainty:
     kind: none
@@ -12827,6 +13757,980 @@ observations:
     pdf_page_index: 2
     table: S1
   read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1586.4'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1598.0:h=973db73de518
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1598'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000725'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1598'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1608.6:h=a13ef9d20f4d
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1608.6'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000976'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1608.6'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1619.2:h=b19156e2f0a1
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1619.2'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000089'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1619.2'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1630.8:h=b900a3f72e6d
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1630.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000117'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1630.8'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1642.5:h=ebb53af38d3f
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1642.5'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000123'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1642.5'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1653.0:h=1c63f096aa50
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1653'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000146'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1653'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1664.7:h=0d70bcdab058
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1664.7'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00016'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1664.7'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1674.2:h=445ad36b93b3
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1674.2'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000197'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1674.2'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1684.8:h=56d20ce145ed
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1684.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000207'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1684.8'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm::T=1695.4:h=b02665d3b144
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1695.4'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000234'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1695.4'
+      locator:
+        pdf_page_index: 2
+        table: S1
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-137-bischof-2023
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_preferred_1674k
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
@@ -25397,7 +27301,7 @@ observations:
     section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
     note: apparatus §2.2.1 AM pp. 4-5; Table 2 weights AM p. 6; calibration eqs. 2-3 AM p. 8
   read_from: pdf:kems-137-bischof-2023
-- observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
+- observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=6c804341a8cf
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
@@ -25419,7 +27323,7 @@ observations:
       reason: source T_range_K [1874.0, 2662.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'T50_condensation_K'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -25439,7 +27343,91 @@ observations:
     table: '9'
     note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
   read_from: pdf:kems-137-bischof-2023
-- observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
+- observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=aa3d21adafc2
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'T50_condensation_K'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1874.0, 2662.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 30
+    table: '9'
+    note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=db266f8fab28
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'T50_condensation_K'
+    species:
+      formula: Ga
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1874.0, 2662.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 30
+    table: '9'
+    note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=45d2277779c3
   experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
   identity:
     quantity:
@@ -25461,7 +27449,91 @@ observations:
       reason: source T_range_K [1781.0, 2611.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'T50_condensation_K'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 30
+    table: '9'
+    note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=466e2fdb3a17
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'T50_condensation_K'
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1781.0, 2611.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 30
+    table: '9'
+    note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=a60632fa1d18
+  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'T50_condensation_K'
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1781.0, 2611.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
