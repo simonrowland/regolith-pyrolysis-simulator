@@ -441,6 +441,80 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
             assert obs.identity.fO2_Pa.is_value
 
 
+def test_g2_plante_partial_pressure_identity_axes_are_source_grounded(tmp_path):
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-042-plante-1979.yaml")
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-042-plante-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.admission.status.value == "admitted"
+    ]
+    assert len(rows) == 162
+    for observation in rows:
+        identity = observation.identity
+        reaction = identity.reaction
+        assert reaction is not None and reaction.is_value
+        assert [
+            (term.species.formula, term.species.phase.value, str(term.coefficient))
+            for term in reaction.value.terms
+        ] == [("K", "g", "2"), ("O2", "g", "1/2"), ("K2O", "l", "-1")]
+
+        reference = identity.reference_state
+        assert reference is not None and reference.is_value
+        assert reference.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference.value.endmember.formula == "K"
+        assert reference.value.endmember.phase.value is Phase.G
+        assert reference.value.reference_pressure_bar == Decimal("1")
+
+        reservoir = identity.reservoir
+        assert reservoir is not None and reservoir.is_value
+        assert reservoir.value.formula == "K2O"
+        assert reservoir.value.phase.value is Phase.L
+
+        total = identity.total_pressure_Pa
+        assert total is not None and total.is_value
+        assert total.value == observation.value.point * Decimal("1.2262")
+        point_total = (observation.point_conditions or {}).get("total_pressure_Pa")
+        assert point_total is not None and point_total.state.is_value
+        assert point_total.state.value == total.value
+        assert observation.derivation is not None
+        relation = observation.derivation.relation
+        assert "K2O(l) -> 2 K(g) + 1/2 O2(g)" in relation
+        assert "chamber background (1e-8..1e-7 Torr) not used" in relation
+        assert "K2, KO and O are neglected as minor" in relation
+
+
+def test_g2_partial_pressure_identity_does_not_invent_ungrounded_fields(tmp_path):
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-184-behrens-1979.yaml")
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-184-behrens-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+    ]
+    assert len(rows) == 18
+    assert all(
+        observation.identity.reaction is not None
+        and observation.identity.reaction.is_unknown
+        and observation.identity.reference_state is not None
+        and observation.identity.reference_state.is_unknown
+        and observation.identity.reservoir is not None
+        and observation.identity.reservoir.is_unknown
+        and observation.identity.total_pressure_Pa is not None
+        and observation.identity.total_pressure_Pa.is_unknown
+        for observation in rows
+    )
+    assert {
+        observation.identity.total_pressure_Pa.reason
+        for observation in rows
+    } == {"in_cell_total_pressure_not_derivable"}
+
+
 def test_g2_non_plante_partial_pressure_species_are_gas(tmp_path):
     root = _write_min_tree(tmp_path)
     _copy_extract(root, "kems-184-behrens-1979.yaml")
