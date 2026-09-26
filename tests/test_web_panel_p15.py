@@ -349,7 +349,7 @@ def test_present_artifact_renders_route_specific_values_and_authority() -> None:
     assert "not condenser inventory" in html.lower()
     assert "132 kg" in _readout(html, "metal-product-yields")
     train_readout = _readout(html, "condensation-train-projection")
-    assert "Cumulative condensation projection · selected hour" in train_readout
+    assert "Live condensation train inventory · selected hour" in train_readout
     assert "5.00e-6 kg" in train_readout
     assert "terminal melt-offgas stored O" in train_readout
     assert "not stage-allocated metal-train inventory alone" in train_readout
@@ -560,7 +560,7 @@ def test_partial_inputs_do_not_feed_missing_backend_values() -> None:
     assert "carrier pressure not emitted" in html
     assert "carrier not emitted" in _gas_dome(html)
     assert "He" not in _gas_dome(html)
-    assert "Cumulative condensation projection · selected hour" in train
+    assert "Live condensation train inventory · selected hour" in train
     assert "Pending — not emitted" in train
     assert "132 kg" not in train
     assert "132 kg" in yields
@@ -1209,7 +1209,7 @@ def test_product_yield_readout_uses_emitter_semantics() -> None:
 
     readout = _readout(_run_panel(artifact)["html"], "metal-product-yields")
 
-    assert "Metal product yields · cumulative product-ledger projection" in readout
+    assert "Metal product yields · at-hour product-ledger projection" in readout
     assert "132 kg" in readout
     assert "Route-wide product readout only; never used as a condenser fill" in readout
     assert "not recovered product" not in readout
@@ -1273,7 +1273,7 @@ def test_condensation_train_projection_discloses_melt_offgas_o2() -> None:
     train = _readout(html, "condensation-train-projection")
     cryo = _account_segment(html, "terminal.oxygen_melt_offgas_stored")
 
-    assert "Cumulative condensation projection · selected hour" in train
+    assert "Live condensation train inventory · selected hour" in train
     assert "3.2 kg" in train or "3.1998 kg" in train
     assert "5.00e-6 kg" in train
     assert "terminal melt-offgas stored O" in train

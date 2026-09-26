@@ -133,7 +133,10 @@ An `advance` command that completes exactly one ordinary step emits:
     "O2_source_side_potential_kg_cumulative": 0.0,
     "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
     "metal_yields_kg": {"Co": 0.0359, "Ni": 0.2054},
-    "condensation_train_kg": {}
+    "product_ledger_kg_at_hour": {"Co": 0.0359, "Ni": 0.2054},
+    "condensation_train_kg": {},
+    "condensation_train_kg_cumulative": {},
+    "recycled_to_reagent_kg_cumulative": {}
   },
   "steps": [{...}]
 }
@@ -167,7 +170,10 @@ An `advance N` command that completes multiple ordinary steps emits:
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {"Co": 0.0359, "Ni": 0.2054},
-      "condensation_train_kg": {}
+      "product_ledger_kg_at_hour": {"Co": 0.0359, "Ni": 0.2054},
+      "condensation_train_kg": {},
+      "condensation_train_kg_cumulative": {},
+      "recycled_to_reagent_kg_cumulative": {}
     }
   ]
 }
@@ -233,7 +239,10 @@ Successful non-step command frames have `frame_type` matching the verb.
     "O2_source_side_potential_kg_cumulative": 0.0,
     "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
     "metal_yields_kg": {},
-    "condensation_train_kg": {}
+    "product_ledger_kg_at_hour": {},
+    "condensation_train_kg": {},
+    "condensation_train_kg_cumulative": {},
+    "recycled_to_reagent_kg_cumulative": {}
   },
   "complete": false,
   "paused": false

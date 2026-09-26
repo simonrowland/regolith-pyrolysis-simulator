@@ -167,7 +167,7 @@ function updateMarkers(index, count) {
 function makeHeader(artifact, rows, energy) {
   const header = artifact.header;
   const finalRow = rows.at(-1) || {};
-  const finalMetal = finalRow.metal_yields_kg || {};
+  const finalMetal = finalRow.product_ledger_kg_at_hour || finalRow.metal_yields_kg || {};
   const o2 = sourceSideO2(finalRow);
   const o2Label = finalRow.O2_metric_label || "O₂ metric label not emitted";
   const temperatures = rows.map((row) => row.T_C);
@@ -238,11 +238,11 @@ function yieldDispositionBanner(terminal) {
 }
 
 function yieldsSection(rows, terminal) {
-  const evolved = rows.at(-1).metal_yields_kg || {};
+  const evolved = rows.at(-1).product_ledger_kg_at_hour || rows.at(-1).metal_yields_kg || {};
   const max = Math.max(maxPresent(Object.values(evolved)) ?? 0, 1);
   const chips = ELLINGHAM_ORDER.map((element) => `<div class="yield-chip"><div class="el">${element}</div><div class="kg">${exactKg(evolved[element])} projected</div><div class="bar"><i style="width:${Math.sqrt((n(evolved[element]) ?? 0) / max) * 100}%"></i></div></div>`).join("");
   const gap = yieldDispositionBanner(terminal);
-  return section(1, "Product-ledger metal projection — Ellingham order", "Mixed-account product-ledger projection from the final hourly metal_yields_kg row; not recovery-only.", `<div class="yield-track">${chips}</div>${gap}`);
+  return section(1, "Product-ledger metal projection at final hour — Ellingham order", "Mixed-account at-hour product-ledger projection from the final hourly row; not recovery-only.", `<div class="yield-track">${chips}</div>${gap}`);
 }
 
 function processSection(artifact, rows, spans) {

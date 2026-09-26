@@ -2458,7 +2458,13 @@ def build_per_hour_summary(
     * ``O2_metric_label``: human-facing label for the O2 metric semantics
     * ``metal_yields_kg``: dict of metal product yields (kg) at this
       hour, sourced from the simulator's product_ledger projection
-    * ``condensation_train_kg``: dict of cumulative condensation totals
+    * ``product_ledger_kg_at_hour``: explicit name for the same at-hour
+      metal product-ledger projection
+    * ``condensation_train_kg``: compatibility projection of live
+      condensation-train inventory
+    * ``condensation_train_kg_cumulative``: gross stage-condensation totals
+    * ``recycled_to_reagent_kg_cumulative``: gross condensate mass moved into
+      reagent inventory by the C3 alkali shuttle and C6 Mg recovery
     * ``vapor_species_kg_hr``: per-species vapor flux from the snapshot
     * ``wall_deposit_delta_kg``: per-hour wall deposit by segment/species
     * ``wall_deposit_cumulative_kg``: running wall deposit by segment/species
@@ -2485,12 +2491,43 @@ def build_per_hour_summary(
     )
     carrier_observables = _carrier_pressure_observables(sim, snapshot)
 
-    products = sim.product_ledger()
+    queries = (
+        AccountingQueries(sim)
+        if getattr(sim, "atom_ledger", None) is not None
+        else None
+    )
+    products = (
+        queries.product_ledger()
+        if queries is not None
+        else sim.product_ledger()
+    )
     metal_yields = {
         species: float(products.get(species, 0.0))
         for species in _METAL_PRODUCT_SPECIES
         if abs(products.get(species, 0.0)) > 1e-12
     }
+
+    if queries is not None:
+        # These are independent read-only projections: the product series is
+        # ``AccountingQueries.product_ledger()``; gross condensation sums the
+        # retained per-hour stage deltas; recycled mass sums existing ledger
+        # transitions from ``process.condensation_train`` to
+        # ``process.reagent_inventory``. This includes C3 alkali shuttle and
+        # C6 Mg recovery transfers; it does not write to the ledger.
+        # For Na/K in the C2A_STAGED replay, the exact closure is
+        # ``gross = product + recycled - terminal.offgas`` because the product
+        # projection also includes that named non-train product account; the
+        # other product accounts are zero for these species on this route. The
+        # identity is scoped to this C3 Na/K route, not C6 Mg or other routes.
+        condensation_train_kg_cumulative = (
+            queries.condensation_train_kg_cumulative()
+        )
+        recycled_to_reagent_kg_cumulative = (
+            queries.recycled_to_reagent_kg_cumulative()
+        )
+    else:
+        condensation_train_kg_cumulative = {}
+        recycled_to_reagent_kg_cumulative = {}
 
     # 0.5.4.1 midflight-review P2 (2026-05-28): the per-tick
     # Knudsen-regime summary (E3) is exposed on HourSnapshot via
@@ -2570,11 +2607,14 @@ def build_per_hour_summary(
         "mre_voltage_V": float(snapshot.mre_voltage_V),
         "mre_current_A": float(snapshot.mre_current_A),
         "metal_yields_kg": metal_yields,
+        "product_ledger_kg_at_hour": dict(metal_yields),
         "condensation_train_kg": {
             species: float(kg)
             for species, kg in sorted(snapshot.condensation_totals.items())
             if abs(kg) > 1e-12
         },
+        "condensation_train_kg_cumulative": condensation_train_kg_cumulative,
+        "recycled_to_reagent_kg_cumulative": recycled_to_reagent_kg_cumulative,
         "vapor_species_kg_hr": _vapor_species_kg_hr(snapshot),
         "wall_deposit_delta_kg": _nested_species_kg_from_segment_species(
             snapshot.wall_deposit_by_segment_species_delta,

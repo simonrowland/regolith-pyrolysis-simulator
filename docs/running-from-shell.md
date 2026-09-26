@@ -126,8 +126,12 @@ cfg = SimSessionConfig(
 s = SimSession().start(cfg)
 for _ in drive_auto_apply(s, 24):
     pass
-rows = s.per_hour_summaries()   # T_C, P_total_bar, pO2_bar, metal_yields_kg,
-                                # condensation_train_kg, O2_yield_kg_cumulative,
+rows = s.per_hour_summaries()   # T_C, P_total_bar, pO2_bar,
+                                # product_ledger_kg_at_hour, metal_yields_kg,
+                                # condensation_train_kg,
+                                # condensation_train_kg_cumulative,
+                                # recycled_to_reagent_kg_cumulative,
+                                # O2_yield_kg_cumulative,
                                 # O2_source_side_potential_kg_cumulative,
                                 # O2_metric_label, mass_balance_pct, hour, campaign
 ```

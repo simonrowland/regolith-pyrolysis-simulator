@@ -183,6 +183,90 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     assert slotted_schedule["points"] == [{"temperature_C": 75.0}]
 
 
+def test_terminal_refusal_restores_incremental_accounting_prefixes() -> None:
+    class TerminalRefusal(RuntimeError):
+        terminal_refusal = True
+
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    def snapshot(species: str, kg: float) -> SimpleNamespace:
+        return SimpleNamespace(
+            condensed_by_stage_species_delta={(0, species): kg},
+        )
+
+    def transition(species: str, kg: float) -> SimpleNamespace:
+        debit = SimpleNamespace(
+            account="process.condensation_train",
+            species_kg={species: kg},
+        )
+        credit = SimpleNamespace(
+            account="process.reagent_inventory",
+            species_kg={species: kg},
+        )
+        return SimpleNamespace(debits=(debit,), credits=(credit,))
+
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = BatchRecord(snapshots=[snapshot("Na", 1.0)])
+    sim._condensation_model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={}
+    )
+    sim.atom_ledger = FakeLedger()
+    sim.atom_ledger._transitions.append(transition("Na", 0.5))
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    sim._build_chemistry_kernel = lambda: object()
+
+    queries = AccountingQueries(sim)
+    assert queries.condensation_train_kg_cumulative() == {"Na": 1.0}
+    assert queries.recycled_to_reagent_kg_cumulative() == {"Na": 0.5}
+
+    refusal = TerminalRefusal("terminal")
+
+    def refuse_after_advancing_prefixes() -> None:
+        sim.record.snapshots.append(snapshot("Na", 2.0))
+        sim.atom_ledger._transitions.append(transition("Na", 1.0))
+        assert AccountingQueries(sim).condensation_train_kg_cumulative() == {
+            "Na": 3.0
+        }
+        assert AccountingQueries(sim).recycled_to_reagent_kg_cumulative() == {
+            "Na": 1.5
+        }
+        raise refusal
+
+    sim._step_one_hour = refuse_after_advancing_prefixes
+    with pytest.raises(TerminalRefusal) as raised:
+        sim.step()
+    assert raised.value is refusal
+    assert AccountingQueries(sim).condensation_train_kg_cumulative() == {
+        "Na": 1.0
+    }
+    assert AccountingQueries(sim).recycled_to_reagent_kg_cumulative() == {
+        "Na": 0.5
+    }
+
+    sim.record.snapshots.append(snapshot("Na", 3.0))
+    sim.atom_ledger._transitions.append(transition("Na", 0.25))
+    assert AccountingQueries(sim).condensation_train_kg_cumulative() == {
+        "Na": 4.0
+    }
+    assert AccountingQueries(sim).recycled_to_reagent_kg_cumulative() == {
+        "Na": 0.75
+    }
+
+
 def test_refusal_snapshot_does_not_patch_global_deepcopy_dispatch() -> None:
     missing = object()
     original_dispatch = copy._deepcopy_dispatch.get(MappingProxyType, missing)
