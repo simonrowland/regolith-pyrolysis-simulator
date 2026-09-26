@@ -108,6 +108,7 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     melt_oxide_activity,
 )
 from simulator.physical_constants import (  # noqa: E402
+    CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     MELT_DISSOCIATION_PO2_MAX_BAR,
     MELT_DISSOCIATION_PO2_MIN_BAR,
 )
@@ -324,6 +325,22 @@ class VaporPressureRangeError(VaporPressureComputationError):
     """A requested Antoine pressure lies outside its certified source range."""
 
     terminal_refusal = True
+
+
+class VaporPressurePhysicalPressureCeilingError(VaporPressureComputationError):
+    """Typed refusal when an evaluated species pressure exceeds the catalog rail."""
+
+    terminal_refusal = True
+
+    def __init__(self, species: str, pressure_Pa: float) -> None:
+        self.species = str(species)
+        self.pressure_Pa = float(pressure_Pa)
+        self.ceiling_Pa = float(CATALOG_PHYSICAL_PRESSURE_CEILING_PA)
+        super().__init__(
+            "vapor-pressure physical ceiling exceeded at evaluator output: "
+            f"species={self.species!r} pressure_Pa={self.pressure_Pa!r} "
+            f"ceiling_Pa={self.ceiling_Pa!r}"
+        )
 
 
 class VaporPressureNumericalOverflowError(OverflowError):
@@ -2652,6 +2669,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 if key in authority_fields
             }
+
+        # The catalog ceiling is an evaluator output contract.  Enforce it
+        # after every rail has produced its final per-species pressure and
+        # before an IntentResult can expose the mapping to evaporation.  A
+        # ceiling violation is therefore a typed terminal outcome, never a
+        # pressure value that can be interpreted as a Hertz-Knudsen flux.
+        for species, pressure_Pa in sorted(vapor_pressures.items()):
+            pressure = float(pressure_Pa)
+            if pressure > CATALOG_PHYSICAL_PRESSURE_CEILING_PA:
+                raise VaporPressurePhysicalPressureCeilingError(
+                    species,
+                    pressure,
+                )
 
         floor_inversion_notices = _attach_pO2_floor_inversion_notices(
             vapor_pressures=vapor_pressures,

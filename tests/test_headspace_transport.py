@@ -476,11 +476,27 @@ def test_interface_po2_holds_headspace_at_kress91_ratio_limits(
         transport_pO2_bar,
         sim._headspace_control_floor_pO2_bar(),
     )
-    assert sim._vacuum_floor_bar() <= interface_pO2_bar <= hold_pO2_bar
-    assert interface_pO2_bar == pytest.approx(transport_pO2_bar)
-    assert sim._last_oxygen_interface_diagnostic['limiting_regime'] == (
-        'gas_side_redox_buffer_exhausted'
-    )
+    assert sim._vacuum_floor_bar() <= interface_pO2_bar
+    diagnostic = sim._last_oxygen_interface_diagnostic
+    if target_fe3_fraction < 0.5:
+        assert interface_pO2_bar <= hold_pO2_bar
+        assert interface_pO2_bar == pytest.approx(transport_pO2_bar)
+        assert diagnostic['redox_buffer_status'] == 'exhausted'
+        assert diagnostic['redox_buffer_exhausted'] is True
+        assert diagnostic['limiting_regime'] == (
+            'gas_side_redox_buffer_exhausted'
+        )
+    else:
+        # A high-Fe melt near the former ratio threshold still has finite
+        # differential capacity.  Exhaustion is inventory/capacity based, not
+        # a ferric-fraction clamp.
+        assert diagnostic['redox_buffer_status'] == 'available'
+        assert diagnostic['redox_buffer_exhausted'] is False
+        assert interface_pO2_bar > transport_pO2_bar
+        assert diagnostic['limiting_regime'] in {
+            'gas_side_limited',
+            'melt_side_limited',
+        }
 
     equilibrium = sim._internal_analytical_equilibrium()
     release_pressures = [
@@ -491,6 +507,71 @@ def test_interface_po2_holds_headspace_at_kress91_ratio_limits(
         math.isfinite(value) and value < CATALOG_PHYSICAL_PRESSURE_CEILING_PA
         for value in release_pressures
     )
+
+
+def test_interface_distinguishes_fe_free_from_capacity_exhaustion(monkeypatch):
+    sim = _transport_sim()
+    sim.melt.temperature_C = 1500.0 - 273.15
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0e-9
+    monkeypatch.setattr(sim, '_cleaned_melt_fe_atom_mol', lambda: 0.0)
+
+    interface_pO2_bar = sim._interface_pO2_bar()
+    diagnostic = sim._last_oxygen_interface_diagnostic
+
+    assert interface_pO2_bar == pytest.approx(1.0e-9)
+    assert diagnostic['redox_buffer_status'] == 'no_fe_redox_buffer'
+    assert diagnostic['redox_buffer_exhausted'] is False
+    assert diagnostic['limiting_regime'] == 'gas_side_no_fe_redox_buffer'
+
+
+def test_interface_marks_positive_fe_with_zero_capacity_exhausted(monkeypatch):
+    sim = _transport_sim()
+    sim.melt.temperature_C = 1500.0 - 273.15
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0e-9
+    monkeypatch.setattr(
+        sim,
+        '_melt_redox_source_capacity_mol_per_ln_fO2',
+        lambda **_: 0.0,
+    )
+
+    interface_pO2_bar = sim._interface_pO2_bar()
+    diagnostic = sim._last_oxygen_interface_diagnostic
+
+    assert interface_pO2_bar == pytest.approx(1.0e-9)
+    assert diagnostic['redox_buffer_status'] == 'exhausted'
+    assert diagnostic['redox_buffer_inventory_mol'] > 0.0
+    assert diagnostic['redox_buffer_exhausted'] is True
+
+
+def test_na2o_evaporation_from_fe_free_melt_has_no_direct_redox_source(
+    monkeypatch,
+):
+    sim = _transport_sim()
+    sim.melt.temperature_C = 1600.0
+    sim._overhead_headspace_config['enabled'] = False
+    monkeypatch.setattr(sim, '_cleaned_melt_fe_atom_mol', lambda: 0.0)
+
+    before_fO2 = sim._current_melt_redox_fO2_log()
+    sp_data = sim.vapor_pressures['oxide_vapors']['Na2O_gas']
+    stoich = sim._evaporation_stoich('Na2O_gas', sp_data)
+    available_kg = sim.atom_ledger.kg_by_account(
+        'process.cleaned_melt'
+    ).get(stoich['parent_oxide'], 0.0)
+    rate_kg_hr = min(
+        1.0e-6,
+        0.1 * available_kg / float(stoich['oxide_per_product_kg']),
+    )
+
+    _, transition = sim._credit_evaporation_transition(
+        'Na2O_gas',
+        rate_kg_hr,
+        rate_kg_hr,
+        sp_data,
+        return_transition=True,
+    )
+    assert transition is not None
+    assert sim._evaporative_redox_source_terms_from_transition(transition) == {}
+    assert sim._current_melt_redox_fO2_log() == pytest.approx(before_fO2)
 
 
 def test_interface_po2_refuses_missing_sso_r_exchange_config():

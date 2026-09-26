@@ -471,6 +471,10 @@ class OxygenReservoirState:
     effective_melt_depth_m: float = 0.0
     tau_hr: float = 0.0
     melt_redox_capacity_mol_per_ln_fO2: float = 0.0
+    redox_buffer_status: str = ""
+    redox_buffer_inventory_mol: float = 0.0
+    redox_buffer_fraction: float | None = None
+    redox_buffer_exhausted: bool = False
     headspace_capacity_mol_per_ln_pO2: float = 0.0
     exchange_o2_mol: float = 0.0
     exchange_o2_kg: float = 0.0
