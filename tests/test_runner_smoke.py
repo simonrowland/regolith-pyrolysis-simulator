@@ -354,6 +354,58 @@ def test_per_hour_summary_preserves_nonzero_shuttle_and_mre_snapshot_values():
     assert summary["mre_current_A"] == 987.6
 
 
+def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A_STAGED",
+        hours=12,
+        mass_kg=1.0,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    rows = []
+    terminal_offgas = []
+    for _ in range(12):
+        decision = session.pending_decision()
+        if decision is not None:
+            session.decide(decision.recommendation or decision.options[0])
+        step = session.advance()
+        rows.append(step.per_hour_summary)
+        offgas = session.simulator.atom_ledger.project_account_kg(
+            "terminal.offgas"
+        )
+        terminal_offgas.append(
+            {species: float(offgas.get(species, 0.0)) for species in ("Na", "K")}
+        )
+
+    def alkali_total(row: dict, key: str) -> float:
+        values = row[key]
+        return sum(float(values.get(species, 0.0)) for species in ("Na", "K"))
+
+    assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
+    assert alkali_total(rows[8], "product_ledger_kg_at_hour") < alkali_total(
+        rows[7], "product_ledger_kg_at_hour"
+    )
+    for key in (
+        "condensation_train_kg_cumulative",
+        "recycled_to_reagent_kg_cumulative",
+    ):
+        values = [alkali_total(row, key) for row in rows]
+        assert values == sorted(values), key
+
+    for row, offgas in zip(rows, terminal_offgas):
+        for species in ("Na", "K"):
+            assert (
+                row["condensation_train_kg_cumulative"].get(species, 0.0)
+                == pytest.approx(
+                    row["product_ledger_kg_at_hour"].get(species, 0.0)
+                    + row["recycled_to_reagent_kg_cumulative"].get(species, 0.0)
+                    - offgas[species]
+                )
+            )
+
+
 @pytest.mark.parametrize(
     ("carrier", "atmosphere"),
     (("N2", "PN2_SWEEP"), ("Ar", "CONTROLLED_O2"), ("CO2", "CO2_BACKPRESSURE")),
@@ -536,7 +588,10 @@ PER_HOUR_KEYS = frozenset({
     "mre_voltage_V",
     "mre_current_A",
     "metal_yields_kg",
+    "product_ledger_kg_at_hour",
     "condensation_train_kg",
+    "condensation_train_kg_cumulative",
+    "recycled_to_reagent_kg_cumulative",
     "vapor_species_kg_hr",
     "wall_deposit_delta_kg",
     "wall_deposit_cumulative_kg",

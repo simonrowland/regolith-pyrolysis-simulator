@@ -82,6 +82,16 @@ The evaporation diagnostic includes `flux_uncertainty_pct`, a per-species map de
 
 Do not use either field as recovered/captured O₂ yield. The downstream sink/recovery model is Phase B. Current lab validation against Robinot et al. shows the source-side/free-O₂ calculation remains about `18.75×` above analyzer-visible O₂ after the honest area/alpha correction; see [`docs/lab-validation-whitepaper.md`](lab-validation-whitepaper.md) §4.1 and §4.5.
 
+## Alkali product and condensation series
+
+`per_hour_summary[i].metal_yields_kg` remains the compatibility name for the
+at-hour product-ledger projection. `product_ledger_kg_at_hour` is its explicit
+name. It can fall when C3 recovers condensate into `process.reagent_inventory`.
+Use `condensation_train_kg_cumulative` for gross stage-condensation additions
+and `recycled_to_reagent_kg_cumulative` for the cumulative condensate moved to
+reagent inventory; neither should be labelled as the at-hour product
+projection.
+
 ## Per-tick HourSnapshot diagnostics (0.5.4+)
 
 The 0.5.4 release added two earlier-warning diagnostic surfaces to every `HourSnapshot`:

@@ -526,19 +526,25 @@
   }
 
   function trainTotal(summary) {
-    // condensation_train_kg is the backend cumulative condensation projection
-    // (runner serializes snapshot.condensation_totals, which injects terminal
-    // melt-offgas stored O2). Do not call it pure metal-train inventory.
-    const train = summary.condensation_train_kg;
+    const hasGrossCumulative = summary.condensation_train_kg_cumulative != null;
+    const train = hasGrossCumulative
+      ? summary.condensation_train_kg_cumulative
+      : summary.condensation_train_kg;
+    const label = hasGrossCumulative
+      ? "Gross cumulative condensation · selected hour"
+      : "Live condensation train inventory · selected hour";
+    const note = hasGrossCumulative
+      ? "Gross stage-condensation additions; separate from live train inventory"
+      : "Legacy live train projection; backend projection may include terminal melt-offgas stored O₂; not stage-allocated metal-train inventory alone";
     return `<div class="sec-p15-readout" data-readout="condensation-train-projection">` +
-      `<span>${esc("Cumulative condensation projection · selected hour")}</span>` +
+      `<span>${esc(label)}</span>` +
       speciesList(train, "kg", "No positive condensation projection emitted") +
-      `<small>${esc("Backend projection may include terminal melt-offgas stored O₂; not stage-allocated metal-train inventory alone")}</small></div>`;
+      `<small>${esc(note)}</small></div>`;
   }
 
   function pulledFromPot(summary) {
-    const yields = summary.metal_yields_kg;
-    return `<div class="sec-p15-readout" data-readout="metal-product-yields"><span>${esc("Metal product yields · cumulative product-ledger projection")}</span>` +
+    const yields = summary.product_ledger_kg_at_hour || summary.metal_yields_kg;
+    return `<div class="sec-p15-readout" data-readout="metal-product-yields"><span>${esc("Metal product yields · at-hour product-ledger projection")}</span>` +
       speciesList(yields, "kg", "No positive metal product yield emitted") +
       `<small>${esc("Route-wide product readout only; never used as a condenser fill")}</small></div>`;
   }

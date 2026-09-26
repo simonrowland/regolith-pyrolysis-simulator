@@ -705,12 +705,19 @@ mole, energy, pressure, or partition arithmetic.
     "O2_yield_kg_cumulative": 0.0,           // legacy key; source-side O2 potential, kg
     "O2_source_side_potential_kg_cumulative": 0.0, // honest alias for the same value
     "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-    "metal_yields_kg": {                     // metal product totals so far
+    "metal_yields_kg": {                     // compatibility: metal product projection at this hour
       "Fe": 5.0
     },
-    "condensation_train_kg": {               // condensation train cumulative kg
+    "product_ledger_kg_at_hour": {            // explicit name for metal_yields_kg semantics
+      "Fe": 5.0
+    },
+    "condensation_train_kg": {               // compatibility: live train inventory kg
       "H2O": 0.3
     },
+    "condensation_train_kg_cumulative": {    // gross stage-condensation kg
+      "H2O": 0.3
+    },
+    "recycled_to_reagent_kg_cumulative": {}, // gross condensate moved to reagent inventory by C3/C6 recovery
     "vapor_species_kg_hr": {"SiO": 0.01},    // vapor flux by species (kg/hr)
     "wall_deposit_delta_kg": {               // this hour's wall deposit kg
       "stage_0_to_stage_1": {"SiO": 0.001}
@@ -786,8 +793,26 @@ incident, stuck, re-evaporated, and net continuous flux and has
   this runner output yet.
 * `metal_yields_kg` is sourced from `PyrolysisSimulator.product_ledger`
   filtered to a curated list of metal species (see
-  `simulator/runner/__init__.py::_METAL_PRODUCT_SPECIES`).  Non-metal products
-  appear in `final_state` and `condensation_train_kg`.
+  `simulator/runner/__init__.py::_METAL_PRODUCT_SPECIES`).  It is an at-hour
+  projection and may fall when the C3 shuttle draws condensate into reagent
+  inventory; it is not a cumulative series. `product_ledger_kg_at_hour` is an
+  explicit name for the same values. Non-metal products appear in
+  `final_state` and the condensation projections.
+* `condensation_train_kg_cumulative` sums each retained
+  `HourSnapshot.condensed_by_stage_species_delta`, so it represents gross
+  stage-condensation additions and stays monotone when recovered condensate
+  leaves the live train account. `recycled_to_reagent_kg_cumulative` sums the
+  existing ledger transitions from `process.condensation_train` to
+  `process.reagent_inventory`, so it counts all condensate moved into reagent
+  inventory by the C3 alkali shuttle and C6 Mg recovery. For Na/K on the
+  C2A_STAGED route, the tested closure is
+  `condensation_train_kg_cumulative ≈ product_ledger_kg_at_hour +
+  recycled_to_reagent_kg_cumulative - terminal.offgas`: `terminal.offgas` is
+  the only non-train product-ledger account for those species on that route;
+  other named product accounts are zero. This identity is scoped to the C3
+  Na/K route; it does not claim closure for C6 Mg recovery or other
+  routes/species. Consumers must name any additional non-train account before
+  applying an identity elsewhere.
 * Lab-schedule runs may include `pO2_enforcement` on each affected
   per-hour row: `{hour, schedule_id, schedule_time_h, setpoint_mbar,
   achieved_mbar, p_total_mbar, limited_by_total_pressure, status}`.

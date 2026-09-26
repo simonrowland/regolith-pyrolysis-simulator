@@ -72,6 +72,7 @@ from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
 )
+from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 from simulator.core import (
     CampaignPhase,
     DEGRADED_PATH_ENGAGEMENT_KEYS,
@@ -1011,6 +1012,8 @@ class PyrolysisRun:
     # the live values.
     run_metadata_overrides: dict[str, Any] = field(default_factory=dict)
     reduced_real_cache: Mapping[str, Any] | None = None
+    imcc_activity_shadow: bool = False
+    high_t_melt_activity: str | None = None
     strict_result_contract: bool = field(init=False, default=True)
     _target_inventory_by_hour: list[dict[str, Any]] = field(
         default_factory=list, init=False, repr=False
@@ -1036,6 +1039,15 @@ class PyrolysisRun:
         )
         self.runtime_campaign_overrides = overrides
         self.setpoints_overrides = overrides
+        if not isinstance(self.imcc_activity_shadow, bool):
+            raise TypeError("imcc_activity_shadow must be bool")
+        if self.high_t_melt_activity is not None:
+            try:
+                self.high_t_melt_activity = normalize_high_t_melt_activity(
+                    self.high_t_melt_activity
+                )
+            except ValueError as exc:
+                raise RunnerError(str(exc)) from exc
 
     def _enforce_preset_comparison_contract(self) -> None:
         preset = self.run_metadata_overrides.get(PRESET_PROVENANCE_METADATA_KEY)
@@ -1171,6 +1183,17 @@ class PyrolysisRun:
         feedstocks = bundle.feedstocks
         setpoints = copy.deepcopy(bundle.setpoints)
         setpoints = _deep_merge_setpoints(setpoints, self.setpoints_patch)
+        if self.high_t_melt_activity is not None:
+            setpoints = _deep_merge_setpoints(
+                setpoints,
+                {"high_t_melt_activity": self.high_t_melt_activity},
+            )
+        try:
+            high_t_melt_activity = normalize_high_t_melt_activity(
+                setpoints.get("high_t_melt_activity", "openimcc")
+            )
+        except ValueError as exc:
+            raise RunnerError(str(exc)) from exc
         if self.chemistry_kernel:
             try:
                 diagnostic_kernel_config = normalize_chemistry_kernel_config(
@@ -1259,6 +1282,8 @@ class PyrolysisRun:
                 if self.force_builtin_vapor_pressure
                 else None
             ),
+            imcc_activity_shadow=self.imcc_activity_shadow,
+            high_t_melt_activity=high_t_melt_activity,
         )
 
     def _load_config_bundle(self) -> ConfigBundle:
@@ -2458,7 +2483,13 @@ def build_per_hour_summary(
     * ``O2_metric_label``: human-facing label for the O2 metric semantics
     * ``metal_yields_kg``: dict of metal product yields (kg) at this
       hour, sourced from the simulator's product_ledger projection
-    * ``condensation_train_kg``: dict of cumulative condensation totals
+    * ``product_ledger_kg_at_hour``: explicit name for the same at-hour
+      metal product-ledger projection
+    * ``condensation_train_kg``: compatibility projection of live
+      condensation-train inventory
+    * ``condensation_train_kg_cumulative``: gross stage-condensation totals
+    * ``recycled_to_reagent_kg_cumulative``: gross condensate mass moved into
+      reagent inventory by the C3 alkali shuttle and C6 Mg recovery
     * ``vapor_species_kg_hr``: per-species vapor flux from the snapshot
     * ``wall_deposit_delta_kg``: per-hour wall deposit by segment/species
     * ``wall_deposit_cumulative_kg``: running wall deposit by segment/species
@@ -2485,12 +2516,43 @@ def build_per_hour_summary(
     )
     carrier_observables = _carrier_pressure_observables(sim, snapshot)
 
-    products = sim.product_ledger()
+    queries = (
+        AccountingQueries(sim)
+        if getattr(sim, "atom_ledger", None) is not None
+        else None
+    )
+    products = (
+        queries.product_ledger()
+        if queries is not None
+        else sim.product_ledger()
+    )
     metal_yields = {
         species: float(products.get(species, 0.0))
         for species in _METAL_PRODUCT_SPECIES
         if abs(products.get(species, 0.0)) > 1e-12
     }
+
+    if queries is not None:
+        # These are independent read-only projections: the product series is
+        # ``AccountingQueries.product_ledger()``; gross condensation sums the
+        # retained per-hour stage deltas; recycled mass sums existing ledger
+        # transitions from ``process.condensation_train`` to
+        # ``process.reagent_inventory``. This includes C3 alkali shuttle and
+        # C6 Mg recovery transfers; it does not write to the ledger.
+        # For Na/K in the C2A_STAGED replay, the exact closure is
+        # ``gross = product + recycled - terminal.offgas`` because the product
+        # projection also includes that named non-train product account; the
+        # other product accounts are zero for these species on this route. The
+        # identity is scoped to this C3 Na/K route, not C6 Mg or other routes.
+        condensation_train_kg_cumulative = (
+            queries.condensation_train_kg_cumulative()
+        )
+        recycled_to_reagent_kg_cumulative = (
+            queries.recycled_to_reagent_kg_cumulative()
+        )
+    else:
+        condensation_train_kg_cumulative = {}
+        recycled_to_reagent_kg_cumulative = {}
 
     # 0.5.4.1 midflight-review P2 (2026-05-28): the per-tick
     # Knudsen-regime summary (E3) is exposed on HourSnapshot via
@@ -2570,11 +2632,14 @@ def build_per_hour_summary(
         "mre_voltage_V": float(snapshot.mre_voltage_V),
         "mre_current_A": float(snapshot.mre_current_A),
         "metal_yields_kg": metal_yields,
+        "product_ledger_kg_at_hour": dict(metal_yields),
         "condensation_train_kg": {
             species: float(kg)
             for species, kg in sorted(snapshot.condensation_totals.items())
             if abs(kg) > 1e-12
         },
+        "condensation_train_kg_cumulative": condensation_train_kg_cumulative,
+        "recycled_to_reagent_kg_cumulative": recycled_to_reagent_kg_cumulative,
         "vapor_species_kg_hr": _vapor_species_kg_hr(snapshot),
         "wall_deposit_delta_kg": _nested_species_kg_from_segment_species(
             snapshot.wall_deposit_by_segment_species_delta,
@@ -2665,6 +2730,16 @@ def build_per_hour_summary(
     overlay = dict(getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {})
     if overlay:
         summary["vapour_batch_flux_overlay"] = _json_safe(overlay)
+    imcc_activity_shadow = dict(
+        getattr(snapshot, "imcc_activity_shadow", {}) or {}
+    )
+    if imcc_activity_shadow:
+        summary["imcc_activity_shadow"] = _json_safe(imcc_activity_shadow)
+    high_t_melt_activity = dict(
+        getattr(sim, "_last_high_t_melt_activity", {}) or {}
+    )
+    if high_t_melt_activity:
+        summary["high_t_melt_activity"] = _json_safe(high_t_melt_activity)
     capture_ledger_snapshot(sim, snapshot)
     return _json_safe(summary)
 
@@ -4196,6 +4271,13 @@ def build_sio_yield_report(
         if vaporock_full_speciation:
             diagnostics["vaporock_full_speciation_Pa"] = (
                 vaporock_full_speciation
+            )
+        high_t_melt_activity = dict(
+            vapor_pressure_diagnostic.get("high_t_melt_activity") or {}
+        )
+        if high_t_melt_activity:
+            diagnostics["high_t_melt_activity"] = _json_safe(
+                high_t_melt_activity
             )
         if include_lab_oxygen_diagnostics:
             queries = AccountingQueries(sim)

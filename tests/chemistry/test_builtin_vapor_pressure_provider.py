@@ -411,7 +411,8 @@ def _si_only_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
         ),
         temperature_C=temperature_K - 273.15,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        # Pin legacy gamma for these arithmetic/source-label fixtures; omitted now selects OpenIMCC above the cap.
+        control_inputs={"pO2_bar": 1e-9, "high_t_melt_activity": "constant_gamma"},
     )
 
 
@@ -2179,7 +2180,8 @@ def test_low_confidence_k_pseudo_vaporock_gas_rail_ignores_condensed_fallback(
         ),
         temperature_C=1800.0,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        # Pin legacy gamma for this pseudo-fit fixture; omitted now selects OpenIMCC above the cap.
+        control_inputs={"pO2_bar": 1e-9, "high_t_melt_activity": "constant_gamma"},
     )
 
     result = provider.dispatch(request)

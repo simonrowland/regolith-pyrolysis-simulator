@@ -844,6 +844,7 @@ class EvaporationMixin:
             self._last_vapour_batch_report = None
             self._last_vapour_batch_flux_overlay = {}
             self._last_vapour_batch_resolve_error = {}
+            self._last_imcc_activity_shadow = {}
             return flux
 
         # VR-11: batch owns channel refusal, eligibility, and active membership.
@@ -871,6 +872,15 @@ class EvaporationMixin:
         self._last_vapour_batch = vapour_batch
         self._last_vapour_batch_report = batch_report
         self._last_vapour_batch_flux_overlay = flux_overlay_report
+        imcc_shadow = None
+        batch_shadow = getattr(vapour_batch, "melt_activity_shadow", None)
+        if hasattr(batch_shadow, "as_mapping"):
+            batch_shadow = batch_shadow.as_mapping()
+        if isinstance(batch_shadow, Mapping):
+            imcc_shadow = batch_shadow.get("imcc_activity_shadow")
+        self._last_imcc_activity_shadow = (
+            dict(imcc_shadow) if isinstance(imcc_shadow, Mapping) else {}
+        )
         extrapolated_flux_species = tuple(
             flux_overlay_report.get('extrapolated_flux_species', ()) or ()
         )

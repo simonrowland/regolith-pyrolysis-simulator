@@ -12,6 +12,7 @@ Pins:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -24,6 +25,7 @@ from simulator.three_product_runner import (
     main,
     run,
 )
+from simulator.runner import RunnerError
 
 
 def test_run_returns_classification_dict():
@@ -84,6 +86,7 @@ def test_cli_writes_markdown_report_to_file(tmp_path):
     assert "Metals + O₂" in body
     assert "Pure silica glass" in body
     assert "Refractory ceramic rump" in body
+    assert "**Run provenance**: mass_kg=1000" in body
 
 
 def test_cli_writes_json_report_to_file(tmp_path):
@@ -203,3 +206,76 @@ def test_run_with_missing_data_dir_falls_back_to_default():
         hours=1,
     )
     assert isinstance(result, dict)
+
+
+def test_cli_mass_scales_classification_and_carries_provenance(tmp_path):
+    """The charge mass is explicit, scales the simulated classification, and
+    carries the canonical runner provenance block into JSON."""
+    default_output = tmp_path / "default.json"
+    one_kg_output = tmp_path / "one-kg.json"
+
+    common_args = [
+        "--feedstock", "lunar_mare_low_ti",
+        "--campaign", "C2A",
+        "--hours", "2",
+        "--format", "json",
+    ]
+    assert main([*common_args, "--output", str(default_output)]) == 0
+    assert main([
+        *common_args,
+        "--mass-kg", "1",
+        "--output", str(one_kg_output),
+    ]) == 0
+
+    default_payload = json.loads(default_output.read_text())
+    one_kg_payload = json.loads(one_kg_output.read_text())
+    assert default_payload["mass_kg"] == 1000.0
+    assert one_kg_payload["mass_kg"] == 1.0
+    assert one_kg_payload["run_metadata"]["mass_kg"] == 1.0
+    quantity_keys = {
+        "metals_plus_O2": "class_total_kg",
+        "pure_silica_glass": "class_total_kg",
+        "industrial_mixed_glass": "class_total_kg",
+        "refractory_ceramic_rump": "class_total_kg",
+        "unclassified": "total_kg",
+    }
+    for bucket, quantity_key in quantity_keys.items():
+        assert one_kg_payload["classification"][bucket][quantity_key] == pytest.approx(
+            default_payload["classification"][bucket][quantity_key] / 1000.0
+        )
+
+    metadata = one_kg_payload["run_metadata"]
+    assert metadata["backend"] == "internal-analytical"
+    assert metadata["backend_status"] == "unavailable"
+    assert metadata["backend_authoritative"] is False
+    vapor_engine = metadata["engines_used"]["registry"]["vapor_pressure"]
+    assert vapor_engine["authoritative"] == "builtin-vapor-pressure"
+    assert vapor_engine["shadows"] == ["vaporock"]
+    assert "sulfur_saturation_notice" in metadata
+    assert one_kg_payload["degraded_path_engagement"][
+        "vapour_pressure_extrapolation"
+    ]["total_count"] >= 0
+
+
+@pytest.mark.parametrize("mass_kg", ["0", "-1", "nan", "inf"])
+def test_cli_rejects_nonpositive_or_nonfinite_mass(mass_kg):
+    with pytest.raises(RunnerError, match="mass_kg"):
+        main([
+            "--feedstock", "lunar_mare_low_ti",
+            "--campaign", "C2A",
+            "--hours", "0",
+            "--mass-kg", mass_kg,
+            "--format", "json",
+        ])
+
+
+def test_default_classification_values_preserve_pre_change_digest():
+    result = run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=2,
+    )
+    digest = hashlib.sha256(
+        json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    assert digest == "772f0f439134828e15d32621b4ecea084d26f30c3d5c7b0dacfb5a01b80dd38c"

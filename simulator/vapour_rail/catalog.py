@@ -1809,6 +1809,9 @@ class VapourRailCatalog:
                 melt_activity_shadow_enabled=state.get(
                     "melt_activity_shadow_enabled", False
                 ),
+                imcc_activity_shadow_enabled=state.get(
+                    "imcc_activity_shadow_enabled", False
+                ),
                 melt_activity_engine_inputs=(
                     state.get("melt_activity_engine_inputs") or {}
                 ),
@@ -1836,6 +1839,7 @@ class VapourRailCatalog:
                         "melt_activity_shadow_state_fingerprint",
                         "melt_activity_shadow_inventory_digest",
                         "melt_activity_shadow_enabled",
+                        "imcc_activity_shadow_enabled",
                         "melt_activity_engine_inputs",
                     }
                 },
