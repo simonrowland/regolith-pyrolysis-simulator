@@ -290,9 +290,13 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # measured fix/HEAD ratio, about -1.103% on evolved kg:
 # lunar 1.05260475258e-05 -> 1.04099243606e-05,
 # mars 1.0653327814e-05 -> 1.05357832376e-05.
+# 2026-09-26 b-573 projected-bulk freeze gate (melt fraction now continuous):
+# studio-3 regen, VapoRock 0001+0002; lunar -1.6e-7 rel, mars +2.35e-5 rel:
+# lunar 1.04099243606e-05 -> 1.0409922677e-05,
+# mars 1.05357832376e-05 -> 1.05360311732e-05.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.04099243606e-05,
-    "mars_basalt": 1.05357832376e-05,
+    "lunar_mare_low_ti": 1.0409922677e-05,
+    "mars_basalt": 1.05360311732e-05,
 }
 
 
@@ -400,9 +404,11 @@ BASELINE_STAGE4_SIO2_KG = {
 # docs-private/research/2026-08-02-train13-adjudication.md
 # Rebaselined 2026-08-28 after f7bcbf79 removed fabricated stage pressure
 # and b42d14ed carried per-carrier authority into the wall-routing model.
+# 2026-09-26 b-573 freeze-gate regen (studio-3): lunar 2.73730312429e-06 ->
+# 2.73730270602e-06, mars 2.7578902906e-06 -> 2.75788843064e-06.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 2.73730312429e-06,
-    "mars_basalt": 2.7578902906e-06,
+    "lunar_mare_low_ti": 2.73730270602e-06,
+    "mars_basalt": 2.75788843064e-06,
 }
 
 
