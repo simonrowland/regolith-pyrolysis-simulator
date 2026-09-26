@@ -32,6 +32,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
 from simulator.melt_backend.magemin import (
     COMPOSITION_PROJECTED,
+    MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
     MAGEMIN_WARM_CALL_TIMEOUT_S,
     MAGEMIN_WARM_LIQUIDUS_BUDGET_S,
     MAGEMinBackend,
@@ -615,6 +616,85 @@ def test_magemin_subprocess_parser_rejects_nonunit_mode_vector():
         MAGEMinBackend._parse_subprocess_stdout(
             'Phase: liq ol\nMode: 0.8 0.8\n'
         )
+
+
+def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
+    calls = []
+
+    def fake_run(args, **kwargs):
+        calls.append((args, kwargs))
+        return subprocess.CompletedProcess(
+            args,
+            0,
+            stdout=(
+                'Phase :      cpx       ol       ol       ne      trd\n'
+                'Mode  :  0.00000  0.00025  0.00010  0.00047  0.66605\n'
+            ),
+            stderr='',
+        )
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.magemin.subprocess.run',
+        fake_run,
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+
+    result = backend.equilibrate(
+        1302.0 - 273.15,
+        composition_kg={'K2O': 0.4394, 'SiO2': 0.5606},
+        fO2_log=-9.0,
+        pressure_bar=1.0e-6,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status'] == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == (
+        MAGEMIN_MODE_VECTOR_MASS_DEFICIT
+    )
+    assert result.diagnostics['magemin_mode_vector_raw_sum'] == pytest.approx(
+        0.66687
+    )
+    assert result.diagnostics['magemin_mode_vector_deficit'] == pytest.approx(
+        0.33313
+    )
+    assert result.diagnostics['magemin_mode_vector_input_components'] == {
+        'K2O': pytest.approx(43.94),
+        'SiO2': pytest.approx(56.06),
+    }
+    assert result.diagnostics[
+        'magemin_mode_vector_unrepresented_input_components'
+    ] is None
+    assert result.diagnostics[
+        'magemin_mode_vector_unrepresented_components_determined'
+    ] is False
+    assert result.phases_present == []
+    assert result.phase_masses_kg == {}
+    assert len(calls) == 1
+    assert any('mass deficit=0.33313' in warning for warning in result.warnings)
+
+
+def test_magemin_plante_mode_vector_is_not_renormalized():
+    with pytest.raises(RuntimeError, match='Mode vector must sum to 1.0'):
+        MAGEMinBackend._parse_subprocess_stdout(
+            'Phase : cpx ol ol ne trd\n'
+            'Mode  : 0.00000 0.00025 0.00010 0.00047 0.66605\n'
+        )
+
+
+def test_magemin_control_mode_vector_serialization_is_byte_identical():
+    parsed = MAGEMinBackend._parse_subprocess_stdout(
+        'Phase : liq cpx ol qfm\n'
+        'Mode  : 0.72251 0.00001 0.23073 0.04675\n'
+    )
+
+    assert repr(parsed) == (
+        "{'liq': {'mass_kg': 0.72251}, "
+        "'cpx': {'mass_kg': 1e-05}, "
+        "'ol': {'mass_kg': 0.23073}}"
+    )
 
 
 def test_magemin_explicit_julia_runtime_failure_retries_subprocess(monkeypatch):
