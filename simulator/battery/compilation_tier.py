@@ -35,6 +35,7 @@ from simulator.battery.enums import (
     Phase,
     Quantity,
     RefusalReason,
+    MetricOperation,
     ResidualStatus,
     SourceRelation,
     ValueKind,
@@ -876,10 +877,12 @@ def _median_abs(values: Sequence[Decimal]) -> str | None:
 
 @dataclass(frozen=True)
 class _TierCell:
+    rail: str
     engine: str
     status: ResidualStatus
     relation: SourceRelation
     numeric: Decimal | None
+    operation: MetricOperation | None
     family: str
     quantity: str
     uncertainty: str
@@ -888,9 +891,11 @@ class _TierCell:
 def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
     by_engine: dict[str, list[_TierCell]] = defaultdict(list)
     by_source: dict[tuple[str, str], list[_TierCell]] = defaultdict(list)
+    by_rail_engine: dict[tuple[str, str], list[_TierCell]] = defaultdict(list)
     for cell in cells:
         by_engine[cell.engine].append(cell)
         by_source[(cell.family, cell.quantity)].append(cell)
+        by_rail_engine[(cell.rail, cell.engine)].append(cell)
     lines = [
         "## Compilation tier",
         "",
@@ -902,9 +907,46 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
         "unchanged. Printed uncertainty is the reference observation's",
         "uncertainty (often none on a grid).",
         "",
+        "| rail | engine | n | RMS dex | median abs dex | n no band | match rate |",
+        "|---|---|---:|---:|---:|---:|---:|",
+    ]
+    if not by_rail_engine:
+        lines.append("| (none) | (none) | 0 | — | — | 0 | — |")
+    for (rail, engine), bucket in sorted(by_rail_engine.items()):
+        numeric = [row for row in bucket if row.numeric is not None]
+        dex = [
+            row.numeric
+            for row in numeric
+            if row.operation is MetricOperation.DEX and row.numeric is not None
+        ]
+        banded = [
+            row
+            for row in numeric
+            if row.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}
+        ]
+        matches = [row for row in banded if row.status is ResidualStatus.MATCH]
+        rms = None
+        if dex:
+            rms = (
+                sum((value * value for value in dex), Decimal(0))
+                / Decimal(len(dex))
+            ).sqrt()
+        median = _median_abs(dex)
+        rate = None if not banded else len(matches) / len(banded)
+        lines.append(
+            f"| {rail} | {engine} | {len(numeric)} | "
+            f"{rms if rms is not None else '—'} | "
+            f"{median or '—'} | "
+            f"{sum(1 for row in numeric if row.status is ResidualStatus.NO_BAND)} | "
+            f"{rate if rate is not None else '—'} |"
+        )
+    lines.extend(
+        [
+            "",
         "| engine | comparisons | refused | numeric | same-source | independent | match same-source | match independent |",
         "|---|---:|---:|---:|---:|---:|---:|---:|",
-    ]
+        ]
+    )
     if not by_engine:
         lines.append("| (none) | 0 | 0 | 0 | 0 | 0 | 0 | 0 |")
     for engine, bucket in sorted(by_engine.items()):
@@ -948,18 +990,30 @@ def _cell_from_observation(
     status: ResidualStatus,
     relation: SourceRelation,
     numeric: Decimal | None,
+    operation: MetricOperation | None,
     observation: Observation,
     origin: str | None,
 ) -> _TierCell:
     quantity = "unknown"
+    rail = "none"
     if isinstance(observation.identity, Identity):
         token = quantity_token(observation.identity)
         quantity = token.value if token is not None else "unknown"
+        from simulator.battery.score import rail_for_quantity
+
+        headline_rail = rail_for_quantity(
+            token,
+            species_formula=observation.identity.species.formula,
+        )
+        if headline_rail is not None:
+            rail = headline_rail.value
     return _TierCell(
+        rail=rail,
         engine=engine,
         status=status,
         relation=relation,
         numeric=numeric,
+        operation=operation,
         family=compilation_family(observation.source_id, origin),
         quantity=quantity,
         uncertainty=uncertainty_text(observation.uncertainty),
@@ -990,6 +1044,9 @@ def compilation_tier_lines(
                 status=residual.status,
                 relation=residual.source_relation,
                 numeric=None if residual.numeric is None else residual.numeric.value,
+                operation=None
+                if residual.numeric is None
+                else residual.numeric.operation,
                 observation=observation,
                 origin=compilation_origin(residual.reference, origins),
             )
@@ -1018,14 +1075,18 @@ def compilation_tier_lines_from_payloads(
             engine = str(row.get("key") or "").rsplit("::", 1)[-1]
         raw_numeric = row.get("numeric")
         numeric = None
+        operation = None
         if isinstance(raw_numeric, Mapping) and raw_numeric.get("value") is not None:
             numeric = as_decimal(raw_numeric["value"])
+            if raw_numeric.get("operation") is not None:
+                operation = MetricOperation(str(raw_numeric["operation"]))
         cells.append(
             _cell_from_observation(
                 engine=engine or "unknown",
                 status=ResidualStatus(str(row.get("status"))),
                 relation=SourceRelation(str(row.get("source_relation") or SourceRelation.UNKNOWN.value)),
                 numeric=numeric,
+                operation=operation,
                 observation=observation,
                 origin=compilation_origin(reference, origins),
             )
@@ -1135,6 +1196,7 @@ def compilation_tier_census(
                 "independent": 0,
                 "match_same_source": 0,
                 "match_independent": 0,
+                "no_band": 0,
                 "residuals": [],
                 "refused": defaultdict(int),
             }
@@ -1196,13 +1258,12 @@ def compilation_tier_census(
         if attempt.value is not None:
             row["engine_values"] += 1
             band = decision_band_for(quantity, relation)
-            if band is None:
-                key = f"decision_rule_missing:no_sourced_decision_band:{quantity.value}"
-                row["refused"][key] += 1
-                return key
             residual = attempt.value - reference
             row["numeric"] += 1
             row["residuals"].append(residual)
+            if band is None:
+                row["no_band"] += 1
+                return "no_band"
             if relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}:
                 row["same_source"] += 1
                 if abs(residual) <= band.value:
@@ -1349,7 +1410,7 @@ def compilation_tier_census(
                         if attempt.value is not None and expect_band is not None:
                             expect = f"numeric:{attempt.value - reference}:{relation.value}"
                         elif attempt.value is not None:
-                            expect = f"decision_rule_missing:no_sourced_decision_band:{token.value}"
+                            expect = f"numeric:{attempt.value - reference}:{relation.value}"
                         else:
                             expect = _refusal_key(
                                 attempt.refusal_reason or RefusalReason.UNSUPPORTED,
@@ -1373,6 +1434,7 @@ def compilation_tier_census(
                     "independent": row["independent"],
                     "match_same_source": row["match_same_source"],
                     "match_independent": row["match_independent"],
+                    "no_band": row["no_band"],
                     "median_abs_residual": _median_abs(row["residuals"]),
                     "refused": dict(sorted(row["refused"].items())),
                 }

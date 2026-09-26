@@ -15,7 +15,7 @@ Ambiguity resolutions:
   fallback notices require from/to; domain notices require band;
   projection notices require dropped; crystal species require polymorph
   (value or unknown, never guessed unspecified).
-- Residual: numeric iff match/mismatch; refusal iff refused; candidate
+- Residual: numeric iff match/mismatch/no_band; refusal iff refused; candidate
   required when execution is produced; candidate_request required when no
   candidate; attempted_unavailable requires call_evidence.
   ``score_eligible`` cannot be true when status is refused, admission is
@@ -1354,13 +1354,21 @@ def validate_residual(
                     f"candidate {residual.candidate!r} does not resolve",
                 )
             )
-    if residual.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}:
+    if residual.status in {
+        ResidualStatus.MATCH,
+        ResidualStatus.MISMATCH,
+        ResidualStatus.NO_BAND,
+    }:
         if residual.numeric is None:
             issues.append(
                 _issue(
                     f"{path}.numeric",
                     RefusalReason.CONDITIONAL_FIELD,
-                    "match/mismatch requires numeric",
+                    (
+                        "no_band requires numeric"
+                        if residual.status is ResidualStatus.NO_BAND
+                        else "match/mismatch requires numeric"
+                    ),
                 )
             )
         if residual.refusal is not None:

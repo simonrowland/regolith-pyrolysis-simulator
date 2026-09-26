@@ -1100,7 +1100,7 @@ class ResidualNumeric:
     operation: MetricOperation
     unit: str
     value: Decimal
-    decision_band: DecisionBand
+    decision_band: DecisionBand | None
     metric_uncertainty: Uncertainty | None = None
 
     def __post_init__(self) -> None:
