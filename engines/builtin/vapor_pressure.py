@@ -534,6 +534,30 @@ _HIGH_T_FLUX_OXIDES: tuple[str, ...] = (
     "TiO2",
 )
 _HIGH_T_ACTIVITY_SEAM_LIMIT_DEX = 0.1
+_HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS: dict[str, dict[str, str]] = {
+    "K2O": {
+        "authority": "constant_gamma",
+        "ruling": "owner 2026-09-26",
+        "reason": (
+            "SF04 KCaAlSi2O7 (log K = 4.30 + 17037/T; Hastie & Bonnell "
+            "1985) is an empirical correction complex with no known pure "
+            "solid (Bonnell & Hastie 1990, High Temp. Sci. 26, 313-334, "
+            "p.316), fitted to K pressures in dolomitic limestones (ibid. "
+            "p.327); it holds nearly all K in Ca-Al melts. Zhang et al. "
+            "(2021, ACS Earth Space Chem.) measured alpha*Gamma(KO0.5) = "
+            "6.9e-8 (1473 K) and 1.11e-6 (1673 K) for a synthetic N-MORB-"
+            "like basalt; since alpha <= 1, openimcc Gamma(KO0.5) "
+            "(3.5e-9, 2.4e-8) is 1.3-1.7 dex below that floor. "
+            "Constant-gamma K is also uncertified (t-999)."
+        ),
+        "citation": (
+            "c3-owner-ruling-B-spec.md; "
+            "../2026-09-26-k-activity-triangulation/"
+            "zhang-controller-findings.md#correction"
+        ),
+        "tracking_id": "t-999",
+    },
+}
 
 
 def _build_high_t_melt_activity_authority(
@@ -568,6 +592,7 @@ def _build_high_t_melt_activity_authority(
         "composition_policy": {},
         "notices": [],
         "seam": {},
+        "authority_exclusions": {},
     }
     try:
         from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
@@ -618,6 +643,9 @@ def _build_high_t_melt_activity_authority(
     base.update(
         {
             "activities_by_oxide": dict(cleaned.single_cation_activities),
+            "openimcc_activities_by_oxide": dict(
+                cleaned.single_cation_activities
+            ),
             "composition_policy": dict(cleaned.policy),
             "composition_projection_classification": dict(
                 cleaned.policy.get("composition_projection_classification", {})
@@ -660,12 +688,30 @@ def _build_high_t_melt_activity_authority(
         ratio_dex = None
         if legacy_activity is not None and legacy_activity > 0.0 and openimcc_activity > 0.0:
             ratio_dex = math.log10(openimcc_activity / legacy_activity)
-            max_abs_dex = max(max_abs_dex, abs(ratio_dex))
+        exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(oxide)
+        selected_activity = openimcc_activity
+        selected_activity_basis = "openimcc_single_cation"
+        selected_ratio_dex = ratio_dex
+        if exclusion is not None and legacy_activity is not None:
+            selected_activity = legacy_activity
+            selected_activity_basis = legacy_basis or "constant_gamma"
+            selected_ratio_dex = 0.0
+            base["activities_by_oxide"][oxide] = selected_activity
+            base["authority_exclusions"][oxide] = dict(exclusion)
+        if selected_ratio_dex is not None:
+            max_abs_dex = max(max_abs_dex, abs(selected_ratio_dex))
         base["seam"][oxide] = {
             "below_cap_activity": legacy_activity,
             "below_cap_activity_basis": legacy_basis,
             "openimcc_activity": openimcc_activity,
             "ratio_dex_openimcc_over_below_cap": ratio_dex,
+            "selected_activity": selected_activity,
+            "selected_activity_basis": selected_activity_basis,
+            "ratio_dex_selected_over_below_cap": selected_ratio_dex,
+            "would_be_openimcc_step_dex": ratio_dex,
+            "authority_exclusion": (
+                dict(exclusion) if exclusion is not None else None
+            ),
         }
 
     previous_temperature = controls.get(
@@ -717,6 +763,8 @@ def _high_t_activity_for_parent(
         return legacy
     if parent_oxide not in _HIGH_T_FLUX_OXIDES or legacy is None:
         return legacy
+    if parent_oxide in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS:
+        return legacy
     activity = float(authority.get("activities_by_oxide", {}).get(parent_oxide, 0.0) or 0.0)
     if activity <= 0.0:
         return legacy
@@ -761,11 +809,26 @@ def _attach_high_t_activity_provenance(
         provenance["high_t_melt_activity_mode"] = str(
             authority.get("requested") or "openimcc"
         )
-        provenance["melt_activity_authority"] = provider
         provenance["melt_activity_temperature_K"] = authority.get(
             "temperature_K"
         )
-        if provider == "openimcc":
+        exclusion = (
+            _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(parent_oxide)
+            if provider == "openimcc"
+            else None
+        )
+        if exclusion is not None:
+            provenance["melt_activity_authority"] = exclusion["authority"]
+            provenance["openimcc_authority_excluded_K2O"] = {
+                "authority": exclusion["authority"],
+                "ruling": exclusion["ruling"],
+                "certification": exclusion["tracking_id"],
+                "reason": exclusion["reason"],
+                "citation": exclusion["citation"],
+            }
+            token = "openimcc_authority_excluded_K2O"
+        elif provider == "openimcc":
+            provenance["melt_activity_authority"] = provider
             provenance.update(
                 {
                     "openimcc_version": authority.get("openimcc_version"),
@@ -803,6 +866,7 @@ def _attach_high_t_activity_provenance(
             )
             token = "openimcc"
         else:
+            provenance["melt_activity_authority"] = provider
             provenance["melt_activity_fallback"] = True
             provenance["openimcc_refusal"] = fallback_reason
             token = "openimcc_refused_constant_gamma_fallback"

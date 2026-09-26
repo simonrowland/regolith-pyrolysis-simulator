@@ -18,6 +18,7 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
@@ -234,6 +235,37 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
     ]
     assert fe_provenance
     assert all(row["activity_basis"] != "kress91_ferrous" for row in fe_provenance)
+
+
+def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
+    result = _provider().dispatch(
+        _request(BASE_MELT_MOL, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
+    )
+    high_t = result.diagnostic["high_t_melt_activity"]
+    constant_gamma = melt_oxide_activity(
+        "K2O",
+        BASE_MELT_MOL,
+        temperature_K=CAP_PLUS_T_K,
+    )
+
+    assert high_t["activities_by_oxide"]["K2O"] == constant_gamma.activity
+    assert high_t["openimcc_activities_by_oxide"]["K2O"] != constant_gamma.activity
+    assert high_t["seam"]["K2O"]["ratio_dex_selected_over_below_cap"] == 0.0
+    assert high_t["seam"]["K2O"]["would_be_openimcc_step_dex"] < -2.0
+    assert high_t["authority_exclusions"]["K2O"]["tracking_id"] == "t-999"
+
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
+    k_rows = [provenance[species] for species in ("K", "K2", "K2O_gas")]
+    assert all(
+        row["melt_activity_authority"] == "constant_gamma"
+        and row["openimcc_authority_excluded_K2O"]["authority"] == "constant_gamma"
+        and row["openimcc_authority_excluded_K2O"]["ruling"] == "owner 2026-09-26"
+        and row["openimcc_authority_excluded_K2O"]["certification"] == "t-999"
+        for row in k_rows
+    )
+    assert high_t["activities_by_oxide"]["Na2O"] == high_t[
+        "openimcc_activities_by_oxide"
+    ]["Na2O"]
 
 
 def test_provider_omitted_high_t_control_defaults_to_openimcc() -> None:
