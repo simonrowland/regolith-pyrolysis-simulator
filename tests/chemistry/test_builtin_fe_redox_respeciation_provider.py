@@ -155,6 +155,33 @@ def test_respeciation_provider_predicts_below_authoritative_temperature_band(
     assert result.diagnostic["temperature_band_authority"] == "extrapolated"
 
 
+def test_respeciation_provider_predicts_in_experimentally_confirmed_extrapolation_band(
+    formula_registry,
+):
+    result = BuiltinFeRedoxRespeciationProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"FeO": 10.0, "SiO2": 20.0},
+                "process.overhead_gas": {"O2": 10.0},
+            },
+            fO2_log=-3.0,
+            temperature_C=1800.0,
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["respeciation_status"] == (
+        "predicted_extrapolation"
+    )
+    assert result.diagnostic["temperature_band_case"] == (
+        "1630C_2100C_extrapolation_experimentally_confirmed"
+    )
+    assert result.diagnostic["temperature_band_authoritative"] is False
+    assert result.diagnostic["temperature_band_authority"] == "extrapolated"
+
+
 def test_oxidizing_respeciation_can_consume_internal_evaporative_o_carrier(
     formula_registry,
 ):

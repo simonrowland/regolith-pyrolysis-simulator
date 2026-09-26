@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 
 from simulator.chemistry.kernel import ProviderUnavailableError
-from simulator.core import FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 from simulator.optimize import sso_r_owner_surface
 from scripts import sso_r_validation_map as validation_map
 
@@ -352,7 +351,7 @@ def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
         assert math.isfinite(row["redox_source_delta_ln_fO2"])
 
 
-def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
+def test_run_row_does_not_emit_dead_evaporative_metal_source_branch(
     monkeypatch,
 ):
     setpoints, feedstocks, vapor_pressures = validation_map._load_data()
@@ -385,10 +384,10 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
         grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
     )
 
-    assert row["redox_source_terms_mol_o2_equiv_by_label"][
-        "redox_source:evaporative_metal_loss"
-    ] > 0.0
-    assert calls[-1] == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
+    assert "redox_source:evaporative_metal_loss" not in (
+        row["redox_source_terms_mol_o2_equiv_by_label"]
+    )
+    assert calls[-1] == "overhead_gas"
 
 
 def test_run_row_establishes_one_production_authority_pin(monkeypatch):
