@@ -83,9 +83,8 @@ def _openimcc_or_skip():
     return pytest.importorskip(
         "openimcc",
         reason=(
-            "openimcc is not importable; set "
-            "PYTHONPATH=/Users/simonrowland/Repos/openimcc/src or install it "
-            "before running the parity check"
+            "openimcc is not importable; install it or put an openimcc "
+            "checkout's src/ directory on PYTHONPATH before running the parity check"
         ),
     )
 

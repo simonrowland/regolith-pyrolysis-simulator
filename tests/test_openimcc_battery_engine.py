@@ -40,16 +40,24 @@ from tests.battery import factories as F
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SHARED_SCRATCH = Path(
-    "/Users/simonrowland/Repos/regolith-pyrolysis-simulator/"
-    "docs-private/research/2026-09-26-imcc-plante-score/scratch/"
-    "plante-analysis.json"
-)
-LOCAL_SCRATCH = (
-    REPO_ROOT
-    / "docs-private/research/2026-09-26-imcc-plante-score/scratch/plante-analysis.json"
-)
-VAPOROCK_ROOT = Path("/Users/simonrowland/Repos/VapoRock")
+PLANTE_HAND_ROWS = REPO_ROOT / "tests/fixtures/openimcc/plante_1979_hand_rows.json"
+
+
+def _vaporock_root() -> Path | None:
+    """VapoRock checkout root: OPENIMCC_VAPOROCK_ROOT, else the installed package's checkout."""
+    configured = os.environ.get("OPENIMCC_VAPOROCK_ROOT")
+    if configured:
+        return Path(configured)
+    import importlib.util
+
+    spec = importlib.util.find_spec("vaporock")
+    if spec is None or spec.origin is None:
+        return None
+    # <root>/src/vaporock/__init__.py -> <root>
+    return Path(spec.origin).resolve().parents[2]
+
+
+VAPOROCK_ROOT = _vaporock_root()
 
 
 def _require_openimcc() -> None:
@@ -57,10 +65,7 @@ def _require_openimcc() -> None:
 
 
 def _scratch_path() -> Path | None:
-    for path in (SHARED_SCRATCH, LOCAL_SCRATCH):
-        if path.is_file():
-            return path
-    return None
+    return PLANTE_HAND_ROWS if PLANTE_HAND_ROWS.is_file() else None
 
 
 def _binary_probe() -> BinaryPot:
@@ -285,7 +290,11 @@ def test_openimcc_plante_candidates_equal_packaged_hand_values() -> None:
 def test_openimcc_gas_table_mutation_to_vaporock_breaks_row_equality(monkeypatch) -> None:
     _require_openimcc()
     scratch = _scratch_path()
-    if scratch is None or not (VAPOROCK_ROOT / "src/vaporock/data/JANAF-vapor-data-full.csv").is_file():
+    if (
+        scratch is None
+        or VAPOROCK_ROOT is None
+        or not (VAPOROCK_ROOT / "src/vaporock/data/JANAF-vapor-data-full.csv").is_file()
+    ):
         pytest.skip("Plante scratch data or VapoRock checkout is not present")
     row = json.loads(scratch.read_text(encoding="utf-8"))["hand_rows"][0]
     composition_wt = {"K2O": float(row["K2O_wt_pct"]), "SiO2": float(row["SiO2_wt_pct"])}

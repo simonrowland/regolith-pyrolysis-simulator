@@ -23,11 +23,10 @@ else:
     _OPENIMCC_IMPORT_ERROR = None
 
 
-OPENIMCC_INSTALL_COMMAND = (
-    "/Users/simonrowland/Repos/regolith-pyrolysis-simulator/.venv/bin/python "
-    "-m pip install --no-deps -e /Users/simonrowland/Repos/openimcc"
+OPENIMCC_INSTALL_HINT = (
+    "python -m pip install --no-deps "
+    "'openimcc @ git+https://github.com/simonrowland/openimcc'"
 )
-OPENIMCC_TEST_PYTHONPATH = "/Users/simonrowland/Repos/openimcc/src"
 
 _PACK_RESOURCE_NAMES = {
     "v1.0.2": None,
@@ -44,9 +43,9 @@ class OpenImccUnavailableError(RuntimeError):
     def __init__(self, import_error: BaseException | None = None) -> None:
         self.reason = "openimcc_not_importable"
         self.remedy = (
-            "remedy: make openimcc importable; controller-managed install command: "
-            f"{OPENIMCC_INSTALL_COMMAND}; test-only alternative: "
-            f"PYTHONPATH={OPENIMCC_TEST_PYTHONPATH}"
+            "remedy: make openimcc importable, e.g. "
+            f"{OPENIMCC_INSTALL_HINT}; tests may instead put an openimcc "
+            "checkout's src/ directory on PYTHONPATH"
         )
         detail = ""
         if import_error is not None:
@@ -210,8 +209,7 @@ evaluate_openimcc = evaluate
 
 
 __all__ = [
-    "OPENIMCC_INSTALL_COMMAND",
-    "OPENIMCC_TEST_PYTHONPATH",
+    "OPENIMCC_INSTALL_HINT",
     "OpenImccBridgeResult",
     "OpenImccUnavailableError",
     "evaluate",
