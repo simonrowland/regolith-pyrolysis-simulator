@@ -1747,6 +1747,28 @@ species:
         composition_source: 'DeMaria 1971 text (Sample 12022,57 alkaline components paragraph): "0.36
           and 0.068 wt. % of Na2O and K2O, respectively"; full oxide suite reported elsewhere (Smales
           1971). Test fixture matches Na2O=0.36.'
+        printed_composition:
+          Na2O: 0.36
+          K2O: 0.068
+        printed_composition_source: DeMaria 1971, p. 1369, alkaline-components paragraph; printed alkalis take precedence for those named fields, while Smales supplies the unprinted bulk oxides.
+        composition_basis: printed_alkali_fields_plus_same_sample_catalog_major_oxides
+        composition_from_sample_catalog: true
+        composition_source_kind: published_same_sample_bulk_analysis
+        sample_oxide_composition_wt_pct:
+          SiO2: 42.3
+          Al2O3: 8.2
+          FeO: 21.6
+          MgO: 11.9
+          CaO: 9.0
+          Na2O: 0.23
+          K2O: 0.061
+          TiO2: 4.9
+          MnO: 0.31
+        composition_source_locator:
+          source_id: smales-1971-lpsc-12022
+          observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
+          published_pages: 1254–1255
+          quote: Apollo 12 rock 12022 analytical composition
         prior_figure_digitization_present: true
         admission_status: rejected_no_figure_reading
         series: upper_line_circles
@@ -1754,6 +1776,15 @@ species:
         first_observed_T_K: 1250.0
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
         co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
+        fO2_pairing:
+          status: unavailable_same_temperature_measured_pair
+          measured_at_same_T: false
+          oxygen_observation_id: demaria_1971_o2_psat_table1_alkali_range
+          reason: >-
+            Table 1 O2 points are at 1396 and 1475 K for sample 12022; none is at the
+            temperature of an admissible Na row. The nearest 1396 K point is context only,
+            not an in-cell fO2 pairing.
+          derivation_status: not_applied
         pO2_atm_as_published: 5.54e-09
         oxygen_partial_pressure:
           value: 5.54e-09
@@ -1916,20 +1947,27 @@ species:
         sample: '12065'
         sample_Na2O_wt_pct: 0.27
         sample_oxide_composition_wt_pct:
-          SiO2: 46.87
-          MgO: 7.82
-          Al2O3: 10.05
-          TiO2: 3.34
-          FeO: 19.76
-          CaO: 10.73
-          Na2O: 0.27
-          K2O: 0.073
-          MnO: 0.256
-        composition_source: Wolf et al. 2022/2023 VapoRock Table 2 "Lunar basalt" column (= Apollo 12065),
-          Refs [7] Maxwell & Wiik (1971); Meyer (2004); De Maria et al. (1971). DeMaria 1971 itself does
-          not tabulate 12065 bulk oxides (refers differences to composition without numbers). Extracted
-          from docs-private/deep-research/literature/wolf-2022-vaporock/mineru/source/vlm/source.md Table
-          2 + NOTE [7].
+          SiO2: 47.1
+          Al2O3: 9.8
+          FeO: 20.0
+          MgO: 9.2
+          CaO: 10.1
+          Na2O: 0.24
+          K2O: 0.063
+          TiO2: 3.1
+          MnO: 0.26
+        composition_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255;
+          same Apollo 12065 number, not a generic lunar-basalt composition. DeMaria 1971 does not tabulate
+          the full 12065 bulk oxides.
+        composition_basis: same_sample_catalog_bulk_analysis
+        sample_alkali_context_source: Wolf et al. 2022/2023 VapoRock Table 2; retained sample_Na2O_wt_pct=0.27 is legacy figure context, not the Smales bulk-map Na2O value.
+        composition_from_sample_catalog: true
+        composition_source_kind: published_same_sample_bulk_analysis
+        composition_source_locator:
+          source_id: smales-1971-lpsc-12022
+          observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
+          published_pages: 1254–1255
+          quote: Apollo 12 rock 12065 analytical composition
         prior_figure_digitization_present: true
         admission_status: rejected_no_figure_reading
         series: lower_line_squares
@@ -1940,6 +1978,15 @@ species:
           series; progressive depletion lowers later points). Not included in this pre-depletion set.'
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
         co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
+        fO2_pairing:
+          status: unavailable_same_temperature_measured_pair
+          measured_at_same_T: false
+          oxygen_observation_id: demaria_1971_o2_psat_table1_alkali_range
+          reason: >-
+            Table 1 O2 points are at 1433, 1459, 1471, 1482 and 1499 K for sample 12065;
+            none is at the temperature of an admissible Na row. The nearest 1433 K point is
+            context only, not an in-cell fO2 pairing.
+          derivation_status: not_applied
         pO2_atm_as_published: 3.78e-09
         oxygen_partial_pressure:
           value: 3.78e-09
