@@ -83,11 +83,11 @@ Each question below has a surface you can drive today. Where the surface is part
 here rather than left for you to discover.
 
 **"Moon rock in, ingots out — what does one batch actually produce?"**
-`python -m simulator.three_product_runner --feedstock <id> --campaign C2A --hours N` reports the
-four product classes of `CLAUDE.md` §5 — metals + O2, pure silica glass, industrial mixed glass,
-refractory ceramic rump — alongside an `ingots_metals` / `oxygen` / `glass` / `captured_volatiles`
-breakdown. It also reports `unclassified`, which is the honesty account: mass the classifier could
-not assign. A growing `unclassified` is a finding about the classifier, not a product.
+The classification-only helper is useful for a quick product-bucket check, but the canonical batch
+runner in [Hero run](#hero-run-1-kg-lunar-mare-to-2200-c) also records the backend, furnace endpoint,
+wall deposit, and audited mass disposition. It reports `unclassified`, which is the honesty account:
+mass the classifier could not assign. A growing `unclassified` is a finding about the classifier,
+not a product.
 
 **"How high can yield go if the furnace is only rated to 1300 °C?"**
 `python -m simulator.optimize --constrained-max` switches the study to yield-under-ceilings mode,
@@ -178,6 +178,54 @@ Model-bearing citations are tracked in [`docs/references/`](docs/references/): a
 ```
 
 ## Quick Start
+
+### Hero run: 1 kg lunar mare to 2200 °C
+
+This is the smallest end-to-end demonstration of the product story. The command uses the default
+`furnace_material: zirconia_ysz` hot-wall configuration (catalog ceiling 2200 °C), runs the
+continuous `C2A` campaign long enough to reach that ceiling, and writes the full report to
+`hero-run.json`:
+
+```bash
+python3 -m simulator.runner \
+  --feedstock lunar_mare_low_ti \
+  --campaign C2A \
+  --hours 225 \
+  --mass-kg 1 \
+  --backend internal-analytical \
+  --include-wall-deposit-rate-diagnostics \
+  --output hero-run.json
+```
+
+Recorded on the current green checkout with the built-in analytical backend:
+
+| audited result | value |
+|---|---:|
+| Furnace endpoint | 2200 °C at hour 213; held through hour 225 |
+| Extracted charge | 0.825164 kg (82.5164%) |
+| Feedstock-element extraction | Fe 94.2003%; O 61.0110%; Si, Al, Ca, Mg, Ti, Na, K, S, Cl, Mn, Cr ~100% |
+| Fe ingot | 0.123948 kg |
+| All ingots | 0.332022 kg |
+| Stored O2 | 0.137477 kg |
+| Stage-3 SiO2 capture | 0.086935 kg; qualified pure-silica product 0 kg (analytical carrier is non-authoritative) |
+| Mixed glass | 0 kg; the canonical runner does not classify mid-run melt as glass |
+| Captured volatiles | 0.652229 kg (classification view; overlaps ingot projections, so do not sum product rows) |
+| Refractory rump | 0.013089 kg retained; 0.000221 kg refractory-oxide class |
+| Wall deposit | 0.000150951 kg Fe; lifespan rate 0.0000301902 kg/campaign, non-authoritative |
+| Unclassified | 0.001310 kg |
+| Mass closure | max per-hour error 4.44e-14%; audited disposition residual 2.70e-15 |
+
+The product-class rows are convenience projections and overlap. The extracted-charge percentage and
+closure above come from the report's origin-first `yield_disposition` ledger, whose terminal mass
+partition is: 0.529685 kg condensed, 0.034239 kg tapped, 0.137477 kg oxygen, 0.122878 kg vented,
+0.000734 kg cleanup-sequestered, and 0.000151 kg wall deposit; 0.013089 kg remains in the melt and
+0.161747 kg remains in the redox buffer.
+
+The report status is `partial / pending_decision`: VapoRock was importable on the run machine but was
+not the active engine; the active vapor-pressure source was `builtin-vapor-pressure` with VapoRock as
+a shadow. The analytical report marks 20 of 21 pressure summaries as extrapolated and the remaining
+one as a pO2-floor inversion. Treat the silica qualification and wall-lifespan number as diagnostic,
+not hardware certification.
 
 From a source checkout, run the dependency installer:
 
