@@ -38,7 +38,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Sequence
+from typing import Any, Mapping, Sequence
 
 from simulator.battery.enums import (
     MethodToken,
@@ -257,6 +257,26 @@ def _is_kinetic_or_yield(quantity: Quantity) -> bool:
     }
 
 
+def comparison_method_cell_constant_cancels(
+    provenance: Mapping[str, Any] | None,
+) -> bool:
+    """Return true only for grounded same-setup comparison activity evidence."""
+
+    if not isinstance(provenance, Mapping):
+        return False
+    method = provenance.get("comparison_method")
+    cell_constant = provenance.get("common_knudsen_cell_constant")
+    pairing = provenance.get("melt_reference_pairing")
+    return (
+        isinstance(method, Mapping)
+        and method.get("kind") in {"ratio", "comparison_ratio"}
+        and isinstance(cell_constant, Mapping)
+        and cell_constant.get("cancels") is True
+        and isinstance(pairing, Mapping)
+        and pairing.get("kind") in {"same_cell", "same_effective_setup"}
+    )
+
+
 # Quantity classes the schema scopes by method. Unknown method on these
 # cannot decide which geometry packet applies; it is not an orifice
 # failure. Thermochemistry is intentionally absent.
@@ -289,6 +309,8 @@ def _quantity_scopes_apparatus_by_method(quantity: Quantity) -> bool:
 def underdetermined_apparatus(
     experiment: Experiment,
     quantity: Quantity,
+    *,
+    observation: Observation | None = None,
 ) -> GateOutcome:
     """Pressure/flux conversion requires the method's geometry determinants."""
 
@@ -348,7 +370,24 @@ def underdetermined_apparatus(
         if not calibrated:
             return _fail(RefusalReason.UNDERDETERMINED_APPARATUS, checks, "kems_calibration")
     elif _is_effusion_pressure(method, quantity):
-        if geometry is None:
+        comparison_activity = (
+            quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and observation is not None
+            and comparison_method_cell_constant_cancels(observation.provenance)
+        )
+        if comparison_activity:
+            checks.append(
+                GateCheck(
+                    "comparison_method_cell_constant_cancels",
+                    True,
+                    {
+                        "method": "comparison_ratio",
+                        "pairing": "same_cell_or_same_effective_setup",
+                        "geometry": "not_required_for_normalized_activity",
+                    },
+                )
+            )
+        elif geometry is None:
             missing.extend(["orifice_area_m2", "clausing_factor"])
         else:
             if (
@@ -587,7 +626,7 @@ def run_validity_gates(
             )
         )
     if quantity is not None:
-        absorb(underdetermined_apparatus(experiment, quantity))
+        absorb(underdetermined_apparatus(experiment, quantity, observation=observation))
         absorb(effusion_regime_unverified(experiment, quantity))
         absorb(background_pressure_high(experiment, quantity))
     if primary is not None:

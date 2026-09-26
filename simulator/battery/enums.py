@@ -162,6 +162,8 @@ class NoticeKind(StrEnum):
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.
     INPUT_OMITTED = "input_omitted"
+    COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
+    PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
 
 
 class ReferenceStateConvention(StrEnum):

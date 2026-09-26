@@ -836,6 +836,64 @@ def test_calibrated_kems_pressure_needs_no_effusion_geometry(quantity: Quantity)
     assert outcome.passed is True
 
 
+def test_comparison_activity_cancels_cell_geometry_only_for_activity() -> None:
+    provenance = {
+        "comparison_method": {"kind": "ratio"},
+        "common_knudsen_cell_constant": {"cancels": True},
+        "melt_reference_pairing": {"kind": "same_effective_setup"},
+    }
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=True
+    )
+    observation = replace(
+        F.observation(
+            "tsaplin-activity",
+            experiment.experiment_id,
+            F.activity_identity(),
+            Decimal("0.2"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        provenance=provenance,
+    )
+    gate = underdetermined_apparatus(
+        experiment, Quantity.ACTIVITY, observation=observation
+    )
+    assert gate.passed is True
+    assert any(
+        check.name == "comparison_method_cell_constant_cancels" and check.passed
+        for check in gate.checks
+    )
+    full_gate = run_validity_gates(experiment, observation)
+    assert full_gate.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+    without_provenance = replace(observation, provenance=None)
+    missing = underdetermined_apparatus(
+        experiment, Quantity.ACTIVITY, observation=without_provenance
+    )
+    assert missing.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert missing.primary_check == "geometry_determinants"
+
+    uncalibrated = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    partial_identity = replace(F.psat_identity("Na"), quantity=Quantity.P_PARTIAL)
+    partial = replace(
+        F.observation(
+            "tsaplin-partial-pressure",
+            uncalibrated.experiment_id,
+            partial_identity,
+            Decimal("0.2"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        provenance=provenance,
+    )
+    partial_gate = underdetermined_apparatus(
+        uncalibrated, Quantity.P_PARTIAL, observation=partial
+    )
+    assert partial_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert partial_gate.primary_check == "kems_calibration"
+
+
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:
     exp = F.kems_experiment(orifice_area=None, clausing=None)
     assert exp.apparatus is not None
