@@ -889,7 +889,11 @@ def _standard_state_from_plain(payload: object) -> StandardState:
         convention=_enum(ReferenceStateConvention, payload["convention"]),
         endmember=_species_from_plain(payload["endmember"]),
         component_basis=str(payload.get("component_basis") or ""),
-        reference_pressure_bar=as_decimal(payload.get("reference_pressure_bar") or 1),
+        reference_pressure_bar=(
+            None
+            if payload.get("reference_pressure_bar") in (None, "")
+            else as_decimal(payload.get("reference_pressure_bar"))
+        ),
     )
 
 
@@ -2297,6 +2301,54 @@ def _initial_oxide_map_from_values(
     return _oxide_map_from_mapping(values)
 
 
+def _mole_fraction_composition_from_values(
+    values: object,
+) -> tuple[Composition | None, tuple[str, ...]]:
+    """Map a printed mole-fraction composition.
+
+    A key that is not a species formula is the unnamed remainder (for example
+    ``minor constituents``). It is omitted and returned so the caller can flag
+    it. The named oxides still map.
+    """
+
+    if not isinstance(values, Mapping):
+        return None, ()
+    from simulator.battery.score import parse_species_formula
+
+    raw = values.get("composition_mol")
+    components: list[tuple[str, Decimal]] = []
+    omitted: list[str] = []
+    if isinstance(raw, Mapping):
+        for name, amount in raw.items():
+            parsed = _as_dec_or_none(amount)
+            if parsed is None:
+                continue
+            token = str(name).strip()
+            if parse_species_formula(token) is None:
+                omitted.append(token)
+                continue
+            components.append((token, parsed))
+    if len(components) < 2:
+        for key in ("X_Na2O_as_published", "X_Na2O"):
+            fraction = _as_dec_or_none(values.get(key))
+            if fraction is None or not Decimal("0") <= fraction <= Decimal("1"):
+                continue
+            components = [("Na2O", fraction), ("SiO2", Decimal("1") - fraction)]
+            break
+    if len(components) < 2:
+        return None, tuple(omitted)
+    if omitted:
+        return None, tuple(omitted)
+    return (
+        Composition(
+            basis="printed_mole_fraction",
+            components=tuple(components),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        ),
+        tuple(omitted),
+    )
+
+
 def _printed_map_payload(wt: Mapping[str, Decimal]) -> dict[str, str]:
     return {str(k): _dec_str(as_decimal(v)) for k, v in wt.items()}
 
@@ -2329,6 +2381,13 @@ def wt_pct_to_mole_fraction_derivation(
 
 def composition_unknown_reason() -> str:
     return f"no composition field under keys {_COMPOSITION_LOOKED_FOR} in this extract"
+
+
+def partial_composition_unknown_reason(omitted_components: Sequence[str]) -> str:
+    return (
+        "partial_composition: omitted non-formula component(s): "
+        + ", ".join(omitted_components)
+    )
 
 
 def bulk_property_species_formula(
@@ -4595,6 +4654,227 @@ def make_species(
     )
 
 
+# A formula token may contain an interior decimal (NaO0.5). A trailing period
+# is sentence punctuation and is not part of the token.
+_REFERENCE_FORMULA = (
+    r"[A-Z][A-Za-z0-9]*(?:\.[0-9]+)?(?:[A-Za-z][A-Za-z0-9]*(?:\.[0-9]+)?)*"
+)
+_NOT_A_REFERENCE_FORMULA = frozenset({"oxide", "metal", "phase"})
+
+
+def _reference_formula_token(raw: object) -> str | None:
+    if not isinstance(raw, str):
+        return None
+    token = raw.strip().rstrip(".")
+    if token.casefold() in _NOT_A_REFERENCE_FORMULA:
+        return None
+    if re.fullmatch(_REFERENCE_FORMULA, token):
+        return token
+    return None
+
+
+def _printed_reference_pressure_bar(lowered: str) -> Decimal | None:
+    """Bar number printed in the prose. 'pressure of interest' is not 1 bar."""
+
+    match = re.search(r"(?<![0-9.])(\d+(?:\.\d+)?)\s*-?\s*bar\b", lowered)
+    if match is None:
+        return None
+    return Decimal(match.group(1))
+
+
+def _reference_phase_tokens(lowered: str) -> set[str]:
+    found: set[str] = set()
+    if re.search(r"\bliquid\b|\(l\)", lowered):
+        found.add("liquid")
+    if re.search(r"\bsolid\b|\(s\)|\(c\)|\btridymite\b", lowered):
+        found.add("solid")
+    return found
+
+
+def _named_reference_endmembers(text: str) -> list[tuple[str, str]]:
+    pairs: list[tuple[str, str]] = []
+    for match in re.finditer(rf"\b(liquid|solid)\s+({_REFERENCE_FORMULA})\b", text):
+        formula = _reference_formula_token(match.group(2))
+        if formula is not None:
+            pairs.append((match.group(1).casefold(), formula))
+    for match in re.finditer(
+        rf"\b({_REFERENCE_FORMULA})\s*\(\s*([lscLSC])\s*\)", text
+    ):
+        formula = _reference_formula_token(match.group(1))
+        if formula is None:
+            continue
+        phase = "liquid" if match.group(2).casefold() == "l" else "solid"
+        pairs.append((phase, formula))
+    return pairs
+
+
+def _names_raoultian_standard(text: str, lowered: str) -> bool:
+    if "ラウール" in text:
+        return True
+    if re.search(r"\bnot\s+(?:a\s+)?raoult(?:ian)?(?:\b|_)", lowered):
+        return False
+    return re.search(r"\braoult(?:ian)?(?:\b|_)", lowered) is not None
+
+
+def _reference_endmember_formula(
+    text: str,
+    species_formula: str,
+    values: Mapping[str, Any],
+) -> str | None:
+    explicit = re.search(
+        rf"endmember(?:\s+formula)?\s*[:=]\s*({_REFERENCE_FORMULA})\b",
+        text,
+    )
+    if explicit:
+        token = _reference_formula_token(explicit.group(1))
+        if token is not None:
+            return token
+    named = []
+    for _phase, formula in _named_reference_endmembers(text):
+        if formula not in named:
+            named.append(formula)
+    if species_formula and species_formula in named:
+        return species_formula
+    if len(named) == 1:
+        return named[0]
+    if len(named) > 1:
+        return None
+    for key in (
+        "reference_state_endmember_formula",
+        "oxide_formula_as_published",
+        "oxide",
+        "formula",
+    ):
+        token = _reference_formula_token(values.get(key))
+        if token is not None:
+            return token
+    return _reference_formula_token(species_formula) or (
+        species_formula if species_formula else None
+    )
+
+
+def _reference_phase_for_formula(
+    text: str,
+    lowered: str,
+    formula: str,
+    convention: ReferenceStateConvention,
+) -> Phase | State[Phase]:
+    attached = {
+        phase
+        for phase, named in _named_reference_endmembers(text)
+        if named == formula
+    }
+    if formula.casefold() == "sio2" and "tridymite" in lowered:
+        attached.add("solid")
+    if attached == {"liquid"}:
+        return Phase.L
+    if attached == {"solid"}:
+        return Phase.CR
+    if len(attached) > 1:
+        return State.unknown(
+            f"source names more than one phase for reference endmember {formula}"
+        )
+    tokens = _reference_phase_tokens(lowered)
+    if tokens == {"liquid"}:
+        return Phase.L
+    if tokens == {"solid"}:
+        return Phase.CR
+    if len(tokens) > 1:
+        return State.unknown(
+            "source names both a solid and a liquid reference; "
+            "phase is not one endmember"
+        )
+    if convention is ReferenceStateConvention.HENRIAN_LIQUID:
+        return Phase.L
+    if convention is ReferenceStateConvention.HENRIAN_SOLID:
+        return Phase.CR
+    return State.unknown("source does not print the reference endmember phase")
+
+
+def reference_state_from_extract(
+    raw: object,
+    *,
+    species_formula: str,
+    values: Mapping[str, Any],
+) -> State[StandardState] | None:
+    """Lift an explicit extract ``standard_state`` into the typed identity.
+
+    The extract field is source prose, so an unrecognised or explicitly
+    unprinted statement remains an unknown rather than becoming a convention
+    by inference. A printed Raoultian activity standard is not overridden by
+    an infinite-dilution coefficient in the same sentence. The phase is the
+    phase printed for that endmember. Reference pressure is a printed bar
+    number, never a default of 1 bar.
+    """
+
+    if raw in (None, ""):
+        return None
+    text = " ".join(str(raw).split())
+    lowered = text.casefold()
+    if not text:
+        return None
+
+    if "vapour reference" in lowered or "vapor reference" in lowered:
+        return State.unknown(
+            "source names a vapour reference; no typed vapour convention exists"
+        )
+    if "not printed" in lowered or "not stated" in lowered:
+        return State.unknown(f"source reference state not printed: {text}")
+    if re.search(r"\bnot\s+(?:a\s+)?raoult(?:ian)?(?:\b|_)", lowered):
+        return State.unknown(
+            f"source explicitly excludes a Raoultian reference state: {text}"
+        )
+    if re.search(
+        r"(?:\braoult(?:ian)?\b\s*(?:/|and)\s*\bhenr(?:ian|y)\b|"
+        r"\bhenr(?:ian|y)\b\s*(?:/|and)\s*\braoult(?:ian)?\b)",
+        lowered,
+    ):
+        return State.unknown(
+            f"source names both Raoultian and Henrian conventions: {text}"
+        )
+
+    if _names_raoultian_standard(text, lowered):
+        convention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    elif (
+        lowered.startswith(("henrian", "henry"))
+        or "infinite-dilution" in lowered
+        or "infinite dilution" in lowered
+        or re.search(r"\bhenry\b", lowered)
+    ):
+        tokens = _reference_phase_tokens(lowered)
+        convention = (
+            ReferenceStateConvention.HENRIAN_SOLID
+            if tokens == {"solid"}
+            else ReferenceStateConvention.HENRIAN_LIQUID
+        )
+    elif "1 wt%" in lowered or "1 wt.%" in lowered or "one wt%" in lowered:
+        convention = ReferenceStateConvention.HYPOTHETICAL_1WT_PCT
+    elif "pure liquid" in lowered or "pure solid" in lowered or "tridymite" in lowered:
+        convention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    elif re.search(r"\b(?:liquid|solid)\s+[A-Z]", text):
+        convention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    elif "pure " in lowered and "metal" in lowered:
+        convention = ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    else:
+        return State.unknown(f"source standard_state is not typed: {text}")
+
+    formula = _reference_endmember_formula(text, species_formula, values)
+    if formula is None:
+        return State.unknown(
+            "source standard_state does not name one reference endmember"
+        )
+    phase = _reference_phase_for_formula(text, lowered, formula, convention)
+    endmember = make_species(formula, phase)
+    return State.of(
+        StandardState(
+            convention=convention,
+            endmember=endmember,
+            component_basis=formula,
+            reference_pressure_bar=_printed_reference_pressure_bar(lowered),
+        )
+    )
+
+
 def polymorph_from_extract(obs: Mapping[str, Any]) -> State[str] | None:
     form = obs.get("condensed_form")
     if isinstance(form, Mapping) and form.get("polymorph"):
@@ -5492,6 +5772,14 @@ def select_declared_source(
             )
         if condition_ranges:
             name, lo, hi = condition_ranges[0]
+            if lo == hi:
+                return _point_selection(
+                    lo,
+                    name,
+                    "as_published:K",
+                    payload,
+                    condition_ranges,
+                )
             return _unavailable_selection(
                 f"source {name} [{lo}, {hi}] is a temperature domain, not a point",
                 condition_ranges=condition_ranges,
@@ -8432,6 +8720,19 @@ class Migrator:
             quantity if isinstance(quantity, Quantity) else None
         )
         initial_oxide_map = _initial_oxide_map_from_values(values)
+        initial_composition, omitted_components = _mole_fraction_composition_from_values(
+            values
+        )
+        if omitted_components:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["composition"],
+                "omitted non-formula composition component(s): "
+                + ", ".join(omitted_components),
+                source=source_key,
+                observation_id=obs_id,
+            )
         if q_token in _BULK_PROPERTY_QUANTITIES:
             species_formula = bulk_property_species_formula(
                 quantity=q_token,
@@ -8554,7 +8855,13 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
-        if initial_oxide_map:
+        if omitted_components:
+            ident_kwargs["composition"] = State.unknown(
+                partial_composition_unknown_reason(omitted_components)
+            )
+        elif initial_composition is not None:
+            ident_kwargs["composition"] = State.of(initial_composition)
+        elif initial_oxide_map:
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(initial_oxide_map)
             )
@@ -8588,7 +8895,28 @@ class Migrator:
             and values.get("Delta_f_G_298_kJ_mol") is not None
         ):
             ident_kwargs["temperature_K"] = State.of(Decimal("298.15"))
-        if suffix_reference:
+        source_reference_state = None
+        if q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+            source_standard_state = obs.get("standard_state")
+            if source_standard_state in (None, ""):
+                source_standard_state = values.get("standard_state")
+            source_reference_state = reference_state_from_extract(
+                source_standard_state,
+                species_formula=species.formula,
+                values=values,
+            )
+        if source_reference_state is not None:
+            ident_kwargs["reference_state"] = source_reference_state
+            if source_reference_state.is_unknown:
+                self.result.add_queue(
+                    work.work_id,
+                    locator,
+                    ["reference_state"],
+                    source_reference_state.reason or "source reference state is unknown",
+                    source=source_key,
+                    observation_id=obs_id,
+                )
+        elif suffix_reference:
             ident_kwargs["reference_state"] = State.unknown(
                 f"qualifier {suffix_reference} does not name a reference_state"
             )

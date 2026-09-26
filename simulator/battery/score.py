@@ -1453,6 +1453,26 @@ def predict_with_engine(
             identity=identity,
         )
 
+    if quantity in MELT_ACTIVITY_QUANTITIES and (
+        identity.composition is None or not identity.composition.is_value
+    ):
+        composition_reason = (
+            "composition is missing"
+            if identity.composition is None
+            else identity.composition.reason or "composition is not a value"
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={"reason": "composition_incomplete", "detail": composition_reason},
+            identity=identity,
+            requested_composition=identity.composition,
+        )
+
     # Formation and pure-standard quantities are not melt activities or
     # partial pressures. A missing branch used to read those maps and
     # return the wrong unit. Refuse instead of emitting 0.
