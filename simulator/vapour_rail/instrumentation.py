@@ -535,7 +535,7 @@ def serialize_melt_activity_shadow(
             ),
         }
     answers_omitted_count = shadow_answer_count - len(answer_payloads)
-    return {
+    payload = {
         "schema": "melt_activity_shadow.v1",
         "behavior_authority": False,
         "batch_shadow": shadow_payload,
@@ -551,6 +551,9 @@ def serialize_melt_activity_shadow(
             )
         ),
     }
+    if isinstance(shadow_payload, Mapping) and "imcc_activity_shadow" in shadow_payload:
+        payload["imcc_activity_shadow"] = shadow_payload["imcc_activity_shadow"]
+    return payload
 
 
 # ---------------------------------------------------------------------------

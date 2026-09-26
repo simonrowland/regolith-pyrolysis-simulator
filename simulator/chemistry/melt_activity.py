@@ -41,6 +41,21 @@ MELT_OXIDE_ACTIVITY_LIMITATION = (
 MELT_OXIDE_ACTIVITY_REFERENCE_STATE = (
     "single_cation_Raoultian_pure_liquid_reference"
 )
+HIGH_T_MELT_ACTIVITY_MODES = frozenset({"openimcc", "constant_gamma"})
+
+
+def normalize_high_t_melt_activity(value: Any) -> str:
+    """Validate the session/recipe high-temperature activity authority."""
+
+    mode = str(value or "").strip().lower()
+    if mode not in HIGH_T_MELT_ACTIVITY_MODES:
+        allowed = ", ".join(sorted(HIGH_T_MELT_ACTIVITY_MODES))
+        raise ValueError(
+            f"high_t_melt_activity must be one of {allowed}; got {value!r}"
+        )
+    return mode
+
+
 # Asserted single-cation mole fraction at which the pure-endmember continuity
 # shell begins. This cutoff is not derived from an error budget, activity
 # tolerance, composition-domain boundary, or literature datum: any blend_start

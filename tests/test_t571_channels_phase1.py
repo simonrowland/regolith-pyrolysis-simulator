@@ -1082,6 +1082,7 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
         ellingham_stoichiometry,
     )
     from simulator.chemistry.melt_activity import melt_oxide_activity
+    from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
     # The provider's Ellingham path evaluates K_decomp with the legacy
     # simulator.state gas constant (8.31446), not the CODATA value in
     # simulator.physical_constants — the recomputation must use the same one.
@@ -1196,6 +1197,26 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                 a_oxide = oxide_activity.equivalent_parent_activity(
                     n_ox / n_M
                 )
+                if T_K > VAPOROCK_T_MAX_K:
+                    # Above the VapoRock cap the melt-activity AUTHORITY is
+                    # openimcc (owner ruling 2026-09-26); only the activity
+                    # source changes, the Ellingham algebra does not.
+                    # Derivation: 2 M + O2 = 2 MO gives n_M = n_ox = 2, so
+                    # root = (K * a_MO**2 / pO2)**0.5 = a_MO * sqrt(K / pO2),
+                    # and root_new / root_legacy = a_MO,openimcc / a_MO,legacy
+                    # at the same K and pO2. Measured on this melt at
+                    # 2073.15 K: CaO -1.1436 dex (14x), MgO -1.2010 dex (16x).
+                    # So the algebra is still checked exactly, using the
+                    # activity the provider actually used.
+                    high_t = diag["high_t_melt_activity"]
+                    a_high_t = float(high_t["activities_by_oxide"][parent])
+                    assert prov["melt_activity_authority"] == "openimcc"
+                    assert math.isfinite(a_high_t) and a_high_t > 0.0
+                    assert a_high_t != a_oxide, (
+                        f"{parent} above the cap still equals the legacy "
+                        "constant-gamma activity"
+                    )
+                    a_oxide = a_high_t
                 dG = ellingham_delta_g_kj_per_mol_o2(species, T_K)
                 K_decomp = math.exp(
                     dG * 1000.0 / (PROVIDER_GAS_CONSTANT * T_K)
