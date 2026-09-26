@@ -1,6 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.core import Atmosphere, CampaignPhase, PyrolysisSimulator
@@ -69,6 +70,31 @@ def test_stage0_mars_feedstock_uses_surface_co2_backpressure():
     assert sim.melt.pO2_mbar == 0.0
     assert snapshot.overhead.pressure_mbar == 6.0
     assert snapshot.overhead.composition["CO2"] == 5.76
+
+
+def test_hot_mars_headspace_uses_co2_buffer_equilibrium():
+    sim = _sim(
+        {
+            "mars": {
+                "label": "Mars",
+                "composition_wt_pct": {"SiO2": 100.0},
+                "surface_pressure_mbar": 6,
+                "atmosphere": "96% CO2",
+            }
+        }
+    )
+
+    sim.load_batch("mars")
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 1500.0
+    reservoir = sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+
+    assert reservoir.headspace_pO2_basis == "carrier_buffer_equilibrium"
+    assert reservoir.headspace_transport_pO2_bar > 1.0e-9
+    assert reservoir.headspace_transport_pO2_bar == pytest.approx(
+        6.5e-5,
+        rel=0.35,
+    )
 
 
 def test_all_builtin_mars_feedstocks_define_co2_environment():

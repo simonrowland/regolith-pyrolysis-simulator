@@ -1140,6 +1140,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar: Dict[str, float] = {}
+        self._headspace_transport_source_total_mol_s = 0.0
+        self._headspace_transport_source_o2_mol_s = 0.0
+        self._headspace_transport_source_o2_buffer_mol_this_hr = 0.0
+        self._headspace_transport_source_o2_committed_mol_this_hr = 0.0
+        self._headspace_transport_source_o2_overhead_mol_this_hr = 0.0
+        self._headspace_transport_source_mass_kg_s = 0.0
+        self._headspace_transport_source_molar_mass_kg_mol = (
+            OXYGEN_MOLAR_MASS_KG_PER_MOL
+        )
+        self._headspace_co2_buffer_polynomials = None
+        self._last_headspace_transport_diagnostic: Dict[str, Any] = {
+            'basis': 'floor',
+            'regime': '',
+            'conductance_m3_s': 0.0,
+            'knudsen_number': 0.0,
+            'formula_id': '',
+        }
 
         # --- Batch record ---
         self.record = BatchRecord()
@@ -1497,6 +1514,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.oxygen_cumulative_kg = 0.0
         self.O2_vented_cumulative_kg = 0.0
         self.O2_stored_cumulative_kg = 0.0
+        # A new batch must not inherit the prior batch's ledger-derived source
+        # predictor before its first evaporation transition commits.
+        self._headspace_transport_source_total_mol_s = 0.0
+        self._headspace_transport_source_o2_mol_s = 0.0
+        self._headspace_transport_source_o2_buffer_mol_this_hr = 0.0
+        self._headspace_transport_source_o2_committed_mol_this_hr = 0.0
+        self._headspace_transport_source_o2_overhead_mol_this_hr = 0.0
+        self._headspace_transport_source_mass_kg_s = 0.0
+        self._headspace_transport_source_molar_mass_kg_mol = (
+            OXYGEN_MOLAR_MASS_KG_PER_MOL
+        )
         self._mre_anode_O2_kg_this_hr = 0.0
         self._o2_bubbler_injected_kg = 0.0
         self._o2_bubbler_absorbed_kg = 0.0
@@ -3903,6 +3931,383 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
 
+    def _headspace_duct_geometry(self) -> tuple[float, float]:
+        """Return validated equipment duct geometry, refusing omissions."""
+
+        from simulator.overhead import OverheadConfigurationError
+
+        # EquipmentDesigner is the existing authority for the runtime pipe;
+        # initialize it here for pre-step diagnostic callers as well as the
+        # normal hour loop, instead of reading OverheadGasModel's constructor
+        # defaults as an implicit transport geometry.
+        if getattr(self, '_equipment', None) is None:
+            melt_area = getattr(self.melt, 'melt_surface_area_m2', None)
+            try:
+                melt_area_value = float(melt_area)
+            except (TypeError, ValueError) as exc:
+                raise OverheadConfigurationError(
+                    'headspace duct requires initialized melt geometry'
+                ) from exc
+            if not math.isfinite(melt_area_value) or melt_area_value <= 0.0:
+                raise OverheadConfigurationError(
+                    'headspace duct requires initialized melt geometry'
+                )
+            self._get_turbine_spec()
+        pipe = getattr(getattr(self, '_equipment', None), 'pipe', None)
+        if pipe is None:
+            raise OverheadConfigurationError(
+                'headspace duct requires equipment.pipe geometry'
+            )
+        values = {}
+        for name in ('diameter_m', 'length_m'):
+            raw = getattr(pipe, name, None)
+            try:
+                value = float(raw)
+            except (TypeError, ValueError) as exc:
+                raise OverheadConfigurationError(
+                    f'headspace duct requires finite positive pipe.{name}'
+                ) from exc
+            if not math.isfinite(value) or value <= 0.0:
+                raise OverheadConfigurationError(
+                    f'headspace duct requires finite positive pipe.{name}; '
+                    f'got {raw!r}'
+                )
+            values[name] = value
+        return values['diameter_m'], values['length_m']
+
+    def _headspace_evaporative_o2_source_mol(
+        self,
+        transition_start_index: int,
+    ) -> tuple[float, float]:
+        """Read gross evaporative O₂ coproducts from this tick's ledger.
+
+        Premise: ``EVAPORATION_TRANSITION`` parks parent-oxide oxygen in the
+        ``reservoir.fo2_buffer`` account before the gas exchange step. Algebra:
+        sum positive O₂ credits on ``evaporate_*`` transitions, then divide
+        credited kg by the O₂ molar mass (kg/mol). Units are mol. The buffer
+        and already-overhead destinations are returned separately: only the
+        buffer leg needs an exchange transition, while both legs contribute to
+        the duct source. Filtering the transition name excludes oxygen
+        exchanged with the melt or bubbler from the duct source rate.
+        """
+
+        buffer_mol = 0.0
+        overhead_mol = 0.0
+        transitions = self.atom_ledger.transitions
+        start = max(0, int(transition_start_index))
+        for transition in transitions[start:]:
+            if not str(getattr(transition, 'name', '')).startswith('evaporate_'):
+                continue
+            for lot in getattr(transition, 'credits', ()):
+                account = str(getattr(lot, 'account', ''))
+                if account not in {FO2_BUFFER_ACCOUNT, 'process.overhead_gas'}:
+                    continue
+                o2_kg = max(
+                    0.0,
+                    float((getattr(lot, 'species_kg', {}) or {}).get(
+                        OXYGEN_SPECIES,
+                        0.0,
+                    )),
+                )
+                o2_mol = o2_kg / OXYGEN_MOLAR_MASS_KG_PER_MOL
+                if account == FO2_BUFFER_ACCOUNT:
+                    buffer_mol += o2_mol
+                elif account == 'process.overhead_gas':
+                    overhead_mol += o2_mol
+        return max(0.0, buffer_mol), max(0.0, overhead_mol)
+
+    def _set_headspace_transport_source_rates(
+        self,
+        evap_flux: EvaporationFlux,
+        *,
+        transition_start_index: int,
+    ) -> None:
+        """Build duct source molar rates from committed vapor and ledger O₂."""
+
+        total_mol_s = 0.0
+        total_mass_kg_s = 0.0
+        for species, raw_rate_kg_hr in (
+            getattr(evap_flux, 'species_kg_hr', {}) or {}
+        ).items():
+            rate_kg_hr = max(0.0, float(raw_rate_kg_hr or 0.0))
+            if rate_kg_hr <= 0.0:
+                continue
+            formula = resolve_species_formula(
+                species,
+                self.species_formula_registry,
+            )
+            molar_mass_kg_mol = float(formula.molar_mass_kg_per_mol())
+            if not math.isfinite(molar_mass_kg_mol) or molar_mass_kg_mol <= 0.0:
+                raise AccountingError(
+                    f'headspace source requires positive molar mass for {species!r}'
+                )
+            # EvaporationFlux is kg/hr. Dividing by 3600 converts the source
+            # to kg/s, and dividing again by kg/mol gives mol/s.
+            total_mass_kg_s += rate_kg_hr / 3600.0
+            total_mol_s += rate_kg_hr / (
+                3600.0 * molar_mass_kg_mol
+            )
+
+        buffer_o2_mol, overhead_o2_mol = self._headspace_evaporative_o2_source_mol(
+            transition_start_index
+        )
+        gross_o2_mol = buffer_o2_mol + overhead_o2_mol
+        self._headspace_transport_source_o2_buffer_mol_this_hr = buffer_o2_mol
+        self._headspace_transport_source_o2_committed_mol_this_hr = 0.0
+        self._headspace_transport_source_o2_overhead_mol_this_hr = overhead_o2_mol
+        # The O₂ coproduct is an additional gas species alongside elemental or
+        # oxide vapor. Its kg/s and mol/s are both included in the duct total.
+        total_mass_kg_s += (
+            gross_o2_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL / 3600.0
+        )
+        total_mol_s += gross_o2_mol / 3600.0
+        self._headspace_transport_source_mass_kg_s = max(
+            0.0,
+            total_mass_kg_s,
+        )
+        self._headspace_transport_source_total_mol_s = max(0.0, total_mol_s)
+        self._headspace_transport_source_o2_mol_s = max(
+            0.0,
+            (buffer_o2_mol + overhead_o2_mol) / 3600.0,
+        )
+        if total_mol_s > 0.0:
+            # M_avg = total mass flow / total molar flow. Both rates use the
+            # same seconds basis, so the time unit cancels and the result is
+            # kg/mol for the molecular-speed and mean-free-path formulas.
+            self._headspace_transport_source_molar_mass_kg_mol = (
+                total_mass_kg_s / total_mol_s
+            )
+        else:
+            self._headspace_transport_source_molar_mass_kg_mol = (
+                OXYGEN_MOLAR_MASS_KG_PER_MOL
+            )
+
+    def _flush_evaporative_o2_buffer_to_headspace(self) -> float:
+        """Move this tick's available evaporative O₂ into the gas ledger."""
+
+        gross_buffer_o2_mol = max(
+            0.0,
+            float(getattr(
+                self,
+                '_headspace_transport_source_o2_buffer_mol_this_hr',
+                0.0,
+            ) or 0.0),
+        )
+        available_o2_mol = max(0.0, float(
+            self.atom_ledger.mol_by_account(FO2_BUFFER_ACCOUNT).get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+        ))
+        committed_o2_mol = min(gross_buffer_o2_mol, available_o2_mol)
+        if committed_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            self._dispatch_and_commit(
+                ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+                control_inputs={
+                    'dn_to_headspace_mol': committed_o2_mol,
+                },
+            )
+        # The duct sees only O₂ that was actually committed into the headspace;
+        # any redox consumption remains an internal buffer debit, not an invented
+        # gas source. Correct the total flow by the same molar-rate delta.
+        uncommitted_o2_mol = max(
+            0.0,
+            gross_buffer_o2_mol - committed_o2_mol,
+        )
+        self._headspace_transport_source_o2_committed_mol_this_hr = (
+            committed_o2_mol
+        )
+        overhead_o2_mol = max(
+            0.0,
+            float(getattr(
+                self,
+                '_headspace_transport_source_o2_overhead_mol_this_hr',
+                0.0,
+            ) or 0.0),
+        )
+        self._headspace_transport_source_o2_mol_s = (
+            committed_o2_mol + overhead_o2_mol
+        ) / 3600.0
+        self._headspace_transport_source_total_mol_s = max(
+            0.0,
+            self._headspace_transport_source_total_mol_s
+            - uncommitted_o2_mol / 3600.0,
+        )
+        # The source mass must lose the same uncommitted O₂ parcel before
+        # M_avg = total mass / total molar flow is reused by molecular speed
+        # and mean-free-path formulas. Units: mol·kg/mol·s⁻¹ = kg/s.
+        self._headspace_transport_source_mass_kg_s = max(
+            0.0,
+            float(getattr(
+                self,
+                '_headspace_transport_source_mass_kg_s',
+                0.0,
+            ) or 0.0)
+            - uncommitted_o2_mol
+            * OXYGEN_MOLAR_MASS_KG_PER_MOL
+            / 3600.0,
+        )
+        remaining_mol_s = self._headspace_transport_source_total_mol_s
+        if remaining_mol_s > 0.0:
+            self._headspace_transport_source_molar_mass_kg_mol = (
+                self._headspace_transport_source_mass_kg_s / remaining_mol_s
+            )
+        else:
+            self._headspace_transport_source_molar_mass_kg_mol = (
+                OXYGEN_MOLAR_MASS_KG_PER_MOL
+            )
+        return committed_o2_mol
+
+    def _headspace_venting_throughput(self):
+        """Solve the duct source/downstream throughput balance."""
+
+        from simulator.transport_constants import COLLISION_DIAMETERS_M
+        from simulator.transport_regime import solve_duct_throughput
+
+        diameter_m, length_m = self._headspace_duct_geometry()
+        temperature_K = self._headspace_temperature_K()
+        downstream_pressure_bar = self._headspace_downstream_pressure_bar()
+        # A commanded O₂ hold is an upstream lower bound, not automatically a
+        # downstream partial pressure. The duct balance contributes the
+        # downstream term y_O2,d*p_d only when the declared downstream total
+        # pressure can contain that partial; hence p_O2,d=min(p_hold,p_d).
+        # Units are bar on both inputs. This also keeps a deliberate vacuum
+        # downstream override (p_d=0) valid for scheduler/control tests.
+        downstream_oxygen_pressure_bar = min(
+            self._headspace_control_floor_pO2_bar(),
+            downstream_pressure_bar,
+        )
+        result = solve_duct_throughput(
+            total_molar_flow_mol_s=max(
+                0.0,
+                float(getattr(
+                    self,
+                    '_headspace_transport_source_total_mol_s',
+                    0.0,
+                ) or 0.0),
+            ),
+            oxygen_molar_flow_mol_s=max(
+                0.0,
+                float(getattr(
+                    self,
+                    '_headspace_transport_source_o2_mol_s',
+                    0.0,
+                ) or 0.0),
+            ),
+            downstream_pressure_bar=downstream_pressure_bar,
+            downstream_oxygen_pressure_bar=downstream_oxygen_pressure_bar,
+            temperature_K=temperature_K,
+            diameter_m=diameter_m,
+            length_m=length_m,
+            molar_mass_kg_mol=float(getattr(
+                self,
+                '_headspace_transport_source_molar_mass_kg_mol',
+                OXYGEN_MOLAR_MASS_KG_PER_MOL,
+            ) or OXYGEN_MOLAR_MASS_KG_PER_MOL),
+            dynamic_viscosity_pa_s=self.overhead_model._gas_dynamic_viscosity_Pa_s(
+                temperature_K
+            ),
+            collision_diameter_m=COLLISION_DIAMETERS_M[OXYGEN_SPECIES],
+        )
+        return result
+
+    def _headspace_co2_buffer_equilibrium(
+        self,
+        ledger_pO2_bar: float,
+    ):
+        """Equilibrate ambient CO₂ and the ledger O₂ in one O/C balance."""
+
+        from simulator.chemistry.offgas_fo2 import (
+            co2_carrier_buffer_equilibrium,
+            load_buffer_polynomials,
+        )
+
+        # The current Mars atmosphere model assigns 96% of the ambient total
+        # pressure to CO₂. This is a partial-pressure input, not an extra max()
+        # term. The ambient carrier is an external boundary condition, not
+        # feedstock inventory: its equilibrium O/C extent must not be credited
+        # to the melt O₂ ledger or to melt-offgas terminal bins. Only melt O₂
+        # already committed to process.overhead_gas enters the ledger pO₂ below;
+        # a source parcel is counted once in duct throughput after exchange.
+        p_total_bar = max(
+            0.0,
+            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) / 1000.0,
+        )
+        p_co2_bar = 0.96 * p_total_bar
+        if p_co2_bar <= 0.0:
+            return None
+        p_o2_initial_bar = max(0.0, float(ledger_pO2_bar))
+        p_co_initial_bar = max(
+            0.0,
+            float((getattr(self.overhead, 'composition', {}) or {}).get(
+                'CO',
+                0.0,
+            ) or 0.0) / 1000.0,
+        )
+        polynomials = getattr(self, '_headspace_co2_buffer_polynomials', None)
+        if polynomials is None:
+            polynomials = load_buffer_polynomials()
+            self._headspace_co2_buffer_polynomials = polynomials
+        return co2_carrier_buffer_equilibrium(
+            p_co2_bar,
+            p_o2_initial_bar,
+            self._headspace_temperature_K(),
+            polynomials,
+            p_co_initial_bar=p_co_initial_bar,
+        )
+
+    def _set_headspace_transport_diagnostic(
+        self,
+        *,
+        basis: str,
+        duct_result=None,
+    ) -> None:
+        self._last_headspace_transport_diagnostic = {
+            'basis': str(basis),
+            'regime': (
+                getattr(getattr(duct_result, 'regime', None), 'value', '')
+                if duct_result is not None
+                else ''
+            ),
+            'conductance_m3_s': (
+                float(getattr(duct_result, 'conductance_m3_s', 0.0) or 0.0)
+                if duct_result is not None
+                else 0.0
+            ),
+            'knudsen_number': (
+                float(getattr(duct_result, 'knudsen_number', 0.0) or 0.0)
+                if duct_result is not None
+                else 0.0
+            ),
+            'formula_id': (
+                str(getattr(duct_result, 'formula_id', '') or '')
+                if duct_result is not None
+                else ''
+            ),
+        }
+
+    def _apply_headspace_transport_diagnostic(
+        self,
+        reservoir: OxygenReservoirState,
+    ) -> None:
+        diagnostic = dict(
+            getattr(self, '_last_headspace_transport_diagnostic', {}) or {}
+        )
+        reservoir.headspace_pO2_basis = str(
+            diagnostic.get('basis', 'floor') or 'floor'
+        )
+        reservoir.headspace_transport_regime = str(
+            diagnostic.get('regime', '') or ''
+        )
+        reservoir.headspace_transport_conductance_m3_s = max(
+            0.0,
+            float(diagnostic.get('conductance_m3_s', 0.0) or 0.0),
+        )
+        reservoir.headspace_transport_knudsen = max(
+            0.0,
+            float(diagnostic.get('knudsen_number', 0.0) or 0.0),
+        )
+
     def _inert_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
         """Inert-sweep transport pO2 for vapor dispatch.
 
@@ -3985,6 +4390,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         head_o2_mol: Optional[float] = None,
     ) -> float:
+        ledger_pO2_bar = max(0.0, float(ledger_pO2_bar))
         if str(getattr(self.melt.atmosphere, 'name', '') or '') in {
             'PN2_SWEEP',
             'ARGON_FLOW',
@@ -3993,12 +4399,98 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 head_o2_mol = self._headspace_o2_mol_for_pO2_bar(
                     ledger_pO2_bar
                 )
+            # The sweep carrier molar-flow field is intentionally not invented
+            # here: b-232 owns that explicit input. Keep the prior incoming-
+            # carrier/residual-ledger result, but expose why it is not a
+            # throughput-derived pO₂ rather than labeling it a silent floor.
+            self._set_headspace_transport_diagnostic(
+                basis='carrier_flow_undeclared',
+            )
             return self._inert_sweep_transport_pO2_bar(head_o2_mol)
-        return max(
-            float(ledger_pO2_bar),
-            self._headspace_control_floor_pO2_bar(),
-            self._vacuum_floor_bar(),
+
+        atmosphere_name = str(getattr(self.melt.atmosphere, 'name', '') or '')
+        control_floor = self._headspace_control_floor_pO2_bar()
+        floor = self._vacuum_floor_bar()
+        if (
+            not self._overhead_headspace_enabled()
+            and atmosphere_name != 'CO2_BACKPRESSURE'
+        ):
+            # Disabled finite headspace preserves the existing ledger/control
+            # path and has no duct geometry contract. CO₂ remains active here
+            # because its ambient carrier-buffer equilibrium is the requested
+            # atmosphere term, independent of finite-bleed enablement.
+            transport_pO2 = max(ledger_pO2_bar, control_floor, floor)
+            if control_floor >= max(ledger_pO2_bar, floor):
+                basis = 'commanded_hold'
+            elif ledger_pO2_bar > floor:
+                basis = 'venting_throughput'
+            else:
+                basis = 'floor'
+            self._set_headspace_transport_diagnostic(basis=basis)
+            return transport_pO2
+
+        source_total_mol_s = max(0.0, float(getattr(
+            self,
+            '_headspace_transport_source_total_mol_s',
+            0.0,
+        ) or 0.0))
+        pre_geometry = (
+            getattr(self, '_equipment', None) is None
+            and float(getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0)
+            <= 0.0
         )
+        if (
+            (pre_geometry or (
+                getattr(self.melt.campaign, 'name', '') == 'IDLE'
+                and getattr(self, '_equipment', None) is None
+            ))
+            and atmosphere_name != 'CO2_BACKPRESSURE'
+            and source_total_mol_s <= 0.0
+            and max(ledger_pO2_bar, control_floor) <= floor
+        ):
+            # Before load_batch establishes melt geometry there is no physical
+            # source term to solve. load_batch also refreshes the reservoir
+            # before installing the new BatchRecord; defer equipment sizing
+            # until that record and batch geometry are authoritative, otherwise
+            # a zero-mass designer result would be cached as runtime geometry.
+            self._set_headspace_transport_diagnostic(basis='floor')
+            return floor
+
+        duct_result = self._headspace_venting_throughput()
+        if atmosphere_name == 'CO2_BACKPRESSURE':
+            buffer_result = self._headspace_co2_buffer_equilibrium(
+                ledger_pO2_bar
+            )
+            if buffer_result is not None:
+                # The equilibrium is an upper-bound source term for homogeneous
+                # CO₂ dissociation; the vacuum floor remains only a lower bound.
+                self._set_headspace_transport_diagnostic(
+                    basis='carrier_buffer_equilibrium',
+                    duct_result=duct_result,
+                )
+                return max(
+                    float(buffer_result.p_o2_bar),
+                    self._vacuum_floor_bar(),
+                )
+
+        source_pO2 = max(0.0, float(duct_result.p_o2_bar))
+        transport_pO2 = max(
+            ledger_pO2_bar,
+            control_floor,
+            source_pO2,
+            floor,
+        )
+        if control_floor >= max(ledger_pO2_bar, source_pO2, floor):
+            basis = 'commanded_hold'
+        elif max(ledger_pO2_bar, source_pO2) > floor:
+            basis = 'venting_throughput'
+        else:
+            basis = 'floor'
+        self._set_headspace_transport_diagnostic(
+            basis=basis,
+            duct_result=duct_result,
+        )
+        return transport_pO2
 
     def _refresh_oxygen_reservoir_transport_pO2_for_vapor(
         self,
@@ -4021,6 +4513,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reservoir.headspace_control_floor_pO2_bar = (
             self._headspace_control_floor_pO2_bar()
         )
+        self._apply_headspace_transport_diagnostic(reservoir)
         self._sync_oxygen_reservoir_mirror()
         return reservoir
 
@@ -4197,6 +4690,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'headspace_control_floor_pO2_bar': _json_safe_number(
                 getattr(reservoir, 'headspace_control_floor_pO2_bar', None)
+            ),
+            'headspace_pO2_basis': getattr(
+                reservoir,
+                'headspace_pO2_basis',
+                'floor',
+            ),
+            'headspace_transport_regime': getattr(
+                reservoir,
+                'headspace_transport_regime',
+                '',
+            ),
+            'headspace_transport_conductance_m3_s': _json_safe_number(
+                getattr(
+                    reservoir,
+                    'headspace_transport_conductance_m3_s',
+                    0.0,
+                )
+            ),
+            'headspace_transport_knudsen': _json_safe_number(
+                getattr(reservoir, 'headspace_transport_knudsen', 0.0)
             ),
             'exchange_direction': getattr(reservoir, 'exchange_direction', ''),
         }
@@ -4999,6 +5512,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             headspace_control_floor_pO2_bar=self._headspace_control_floor_pO2_bar(),
             exchange_direction=exchange_direction,
         )
+        self._apply_headspace_transport_diagnostic(reservoir)
         self.melt.oxygen_reservoir = reservoir
         self._sync_oxygen_reservoir_mirror()
         return reservoir
@@ -5072,6 +5586,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reservoir.headspace_control_floor_pO2_bar = (
             self._headspace_control_floor_pO2_bar()
         )
+        self._apply_headspace_transport_diagnostic(reservoir)
         reservoir.melt_redox_capacity_mol_per_ln_fO2 = C_m
         reservoir.headspace_capacity_mol_per_ln_pO2 = max(
             head_o2_mol,
@@ -6134,6 +6649,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_redox_capacity_mol_per_ln_fO2=C_m,
             headspace_capacity_mol_per_ln_pO2=C_h,
         )
+        self._apply_headspace_transport_diagnostic(reservoir)
 
         if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
             reservoir.exchange_direction = 'none:no_melt_redox_capacity'
@@ -6246,6 +6762,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 head_o2_mol=post_head_o2_mol,
             )
         )
+        self._apply_headspace_transport_diagnostic(reservoir)
         reservoir.exchange_o2_mol = dn_ledger_to_headspace
         reservoir.exchange_o2_kg = (
             dn_ledger_to_headspace * OXYGEN_MOLAR_MASS_KG_PER_MOL
@@ -13233,6 +13750,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # diagnostics and return a detached snapshot without clearing evidence.
         if self.paused_for_decision:
             return self._make_snapshot()
+        transition_start_index = len(self.atom_ledger.transitions)
         o2_bubbler_refusal = self._o2_bubbler_control_refusal()
         if o2_bubbler_refusal is not None:
             self._last_o2_bubbler_diagnostic = o2_bubbler_refusal
@@ -13253,6 +13771,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._pending_shuttle_bakeout_cycle_increment = ''
         self._reset_redox_source_diagnostics_for_hour()
         self._reset_o2_bubbler_telemetry_for_hour()
+        # The carried-in passive exchange must see the last committed vapor
+        # source rate. That ledger-derived rate is the explicit predictor for
+        # this hour's equilibrium; the current hour replaces it after its
+        # evaporation transitions commit and before the overhead bleed below.
 
         # --- 1. Decision check ---
         self._restore_metal_phase_staging()
@@ -13485,6 +14007,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # by transport saturation. The returned turbine record no longer owns
         # O2 partition authority, but the geometry side effect remains required.
         self._get_turbine_spec()
+        finite_headspace_enabled = self._overhead_headspace_enabled()
+        if finite_headspace_enabled:
+            self._set_headspace_transport_source_rates(
+                evap_flux,
+                transition_start_index=transition_start_index,
+            )
+            self._flush_evaporative_o2_buffer_to_headspace()
+        else:
+            # The new ledger-derived source applies only to the finite-headspace
+            # path. Disabled headspace retains the pre-existing no-exchange
+            # behavior and cannot carry a stale source predictor into a later
+            # diagnostic call. All values are mol/s or mol as named.
+            self._headspace_transport_source_total_mol_s = 0.0
+            self._headspace_transport_source_o2_mol_s = 0.0
+            self._headspace_transport_source_o2_buffer_mol_this_hr = 0.0
+            self._headspace_transport_source_o2_committed_mol_this_hr = 0.0
+            self._headspace_transport_source_o2_overhead_mol_this_hr = 0.0
+            self._headspace_transport_source_mass_kg_s = 0.0
         # The AtomLedger is the canonical quantity authority (see AGENTS.md),
         # so the turbine/vent decision is fed strictly the actual finite O2
         # holdup in process.overhead_gas. This is NOT max()'d with a per-tick
@@ -13495,7 +14035,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # fresh throughput, or mask the case where holdup < this-hour output.
         from simulator.thermal_train import FiniteCapacity
 
-        finite_headspace_enabled = self._overhead_headspace_enabled()
         configured_capacity, _cold_train = self._cold_train_capacity_policy()
         bleed_result = None
         if finite_headspace_enabled:

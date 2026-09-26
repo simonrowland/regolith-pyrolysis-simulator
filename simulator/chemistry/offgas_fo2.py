@@ -130,6 +130,20 @@ class OffgasFO2Unavailable(Exception):
 
 
 @dataclass(frozen=True)
+class CO2BufferEquilibrium:
+    """One finite-inventory CO/CO2/O2 equilibrium result."""
+
+    p_co2_bar: float
+    p_co_bar: float
+    p_o2_bar: float
+    extent_bar: float
+    equilibrium_constant: float
+    assumption: str = (
+        "equilibrium_upper_bound_homogeneous_kinetics_unverified"
+    )
+
+
+@dataclass(frozen=True)
 class OffgasFO2:
     """One imposed fO2, plus everything needed to audit how it was obtained."""
 
@@ -563,6 +577,122 @@ def _log10_K_couple(
     return math.log10(reaction_equilibrium_constant(terms, T_K=T_K))
 
 
+def co2_dissociation_log10_K(
+    polynomials: Mapping[str, NasaCeaPolynomial], T_K: float
+) -> float:
+    """Return log10 K for ``2 CO2 <=> 2 CO + O2``.
+
+    Premise: the existing CO couple is ``CO + 1/2 O2 <=> CO2``. Algebra for
+    the requested reverse reaction is ΔG° = 2G°(CO) + G°(O2) − 2G°(CO2),
+    hence K = exp(−ΔG°/(RT)); the standard state is 1 bar, so the pressure
+    values passed to the carrier solver are numerical bar ratios. Units: all
+    Gibbs terms enter as dimensionless G°/(RT), and K is dimensionless.
+    Sanity: JANAF rows give K≈2.38e−11 at 1500 K, producing about
+    5.3e−6 bar O2 from 5 mbar pure CO2.
+    """
+
+    T = _coerce_T_K(T_K)
+    T = _validate_T_K(
+        polynomials,
+        T,
+        _COUPLE_RECORDS["CO"],
+        "log10 K(CO2 dissociation)",
+    )
+    terms = [
+        (+2.0, polynomials["CO"].evaluate(T)),
+        (+1.0, polynomials["O2"].evaluate(T)),
+        (-2.0, polynomials["CO2"].evaluate(T)),
+    ]
+    return math.log10(reaction_equilibrium_constant(terms, T_K=T))
+
+
+def co2_carrier_buffer_equilibrium(
+    p_co2_bar: float,
+    p_o2_initial_bar: float,
+    T_K: float,
+    polynomials: Mapping[str, NasaCeaPolynomial] | None = None,
+    *,
+    p_co_initial_bar: float = 0.0,
+) -> CO2BufferEquilibrium:
+    """Equilibrate carrier CO2 and the available O2 in one O/C balance.
+
+    Let ξ be the pressure-equivalent reaction extent at fixed headspace volume
+    and temperature. The inventory equations are
+    ``pCO2=pCO2,0−2ξ``, ``pCO=pCO,0+2ξ``, and
+    ``pO2=pO2,0+ξ``. Solving
+    ``K=pCO² pO2 / pCO2²`` by bisection preserves both carbon and oxygen; it
+    intentionally does not take a maximum of separate CO2 and O2 pressures.
+    For pure CO2, pCO2,0=P and pO2,0=pCO,0=0, so pCO=2pO2 and
+    ``pO2=(K P²/4)^(1/3)``. The returned value is an equilibrium upper bound:
+    homogeneous millibar kinetics may be too slow to reach it.
+    """
+
+    try:
+        p_co2 = float(p_co2_bar)
+        p_o2 = float(p_o2_initial_bar)
+        p_co = float(p_co_initial_bar)
+    except (TypeError, ValueError) as exc:
+        raise OffgasFO2Unavailable(
+            "CO2 carrier partial pressures must be finite non-negative numbers"
+        ) from exc
+    if not all(math.isfinite(value) and value >= 0.0 for value in (p_co2, p_o2, p_co)):
+        raise OffgasFO2Unavailable(
+            "CO2 carrier partial pressures must be finite non-negative numbers"
+        )
+    T = _coerce_T_K(T_K)
+    if polynomials is None:
+        polynomials = load_buffer_polynomials()
+    K = 10.0 ** co2_dissociation_log10_K(polynomials, T)
+    if p_co2 <= 0.0:
+        return CO2BufferEquilibrium(
+            p_co2_bar=0.0,
+            p_co_bar=p_co,
+            p_o2_bar=p_o2,
+            extent_bar=0.0,
+            equilibrium_constant=K,
+        )
+
+    lower = max(-0.5 * p_co, -p_o2)
+    upper = 0.5 * p_co2
+
+    def quotient(extent: float) -> float:
+        co2 = p_co2 - 2.0 * extent
+        co = p_co + 2.0 * extent
+        o2 = p_o2 + extent
+        if co2 <= 0.0:
+            return math.inf
+        if co <= 0.0 or o2 <= 0.0:
+            return 0.0
+        return co * co * o2 / (co2 * co2)
+
+    q_lower = quotient(lower)
+    q_upper = quotient(upper)
+    if q_lower >= K:
+        extent = lower
+    elif q_upper <= K:
+        extent = upper
+    else:
+        lo = lower
+        hi = upper
+        for _ in range(120):
+            mid = 0.5 * (lo + hi)
+            if quotient(mid) < K:
+                lo = mid
+            else:
+                hi = mid
+            if hi - lo <= max(1.0e-15, 1.0e-12 * max(1.0, hi)):
+                break
+        extent = 0.5 * (lo + hi)
+
+    return CO2BufferEquilibrium(
+        p_co2_bar=max(0.0, p_co2 - 2.0 * extent),
+        p_co_bar=max(0.0, p_co + 2.0 * extent),
+        p_o2_bar=max(0.0, p_o2 + extent),
+        extent_bar=extent,
+        equilibrium_constant=K,
+    )
+
+
 def water_gas_shift_log10_K(
     polynomials: Mapping[str, NasaCeaPolynomial], T_K: float
 ) -> float:
@@ -944,7 +1074,10 @@ __all__ = [
     "UNMODELLED_REDOX_SPECIES",
     "OffgasFO2",
     "OffgasFO2Unavailable",
+    "CO2BufferEquilibrium",
     "load_buffer_polynomials",
+    "co2_dissociation_log10_K",
+    "co2_carrier_buffer_equilibrium",
     "water_gas_shift_log10_K",
     "shift_extent",
     "imposed_fo2",

@@ -456,6 +456,12 @@ class OxygenReservoirState:
     headspace_ledger_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
     headspace_transport_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
     headspace_control_floor_pO2_bar: float = 0.0
+    # Physical provenance for the transport pO2 consumed by vapor-pressure
+    # readers. These are diagnostics only; the AtomLedger remains authoritative.
+    headspace_pO2_basis: str = "floor"
+    headspace_transport_regime: str = ""
+    headspace_transport_conductance_m3_s: float = 0.0
+    headspace_transport_knudsen: float = 0.0
     k_O_m_s: float = 0.0
     k_O_source: str = ""
     effective_melt_depth_m: float = 0.0
