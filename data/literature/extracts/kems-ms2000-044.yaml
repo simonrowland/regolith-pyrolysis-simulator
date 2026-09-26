@@ -13,6 +13,34 @@ extraction:
   worker: fix-deep-ms2000
   provenance_path: docs-private/research/2026-09-06-deepening/DEEP-kems-ms2000-044/RESULT-r2.md
 review_status: draft
+provenance:
+  comparison_method:
+    kind: ratio
+    equation: Eq. (2)
+    signal: ion_current_ratio
+    reference: pure_liquid_Me2O
+    reference_activity: 1
+    evidence:
+      page: 3
+      quote: >-
+        As in all cases a(M)=1, this reaction allowed calculation of the activity
+        of the alkali oxides from the vapour pressures (ion currents, I) measured
+        over compositions saturated and unsaturated with Na2O or K2O using the
+        following equation.
+  common_knudsen_cell_constant:
+    cancels: true
+    evidence:
+      page: 3
+      quote: >-
+        The activity is obtained from an ion-current ratio against the pure
+        liquid Me2O reference (a(M)=1); the common Knudsen-cell constant
+        therefore cancels in Eq. (2).
+  melt_reference_pairing:
+    kind: same_effective_setup
+    cells: double_effusion_cells
+    evidence:
+      page: 3
+      quote: Double effusion cells were used in experiments.
 benches:
   - id: alkali-silicate-kems
     identity: {basis: described_in_this_work}
@@ -74,6 +102,10 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: &tsaplin_pressure_calibration
+        reference_vapour_pressure_function:
+          state: {tag: value, value: 'Ag, Ni, or Cu reference-substance vapour pressure from IVTANTERMO'}
+          locator: *apparatus_locator
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -123,6 +155,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -172,6 +205,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -221,6 +255,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -270,6 +305,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -319,6 +355,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -368,6 +405,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -417,6 +455,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -466,6 +505,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -515,6 +555,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -564,6 +605,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -613,6 +655,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -662,6 +705,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -711,6 +755,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -760,6 +805,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -809,6 +855,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -858,6 +905,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -907,6 +955,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -956,6 +1005,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -1005,6 +1055,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -1054,6 +1105,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -1103,6 +1155,7 @@ experiments:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
         locator: {page: 2, section: '2. Experimental'}
     apparatus:
+      calibration: *tsaplin_pressure_calibration
       geometry:
         orifice_diameter_m:
           state: {tag: unknown, reason: not_published}
@@ -2046,7 +2099,8 @@ species:
           composition_mol: {SiO2: 0.811, K2O: 0.189}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
-          admission_status: admitted
+          admission_status: typed_refusal
+          reason: probable source misprint
           system_class: silicate_melt
         uncertainty:
           note: Experimental and model entries differ by two decades as printed; neither is altered.

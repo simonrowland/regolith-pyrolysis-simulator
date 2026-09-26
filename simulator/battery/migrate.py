@@ -615,6 +615,17 @@ def _as_dec_or_none(value: object) -> Decimal | None:
         return None
 
 
+def _provenance_from_extract(
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+    inherited: Mapping[str, Any] | None,
+) -> Mapping[str, Any] | None:
+    for candidate in (obs.get("provenance"), values.get("provenance"), inherited):
+        if isinstance(candidate, Mapping):
+            return dict(candidate)
+    return None
+
+
 # ---------------------------------------------------------------------------
 # YAML plain codec (deterministic; no timestamps)
 # ---------------------------------------------------------------------------
@@ -1789,6 +1800,9 @@ def observation_from_plain(payload: object) -> Observation:
         evidence=_evidence_from_plain(payload["evidence"]),
         admission=_admission_from_plain(payload["admission"]),
         notices=notices,
+        provenance=dict(payload["provenance"])
+        if isinstance(payload.get("provenance"), Mapping)
+        else None,
         source_id=payload.get("source_id"),
         locator=_locator_from_plain(payload.get("locator")),
         read_from=payload.get("read_from"),
@@ -9182,6 +9196,11 @@ class Migrator:
             doc, work=work, source_id=source_id, experiment_refs=experiment_refs
         )
         extraction = doc.get("extraction") if isinstance(doc.get("extraction"), Mapping) else {}
+        extract_provenance = (
+            dict(doc["provenance"])
+            if isinstance(doc.get("provenance"), Mapping)
+            else None
+        )
         rows = list(iter_extract_observations(doc))
         count.rows_in += len(rows)
         self.result.measured.citations += 1
@@ -9212,6 +9231,7 @@ class Migrator:
                 extraction=extraction or {},
                 local_ids=local_ids,
                 declared_experiment_id=declared_experiment_id,
+                provenance=extract_provenance,
             )
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
@@ -9256,6 +9276,7 @@ class Migrator:
         extraction: Mapping[str, Any],
         local_ids: set[str],
         declared_experiment_id: str | None = None,
+        provenance: Mapping[str, Any] | None = None,
     ) -> None:
         measured = self.result.measured
         raw_obs_id = str(obs.get("observation_id") or f"{source_id}:missing")
@@ -9271,6 +9292,7 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
+        observation_provenance = _provenance_from_extract(obs, values, provenance)
         t_for_rekey = None
         if isinstance(values, Mapping):
             t_sel_rekey = select_declared_source(AXIS_TEMPERATURE_K, None, values)
@@ -9314,6 +9336,7 @@ class Migrator:
                     extraction=extraction,
                     local_ids=local_ids,
                     declared_experiment_id=declared_experiment_id,
+                    provenance=observation_provenance,
                 )
             return
         locator = locator_from_mapping(
@@ -9946,6 +9969,7 @@ class Migrator:
                     notices=point_notices,
                     equipment=obs.get("equipment"),
                     parent_values=values,
+                    provenance=observation_provenance,
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -9970,6 +9994,7 @@ class Migrator:
                     source_derivation=source_derivation,
                     equipment=obs.get("equipment"),
                     parent_values=values,
+                    provenance=observation_provenance,
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -10002,6 +10027,39 @@ class Migrator:
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
         observation_notices: list[Notice] = []
+        from simulator.battery.validity import comparison_method_cell_constant_cancels
+
+        if (
+            isinstance(q_token, Quantity)
+            and q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and comparison_method_cell_constant_cancels(observation_provenance)
+        ):
+            observation_notices.append(
+                Notice(
+                    kind=NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS,
+                    affected_quantities=(q_token,),
+                    reason=(
+                        "normalized melt/reference comparison records cancellation "
+                        "of the common Knudsen-cell constant"
+                    ),
+                    origin=obs_id,
+                )
+            )
+        hold_reason = str(
+            values.get("reason") or obs.get("reason") or ""
+        ).strip()
+        if (
+            isinstance(q_token, Quantity)
+            and hold_reason.lower().startswith("probable source misprint")
+        ):
+            observation_notices.append(
+                Notice(
+                    kind=NoticeKind.PROBABLE_SOURCE_MISPRINT,
+                    affected_quantities=(q_token,),
+                    reason=hold_reason,
+                    origin=obs_id,
+                )
+            )
         bulk_fence = _bulk_composition_pressure_fence(values)
         if bulk_fence:
             observation_notices.append(
@@ -10040,6 +10098,7 @@ class Migrator:
             evidence=evidence,
             admission=admission,
             notices=tuple(observation_notices),
+            provenance=observation_provenance,
             source_id=source_id,
             locator=locator,
             read_from=read_from,
@@ -10079,6 +10138,7 @@ class Migrator:
         notices: tuple[Notice, ...] = (),
         equipment: object = None,
         parent_values: object = None,
+        provenance: Mapping[str, Any] | None = None,
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
@@ -10308,6 +10368,7 @@ class Migrator:
             evidence=evidence,
             admission=admission,
             notices=notices,
+            provenance=provenance,
             source_id=source_id,
             locator=point_locator,
             read_from=read_from,

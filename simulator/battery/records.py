@@ -1056,6 +1056,7 @@ class Observation:
     engine: EngineTrace | None = None
     authority: Authority | None = None
     certified_band: Mapping[str, tuple[Decimal, Decimal]] | None = None
+    provenance: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if not self.observation_id:
