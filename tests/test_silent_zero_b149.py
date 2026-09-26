@@ -5,7 +5,7 @@ Instrument-first: zeros remain zeros; notes make the cause visible.
 
 from __future__ import annotations
 
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 
 import pytest
 
@@ -191,6 +191,10 @@ def test_evaporation_empty_request_proven_empty_inventory() -> None:
         _record_degraded_path_engagement=lambda *a, **k: None,
         _resolve_evaporation_vapour_batch=lambda eq, **kw: batch,
     )
+    sim._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        sim,
+    )
     equilibrium = SimpleNamespace(liquid_fraction=1.0, diagnostics={})
 
     flux = EvaporationMixin._calculate_evaporation(sim, equilibrium)
@@ -302,6 +306,10 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
         _evaporation_bulk_partial_pressure_pa=lambda sp: 0.0,
         _build_partial_melt_offgassing_diagnostic=lambda *a, **kw: {},
         _freeze_gate_enabled=lambda: False,
+    )
+    sim._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        sim,
     )
     equilibrium = SimpleNamespace(
         liquid_fraction=1.0,

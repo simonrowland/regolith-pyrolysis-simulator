@@ -6515,9 +6515,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             species: 0.0
             for species in dict(equilibrium.vapor_pressures_Pa or {})
         }
+        # Same species the live path will price. The 400 K floor and a proven
+        # zero liquid return before that dispatch, so those hours keep the
+        # shadow's existing molar-mass order. Above those gates the batch map
+        # includes extrapolated species and the capacity solve prices that map
+        # with the extrapolation flag attached.
+        from simulator.melt_regime import legacy_raw_liquid_fraction_is_zero
+
+        liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
+        temperature_K = float(self.melt.temperature_C) + 273.15
+        batch_flux_pressures = None
+        if not (
+            liquid_fraction is not None
+            and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
+        ) and temperature_K >= 400.0:
+            batch_flux_pressures, _, _, _, _, _ = (
+                self._resolve_evaporation_batch_flux_state(
+                    equilibrium,
+                    temperature_K=temperature_K,
+                )
+            )
         controls, molar_masses = self._evaporation_flux_control_inputs(
             equilibrium,
             overhead_partials_Pa=initial_partials,
+            vapour_batch_flux_pressures_Pa=batch_flux_pressures,
         )
         for species in pre_holdup:
             molar_masses.setdefault(
