@@ -6,6 +6,7 @@ import pytest
 
 from simulator import condensation
 from simulator.condensation import (
+    WallSaturationPressureRefusal,
     _reactive_product_backstop_authorized,
     _stable_condensation_product_backstop_authorized,
     _sticking_reactivity_class,
@@ -36,15 +37,18 @@ def test_reactive_backstop_accepts_any_reactive_species(monkeypatch) -> None:
         "reactive",
     )
     assert _reactive_product_backstop_authorized("Mg") is True
-    driving = _wall_deposition_driving_pressure_pa(
-        "Mg",
-        10.0,
-        300.0,
-        vapor_pressure_data={},
-        reactive_product_backstop=True,
-        diagnostic_out={},
-    )
-    assert driving == pytest.approx(10.0)
+    with pytest.raises(
+        WallSaturationPressureRefusal,
+        match="reactive_sink_not_declared",
+    ):
+        _wall_deposition_driving_pressure_pa(
+            "Mg",
+            10.0,
+            300.0,
+            vapor_pressure_data={},
+            reactive_product_backstop=True,
+            diagnostic_out={},
+        )
 
 
 def test_stable_backstop_rejects_undeclared_species() -> None:

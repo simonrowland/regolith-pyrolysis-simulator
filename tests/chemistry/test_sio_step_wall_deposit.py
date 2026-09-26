@@ -220,8 +220,11 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # hourly vapor supply converted to mol/s. The executable stage split moves
     # the cold-wall value from 8.192e-6 kg to 4.391e-6 kg because more SiO is
     # captured upstream.
+    # d-025 replaces the T_cond capture gate with the SiO disproportionation
+    # equilibrium. The default integrated 1050 C wall is undersaturated, so
+    # the old b-324 positive wall pin is no longer the applicable outcome.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        4.39057870014e-06, rel=1e-9
+        0.0, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9
@@ -243,11 +246,17 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     # disproportionation-product backstop supplies the P_sat ~= 0 limit.
     assert refusal.value.valid_range_K == [1400.0, 2273.15]
 
-    expected_hkl = alpha_s * _hkl_impingement_flux_mol_m2_s(
+    driving_notice: dict[str, object] = {}
+    driving_pressure = _wall_deposition_driving_pressure_pa(
         "SiO",
         p_local_pa,
         wall_T_K,
+        diagnostic_out=driving_notice,
     )
+    assert driving_pressure == 0.0
+    assert driving_notice["reason"] == "reactive_equilibrium_undersaturated"
+    assert driving_notice["saturation_pressure_policy"] == "reactive_equilibrium"
+    expected_hkl = 0.0
     hkl_flux = _hkl_surface_deposition_flux_mol_m2_s(
         "SiO",
         P_local_pa=p_local_pa,
@@ -264,7 +273,7 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
 
     assert hkl_flux == pytest.approx(expected_hkl)
     assert series_flux == pytest.approx(expected_hkl)
-    assert hkl_flux > 0.0
+    assert hkl_flux == 0.0
 
 
 @pytest.mark.parametrize(

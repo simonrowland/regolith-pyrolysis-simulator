@@ -1343,11 +1343,15 @@ def test_b1_oxide_row_requires_activity_for_condensation_without_antoine() -> No
     assert authority["authority_level"] == "extrapolated"
     assert k_refusal["upstream_authority_status"] == "missing"
     assert authority["stage_condensed_mass_kg_hr"] > 0.0
-    assert "K" not in route.wall_deposit_by_species
+    # d-025 removes the T_cond capture conjunct; this silica route now records
+    # the reactive wall uptake rather than suppressing the K candidate.
+    assert route.wall_deposit_by_species["K"] > 0.0
     assert 0.0 < route.remaining_by_species["K"] < 1.0
-    assert route.remaining_by_species["K"] + authority[
-        "stage_condensed_mass_kg_hr"
-    ] == pytest.approx(1.0)
+    assert (
+        route.remaining_by_species["K"]
+        + authority["stage_condensed_mass_kg_hr"]
+        + route.wall_deposit_by_species["K"]
+    ) == pytest.approx(1.0)
 
 
 def test_metals_projection_reference_evaluation_declares_neutral_inputs() -> None:

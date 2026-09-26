@@ -295,17 +295,18 @@ def test_source_reaction_without_wall_sidecar_marks_but_invalid_fit_refuses(
         melt_temperature_C=1800.0, wall_temperature_C=1800.0,
         surface_area_m2=1.0,
     )
-    if invalid_data:
+    if invalid_data in {None, "pure_component_antoine"}:
+        record = wall_deposit_candidate_for_surface_kg(model, **kwargs)
+        assert isinstance(record, float)
+        assert record >= 0.0
+    else:
         with pytest.raises(DepositionInputRefusal) as refused:
             wall_deposit_candidate_for_surface_kg(model, **kwargs)
         assert refused.value.terminal_refusal is True
+    if invalid_data in {None, "pure_component_antoine"}:
+        assert model.last_wall_deposition_rate_shadow_candidate
     else:
-        record = wall_deposit_candidate_for_surface_kg(model, **kwargs)
-        assert record["status"] == "unavailable"
-        assert "no extrapolation available" in record["reason"]
-        assert record["terminal_refusal"] is False
-        assert record["wall_temperature_K"] == pytest.approx(2073.15)
-    assert model.last_wall_deposition_rate_shadow_candidate == {}
+        assert model.last_wall_deposition_rate_shadow_candidate == {}
 
 
 def test_source_only_antoine_pole_is_terminal_input_refusal(monkeypatch) -> None:
@@ -794,11 +795,13 @@ def test_shadow_rate_shares_species_supply_across_segments() -> None:
             records_by_species.setdefault(species, []).append(record)
 
     assert records_by_species["Na"]
-    assert all(
-        float(record["mol_s"]) == 0.0
-        and float(record["species_partial_pressure_pa"])
-        <= float(record["total_pressure_pa"])
-        and record["supersaturated"] is False
+    # d-025 removes the T_cond capture conjunct. The silica reactive branch
+    # therefore captures the supersaturated Na sample instead of forcing every
+    # Na wall candidate to zero.
+    assert any(
+        float(record["mol_s"]) > 0.0
+        and record["supersaturated"] is True
+        and record["reason"] == "reactive_uptake"
         for record in records_by_species["Na"]
     )
     assert len(records_by_species["SiO"]) > 1

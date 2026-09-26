@@ -372,4 +372,6 @@ def test_b304_healthy_sio_flux_at_ten_pa_1200k_alpha_004():
     flux = _series_resistance_deposition_flux_mol_m2_s(
         "SiO", 10.0, 1200.0, 0.04,
     )
-    assert flux == pytest.approx(2.9388e-4, rel=1e-4)
+    # d-025 uses the reactive-equilibrium driving pressure instead of the
+    # interim zero-product-pressure backstop.
+    assert flux == pytest.approx(2.909946766e-4, rel=1e-4)

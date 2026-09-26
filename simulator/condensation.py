@@ -1211,7 +1211,14 @@ def _sio_disproportionation_equilibrium(
     )
 
     temperature_K = float(temperature_K)
-    inputs = _sio_reference_equilibrium_inputs(vapor_pressure_data)
+    try:
+        inputs = _sio_reference_equilibrium_inputs(vapor_pressure_data)
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        raise WallSaturationPressureRefusal(
+            'SiO',
+            temperature_K,
+            'invalid_standard_reaction_reference',
+        ) from exc
     liquid = _sio_liquid_ellingham_leg()
     liquid_floor_K = float(liquid.range_K[0])
     if temperature_K >= liquid_floor_K:
@@ -1222,26 +1229,33 @@ def _sio_disproportionation_equilibrium(
         primary = liquid
         comparison = ellingham_segment_for_temperature('Si', temperature_K)
         mismatch = True
-    p_eq_pa, dG_disp_J = _sio_p_eq_pa_for_leg(
-        temperature_K,
-        primary,
-        antoine_A=inputs[0],
-        antoine_B=inputs[1],
-        antoine_C=inputs[2],
-        p_std_pa=inputs[3],
-        pO2_reference_bar=inputs[4],
-    )
-    comparison_pa = None
-    if comparison is not None:
-        comparison_pa, _comparison_dG = _sio_p_eq_pa_for_leg(
+    try:
+        p_eq_pa, dG_disp_J = _sio_p_eq_pa_for_leg(
             temperature_K,
-            comparison,
+            primary,
             antoine_A=inputs[0],
             antoine_B=inputs[1],
             antoine_C=inputs[2],
             p_std_pa=inputs[3],
             pO2_reference_bar=inputs[4],
         )
+        comparison_pa = None
+        if comparison is not None:
+            comparison_pa, _comparison_dG = _sio_p_eq_pa_for_leg(
+                temperature_K,
+                comparison,
+                antoine_A=inputs[0],
+                antoine_B=inputs[1],
+                antoine_C=inputs[2],
+                p_std_pa=inputs[3],
+                pO2_reference_bar=inputs[4],
+            )
+    except (KeyError, TypeError, ValueError, OverflowError, ZeroDivisionError) as exc:
+        raise WallSaturationPressureRefusal(
+            'SiO',
+            temperature_K,
+            'invalid_standard_reaction_reference',
+        ) from exc
     cache = getattr(_sio_disproportionation_equilibrium, '_crossing_cache', None)
     if not isinstance(cache, dict):
         liquid_crossing_C = _sio_1mbar_crossing_C(liquid, inputs)
