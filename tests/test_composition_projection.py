@@ -1,3 +1,4 @@
+from fractions import Fraction
 import json
 import math
 
@@ -80,6 +81,11 @@ def test_invalid_source_sum_refuses_with_typed_reason(source_sum, reason):
         (math.nan, "component_not_finite:NaCl"),
         (math.inf, "component_not_finite:NaCl"),
         (-0.1, "component_negative:NaCl"),
+        pytest.param(
+            Fraction(-1, 10**400),
+            "component_negative:NaCl",
+            id="negative-fraction-underflows-to-negative-zero",
+        ),
         pytest.param(object(), "component_not_numeric:NaCl", id="object"),
     ],
 )

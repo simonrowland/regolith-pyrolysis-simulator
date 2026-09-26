@@ -145,6 +145,12 @@ def classify_projected_bulk(
                 if invalid_reason is None:
                     invalid_reason = f'component_not_numeric:{name}'
                 continue
+            # Check the sign on the exact value: a tiny negative Fraction
+            # underflows to -0.0 in float() and would pass as "absent".
+            if value < 0:
+                if invalid_reason is None:
+                    invalid_reason = f'component_negative:{name}'
+                continue
             try:
                 numeric = float(value)
             except (OverflowError, TypeError, ValueError):
