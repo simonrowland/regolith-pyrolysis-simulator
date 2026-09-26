@@ -1276,7 +1276,7 @@ def _validate_legacy_payload(
     _validate_float_map(alpha["phase_modes_wt_pct"], "payload/alphamelts/phase_modes_wt_pct")
     sulfur = eq["sulfur_saturation"]
     if validate_followers and sulfur is not None:
-        sulfur = _expect_keys(
+        sulfur = _expect_subset_keys(
             sulfur,
             {
                 "SCSS_ppm",
@@ -1287,8 +1287,21 @@ def _validate_legacy_payload(
                 "calibration_status",
                 "warnings",
             },
+            {"melt_presence_basis", "not_evaluated_reason"},
             "payload/equilibrium_result/sulfur_saturation",
         )
+        basis = sulfur.get("melt_presence_basis", {})
+        if not isinstance(basis, dict):
+            raise ConversionError(
+                "payload/equilibrium_result/sulfur_saturation/melt_presence_basis: "
+                "expected object"
+            )
+        reason = sulfur.get("not_evaluated_reason")
+        if reason is not None and not isinstance(reason, str):
+            raise ConversionError(
+                "payload/equilibrium_result/sulfur_saturation/not_evaluated_reason: "
+                "expected string or null"
+            )
         for name in ("SCSS_ppm", "SCAS_ppm", "S6_fraction", "S_in_sulfide_ppm", "S_in_sulfate_ppm"):
             _f64(sulfur[name], f"payload/sulfur/{name}")
     if eq["liquid_composition_wt_pct"] != alpha["liquid_composition_wt_pct"]:
@@ -1474,6 +1487,8 @@ def _compatibility_paths(
             "S_in_sulfate_ppm",
             "calibration_status",
             "warnings",
+            "melt_presence_basis",
+            "not_evaluated_reason",
         )
     )
     return [[path, _path_state(payload, path)] for path in _utf8_sorted(paths)]
@@ -1729,7 +1744,9 @@ def _sulfsat_legacy_result_metadata(
             "sulfur_saturation.calibration_status": frozenset({"in_range"})
         },
         physics_refusal_statuses={
-            "sulfur_saturation.calibration_status": frozenset({"out_of_range"})
+            "sulfur_saturation.calibration_status": frozenset(
+                {"out_of_range", "not_evaluated"}
+            )
         },
     )
 
@@ -2245,6 +2262,9 @@ def materialize_legacy_row(
             "applied_input_completeness": "legacy-stored-engine-inputs",
             "legacy_sulfur_side": key["sulfur_side"],
         }
+        for name in ("melt_presence_basis", "not_evaluated_reason"):
+            if name in sulfur:
+                sulf_control_audit[name] = sulfur[name]
         sulfsat["control_audit_json"] = display_json(sulf_control_audit)
         sulf_identity_json = {"warnings_json": sulfur["warnings"]}
         sulfsat["output_sha256"] = _output_hash(
@@ -2711,6 +2731,18 @@ def reconstruct_legacy_payload(connection: sqlite3.Connection, state_id: int) ->
             "calibration_status": sulf["calibration_status"],
             "warnings": sulfur_warnings,
         }
+        sulf_audit = _json_column(sulf, "control_audit_json") or {}
+        for name in ("melt_presence_basis", "not_evaluated_reason"):
+            pointer = f"/equilibrium_result/sulfur_saturation/{name}"
+            if pointer not in states:
+                continue
+            if states[pointer] == "absent":
+                continue
+            if name not in sulf_audit:
+                raise ParityError(f"SulfSat {name} audit path is absent")
+            value = _shape_value(states, pointer, sulf_audit[name])
+            if value is not MISSING:
+                sulfur_typed[name] = value
         sulfur_value = _shape_value(
             states, "/equilibrium_result/sulfur_saturation", sulfur_typed
         )

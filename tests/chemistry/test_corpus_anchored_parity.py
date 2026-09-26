@@ -2107,6 +2107,12 @@ def test_f349_composition_bounds_include_cross_extremes(tmp_path: Path) -> None:
             ),
             "sulfur_saturation.calibration_status='out_of_range'",
         ),
+        (
+            cache_convert._sulfsat_legacy_result_metadata(
+                {"calibration_status": "not_evaluated"}
+            ),
+            "sulfur_saturation.calibration_status='not_evaluated'",
+        ),
     ),
 )
 def test_f353_known_physics_statuses_preserve_typed_refusal(
