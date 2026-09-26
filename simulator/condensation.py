@@ -160,6 +160,12 @@ WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 WALL_DEPOSIT_SEGMENT_ACCOUNTS = PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
 DEFAULT_PIPE_TEMPERATURE_C = 1500.0
 DEFAULT_PIPE_DIAMETER_M = 0.12
+STAGE3_ROUTE_THROUGH = 'through'
+STAGE3_ROUTE_DIVERT = 'divert'
+STAGE3_ROUTE_CHOICES = frozenset((STAGE3_ROUTE_THROUGH, STAGE3_ROUTE_DIVERT))
+STAGE3_MAIN_UPSTREAM_SEGMENT_NAME = 'stage_2_to_stage_3'
+STAGE3_MAIN_DOWNSTREAM_SEGMENT_NAME = 'stage_3_to_stage_4'
+STAGE3_BYPASS_SEGMENT_NAME = 'stage_3_bypass_to_stage_4'
 # N2_COLLISION_DIAMETER_M and the Knudsen flow-regime thresholds
 # (VISCOUS_KNUDSEN_MAX / FREE_MOLECULAR_KNUDSEN_MIN) are single-sourced in
 # simulator/transport_constants.py (shared with simulator/transport_regime.py) so
@@ -2647,6 +2653,10 @@ class CondensationRouteResult:
         default_factory=dict)
     stage_area_geometry_provenance_notice: Dict[str, Any] = field(
         default_factory=dict)
+    stage3_route: str = STAGE3_ROUTE_THROUGH
+    diverted_flow_by_species_kg_hr: Dict[str, float] = field(
+        default_factory=dict)
+    stage3_route_diagnostic: Dict[str, Any] = field(default_factory=dict)
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -2681,6 +2691,7 @@ class CondensationModel:
         wall_temperature_C: float = DEFAULT_PIPE_TEMPERATURE_C,
         materials: Mapping[str, Any] | None = None,
         species_formula_registry: Mapping[str, Any] | None = None,
+        bypass_segment_config: Mapping[str, Any] | None = None,
     ):
         self.train = train
         # Owner-boundary projection: schema-v2 → legacy view once so the
@@ -2725,6 +2736,11 @@ class CondensationModel:
             materials if materials is not None else MATERIALS_DATA
         )
         self.species_formula_registry = species_formula_registry or {}
+        self.bypass_segment_config = copy.deepcopy(
+            dict(bypass_segment_config)
+            if isinstance(bypass_segment_config, Mapping)
+            else None
+        )
 
         for label, value in (
             ('wall_surface_area_m2', wall_surface_area_m2),
@@ -2765,6 +2781,7 @@ class CondensationModel:
             str, dict[str, float]
         ] = {}
         self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
+        self.stage3_route = STAGE3_ROUTE_THROUGH
         self.stage_area_m2_by_stage: dict[str, float] = {}
         self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
         self.gas_temperature_C = float(wall_temperature_C)
@@ -2842,6 +2859,11 @@ class CondensationModel:
         ] = {}
         self.cold_spot_history: list[dict[str, Any]] = []
         self.operating_history: list[dict[str, Any]] = []
+        self.last_stage3_route_diagnostic: dict[str, Any] = {
+            'stage3_route': STAGE3_ROUTE_THROUGH,
+            'diverted_flow_by_species_kg_hr': {},
+            'findings': [],
+        }
 
         # Default residence time per stage (seconds)
         # In a real design, this comes from equipment sizing
@@ -2883,6 +2905,7 @@ class CondensationModel:
         carrier_gas: str | None = None,
         campaign_name: str | None = None,
         campaign_hour: float | None = None,
+        stage3_route: str | None = None,
     ) -> None:
         """Update tick-local wall and Knudsen conditions for cached models.
 
@@ -2957,6 +2980,14 @@ class CondensationModel:
             )
         if carrier_gas is not None:
             _canonical_carrier_gas_key(carrier_gas)
+        normalized_stage3_route = self.stage3_route
+        if stage3_route is not None:
+            normalized_stage3_route = str(stage3_route).strip().lower()
+            if normalized_stage3_route not in STAGE3_ROUTE_CHOICES:
+                raise ValueError(
+                    'stage3_route must be one of '
+                    f'{sorted(STAGE3_ROUTE_CHOICES)}, got {stage3_route!r}'
+                )
         if campaign_hour is not None:
             if isinstance(campaign_hour, bool):
                 raise ValueError('campaign_hour must be finite and non-negative')
@@ -3020,6 +3051,8 @@ class CondensationModel:
                 stage_area_geometry_provenance_notice)
         if carrier_gas is not None:
             self.carrier_gas = _canonical_carrier_gas_key(carrier_gas)
+        if stage3_route is not None:
+            self.stage3_route = normalized_stage3_route
         # Track requested vs applied stir for the operating-history audit.
         # Codex + gstack reviewers (Phase B P3): the canonical clamp at
         # ``clamp_stir_factor`` is silent — a downstream auditor reading
@@ -3150,6 +3183,7 @@ class CondensationModel:
                 stage_area_geometry_provenance_notice,
                 pipe_segment_temperatures_C,
                 carrier_gas,
+                stage3_route,
             )
         )
         if _snapshot_inputs_changed:
@@ -3195,6 +3229,7 @@ class CondensationModel:
                 "knudsen_regime": self.knudsen_regime.value,
                 "regime_factor": float(self.regime_factor),
                 "carrier_gas": self.carrier_gas,
+                "stage3_route": self.stage3_route,
                 "knudsen_warnings": tuple(
                     self.last_knudsen_regime_diagnostic.get(
                         "warnings", ())),
@@ -3340,7 +3375,113 @@ class CondensationModel:
                     downstream_material.get('liner_material') or ''
                 ),
             ))
+        bypass = self._build_stage3_bypass_segment(wall_temperature_C)
+        if bypass is not None:
+            segments.insert(2, bypass)
         return segments
+
+    def _build_stage3_bypass_segment(
+        self,
+        wall_temperature_C: float,
+    ) -> PipeSegment | None:
+        config = self.bypass_segment_config
+        if config is None:
+            return None
+        if not isinstance(config, Mapping):
+            raise ValueError('stage_3_bypass geometry must be a mapping')
+        try:
+            length_m = float(config.get('length_m'))
+            diameter_m = float(config.get('inner_diameter_m'))
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                'stage_3_bypass length_m and inner_diameter_m must be numeric'
+            ) from exc
+        if (
+            not math.isfinite(length_m)
+            or not math.isfinite(diameter_m)
+            or length_m <= 0.0
+            or diameter_m <= 0.0
+        ):
+            raise ValueError(
+                'stage_3_bypass length_m and inner_diameter_m must be positive'
+            )
+        liner_material = str(config.get('liner_material') or '').strip()
+        if not liner_material:
+            raise ValueError('stage_3_bypass liner_material is required')
+        if wall_material_class_for_liner(liner_material) == 'silica':
+            raise ValueError(
+                'stage_3_bypass liner_material must not be silica-class'
+            )
+        raw_area = config.get('declared_area_m2')
+        declared_area_m2 = None
+        if raw_area is not None:
+            try:
+                declared_area_m2 = float(raw_area)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    'stage_3_bypass declared_area_m2 must be numeric'
+                ) from exc
+            if not math.isfinite(declared_area_m2) or declared_area_m2 <= 0.0:
+                raise ValueError(
+                    'stage_3_bypass declared_area_m2 must be positive'
+                )
+        return PipeSegment(
+            name=STAGE3_BYPASS_SEGMENT_NAME,
+            upstream_stage='stage_2',
+            downstream_stage='stage_4',
+            wall_temperature_C=float(wall_temperature_C),
+            length_m=length_m,
+            inner_diameter_m=diameter_m,
+            role='stage_3_bypass',
+            declared_area_m2=declared_area_m2,
+            source_class='setpoints:condenser_geometry.stage_3_bypass',
+            extraction_note=(
+                'non-silica hot-wall bypass around the Stage-3 fused-silica '
+                'capture cartridge'
+            ),
+            liner_material=liner_material,
+        )
+
+    def _route_pipe_segments(self) -> list[PipeSegment]:
+        """Return wall segments on the selected Stage-3 flow path."""
+
+        bypass = next(
+            (
+                segment for segment in self.pipe_segments
+                if segment.name == STAGE3_BYPASS_SEGMENT_NAME
+            ),
+            None,
+        )
+        main_segments = [
+            segment for segment in self.pipe_segments
+            if segment.name != STAGE3_BYPASS_SEGMENT_NAME
+        ]
+        if self.stage3_route == STAGE3_ROUTE_THROUGH:
+            return main_segments
+        if self.stage3_route != STAGE3_ROUTE_DIVERT:
+            raise ValueError(f'unknown Stage-3 route {self.stage3_route!r}')
+
+        active: list[PipeSegment] = []
+        inserted_bypass = False
+        for segment in main_segments:
+            if segment.name in {
+                STAGE3_MAIN_UPSTREAM_SEGMENT_NAME,
+                STAGE3_MAIN_DOWNSTREAM_SEGMENT_NAME,
+            }:
+                continue
+            upstream_number = _segment_stage_number(segment.upstream_stage)
+            if (
+                bypass is not None
+                and not inserted_bypass
+                and upstream_number is not None
+                and upstream_number >= 4
+            ):
+                active.append(bypass)
+                inserted_bypass = True
+            active.append(segment)
+        if bypass is not None and not inserted_bypass:
+            active.append(bypass)
+        return active
 
     def _stage_area_m2_for_stage_number(self, stage_number: int) -> float | None:
         key = STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number))
@@ -3502,6 +3643,101 @@ class CondensationModel:
             else:
                 data._route_catalog = previous
 
+    def _build_stage3_route_diagnostic(
+        self,
+        *,
+        evap_flux: EvaporationFlux,
+        melt: MeltState,
+        stage_route_by_species: Mapping[str, Mapping[str, Any]],
+        diverted_flow_by_species_kg_hr: Mapping[str, float],
+    ) -> dict[str, Any]:
+        findings: list[dict[str, Any]] = []
+        if self.stage3_route == STAGE3_ROUTE_THROUGH:
+            stage3 = next(
+                (
+                    stage for stage in self.train.stages
+                    if int(stage.stage_number) == 3
+                ),
+                None,
+            )
+            if stage3 is not None:
+                stage3_temperature_K = _stage_midpoint_temperature_K(stage3)
+                for species in ('Na', 'K'):
+                    rate_kg_hr = max(
+                        0.0,
+                        float(evap_flux.species_kg_hr.get(species, 0.0) or 0.0),
+                    )
+                    route = stage_route_by_species.get(species)
+                    if rate_kg_hr <= 1.0e-15 or not isinstance(route, Mapping):
+                        continue
+                    arriving_kg_hr = max(
+                        0.0,
+                        float(
+                            route.get('remaining_after_stage', {}).get(
+                                2,
+                                rate_kg_hr,
+                            )
+                        ),
+                    )
+                    if arriving_kg_hr <= 1.0e-15:
+                        continue
+                    p_metal_pa = max(
+                        0.0,
+                        float(
+                            self.wall_species_partial_pressures_pa.get(
+                                species,
+                                0.0,
+                            )
+                            or 0.0
+                        ),
+                    )
+                    if p_metal_pa <= 0.0:
+                        continue
+                    gate = _alkali_silicate_gate(
+                        species,
+                        stage3_temperature_K,
+                        p_metal_pa,
+                        self._headspace_transport_pO2_bar,
+                    )
+                    if not bool(gate.get('favoured')):
+                        continue
+                    findings.append({
+                        'key': 'silica_exposed_to_alkali',
+                        'severity': 'error',
+                        'stage_number': 3,
+                        'species': species,
+                        'arriving_flux_kg_hr': arriving_kg_hr,
+                        'route': self.stage3_route,
+                        'd025_gate_on': True,
+                        'gate_notice': copy.deepcopy(gate.get('notice', {})),
+                        'campaign': str(
+                            getattr(getattr(melt, 'campaign', None), 'name', '')
+                        ),
+                        'campaign_hour': float(
+                            getattr(melt, 'campaign_hour', 0.0) or 0.0
+                        ),
+                    })
+        return {
+            'stage3_route': self.stage3_route,
+            'stage3_segment': 'stage_3_to_stage_4',
+            'bypass_segment': (
+                STAGE3_BYPASS_SEGMENT_NAME
+                if any(
+                    segment.name == STAGE3_BYPASS_SEGMENT_NAME
+                    for segment in self.pipe_segments
+                )
+                else None
+            ),
+            'diverted_flow_by_species_kg_hr': {
+                str(species): max(0.0, float(rate))
+                for species, rate in diverted_flow_by_species_kg_hr.items()
+                if float(rate) > 1.0e-15
+            },
+            'finding_keys': sorted({str(item['key']) for item in findings}),
+            'findings': findings,
+            'optimizer_feasibility_owner': 'b-585',
+        }
+
     def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """
         Route all evaporated species through the train.
@@ -3516,6 +3752,15 @@ class CondensationModel:
         collection dictionaries are UI projections and are updated only after
         the simulator commits the matching ledger transition.
         """
+        route_pipe_segments = self._route_pipe_segments()
+        route_stages = [
+            stage for stage in self.train.stages
+            if not (
+                self.stage3_route == STAGE3_ROUTE_DIVERT
+                and int(stage.stage_number) == 3
+            )
+        ]
+        diverted_flow_by_species_kg_hr: dict[str, float] = {}
         for species, raw_rate_kg_hr in evap_flux.species_kg_hr.items():
             _finite_nonnegative_value(
                 raw_rate_kg_hr,
@@ -3664,7 +3909,7 @@ class CondensationModel:
         self._headspace_transport_pO2_bar = headspace_pO2_bar
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
-            [segment for segment in self.pipe_segments
+            [segment for segment in route_pipe_segments
              if segment.name not in self.wall_temperature_input_refusals],
             evap_flux.species_kg_hr,
             margin_C=self.cold_spot_margin_C,
@@ -3738,7 +3983,7 @@ class CondensationModel:
             hkl_condensed_by_stage: Dict[int, float] = {}
             remaining_after_stage: Dict[int, float] = {}
             stage_alpha_records_by_stage: Dict[int, dict[str, Any]] = {}
-            for stage in self.train.stages:
+            for stage in route_stages:
                 if remaining_kg <= 1e-15:
                     break
                 if _cr_stage_isolation_blocks(stage, species):
@@ -3794,7 +4039,7 @@ class CondensationModel:
             capture_budget_kg = _pressure_isolated_capture_budget_kg(
                 species,
                 rate_kg_hr,
-                self.train.stages,
+                route_stages,
                 self.residence_time_s,
                 temps=self.condensation_temperatures_C,
                 vapor_pressure_data=self.vapor_pressure_data,
@@ -3809,6 +4054,31 @@ class CondensationModel:
                 'capture_budget_kg': capture_budget_kg,
                 'capture_budget_alpha_record': capture_budget_alpha_record,
             }
+
+            if self.stage3_route == STAGE3_ROUTE_DIVERT and species in {'Na', 'K'}:
+                diverted_flow_by_species_kg_hr[species] = max(
+                    0.0,
+                    float(
+                        remaining_after_stage.get(
+                            2,
+                            rate_kg_hr,
+                        )
+                    ),
+                )
+
+        stage3_route_diagnostic = self._build_stage3_route_diagnostic(
+            evap_flux=evap_flux,
+            melt=melt,
+            stage_route_by_species=stage_route_by_species,
+            diverted_flow_by_species_kg_hr=diverted_flow_by_species_kg_hr,
+        )
+        self.last_stage3_route_diagnostic = copy.deepcopy(
+            stage3_route_diagnostic
+        )
+        if self.operating_history:
+            self.operating_history[-1]['stage3_route_diagnostic'] = copy.deepcopy(
+                stage3_route_diagnostic
+            )
 
         positive_wall_species = {
             species
@@ -4057,7 +4327,7 @@ class CondensationModel:
                     wall_deposit_by_segment_species,
                     species,
                     wall_deposit_kg,
-                    self.pipe_segments,
+                    route_pipe_segments,
                 )
                 wall_deposit_fraction_by_species[species] = wall_fraction
                 wall_deposit_account_fractions_by_species[species] = dict(
@@ -4571,6 +4841,11 @@ class CondensationModel:
             stage_area_geometry_provenance_notice=copy.deepcopy(
                 geometry_notice
             ),
+            stage3_route=self.stage3_route,
+            diverted_flow_by_species_kg_hr=copy.deepcopy(
+                diverted_flow_by_species_kg_hr
+            ),
+            stage3_route_diagnostic=copy.deepcopy(stage3_route_diagnostic),
         )
 
     def adjust_c2a_pressure_setpoint(
@@ -4600,7 +4875,7 @@ class CondensationModel:
             overhead_pressure_mbar=requested_p_total_mbar,
             gas_temperature_C=gas_temperature_C,
             pipe_diameter_m=pipe_diameter_m,
-            pipe_segments=self.pipe_segments,
+            pipe_segments=self._route_pipe_segments(),
             carrier_gas=carrier_gas,
         )
         if current.get('regime') != KnudsenRegime.FREE_MOLECULAR.value:
@@ -4621,7 +4896,7 @@ class CondensationModel:
         basis = minimum_pressure_mbar_for_knudsen(
             gas_temperature_C=gas_temperature_C,
             pipe_diameter_m=pipe_diameter_m,
-            pipe_segments=self.pipe_segments,
+            pipe_segments=self._route_pipe_segments(),
             carrier_gas=carrier_gas,
         )
         pO2 = max(0.0, float(pO2_mbar))
@@ -4672,7 +4947,7 @@ class CondensationModel:
             overhead_pressure_mbar=self.overhead_pressure_mbar,
             gas_temperature_C=self.gas_temperature_C,
             pipe_diameter_m=self.pipe_diameter_m,
-            pipe_segments=self.pipe_segments,
+            pipe_segments=self._route_pipe_segments(),
             regime_factor=self.regime_factor,
             carrier_gas=self.carrier_gas,
         )
@@ -4809,7 +5084,8 @@ class CondensationModel:
         antoine_extrapolation_warnings: list[str] | None = None,
     ) -> Dict[str, Dict[str, float]]:
         self.last_wall_capture_fixed_point_iterations = 0
-        if not self.pipe_segments or not stage_route_by_species:
+        route_pipe_segments = self._route_pipe_segments()
+        if not route_pipe_segments or not stage_route_by_species:
             self.wall_species_partial_pressures_pa_by_segment = {}
             return {}
 
@@ -4817,7 +5093,7 @@ class CondensationModel:
             str(species): max(0.0, float(rate_kg_hr))
             for species, rate_kg_hr in evap_flux.species_kg_hr.items()
         }
-        segment_names = [segment.name for segment in self.pipe_segments]
+        segment_names = [segment.name for segment in route_pipe_segments]
         total_pressure_pa = self.overhead_pressure_mbar * 100.0
 
         def segment_rates_from_capture(
@@ -4826,7 +5102,7 @@ class CondensationModel:
         ) -> dict[str, dict[str, float]]:
             by_segment: dict[str, dict[str, float]] = {}
             prior_segments: list[str] = []
-            for segment in self.pipe_segments:
+            for segment in route_pipe_segments:
                 upstream_number = _segment_stage_number(segment.upstream_stage)
                 rates: dict[str, float] = {}
                 for species, inlet_rate in inlet_rates.items():
@@ -5087,13 +5363,14 @@ class CondensationModel:
         self,
         species: str,
     ) -> list[PipeSegment]:
+        route_pipe_segments = self._route_pipe_segments()
         if self.lab_geometry is not None:
-            return list(self.pipe_segments)
+            return list(route_pipe_segments)
         target_stage_number = designated_stage_number(species)
         if target_stage_number is None:
             return []
         segments: list[PipeSegment] = []
-        for segment in self.pipe_segments:
+        for segment in route_pipe_segments:
             downstream_number = _segment_stage_number(segment.downstream_stage)
             if downstream_number is None:
                 continue
@@ -5149,7 +5426,7 @@ class CondensationModel:
         remaining_after_stage: Mapping[int, float],
     ) -> Dict[str, float]:
         supply: Dict[str, float] = {}
-        for segment in self.pipe_segments:
+        for segment in self._route_pipe_segments():
             upstream_number = _segment_stage_number(segment.upstream_stage)
             if upstream_number is None:
                 supply[segment.name] = max(0.0, float(rate_kg_hr))
@@ -9148,7 +9425,25 @@ STAGE_PURITY_VERDICTS = frozenset((
 STAGE_PURITY_NO_CAPTURED_MASS = 'no_captured_mass'
 
 
-def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
+def stage3_route_diagnostic_is_material(
+    diagnostic: Mapping[str, Any] | None,
+) -> bool:
+    """Return whether a route record changes the report-facing result."""
+
+    if not isinstance(diagnostic, Mapping):
+        return False
+    route = str(diagnostic.get('stage3_route', STAGE3_ROUTE_THROUGH)).strip().lower()
+    return route != STAGE3_ROUTE_THROUGH or bool(
+        diagnostic.get('diverted_flow_by_species_kg_hr')
+        or diagnostic.get('finding_keys')
+        or diagnostic.get('findings')
+    )
+
+
+def stage_purity_report(
+    train: CondensationTrain,
+    stage3_route_diagnostic: Mapping[str, Any] | None = None,
+) -> dict[str, dict[str, Any]]:
     """Classify each stage's accumulated product as designated or impurity."""
 
     report: dict[str, dict[str, Any]] = {}
@@ -9222,5 +9517,17 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
             stage_report['reason'] = STAGE_PURITY_NO_CAPTURED_MASS
         if activity:
             stage_report['activity'] = activity
+        if stage_number == 3 and stage3_route_diagnostic_is_material(
+            stage3_route_diagnostic
+        ):
+            stage_report['stage3_route'] = str(
+                stage3_route_diagnostic.get('stage3_route', STAGE3_ROUTE_THROUGH)
+            )
+            stage_report['diagnostic_findings'] = copy.deepcopy(
+                list(stage3_route_diagnostic.get('findings') or [])
+            )
+            stage_report['finding_keys'] = list(
+                stage3_route_diagnostic.get('finding_keys') or []
+            )
         report[stage_key] = stage_report
     return report

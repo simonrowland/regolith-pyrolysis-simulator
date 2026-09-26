@@ -3120,6 +3120,7 @@ class EvaporationMixin:
                 carrier_gas=self._resolve_condensation_carrier_gas(),
                 campaign_name=str(getattr(self.melt.campaign, 'name', '')),
                 campaign_hour=float(getattr(self.melt, 'campaign_hour', 0.0) or 0.0),
+                stage3_route=self.campaign_mgr.stage3_route_for(self.melt),
             )
         route_result = self.condensation_model.route(
             evap_flux, self.melt)

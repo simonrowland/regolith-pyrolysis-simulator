@@ -4,6 +4,7 @@ import pytest
 
 from simulator.condensation import (
     CondensationModel,
+    STAGE3_BYPASS_SEGMENT_NAME,
     STAGE_PURITY_NO_CAPTURED_MASS,
     STAGE_PURITY_VERDICT_INDETERMINATE,
     STAGE_PURITY_VERDICT_PURE,
@@ -17,6 +18,36 @@ from simulator.condensation_routing import (
     target_species_for_stage_number,
 )
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+
+
+STAGE3_BYPASS_CONFIG = {
+    "length_m": 0.75,
+    "inner_diameter_m": 0.12,
+    "declared_area_m2": 0.28,
+    "liner_material": "hot_duct_refractory_liner",
+}
+
+
+def _alkali_route_model(route: str):
+    train = CondensationTrain.create_default()
+    model = CondensationModel(
+        train,
+        bypass_segment_config=STAGE3_BYPASS_CONFIG,
+    )
+    melt = MeltState(temperature_C=1650.0)
+    melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0e-6
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 1.0, "K": 0.5},
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in train.stages
+        },
+        campaign_name="C2A",
+        stage3_route=route,
+    )
+    flux = EvaporationFlux({"Na": 1.0, "K": 0.5})
+    flux.update_totals()
+    return train, model, melt, flux
 
 
 @pytest.mark.parametrize("stage_number", [1, 2, 3, 4])
@@ -123,3 +154,45 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     assert impurity >= 0.0
     total_deposited = condensed + route.wall_deposit_by_species.get("K", 0.0)
     assert route.remaining_by_species["K"] == pytest.approx(1.0 - total_deposited)
+
+
+def test_stage3_divert_skips_silica_and_conserves_alkali_to_stage4():
+    train, model, melt, flux = _alkali_route_model("divert")
+
+    route = model.route(flux, melt)
+
+    assert route.stage3_route == "divert"
+    assert route.condensed_by_stage_species.get(3, {}) == {}
+    assert route.condensed_by_stage_species[4]["Na"] > 0.0
+    assert route.condensed_by_stage_species[4]["K"] > 0.0
+    assert route.diverted_flow_by_species_kg_hr["Na"] > 0.0
+    assert route.diverted_flow_by_species_kg_hr["K"] > 0.0
+    assert any(
+        segment.name == STAGE3_BYPASS_SEGMENT_NAME
+        for segment in model._route_pipe_segments()
+    )
+    for species, input_kg in flux.species_kg_hr.items():
+        deposited_kg = sum(
+            stage_species.get(species, 0.0)
+            for stage_species in route.condensed_by_stage_species.values()
+        )
+        deposited_kg += route.wall_deposit_by_species.get(species, 0.0)
+        deposited_kg += route.remaining_by_species.get(species, 0.0)
+        deposited_kg += route.retained_in_source_by_species.get(species, 0.0)
+        assert deposited_kg == pytest.approx(input_kg, abs=1.0e-12)
+
+
+def test_stage3_through_exposes_alkali_and_surfaces_d025_finding():
+    train, model, melt, flux = _alkali_route_model("through")
+
+    route = model.route(flux, melt)
+
+    assert route.condensed_by_stage_species[3]["Na"] > 0.0
+    assert route.condensed_by_stage_species[3]["K"] > 0.0
+    assert "silica_exposed_to_alkali" in route.stage3_route_diagnostic[
+        "finding_keys"
+    ]
+    report = stage_purity_report(train, route.stage3_route_diagnostic)
+    assert report[STAGE_KEY_BY_NUMBER[3]]["finding_keys"] == [
+        "silica_exposed_to_alkali"
+    ]
