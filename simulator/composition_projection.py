@@ -40,6 +40,7 @@ class ProjectedBulkClassification:
     threshold_wt_pct: float
     source_sum_wt_pct: float
     verdict: str
+    invalid_reason: str | None
     _dropped_component_mol_unavailable_reasons: Mapping[str, str] = field(
         default_factory=dict,
         repr=False,
@@ -94,6 +95,7 @@ class ProjectedBulkClassification:
             'threshold_wt_pct': self.threshold_wt_pct,
             'source_sum_wt_pct': self.source_sum_wt_pct,
             'projection_verdict': self.verdict,
+            'invalid_reason': self.invalid_reason,
         }
 
 
@@ -110,22 +112,35 @@ def classify_projected_bulk(
     unnormalised wt% scale as ``source_sum_wt_pct``. The returned component
     values and total are normalized to the full input bulk (100 wt%).
     """
+    invalid_reason: str | None = None
     try:
         source_sum = float(source_sum_wt_pct)
     except (TypeError, ValueError):
         source_sum = 0.0
+        invalid_reason = 'source_sum_not_positive_finite'
+    if source_sum <= 0.0 or not math.isfinite(source_sum):
+        source_sum = 0.0
+        invalid_reason = 'source_sum_not_positive_finite'
     positive: dict[str, float] = {}
     for component, value in dropped_component_wt_pct.items():
+        name = str(component)
         try:
             numeric = float(value)
         except (TypeError, ValueError):
+            if invalid_reason is None:
+                invalid_reason = f'component_not_numeric:{name}'
             continue
-        if (
-            math.isfinite(numeric)
-            and numeric > PROJECTED_BULK_COMPONENT_MIN_WT_PCT
-        ):
-            positive[str(component)] = numeric
-    if source_sum > 0.0 and math.isfinite(source_sum):
+        if not math.isfinite(numeric):
+            if invalid_reason is None:
+                invalid_reason = f'component_not_finite:{name}'
+            continue
+        if numeric < PROJECTED_BULK_COMPONENT_MIN_WT_PCT:
+            if invalid_reason is None:
+                invalid_reason = f'component_negative:{name}'
+            continue
+        if numeric > PROJECTED_BULK_COMPONENT_MIN_WT_PCT:
+            positive[name] = numeric
+    if invalid_reason is None:
         scale = 100.0 / source_sum
     else:
         scale = 0.0
@@ -133,12 +148,15 @@ def classify_projected_bulk(
         component: value * scale
         for component, value in sorted(positive.items())
     }
-    dropped_total = sum(normalized.values())
-    verdict = (
-        "within_threshold"
-        if dropped_total <= PROJECTED_BULK_MAX_DROPPED_WT_PCT
-        else "over_threshold"
-    )
+    dropped_total = math.fsum(normalized.values())
+    if invalid_reason is not None:
+        verdict = 'invalid_input'
+    else:
+        verdict = (
+            "within_threshold"
+            if dropped_total <= PROJECTED_BULK_MAX_DROPPED_WT_PCT
+            else "over_threshold"
+        )
     mol_by_component = dropped_component_mol_per_kg or {}
     components = tuple(
         ProjectedBulkComponent(
@@ -154,6 +172,7 @@ def classify_projected_bulk(
         threshold_wt_pct=PROJECTED_BULK_MAX_DROPPED_WT_PCT,
         source_sum_wt_pct=source_sum,
         verdict=verdict,
+        invalid_reason=invalid_reason,
         _dropped_component_mol_unavailable_reasons=dict(
             dropped_component_mol_unavailable_reasons or {}
         ),
@@ -178,6 +197,8 @@ def projected_component_moles_per_kg(
         source_sum = float(source_sum_wt_pct)
     except (TypeError, ValueError):
         return {}, {}
+    # Invalid source sums return empty mappings; the classifier's invalid_input
+    # verdict guards this helper from being consumed for those inputs.
     if source_sum <= 0.0 or not math.isfinite(source_sum):
         return {}, {}
 
