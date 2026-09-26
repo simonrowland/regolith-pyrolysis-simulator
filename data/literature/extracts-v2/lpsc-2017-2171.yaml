@@ -61,6 +61,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1173.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'method_capability_window'; refusing to pick a
@@ -85,6 +88,38 @@ observations:
     pdf_page_index: 2
     section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
   read_from: unknown:lpsc-2017-2171
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        page: 2
+        pdf_page_index: 2
+        section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '900'
+            locator:
+              page: 2
+              pdf_page_index: 2
+              section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              pdf_page_index: 2
+              section: Evolved gas analysis; In Situ Resource Utilization demonstration; Stepped pyrolysis or combustion
+        output_unit: K
 - observation_id: lpsc-2017-2171::barber_2017_prospa_sample_preservation_and_oven
   experiment_id: e2ba786e518efc4bbd5d21214590d5091ab74b0bcb98fa5eef2407e5e96b149c::lpsc-2017-2171
   identity:

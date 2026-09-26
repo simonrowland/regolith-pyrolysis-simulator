@@ -245,8 +245,8 @@ observations:
         published_page: 850
         pdf_page_index: 8
         section: 4. Discussion
-- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe
-  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_12
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p094
   identity:
     quantity:
       tag: value
@@ -310,7 +310,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, L_plus_eps_mean_a_Fe, L_plus_eps_mean_note, rows'
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
     approximate: false
   uncertainty:
     kind: printed
@@ -327,10 +327,10 @@ observations:
   notices: []
   source_id: kems-112-ichise-1989
   locator:
-    published_page: 847
-    pdf_page_index: 5
+    published_page: 846
+    pdf_page_index: 4
     table: '1'
-    note: Table 1 split across pp. 846-847. a_Fe at 1873 K from I(alloy)/I(foil).
+    note: Table 1 heat 12; X_Ta=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
     temperature_K:
@@ -338,10 +338,1853 @@ observations:
         tag: value
         value: '1873'
       locator:
-        published_page: 847
-        pdf_page_index: 5
+        published_page: 846
+        pdf_page_index: 4
         table: '1'
-        note: Table 1 split across pp. 846-847. a_Fe at 1873 K from I(alloy)/I(foil).
+        note: Table 1 heat 12; X_Ta=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_17
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p319
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 17; X_Ta=0.319; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 17; X_Ta=0.319; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_21
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p153
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 21; X_Ta=0.153; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 21; X_Ta=0.153; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p244
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 22; X_Ta=0.244; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 22; X_Ta=0.244; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p239
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 25; X_Ta=0.239; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 25; X_Ta=0.239; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p255
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 27; X_Ta=0.255; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 27; X_Ta=0.255; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_31
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p156
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 31; X_Ta=0.156; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 31; X_Ta=0.156; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_32
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p152
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 32; X_Ta=0.152; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 32; X_Ta=0.152; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p297
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 33; X_Ta=0.297; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 33; X_Ta=0.297; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_34
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p054
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 34; X_Ta=0.054; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 34; X_Ta=0.054; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_47
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p436
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 47; X_Ta=0.436; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 47; X_Ta=0.436; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_48
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p606
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 48; X_Ta=0.606; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 48; X_Ta=0.606; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_49
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p406
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 49; X_Ta=0.406; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 49; X_Ta=0.406; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_50
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p404
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 50; X_Ta=0.404; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 50; X_Ta=0.404; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_51
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p444
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 51; X_Ta=0.444; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 51; X_Ta=0.444; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_53
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p727
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 53; X_Ta=0.727; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 53; X_Ta=0.727; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_54
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p810
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 54; X_Ta=0.810; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 54; X_Ta=0.810; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_55
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p775
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 55; X_Ta=0.775; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 55; X_Ta=0.775; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_56
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p828
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 56; X_Ta=0.828; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 56; X_Ta=0.828; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_9
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-xta-0p048
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 846
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 heat 9; X_Ta=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 846
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 heat 9; X_Ta=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
 - observation_id: kems-112-ichise-1989::ichise_1989_table2_metallography
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -505,8 +2348,8 @@ observations:
         published_page: 848
         pdf_page_index: 6
         table: '4'
-- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe
-  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_11
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p192
   identity:
     quantity:
       tag: value
@@ -570,7 +2413,7 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, rows'
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
     approximate: false
   uncertainty:
     kind: printed
@@ -587,10 +2430,10 @@ observations:
   notices: []
   source_id: kems-112-ichise-1989
   locator:
-    published_page: 849
-    pdf_page_index: 7
+    published_page: 848
+    pdf_page_index: 6
     table: '5'
-    note: Table 5 split across pp. 848-849. a_Fe column on p.849.
+    note: Table 5 heat 11; X_Nb=0.192; a_Fe at 1873 K from I(alloy)/I(foil)
   read_from: pdf:kems-112-ichise-1989
   point_conditions:
     temperature_K:
@@ -598,10 +2441,1853 @@ observations:
         tag: value
         value: '1873'
       locator:
-        published_page: 849
-        pdf_page_index: 7
+        published_page: 848
+        pdf_page_index: 6
         table: '5'
-        note: Table 5 split across pp. 848-849. a_Fe column on p.849.
+        note: Table 5 heat 11; X_Nb=0.192; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_12
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p242
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 12; X_Nb=0.242; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 12; X_Nb=0.242; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_14
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p234
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 14; X_Nb=0.234; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 14; X_Nb=0.234; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_15
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p320
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 15; X_Nb=0.320; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 15; X_Nb=0.320; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_16
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p502
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 16; X_Nb=0.502; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 16; X_Nb=0.502; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p394
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 19; X_Nb=0.394; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 19; X_Nb=0.394; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p388
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 20; X_Nb=0.388; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 20; X_Nb=0.388; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_23
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p596
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 23; X_Nb=0.596; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 23; X_Nb=0.596; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_24
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p671
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 24; X_Nb=0.671; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 24; X_Nb=0.671; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_25
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p760
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 25; X_Nb=0.760; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 25; X_Nb=0.760; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p548
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 26; X_Nb=0.548; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 26; X_Nb=0.548; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_27
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p856
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 27; X_Nb=0.856; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 27; X_Nb=0.856; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p384
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 29; X_Nb=0.384; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 29; X_Nb=0.384; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p370
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 30; X_Nb=0.370; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 30; X_Nb=0.370; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_31
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p094
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 31; X_Nb=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 31; X_Nb=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p298
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 32; X_Nb=0.298; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 32; X_Nb=0.298; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_4
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p091
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 4; X_Nb=0.091; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 4; X_Nb=0.091; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_58
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p144
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 58; X_Nb=0.144; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 58; X_Nb=0.144; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_59
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p139
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 59; X_Nb=0.139; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 59; X_Nb=0.139; a_Fe at 1873 K from I(alloy)/I(foil)
+- observation_id: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_8
+  experiment_id: 10.2355/isijinternational.29.843::experiment::fe-nb-xnb-0p048
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
+      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on individual Table 5 a_Fe cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-112-ichise-1989
+  locator:
+    published_page: 848
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5 heat 8; X_Nb=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
+  read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 848
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 heat 8; X_Nb=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
 - observation_id: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:

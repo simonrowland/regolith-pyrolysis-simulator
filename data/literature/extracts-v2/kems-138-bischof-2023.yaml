@@ -43,8 +43,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-138-bischof-2023::bischof_2023_fig5_ga_psat_figure_only_deep4_quoted
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: wave-W2-kems-138-bischof-2023
+      date: '2026-09-06'
       evidence:
         published_page: 9
         pdf_page_index: 10
@@ -95,8 +95,18 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Full P(T) series exists only as Fig. 5; not digitised this round. Printed 1752 K points are in bischof_2023_psat_ga_1752k
+      / _gao_ / _ga2o_.
+    decided_by:
+      worker: wave-W2-kems-138-bischof-2023
+      date: '2026-09-06'
+      evidence:
+        published_page: 9
+        pdf_page_index: 9
+        figure: '5'
+        note: quote=Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
+          within a temperature range of 1510–1752 K.
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -147,8 +157,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only_deep4_quoted
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: wave-W2-kems-138-bischof-2023
+      date: '2026-09-06'
       evidence:
         published_page: 9
         pdf_page_index: 10
@@ -197,8 +207,17 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Full P(T) series exists only as Fig. 6; not digitised this round.
+    decided_by:
+      worker: wave-W2-kems-138-bischof-2023
+      date: '2026-09-06'
+      evidence:
+        published_page: 9
+        pdf_page_index: 9
+        figure: '6'
+        note: quote=Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
+          within a temperature range of 1210–1611 K.
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -239,11 +258,20 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Figs 7-11 are ln(K) and 3rd-law enthalpy vs 1/T plots; numeric values are in Tables 8-13. Not digitised.
+    decided_by:
+      worker: wave-W2-kems-138-bischof-2023
+      date: '2026-09-06'
+      evidence:
+        published_page: 10
+        pdf_page_index: 11
+        figure: '7'
+        note: also Figs 8-11 ln(K) and Delta_r H vs 1/T; quote=ln(K) for the reactions of Ga2O3 into a) Ga2O, b) Ga and c)
+          GaO plotted vs. reciprocal T for measured and literature data.
   notices: []
   source_id: kems-138-bischof-2023
   locator:
@@ -956,7 +984,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1098,7 +1126,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1143,7 +1171,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1189,7 +1217,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1415,7 +1443,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1505,7 +1533,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1550,7 +1578,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1683,7 +1711,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1837,7 +1865,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1927,7 +1955,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending

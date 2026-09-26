@@ -1,7 +1,7 @@
 schema_version: battery_work.v2.1
 work:
   work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
-  citation: Shirai, T., Tachibana, S. and Tsuchiyama, A. (2000), Evaporation rates of Na from Na2O-SiO2 melt at 1 atm, Lunar
+  citation: Shirai, T., Tachibana, S. & Tsuchiyama, A. (2000), "Evaporation rates of Na from Na2O-SiO2 melt at 1 atm", Lunar
     and Planetary Science XXXI, abstract 1610.
   source_ids:
   - ta-shirai-2000-lpsc
@@ -18,11 +18,963 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
+- experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%
+      locator:
+        page: 1
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: glass charge on platinum wire loop
+      locator:
+        page: 1
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1300 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1300 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1300 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1 atm total pressure; SI conversion only
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Experiments
+        note: H2-CO2 mixed streams named; component fractions not printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  locator:
+    page: 2
+    figure: 1a
+    note: 1300 C, p(O2)=10^-10 bar concentration-time series
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-CO2 mixed gas streams
+      locator:
+        page: 1
+        section: Experiments
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00001'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed p(O2)=10^-10 bar; SI conversion only
+  bench_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::bench::shirai-1atm-wire-loop
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: heated for a variable duration then quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        figure: 1a
+        note: This experiment is a time series; no single duration applies
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+- experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%
+      locator:
+        page: 1
+        section: Experiments
+        note: Starting glass composition as printed
+    form:
+      state:
+        tag: value
+        value: glass charge on platinum wire loop
+      locator:
+        page: 1
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1300 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1300 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1300 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1 atm total pressure; SI conversion only
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Experiments
+        note: H2-CO2 mixed streams are named, but component fractions and partial pressures are not printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  locator:
+    page: 2
+    figure: 1a
+    note: 1300 C, p(O2)=10^-8 bar concentration-time series
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-CO2 mixed gas streams
+      locator:
+        page: 1
+        section: Experiments
+        note: Mixing ratio controlled the printed oxygen fugacity
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.001'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed p(O2)=10^-8 bar; SI conversion only
+  bench_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::bench::shirai-1atm-wire-loop
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: heated for a variable duration then quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        figure: 1a
+        note: This experiment is a time series; no single duration applies
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+- experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%
+      locator:
+        page: 1
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: glass charge on platinum wire loop
+      locator:
+        page: 1
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1300 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1300 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1300 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1 atm total pressure; SI conversion only
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Experiments
+        note: H2-CO2 mixed streams named; component fractions not printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  locator:
+    page: 2
+    figure: 1a
+    note: 1300 C, p(O2)=10^-9 bar concentration-time series
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-CO2 mixed gas streams
+      locator:
+        page: 1
+        section: Experiments
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed p(O2)=10^-9 bar; SI conversion only
+  bench_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::bench::shirai-1atm-wire-loop
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: heated for a variable duration then quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        figure: 1a
+        note: This experiment is a time series; no single duration applies
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+- experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%
+      locator:
+        page: 1
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: glass charge on platinum wire loop
+      locator:
+        page: 1
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1400 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1400 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1400 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1 atm total pressure; SI conversion only
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Experiments
+        note: H2-CO2 mixed streams named; component fractions not printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  locator:
+    page: 2
+    figure: 1b
+    note: 1400 C, p(O2)=10^-10 bar concentration-time series
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-CO2 mixed gas streams
+      locator:
+        page: 1
+        section: Experiments
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00001'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed p(O2)=10^-10 bar; SI conversion only
+  bench_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::bench::shirai-1atm-wire-loop
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: heated for a variable duration then quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        figure: 1b
+        note: This experiment is a time series; no single duration applies
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+- experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%
+      locator:
+        page: 1
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: glass charge on platinum wire loop
+      locator:
+        page: 1
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1400 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1400 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1400 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1 atm total pressure; SI conversion only
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Experiments
+        note: H2-CO2 mixed streams named; component fractions not printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  locator:
+    page: 2
+    figure: 1b
+    note: 1400 C, p(O2)=10^-8 bar concentration-time series
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-CO2 mixed gas streams
+      locator:
+        page: 1
+        section: Experiments
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.001'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed p(O2)=10^-8 bar; SI conversion only
+  bench_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::bench::shirai-1atm-wire-loop
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: heated for a variable duration then quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        figure: 1b
+        note: This experiment is a time series; no single duration applies
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+- experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%
+      locator:
+        page: 1
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: glass charge on platinum wire loop
+      locator:
+        page: 1
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1400 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1400 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1400 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1 atm total pressure; SI conversion only
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Experiments
+        note: H2-CO2 mixed streams named; component fractions not printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  locator:
+    page: 2
+    figure: 1b
+    note: 1400 C, p(O2)=10^-9 bar concentration-time series
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-CO2 mixed gas streams
+      locator:
+        page: 1
+        section: Experiments
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed p(O2)=10^-9 bar; SI conversion only
+  bench_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::bench::shirai-1atm-wire-loop
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: heated for a variable duration then quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        figure: 1b
+        note: This experiment is a time series; no single duration applies
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+- experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-flow-check-1400-pO2-1e-9
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Synthesized Na2O-SiO2 glass; Na2O=22-23 wt%
+      locator:
+        page: 1
+        section: Experiments
+    form:
+      state:
+        tag: value
+        value: glass charge on platinum wire loop
+      locator:
+        page: 1
+        section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1400 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1400 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 1
+              section: Experiments
+              note: Printed 1400 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1 atm total pressure; SI conversion only
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Experiments
+        note: H2-CO2 mixed streams named; component fractions not printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  locator:
+    page: 1
+    section: Experiments
+    note: Flow-rate screening at 1400 C, p(O2)=10^-9 bar, 30 min
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: H2-CO2 mixed gas streams
+      locator:
+        page: 1
+        section: Experiments
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed p(O2)=10^-9 bar; SI conversion only
+  bench_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::bench::shirai-1atm-wire-loop
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: 30 min heating then quench in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1673.15'
+            approximate: false
+        locator:
+          page: 1
+          section: Experiments
+          note: Printed 1400 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1400'
+              locator:
+                page: 1
+                section: Experiments
+                note: Printed 1400 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                page: 1
+                section: Experiments
+                note: Printed 1400 C; unit conversion only
+          output_unit: K
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1800'
+            approximate: false
+        locator:
+          page: 1
+          section: Experiments
+          note: Printed 30 minutes; unit conversion only
+        inference:
+          relation: min_to_s
+          inputs:
+          - t_s = t_min × 60
+          - original_unit=min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '30'
+              locator:
+                page: 1
+                section: Experiments
+                note: Printed 30 minutes; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                page: 1
+                section: Experiments
+                note: Printed 30 minutes; unit conversion only
+          output_unit: s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched in diffusion pump oil
+      locator:
+        page: 1
+        section: Experiments
 - experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   kind: literature
   method:
     tag: unknown
-    reason: regime '1atm_HBD_apparent_evaporation_coefficient' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'quoted_literature_activity' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -48,50 +1000,270 @@ experiments:
   work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
   locator:
     page: 2
-    figure: 1a-1b
-    section: Estimation of alpha*
+    section: Discussion
+    equation: 5-6
+    note: Reference [6] is the experimental activity source cited by the authors; its numeric source table is not reproduced
+      in this abstract
+benches:
+- id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::bench::shirai-1atm-wire-loop
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: 1 atm furnace with alumina muffle tube
+    locator:
+      page: 1
+      section: Experiments
+      note: One-atmosphere furnace and alumina muffle tube are printed in the apparatus paragraph
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: platinum wire loop suspended in an alumina muffle tube
+    locator:
+      page: 1
+      section: Experiments
+      note: Platinum loop supports the charge; alumina muffle tube is the furnace liner
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.04'
+            approximate: false
+        locator:
+          page: 1
+          section: Experiments
+          note: Printed 4 cm inner diameter; SI conversion only
+  heating_method:
+    state:
+      tag: value
+      value: wire-loop heating in a hot spot of a gas-mixing furnace
+    locator:
+      page: 1
+      section: Experiments
+  other_facts:
+  - name: wire_loop_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed platinum wire loop diameter 2 mm
+    unit: mm
+  - name: analysis_beam_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '50'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed broad EPMA beam diameter 50 micrometres
+    unit: micrometres
+  - name: analysis_accelerating_voltage
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '15'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed EPMA accelerating voltage 15 kV
+    unit: kV
+  - name: analysis_beam_current
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed EPMA beam current 12 nA
+    unit: nA
+  - name: analysis_standards_and_method
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Albite and quartz standards; quantitative analysis by ZAF method
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+    unit: as_printed
 context:
-- observation_id: shirai_2000_experiments
+- observation_id: shirai_2000_activity_conversion_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    section: Discussion
+    equation: 5-6
+    note: Authors state activities from ref. [6] were converted to a_NaO0.5
+  units: X_Na2O in mol% as printed; log activity dimensionless
+  values:
+    quantity: activity_fit_lineage
+    method_class: model_derived
+    evidence_class: cited_activity_conversion
+    cited_source: Tsuchiyama et al. (1981), reference [6]
+    conversion_statement: authors converted published Na2O-SiO2 melt activities to a_NaO0.5
+  context_id: ta-shirai-2000-lpsc::context::shirai_2000_activity_conversion_context
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  source_id: ta-shirai-2000-lpsc
+  species: Na2O
+- observation_id: shirai_2000_apparatus_and_analysis_context
   type: apparatus
   locator:
     page: 1
     section: Experiments
-  phase: Na2O-SiO2_melt
-  regime: 1atm_H2_CO2_wire_loop
-  units: as published
+  units: as printed
   values:
-    quantity: experimental_conditions
-    method_class: method_only
-    starting_material: synthesized Na2O-SiO2 glass
-    starting_Na2O_wt_pct_range:
-    - 22
-    - 23
-    method: Pt wire loop 2 mm diameter in 1 atm furnace with alumina muffle tube (4 cm ID)
+    quantity: apparatus_and_analysis_conditions
+    method_class: measured_direct
+    evidence_class: authors_own_experiment
+    furnace: 1 atm furnace with alumina muffle tube
+    muffle_tube_inner_diameter_cm: 4
+    wire_loop_material: platinum
+    wire_loop_diameter_mm: 2
     atmosphere: H2-CO2 mixed gas streams
-    temperatures_C:
+    heating_temperatures_C:
     - 1300
     - 1400
-    pO2_bar_setpoints:
-    - '0.00000001'
-    - '0.000000001'
-    - '0.0000000001'
-    flow_rates_tested_ml_per_min:
-    - 500
-    - 678
-    - 1000
-    - 1500
-    flow_rate_selected_ml_per_min: 1000
-    flow_rate_selection_conditions: 1400 C, pO2=1e-9 bar, 30 min; Na2O concentration independent of flow 500-1500 ml/min
+    oxygen_fugacity_bar_as_printed:
+    - 10^-8
+    - 10^-9
+    - 10^-10
     quench: diffusion pump oil
-    analysis: EPMA broad beam 50 um, 15 kV, 12 nA; ZAF; albite and quartz standards
-    reaction_as_printed: NaO0.5(l) = Na(g) + 1/4 O2(g)
-  equipment:
-    cell_material:
-      value: Pt wire loop; alumina muffle tube furnace
+    analysis: EPMA broad beam, ZAF quantitative analysis
+    beam_diameter_micrometres: 50
+    accelerating_voltage_kV: 15
+    beam_current_nA: 12
+    standards: albite and quartz
+  context_id: ta-shirai-2000-lpsc::context::shirai_2000_apparatus_and_analysis_context
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  source_id: ta-shirai-2000-lpsc
+  species: Na2O
+- observation_id: shirai_2000_flow_rate_screening
+  type: experiment_series
+  locator:
+    page: 1
+    section: Experiments and Results
+    note: Flow-rate check at 1400 C, p(O2)=10^-9 bar, 30 min
+  units: mL/min, C, bar, min as printed
+  values:
+    quantity: gas_flow_rate_screening
+    method_class: measured_direct
+    evidence_class: authors_own_experiment
+    conditions:
+      temperature_C: 1400
+      pO2_bar_as_printed: 10^-9
+      duration_min: 30
+      composition_as_printed: Na2O-SiO2 glass
+    series:
+    - flow_rate_mL_min: 500
       locator:
         page: 1
         section: Experiments
-  context_id: ta-shirai-2000-lpsc::context::shirai_2000_experiments
+        note: First printed flow-rate condition
+    - flow_rate_mL_min: 678
+      locator:
+        page: 1
+        section: Experiments
+        note: Second printed flow-rate condition
+    - flow_rate_mL_min: 1000
+      selected_for_further_experiments: true
+      locator:
+        page: 1
+        section: Experiments and Results
+        note: Selected flow rate
+    - flow_rate_mL_min: 1500
+      locator:
+        page: 1
+        section: Experiments
+        note: Fourth printed flow-rate condition
+    concentration_result: Na2O concentrations almost constant within errors over 500-1500 mL/min
+  context_id: ta-shirai-2000-lpsc::context::shirai_2000_flow_rate_screening
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  source_id: ta-shirai-2000-lpsc
+  species: Na2O
+- observation_id: shirai_2000_jna_fit_comparison
+  type: thermodynamic_example
+  locator:
+    page: 2
+    figure: '2'
+    paragraph: The dependence of jNa on p(O2)
+    note: Printed comparison of fitted slopes with theoretical -1/4
+  units: dimensionless slope as printed
+  values:
+    quantity: oxygen_pressure_exponent_comparison
+    method_class: model_derived
+    evidence_class: author_text_interpretation
+    slope_1300C: '-0.153'
+    slope_1400C: '-0.26'
+    theoretical_slope: '-0.25'
+    theoretical_slope_as_printed: -1/4
+    interpretation: 1400 C slope is almost consistent with -1/4; 1300 C slope is smaller than -1/4
+  context_id: ta-shirai-2000-lpsc::context::shirai_2000_jna_fit_comparison
   work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
   source_id: ta-shirai-2000-lpsc
   species: Na
+- observation_id: shirai_2000_kinetic_equations
+  type: thermodynamic_example
+  locator:
+    page: 1
+    section: Discussion
+    equation: 1-4
+    note: Printed Na evaporation reaction, equilibrium constant, Hertz-Knudsen form, and apparent-coefficient form
+  units: bar-based pressure and dimensionless activity as printed; jNa denominator expression retained verbatim
+  values:
+    quantity: Na_evaporation_model_equations
+    method_class: model_derived
+    evidence_class: author_equations
+    reaction_as_printed: NaO0.5(l) = Na(g) + 1/4 O2(g)
+    equation_1: K = pe(Na) pe(O2)^(1/4) / a_NaO0.5
+    equation_2: jNa = alpha [pe(Na)-p(Na)] / (2 pi mNa k T)^(1/2)
+    equation_3: jNa = alpha* pe(Na) / (2 pi mNa k T)^(1/2)
+    equation_4: jNa = alpha* K a_NaO0.5 pe(O2)^(-1/4) / (2 pi mNa k T)^(1/2)
+    alpha_bounds_as_printed: 0 < alpha* <= alpha <= 1
+    pNa_status: surrounding-gas Na partial pressure is usually unknown in the experiments
+  context_id: ta-shirai-2000-lpsc::context::shirai_2000_kinetic_equations
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  source_id: ta-shirai-2000-lpsc
+  species: Na2O
+- observation_id: shirai_2000_tridymite_composition_limit
+  type: characterization
+  locator:
+    page: 1
+    section: Results
+    note: Minimum Na2O concentrations and tridymite exclusion statement
+  units: wt% Na2O as printed
+  values:
+    quantity: crystallization_limited_minimum_Na2O_concentration
+    method_class: measured_direct
+    evidence_class: authors_own_experiment
+    minimum_Na2O_wt_pct_at_1300C: 16
+    minimum_Na2O_wt_pct_at_1400C: 14
+    cause: crystallization of tridymite keeps melt composition constant
+    excluded_runs: runs in which tridymite crystallized were not used for further discussion
+  context_id: ta-shirai-2000-lpsc::context::shirai_2000_tridymite_composition_limit
+  work_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd
+  source_id: ta-shirai-2000-lpsc
+  species: Na2O

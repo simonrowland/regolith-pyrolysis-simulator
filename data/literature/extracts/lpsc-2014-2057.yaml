@@ -33,6 +33,28 @@ fidelity_samples:
     page: 2
     section: Results and Discussion
     note: printed QMS/O2 relative order and shift for magnetite
+experiments:
+- experiment_id: lpsc-2014-thermal-program
+  method: dta_dsc
+  locator: {page: 1, section: Materials and Methods}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Materials and Methods, note: '25-715 C is a program range, not one setpoint'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '3000', interval_high: '7500'}}
+      locator: {page: 1, section: Materials and Methods, note: 30-75 mbar carrier-gas pressure; unit conversion only}
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: helium
+          flow_sccm: {tag: unknown, reason: not_published}
+          partial_pressure_Pa: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Materials and Methods, note: He carrier gas; flow/partial pressure not published in typed units}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
 species:
   Ca(ClO4)2:
     observations:
@@ -41,6 +63,8 @@ species:
       locator:
         page: 1
         section: Materials and Methods
+      experiment: lpsc-2014-thermal-program
+      T_range_K: [298.15, 988.15]
       phase: dehydrated_calcium_perchlorate_mixed_with_iron_phase
       regime: dsc_qms_heated_carrier_gas
       units: as printed (mmol, mg, micrometres, °C, °C/min, mL/min, mbar)

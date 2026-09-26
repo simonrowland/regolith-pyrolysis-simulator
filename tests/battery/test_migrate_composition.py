@@ -12,6 +12,7 @@ from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.enums import AmountBasis
 from simulator.battery.migrate import (
     REPO_ROOT,
+    _sample_from_plain,
     migrate,
     oxide_molar_mass,
     wt_pct_to_mole_fraction,
@@ -40,6 +41,82 @@ _MLS_BULK_IDS = {
     "kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:h=23d3c0f9125e",
     "pomeroy_cardiff_2006_measurements:pomeroy_non_condensed_mass_loss_fraction",
 }
+
+
+def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
+    raw = {
+        "initial_composition": {
+            "locator": {"table": "2", "page": 14},
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["SiO2", "60"], ["MgO", "40"]],
+                },
+            },
+        }
+    }
+
+    sample = _sample_from_plain(raw)
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == {"SiO2": "60", "MgO": "40"}
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert sample.initial_composition.inference is not None
+    assert sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
+    assert dict(sample.initial_composition.state.value.components) == dict(
+        wt_pct_to_mole_fraction({"SiO2": Decimal("60"), "MgO": Decimal("40")}).components
+    )
+
+
+def test_typed_printed_composition_is_readable_and_gets_canonical_sibling() -> None:
+    raw = {
+        "printed_composition": {
+            "locator": {"table": "2", "page": 14},
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["SiO2", "60"], ["MgO", "40"]],
+                },
+            },
+        }
+    }
+
+    sample = _sample_from_plain(raw)
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == {"SiO2": "60", "MgO": "40"}
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_value
+    assert sample.initial_composition.inference is not None
+    assert sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
+
+
+def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
+    raw = {
+        "initial_composition": {
+            "locator": {"table": "2", "page": 14},
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["SiO2", "60"], ["Cl", "40"]],
+                },
+            },
+        }
+    }
+
+    sample = _sample_from_plain(raw)
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == raw["initial_composition"]["state"]["value"]
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
 
 
 def _iter_store_observations() -> list[dict]:

@@ -49,17 +49,1059 @@ benches:
           state: {tag: value, value: {kind: categorical, categorical: 'Silver, nickel, or copper reference-substance vapour pressures from IVTANTERMO'}}
           locator: *apparatus_locator
 experiments:
-  - experiment_id: alkali-silicate-kems-series
+  - experiment_id: na2o-sio2-xsio2-0p805
     bench_id: alkali-silicate-kems
     method: knudsen_effusion
-    locator: {page: 2, section: '2. Experimental', note: 'Own Na2O-SiO2 and K2O-SiO2 measurements.'}
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.805; activities chosen at random'}
     sample:
       printed_composition:
-        state: {tag: value, value: Na2O-SiO2 and K2O-SiO2 samples}
-        locator: *apparatus_locator
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.805'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.805']
+            - [Na2O, '0.195']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
       pretreatment:
         state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
-        locator: *apparatus_locator
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p753
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.753; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.753'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.753']
+            - [Na2O, '0.247']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p709
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.709; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.709'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.709']
+            - [Na2O, '0.291']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p671
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.671; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.671'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.671']
+            - [Na2O, '0.329']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p625
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.625; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.625'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.625']
+            - [Na2O, '0.375']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p573
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.573; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.573'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.573']
+            - [Na2O, '0.427']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p524
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.524; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.524'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.524']
+            - [Na2O, '0.476']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p477
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.477; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.477'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.477']
+            - [Na2O, '0.523']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p430
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.430; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.430'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.430']
+            - [Na2O, '0.570']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p405
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.405; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.405'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.405']
+            - [Na2O, '0.595']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p382
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.382; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.382'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.382']
+            - [Na2O, '0.618']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: na2o-sio2-xsio2-0p349
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 Na2O-SiO2 row x(SiO2)=0.349; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'Na2O-SiO2 melt; x(SiO2)=0.349'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.349']
+            - [Na2O, '0.651']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(Na2O)=1-x(SiO2) from binary Na2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p892
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.892; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.892'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.892']
+            - [K2O, '0.108']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p848
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.848; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.848'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.848']
+            - [K2O, '0.152']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p811
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.811; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.811'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.811']
+            - [K2O, '0.189']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p770
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.770; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.770'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.770']
+            - [K2O, '0.230']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p722
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.722; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.722'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.722']
+            - [K2O, '0.278']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p674
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.674; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.674'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.674']
+            - [K2O, '0.326']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p630
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.630; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.630'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.630']
+            - [K2O, '0.370']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p591
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.591; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.591'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.591']
+            - [K2O, '0.409']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p543
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.543; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.543'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.543']
+            - [K2O, '0.457']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
+    apparatus:
+      geometry:
+        orifice_diameter_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 4, section: '3.2', note: 'Various orifice areas without printed diameters or run assignment.'}
+        orifice_channel_length_m:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, section: '2. Experimental', note: Not published.}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'The <10^-4 Pa value is preparation pressure, not measurement pressure.'}
+      sweep_gas:
+        state: {tag: not_applicable, reason: not_applicable}
+        locator: {page: 2, section: '2. Experimental', note: 'Dry nitrogen was used for manipulation, not measurement gas.'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No heating schedule is printed.'}
+      total_duration_s:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, section: '2. Experimental', note: 'No run duration is printed.'}
+
+  - experiment_id: k2o-sio2-xsio2-0p500
+    bench_id: alkali-silicate-kems
+    method: knudsen_effusion
+    locator: {page: 22, table: '1', note: 'Table 1 K2O-SiO2 row x(SiO2)=0.500; activities chosen at random'}
+    sample:
+      printed_composition:
+        state: {tag: value, value: 'K2O-SiO2 melt; x(SiO2)=0.500'}
+        locator: {page: 22, table: '1', note: 'Label retained; numeric mole fractions in initial_composition'}
+      initial_composition:
+        state:
+          tag: value
+          value:
+            basis: printed_oxides
+            amount_basis: mole_fraction
+            components:
+            - [SiO2, '0.500']
+            - [K2O, '0.500']
+        locator:
+          page: 22
+          table: '1'
+          note: 'x(SiO2) as Table 1 column (printed spelling); x(K2O)=1-x(SiO2) from binary K2O-SiO2 system identity; not renormalised'
+      pretreatment:
+        state: {tag: value, value: 'Synthesised in effusion cells or smelted in closed nickel crucibles under <10^-4 Pa'}
+        locator: {page: 2, section: '2. Experimental'}
     apparatus:
       geometry:
         orifice_diameter_m:
@@ -88,7 +1130,7 @@ species:
   Na2O:
     observations:
       - observation_id: ms2000_044_na2o_activity_xsio2_0805_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p805
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.805 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -101,7 +1143,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0753_t1273
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p753
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.753 T=1273 K'}
         T_range_K: [1273.0, 1273.0]
@@ -114,7 +1156,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0709_t1673
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p709
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.709 T=1673 K'}
         T_range_K: [1673.0, 1673.0]
@@ -127,7 +1169,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0671_t1173
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p671
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.671 T=1173 K'}
         T_range_K: [1173.0, 1173.0]
@@ -140,7 +1182,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0625_t1573
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p625
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.625 T=1573 K'}
         T_range_K: [1573.0, 1573.0]
@@ -153,7 +1195,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0573_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p573
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.573 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -166,7 +1208,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0524_t1573
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p524
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.524 T=1573 K'}
         T_range_K: [1573.0, 1573.0]
@@ -179,7 +1221,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0477_t1373
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p477
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.477 T=1373 K'}
         T_range_K: [1373.0, 1373.0]
@@ -192,7 +1234,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0430_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p430
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.430 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -205,7 +1247,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0405_t1423
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p405
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.405 T=1423 K'}
         T_range_K: [1423.0, 1423.0]
@@ -218,7 +1260,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0382_t1383
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p382
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.382 T=1383 K'}
         T_range_K: [1383.0, 1383.0]
@@ -231,7 +1273,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0349_t1373
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p349
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.349 T=1373 K'}
         T_range_K: [1373.0, 1373.0]
@@ -244,7 +1286,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_na2o_activity_xsio2_0805_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p805
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -282,7 +1324,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0753_t1273_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p753
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -320,7 +1362,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0709_t1673_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p709
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -358,7 +1400,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0671_t1173_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p671
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -396,7 +1438,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0625_t1573_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p625
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -434,7 +1476,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0573_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p573
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -472,7 +1514,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0524_t1573_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p524
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -510,7 +1552,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0477_t1373_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p477
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -548,7 +1590,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0430_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p430
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -586,7 +1628,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0405_t1423_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p405
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -624,7 +1666,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0382_t1383_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p382
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -662,7 +1704,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_na2o_activity_xsio2_0349_t1373_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p349
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -702,7 +1744,7 @@ species:
   K2O:
     observations:
       - observation_id: ms2000_044_k2o_activity_xsio2_0892_t1723_contested
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p892
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.892 T=1723 K'}
         T_range_K: [1723.0, 1723.0]
@@ -715,7 +1757,7 @@ species:
         uncertainty: {note: Experimental activity cell is CONTESTED and remains null.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0848_t1573
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p848
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.848 T=1573 K'}
         T_range_K: [1573.0, 1573.0]
@@ -728,7 +1770,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0811_t1173
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p811
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.811 T=1173 K'}
         T_range_K: [1173.0, 1173.0]
@@ -741,7 +1783,7 @@ species:
         uncertainty: {note: Experimental and model entries differ by two decades as printed; neither is altered.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0770_t1073
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p770
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.770 T=1073 K'}
         T_range_K: [1073.0, 1073.0]
@@ -754,7 +1796,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0722_t1323
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p722
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.722 T=1323 K'}
         T_range_K: [1323.0, 1323.0]
@@ -767,7 +1809,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0722_t1673
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p722
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.722 T=1673 K'}
         T_range_K: [1673.0, 1673.0]
@@ -780,7 +1822,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0674_t1373
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p674
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.674 T=1373 K'}
         T_range_K: [1373.0, 1373.0]
@@ -793,7 +1835,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0630_t1323
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p630
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.630 T=1323 K'}
         T_range_K: [1323.0, 1323.0]
@@ -806,7 +1848,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0630_t1523
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p630
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.630 T=1523 K'}
         T_range_K: [1523.0, 1523.0]
@@ -819,7 +1861,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0591_t1323
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p591
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.591 T=1323 K'}
         T_range_K: [1323.0, 1323.0]
@@ -832,7 +1874,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0543_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p543
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.543 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -845,7 +1887,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0500_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p500
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.500 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -858,7 +1900,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_k2o_activity_xsio2_0892_t1723_contested_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p892
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -900,7 +1942,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0848_t1573_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p848
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -938,7 +1980,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0811_t1173_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p811
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -976,7 +2018,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0770_t1073_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p770
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1014,7 +2056,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0722_t1323_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p722
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1052,7 +2094,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0722_t1673_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p722
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1090,7 +2132,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0674_t1373_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p674
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1128,7 +2170,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0630_t1323_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p630
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1166,7 +2208,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0630_t1523_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p630
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1204,7 +2246,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0591_t1323_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p591
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1242,7 +2284,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0543_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p543
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1280,7 +2322,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0500_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p500
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1320,7 +2362,7 @@ species:
   SiO2:
     observations:
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0805_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p805
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.805 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -1333,7 +2375,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0753_t1273
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p753
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.753 T=1273 K'}
         T_range_K: [1273.0, 1273.0]
@@ -1346,7 +2388,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0709_t1673
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p709
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.709 T=1673 K'}
         T_range_K: [1673.0, 1673.0]
@@ -1359,7 +2401,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0671_t1173
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p671
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.671 T=1173 K'}
         T_range_K: [1173.0, 1173.0]
@@ -1372,7 +2414,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0625_t1573
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p625
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.625 T=1573 K'}
         T_range_K: [1573.0, 1573.0]
@@ -1385,7 +2427,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0573_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p573
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.573 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -1398,7 +2440,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0524_t1573
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p524
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.524 T=1573 K'}
         T_range_K: [1573.0, 1573.0]
@@ -1411,7 +2453,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0477_t1373
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p477
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.477 T=1373 K'}
         T_range_K: [1373.0, 1373.0]
@@ -1424,7 +2466,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0430_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p430
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.430 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -1437,7 +2479,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0405_t1423
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p405
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.405 T=1423 K'}
         T_range_K: [1423.0, 1423.0]
@@ -1450,7 +2492,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0382_t1383
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p382
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.382 T=1383 K'}
         T_range_K: [1383.0, 1383.0]
@@ -1463,7 +2505,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0349_t1373
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p349
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'Na2O-SiO2 x(SiO2)=0.349 T=1373 K'}
         T_range_K: [1373.0, 1373.0]
@@ -1476,7 +2518,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0892_t1723
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p892
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.892 T=1723 K'}
         T_range_K: [1723.0, 1723.0]
@@ -1489,7 +2531,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0848_t1573
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p848
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.848 T=1573 K'}
         T_range_K: [1573.0, 1573.0]
@@ -1502,7 +2544,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0811_t1173
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p811
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.811 T=1173 K'}
         T_range_K: [1173.0, 1173.0]
@@ -1515,7 +2557,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0770_t1073
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p770
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.770 T=1073 K'}
         T_range_K: [1073.0, 1073.0]
@@ -1528,7 +2570,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0722_t1323
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p722
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.722 T=1323 K'}
         T_range_K: [1323.0, 1323.0]
@@ -1541,7 +2583,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0722_t1673
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p722
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.722 T=1673 K'}
         T_range_K: [1673.0, 1673.0]
@@ -1554,7 +2596,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0674_t1373
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p674
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.674 T=1373 K'}
         T_range_K: [1373.0, 1373.0]
@@ -1567,7 +2609,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0630_t1323
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p630
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.630 T=1323 K'}
         T_range_K: [1323.0, 1323.0]
@@ -1580,7 +2622,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0630_t1523
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p630
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.630 T=1523 K'}
         T_range_K: [1523.0, 1523.0]
@@ -1593,7 +2635,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0591_t1323
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p591
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.591 T=1323 K'}
         T_range_K: [1323.0, 1323.0]
@@ -1606,7 +2648,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0543_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p543
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.543 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -1619,7 +2661,7 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0500_t1473
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p500
         type: activity_coefficient
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '1', page: PDF p. 22, row: 'K2O-SiO2 x(SiO2)=0.500 T=1473 K'}
         T_range_K: [1473.0, 1473.0]
@@ -1632,7 +2674,6 @@ species:
         uncertainty: {note: Table 1 states no uncertainty for this point.}
         equipment: {}
       - observation_id: ms2000_044_solid_silicate_formation_table2
-        experiment: alkali-silicate-kems-series
         type: gibbs_table
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '2', page: PDF p. 23}
         T_range_K: [869.0, 1285.0]
@@ -1654,7 +2695,6 @@ species:
         uncertainty: {note: Per-row uncertainty is stored with each published value.}
         equipment: {}
       - observation_id: ms2000_044_solid_silicate_standard_functions_table3
-        experiment: alkali-silicate-kems-series
         type: gibbs_table
         locator: {source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md, table: '3', page: PDF p. 23}
         T_range_K: [298.15, 298.15]
@@ -1682,7 +2722,7 @@ species:
         uncertainty: {note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in Table 3.}
         equipment: {}
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0805_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p805
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1723,7 +2763,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0753_t1273_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p753
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1764,7 +2804,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0709_t1673_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p709
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1805,7 +2845,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0671_t1173_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p671
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1846,7 +2886,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0625_t1573_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p625
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1887,7 +2927,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0573_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p573
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1928,7 +2968,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0524_t1573_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p524
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -1969,7 +3009,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0477_t1373_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p477
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2010,7 +3050,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0430_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p430
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2051,7 +3091,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0405_t1423_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p405
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2092,7 +3132,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0382_t1383_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p382
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2133,7 +3173,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_na_system_xsio2_0349_t1373_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: na2o-sio2-xsio2-0p349
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2174,7 +3214,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0892_t1723_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p892
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2215,7 +3255,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0848_t1573_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p848
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2256,7 +3296,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0811_t1173_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p811
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2297,7 +3337,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0770_t1073_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p770
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2338,7 +3378,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0722_t1323_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p722
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2379,7 +3419,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0722_t1673_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p722
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2420,7 +3460,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0674_t1373_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p674
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2461,7 +3501,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0630_t1323_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p630
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2502,7 +3542,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0630_t1523_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p630
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2543,7 +3583,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0591_t1323_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p591
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2584,7 +3624,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0543_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p543
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2625,7 +3665,7 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_sio2_activity_k_system_xsio2_0500_t1473_class_quote_r2
-        experiment: alkali-silicate-kems-series
+        experiment: k2o-sio2-xsio2-0p500
         type: activity_coefficient
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2666,7 +3706,6 @@ species:
           class: model
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_solid_silicate_formation_table2_class_quote_r2
-        experiment: alkali-silicate-kems-series
         type: gibbs_table
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
@@ -2757,7 +3796,6 @@ species:
         equipment: {}
         supersedes: ms2000_044_solid_silicate_formation_table2
       - observation_id: ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2
-        experiment: alkali-silicate-kems-series
         type: gibbs_table
         locator:
           source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf

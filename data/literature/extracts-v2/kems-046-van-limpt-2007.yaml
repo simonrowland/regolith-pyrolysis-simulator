@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-046-van-limpt-2007.yaml
 observations:
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_boron_operating_conditions_and_uncertainties
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
       tag: unknown
@@ -43,7 +43,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
   read_from: unknown:kems-046-van-limpt-2007
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
       tag: unknown
@@ -83,7 +83,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
   read_from: unknown:kems-046-van-limpt-2007
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig45_naoh_saturation_measured
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
       tag: unknown
@@ -123,7 +123,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
       tag: unknown
@@ -148,9 +148,9 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'transpiration_evaporation'
-    original_method_class: transpiration_evaporation
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -162,8 +162,57 @@ observations:
     note: figure reading; measured markers only, approximate values
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig48_boron_evaporation_measured
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_model_output
   experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'modeled_Na_saturation_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'modeled_Na_saturation_pressure'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: extract-van-limpt-2007
+      date: '2026-09-19'
+      evidence:
+        page: 156
+        figure: '4.6'
+        note: figure reading; thermochemical-model marker kept separate from measured marker
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 156
+    figure: '4.6'
+    note: figure reading; thermochemical-model marker kept separate from measured marker
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig48_boron_evaporation_measured
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
       tag: unknown
@@ -179,6 +228,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1723.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_total_boron_evaporation_rate_vs_sqrt_water_pressure';
@@ -202,8 +254,43 @@ observations:
     note: page image checked; diamond markers measured, line excluded; approximate plot readings
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
   read_from: unknown:kems-046-van-limpt-2007
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 161
+        figure: '4.8'
+        note: page image checked; diamond markers measured, line excluded; approximate plot readings
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 161
+              figure: '4.8'
+              note: page image checked; diamond markers measured, line excluded; approximate plot readings
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 161
+              figure: '4.8'
+              note: page image checked; diamond markers measured, line excluded; approximate plot readings
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+        output_unit: K
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_setup_c_and_sodium_conditions
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
       tag: unknown
@@ -243,7 +330,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_sodium_transpiration_operating_window
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
       tag: unknown
@@ -282,7 +369,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table42_float_and_tableware_compositions
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
       tag: unknown
@@ -321,7 +408,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table42_potassium_bearing_glasses
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
       tag: unknown
@@ -355,12 +442,13 @@ observations:
   notices: []
   source_id: kems-046-van-limpt-2007
   locator:
-    page: 141
-    table: '4.2'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+    page: 172
+    figure: '4.15'
+    section: 4.4.2
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
   read_from: unknown:kems-046-van-limpt-2007
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table43_borosilicate_compositions
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
       tag: unknown
@@ -399,7 +487,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
       tag: unknown

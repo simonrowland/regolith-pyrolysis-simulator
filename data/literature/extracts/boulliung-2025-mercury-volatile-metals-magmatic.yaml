@@ -427,3 +427,39 @@ species:
         melt_concentration_ppm: 12
         fraction_degassed: 80%
         equilibrium_partial_pressure_Pa: 77
+
+notes:
+  - >-
+    The supplied 37-page journal pre-proof does not contain a readable Table 1
+    body (scout slice-1 cites Table 1 on PDF pp. 8-11; table body absent;
+    pp. 30-37 are figure images only). No supplementary PDF is in the corpus.
+    Major-oxide printed_composition therefore remains a prose label (Icelandic
+    basalt + dopants), not an oxide map — unsupported_print_form for engine_point.
+  - >-
+    Undoped basalt is named as the Norris and Wood (2017) material; those oxide
+    numbers are not reprinted in this PDF and are not copied across (would invent).
+  - >-
+    Oxygen: Fe K-edge XANES on quenched products is printed as Fe3+/(Fe3++Fe2+)
+    about 0.1 with author interpretation "about 1 log fO2 unit below FMQ". That
+    relative, approximate statement is not a point log_fO2 and is not a named
+    buffer (FMQ alone would be wrong). No vacuum-as-fO2 invent. oxygen_condition
+    left GAP.
+  - >-
+    Pressure: ampoule evacuated to about 2.7 mbar before sealing; run total
+    pressure rises with temperature and is not printed as one measured value.
+    Evacuation pressure is not landed as total_pressure_Pa. pressure_boundary
+    left GAP.
+  - >-
+    Temperature: discrete 1250 / 1300 / 1400 C setpoints live on observations;
+    no single series setpoint.
+refused:
+  - what: Table 1 starting major-oxide map
+    reason: table body not present/readable in the supplied pre-proof PDF
+  - what: calculated composition from Norris and Wood (2017) citation
+    reason: oxide numbers for the undoped basalt are not reprinted here
+  - what: point log_fO2 from "about 1 log unit below FMQ"
+    reason: approximate relative statement; not a printed point or named buffer
+  - what: vacuum / evacuation pressure as oxygen_condition
+    reason: vacuum-as-fO2 invent refused
+  - what: evacuation about 2.7 mbar as run total_pressure_Pa
+    reason: printed as pre-seal evacuation, not measured run total pressure

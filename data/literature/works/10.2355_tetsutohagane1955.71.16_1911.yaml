@@ -37,7 +37,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/tetsutohagane1955.71.16_1911
 experiments:
-- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::feto-p2o5-series
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::feto-p2o5-sample-1
   kind: literature
   method:
     tag: value
@@ -46,12 +46,16 @@ experiments:
     printed_composition:
       state:
         tag: value
-        value: FeO 99.9% and 3FeO.P2O5.8H2O 98% or above
+        value:
+          P2O5: '1.52'
+          FeO: '86.55'
+          Fe2O3: '10.07'
       locator:
-        published_page: 1912
-        pdf_page_index: 2
-        figure: '1'
-        section: '2.1'
+        published_page: 1914
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 sample 1; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=75.02 wt%, t in FetO=0.955,
+          X_P2O5=0.0075 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
     characterization:
       state:
         tag: value
@@ -95,21 +99,8 @@ experiments:
   locator:
     published_page: 1912-1913
     section: 2.1; 3.3
-    note: FetO-P2O5 system
+    note: FetO-P2O5 sample 1 of 8; Table 4 post-run chemical analysis
   apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). PbO-P2O5: inner diameter 9 mm, orifice diameter
-          about 0.4 mm, Pd inner crucible. FetO-P2O5: inner diameter 15 mm, orifice diameter about 0.5 mm (0.3 mm for Table
-          5 asterisk rows No. 4 and No. 7), electrolytic-iron inner crucible. Ta susceptor; W-26%Re/W-5%Re thermocouple calibrated
-          at the melting point of pure Ni. Hitachi RM-6E Knudsen-cell mass spectrometer.'
-      locator:
-        published_page: 1912
-        pdf_page_index: 2
-        figure: '1'
-        section: '2.1'
-        note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
     geometry:
       orifice_diameter_m:
         state:
@@ -196,7 +187,7 @@ experiments:
                 section: '2.1'
                 note: 1370-1390 C; unit conversion only
           output_unit: K
-- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::pbo-p2o5-series
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::feto-p2o5-sample-2
   kind: literature
   method:
     tag: value
@@ -205,12 +196,1065 @@ experiments:
     printed_composition:
       state:
         tag: value
-        value: Pb(PO3)2 99.99% and Pb3(PO4)2 99.99%
+        value:
+          P2O5: '4.06'
+          FeO: '84.32'
+          Fe2O3: '11.38'
+      locator:
+        published_page: 1914
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 sample 2; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=73.5 wt%, t in FetO=0.949,
+          X_P2O5=0.0202 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after mass-spectrometric measurement
       locator:
         published_page: 1912
         pdf_page_index: 2
         figure: '1'
         section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Premelted at 1370 C for 4 h in vacuum in an iron crucible, then crushed
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912-1913
+    section: 2.1; 3.3
+    note: FetO-P2O5 sample 2 of 8; Table 4 post-run chemical analysis
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Typical about 0.5 mm but Table 5 rows 4 and 7 used about 0.3 mm; aggregate configuration is mixed
+      cell_internal_dimensions:
+        diameter_m:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.015'
+              approximate: false
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Channel length not printed
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '23.0'
+        locator:
+          published_page: 1913
+          section: '3.3'
+  bench_id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1643.15'
+            interval_high: '1663.15'
+            approximate: false
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: 1370-1390 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '1370'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - original_high
+            - state:
+                tag: value
+                value: '1390'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          output_unit: K
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::feto-p2o5-sample-3
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          P2O5: '5.42'
+          FeO: '82.97'
+          Fe2O3: '11.71'
+      locator:
+        published_page: 1914
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 sample 3; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=72.68 wt%, t in FetO=0.947,
+          X_P2O5=0.0271 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after mass-spectrometric measurement
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Premelted at 1370 C for 4 h in vacuum in an iron crucible, then crushed
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912-1913
+    section: 2.1; 3.3
+    note: FetO-P2O5 sample 3 of 8; Table 4 post-run chemical analysis
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Typical about 0.5 mm but Table 5 rows 4 and 7 used about 0.3 mm; aggregate configuration is mixed
+      cell_internal_dimensions:
+        diameter_m:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.015'
+              approximate: false
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Channel length not printed
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '23.0'
+        locator:
+          published_page: 1913
+          section: '3.3'
+  bench_id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1643.15'
+            interval_high: '1663.15'
+            approximate: false
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: 1370-1390 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '1370'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - original_high
+            - state:
+                tag: value
+                value: '1390'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          output_unit: K
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::feto-p2o5-sample-4
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          P2O5: '8.38'
+          FeO: '81.5'
+          Fe2O3: '9.87'
+      locator:
+        published_page: 1914
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 sample 4; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=70.25 wt%, t in FetO=0.953,
+          X_P2O5=0.0427 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after mass-spectrometric measurement
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Premelted at 1370 C for 4 h in vacuum in an iron crucible, then crushed
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912-1913
+    section: 2.1; 3.3
+    note: FetO-P2O5 sample 4 of 8; Table 4 post-run chemical analysis
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Typical about 0.5 mm but Table 5 rows 4 and 7 used about 0.3 mm; aggregate configuration is mixed
+      cell_internal_dimensions:
+        diameter_m:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.015'
+              approximate: false
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Channel length not printed
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '23.0'
+        locator:
+          published_page: 1913
+          section: '3.3'
+  bench_id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1643.15'
+            interval_high: '1663.15'
+            approximate: false
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: 1370-1390 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '1370'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - original_high
+            - state:
+                tag: value
+                value: '1390'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          output_unit: K
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::feto-p2o5-sample-5
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          P2O5: '9.77'
+          FeO: '80.99'
+          Fe2O3: '9.37'
+      locator:
+        published_page: 1914
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 sample 5; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=69.5 wt%, t in FetO=0.955,
+          X_P2O5=0.0499 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after mass-spectrometric measurement
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Premelted at 1370 C for 4 h in vacuum in an iron crucible, then crushed
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912-1913
+    section: 2.1; 3.3
+    note: FetO-P2O5 sample 5 of 8; Table 4 post-run chemical analysis
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Typical about 0.5 mm but Table 5 rows 4 and 7 used about 0.3 mm; aggregate configuration is mixed
+      cell_internal_dimensions:
+        diameter_m:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.015'
+              approximate: false
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Channel length not printed
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '23.0'
+        locator:
+          published_page: 1913
+          section: '3.3'
+  bench_id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1643.15'
+            interval_high: '1663.15'
+            approximate: false
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: 1370-1390 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '1370'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - original_high
+            - state:
+                tag: value
+                value: '1390'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          output_unit: K
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::feto-p2o5-sample-6
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          P2O5: '13.29'
+          FeO: '78.54'
+          Fe2O3: '8.35'
+      locator:
+        published_page: 1914
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 sample 6; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=66.89 wt%, t in FetO=0.958,
+          X_P2O5=0.0691 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after mass-spectrometric measurement
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Premelted at 1370 C for 4 h in vacuum in an iron crucible, then crushed
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912-1913
+    section: 2.1; 3.3
+    note: FetO-P2O5 sample 6 of 8; Table 4 post-run chemical analysis
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Typical about 0.5 mm but Table 5 rows 4 and 7 used about 0.3 mm; aggregate configuration is mixed
+      cell_internal_dimensions:
+        diameter_m:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.015'
+              approximate: false
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Channel length not printed
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '23.0'
+        locator:
+          published_page: 1913
+          section: '3.3'
+  bench_id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1643.15'
+            interval_high: '1663.15'
+            approximate: false
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: 1370-1390 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '1370'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - original_high
+            - state:
+                tag: value
+                value: '1390'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          output_unit: K
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::feto-p2o5-sample-7
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          P2O5: '14.53'
+          FeO: '77.17'
+          Fe2O3: '8.11'
+      locator:
+        published_page: 1914
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 sample 7; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=65.66 wt%, t in FetO=0.959,
+          X_P2O5=0.0764 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after mass-spectrometric measurement
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Premelted at 1370 C for 4 h in vacuum in an iron crucible, then crushed
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912-1913
+    section: 2.1; 3.3
+    note: FetO-P2O5 sample 7 of 8; Table 4 post-run chemical analysis
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Typical about 0.5 mm but Table 5 rows 4 and 7 used about 0.3 mm; aggregate configuration is mixed
+      cell_internal_dimensions:
+        diameter_m:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.015'
+              approximate: false
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Channel length not printed
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '23.0'
+        locator:
+          published_page: 1913
+          section: '3.3'
+  bench_id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1643.15'
+            interval_high: '1663.15'
+            approximate: false
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: 1370-1390 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '1370'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - original_high
+            - state:
+                tag: value
+                value: '1390'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          output_unit: K
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::feto-p2o5-sample-8
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          P2O5: '18.53'
+          FeO: '73.01'
+          Fe2O3: '8.88'
+      locator:
+        published_page: 1914
+        pdf_page_index: 4
+        table: '4'
+        note: 'Table 4 sample 8; oxide wt% as printed (P2O5, FeO, Fe2O3); also printed Total Fe=62.96 wt%, t in FetO=0.953,
+          X_P2O5=0.0991 (mole fraction); post-run chemical analysis; label retained: FeO 99.9% and 3FeO.P2O5.8H2O >=98%'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after mass-spectrometric measurement
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Premelted at 1370 C for 4 h in vacuum in an iron crucible, then crushed
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912-1913
+    section: 2.1; 3.3
+    note: FetO-P2O5 sample 8 of 8; Table 4 post-run chemical analysis
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Typical about 0.5 mm but Table 5 rows 4 and 7 used about 0.3 mm; aggregate configuration is mixed
+      cell_internal_dimensions:
+        diameter_m:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.015'
+              approximate: false
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Channel length not printed
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '23.0'
+        locator:
+          published_page: 1913
+          section: '3.3'
+  bench_id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1643.15'
+            interval_high: '1663.15'
+            approximate: false
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: 1370-1390 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '1370'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - original_high
+            - state:
+                tag: value
+                value: '1390'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1370-1390 C; unit conversion only
+          output_unit: K
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::pbo-p2o5-melt-1
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Pb: '63.84'
+          P: '10.68'
+      locator:
+        published_page: 1913
+        pdf_page_index: 3
+        table: '3'
+        note: 'Table 3 row 1; elemental Pb and P wt% as printed; also printed X_P2O5=0.359 (mole fraction, not wt%); post-run
+          chemical analysis (not a pre-run assay); label retained: Pb(PO3)2 99.99% and Pb3(PO4)2 99.99%'
     characterization:
       state:
         tag: value
@@ -245,21 +1289,278 @@ experiments:
   locator:
     published_page: 1912-1913
     section: 2.1; 3.3
-    note: PbO-P2O5 system
+    note: PbO-P2O5 melt 1 of 3; Table 3 post-run chemical analysis
   apparatus:
-    cell_material_and_liner:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: true
+        locator:
+          published_page: 1912
+          pdf_page_index: 2
+          figure: '1'
+          section: '2.1'
+      cell_internal_dimensions:
+        diameter_m:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.009'
+              approximate: false
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Channel length not printed
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '31.1'
+        locator:
+          published_page: 1913
+          section: '3.3'
+  bench_id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+            approximate: false
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: 1300 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1300'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1300 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1300 C; unit conversion only
+          output_unit: K
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::pbo-p2o5-melt-2
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
       state:
         tag: value
-        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). PbO-P2O5: inner diameter 9 mm, orifice diameter
-          about 0.4 mm, Pd inner crucible. FetO-P2O5: inner diameter 15 mm, orifice diameter about 0.5 mm (0.3 mm for Table
-          5 asterisk rows No. 4 and No. 7), electrolytic-iron inner crucible. Ta susceptor; W-26%Re/W-5%Re thermocouple calibrated
-          at the melting point of pure Ni. Hitachi RM-6E Knudsen-cell mass spectrometer.'
+        value:
+          Pb: '66.84'
+          P: '11.28'
+      locator:
+        published_page: 1913
+        pdf_page_index: 3
+        table: '3'
+        note: 'Table 3 row 2; elemental Pb and P wt% as printed; also printed X_P2O5=0.361 (mole fraction, not wt%); post-run
+          chemical analysis (not a pre-run assay); label retained: Pb(PO3)2 99.99% and Pb3(PO4)2 99.99%'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after mass-spectrometric measurement
       locator:
         published_page: 1912
         pdf_page_index: 2
         figure: '1'
         section: '2.1'
-        note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912-1913
+    section: 2.1; 3.3
+    note: PbO-P2O5 melt 2 of 3; Table 3 post-run chemical analysis
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0004'
+            approximate: true
+        locator:
+          published_page: 1912
+          pdf_page_index: 2
+          figure: '1'
+          section: '2.1'
+      cell_internal_dimensions:
+        diameter_m:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '0.009'
+              approximate: false
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: Channel length not printed
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '31.1'
+        locator:
+          published_page: 1913
+          section: '3.3'
+  bench_id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+            approximate: false
+        locator:
+          published_page: 1912
+          section: '2.1'
+          note: 1300 C; unit conversion only
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1300'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1300 C; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 1912
+                section: '2.1'
+                note: 1300 C; unit conversion only
+          output_unit: K
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::experiment::pbo-p2o5-melt-3
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Pb: '64.79'
+          P: '12.0'
+      locator:
+        published_page: 1913
+        pdf_page_index: 3
+        table: '3'
+        note: 'Table 3 row 3; elemental Pb and P wt% as printed; also printed X_P2O5=0.382 (mole fraction, not wt%); post-run
+          chemical analysis (not a pre-run assay); label retained: Pb(PO3)2 99.99% and Pb3(PO4)2 99.99%'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after mass-spectrometric measurement
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912-1913
+    section: 2.1; 3.3
+    note: PbO-P2O5 melt 3 of 3; Table 3 post-run chemical analysis
+  apparatus:
     geometry:
       orifice_diameter_m:
         state:
@@ -389,6 +1690,16 @@ experiments:
         figure: '1'
         section: '2.1'
         note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+    calibration:
+      calibration:
+        state:
+          tag: value
+          value: corrected using literature AP of H2O+ 12.67 eV (ref 4) and Ar+ 15.74 eV (ref 5)
+        locator:
+          published_page: 1913
+          pdf_page_index: 3
+          table: '2'
+          note: Table 2 appearance potentials of the ionic species
 benches:
 - id: 10.2355/tetsutohagane1955.71.16_1911::bench::rm6e
   work_id: 10.2355/tetsutohagane1955.71.16_1911

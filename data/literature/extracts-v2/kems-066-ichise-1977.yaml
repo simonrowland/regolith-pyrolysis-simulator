@@ -91,8 +91,8 @@ observations:
               note: extrapolating each composition ln(I+_Al/I+_Fe) vs 1/T to 1600 C then integrating eq (2) gave gamma_Al^o=0.041
                 and gamma_Fe^o=0.021; authors did not adopt because Fig. 4 slopes scatter
         output_unit: K
-- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p0
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p0
   identity:
     quantity:
       tag: unknown
@@ -138,7 +138,7 @@ observations:
     published_page: 421
     pdf_page_index: 5
     table: '1'
-    note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+    note: Table 1 N_Al=0.0 Al activity at 1400 C
   read_from: pdf:kems-066-ichise-1977
   point_conditions:
     temperature_K:
@@ -149,7 +149,7 @@ observations:
         published_page: 421
         pdf_page_index: 5
         table: '1'
-        note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+        note: Table 1 N_Al=0.0 Al activity at 1400 C
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -164,7 +164,7 @@ observations:
               published_page: 421
               pdf_page_index: 5
               table: '1'
-              note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+              note: Table 1 N_Al=0.0 Al activity at 1400 C
         - - factor
           - state:
               tag: value
@@ -173,7 +173,931 @@ observations:
               published_page: 421
               pdf_page_index: 5
               table: '1'
-              note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+              note: Table 1 N_Al=0.0 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p1
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.1 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.1 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.1 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.1 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p2
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.2 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.2 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.2 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.2 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p3
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.3 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.3 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.3 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.3 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p368
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p368
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.368 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.368 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.368 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.368 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p406
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p406
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.406 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.406 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.406 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.406 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p5
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.5 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.5 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.5 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.5 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p6
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.6 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.6 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.6 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.6 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p7
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.7 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.7 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.7 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.7 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p8
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.8 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.8 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.8 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.8 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p9
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.9 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.9 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.9 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.9 Al activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_1p0
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-1p0
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=1.0 Al activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=1.0 Al activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=1.0 Al activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=1.0 Al activity at 1400 C
         output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_eq10_11_ion_ratio_integrand_1400C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
@@ -256,8 +1180,8 @@ observations:
               equation: 10-11
               note: linear fits of ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) vs N_Al at 1400 C
         output_unit: K
-- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p0
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p0
   identity:
     quantity:
       tag: unknown
@@ -303,7 +1227,7 @@ observations:
     published_page: 421
     pdf_page_index: 5
     table: '1'
-    note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+    note: Table 1 N_Al=0.0 Fe activity at 1400 C
   read_from: pdf:kems-066-ichise-1977
   point_conditions:
     temperature_K:
@@ -314,7 +1238,7 @@ observations:
         published_page: 421
         pdf_page_index: 5
         table: '1'
-        note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+        note: Table 1 N_Al=0.0 Fe activity at 1400 C
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -329,7 +1253,7 @@ observations:
               published_page: 421
               pdf_page_index: 5
               table: '1'
-              note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+              note: Table 1 N_Al=0.0 Fe activity at 1400 C
         - - factor
           - state:
               tag: value
@@ -338,7 +1262,931 @@ observations:
               published_page: 421
               pdf_page_index: 5
               table: '1'
-              note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+              note: Table 1 N_Al=0.0 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p1
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.1 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.1 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.1 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.1 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p2
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.2 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.2 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.2 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.2 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p3
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.3 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.3 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.3 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.3 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p368
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p368
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.368 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.368 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.368 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.368 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p406
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p406
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.406 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.406 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.406 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.406 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p5
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.5 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.5 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.5 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.5 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p6
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.6 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.6 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.6 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.6 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p7
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.7 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.7 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.7 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.7 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p8
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.8 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.8 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.8 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.8 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p9
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=0.9 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=0.9 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.9 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=0.9 Fe activity at 1400 C
+        output_unit: K
+- observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_1p0
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-1p0
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_activity_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    reference_state:
+      tag: unknown
+      reason: qualifier and_activity_coefficient does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_activity_coefficient'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-row sigma printed on Table 1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-066-ichise-1977
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 N_Al=1.0 Fe activity at 1400 C
+  read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 421
+        pdf_page_index: 5
+        table: '1'
+        note: Table 1 N_Al=1.0 Fe activity at 1400 C
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=1.0 Fe activity at 1400 C
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 421
+              pdf_page_index: 5
+              table: '1'
+              note: Table 1 N_Al=1.0 Fe activity at 1400 C
         output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_fig10_Al2O_Al_ion_ratio_vs_1_over_T_figure_only
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
@@ -1073,7 +2921,7 @@ observations:
                 (Belton-Fruehan) value
         output_unit: K
 - observation_id: kems-066-ichise-1977::ichise_1977_ion_ratio_NAl_0p5_1470C_30V
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
+  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-nal-0p5
   identity:
     quantity:
       tag: value
@@ -1194,54 +3042,6 @@ observations:
               section: '2.5'
               note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
         output_unit: K
-- observation_id: kems-066-ichise-1977::ichise_1977_kems_geometry_and_calibration
-  experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'kems_method_geometry_reference'
-    species:
-      formula: Al
-      phase:
-        tag: unknown
-        reason: phase string 'Al-Fe_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
-      a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric calibration envelope printed. Temperature of the melt is the Kato-Furukawa corrected B-point reading;
-        50 C A-B gradient corresponds to a 61 C correction (Fig. 2).
-  evidence:
-    class:
-      tag: unknown
-      reason: 'page_grounded: method_class method_only'
-    original_method_class: method_only
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-066-ichise-1977
-  locator:
-    published_page: 418
-    pdf_page_index: 2
-    figure: '1'
-    section: '2'
-    note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals and English
-      captions only.
-  read_from: pdf:kems-066-ichise-1977
 - observation_id: kems-066-ichise-1977::ichise_1977_limiting_molar_heat_of_mixing_Al
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::experiment::fe-al-series
   identity:

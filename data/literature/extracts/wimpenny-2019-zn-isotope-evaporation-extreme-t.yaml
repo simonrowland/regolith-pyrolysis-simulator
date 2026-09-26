@@ -1,7 +1,9 @@
 schema_version: literature_extract.v1
 source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
 source:
-  citation: Wimpenny, J., Marks, N., Knight, K., Rolison, J. M., Borg, L., Eppich, G., Badro, J., Ryerson, F. J., Sanborn, M., Huyskens, M. H. & Yin, Q.-z. (2019), "Experimental determination of Zn isotope fractionation during evaporative loss at extreme temperatures", Geochimica et Cosmochimica Acta.
+  citation: Wimpenny, J., Marks, N., Knight, K., Rolison, J. M., Borg, L., Eppich, G., Badro, J., Ryerson, F. J., Sanborn,
+    M., Huyskens, M. H. & Yin, Q.-z. (2019), "Experimental determination of Zn isotope fractionation during evaporative loss
+    at extreme temperatures", Geochimica et Cosmochimica Acta.
   doi: 10.1016/j.gca.2019.06.016
   year: 2019
 extraction:
@@ -12,78 +14,2669 @@ extraction:
 review_status: draft
 benches:
 - id: ipgp-laser-levitation
-  identity: {basis: described_in_this_work}
+  identity:
+    basis: described_in_this_work
   apparatus_family:
-    state: {tag: value, value: Gas-mixing aerodynamic levitation laser furnace at IPGP}
-    locator: &wimpenny_laser {published_page: 5, section: '2.1 Laser melting experiments'}
+    state:
+      tag: value
+      value: Gas-mixing aerodynamic levitation laser furnace at IPGP
+    locator: &id001
+      published_page: 5
+      section: 2.1 Laser melting experiments
   heating_method:
-    state: {tag: value, value: CO2 laser aerodynamic levitation}
-    locator: *wimpenny_laser
+    state:
+      tag: value
+      value: CO2 laser aerodynamic levitation
+    locator: *id001
   temperature_measurement:
     sensor:
-      state: {tag: value, value: External pyrometer}
-      locator: *wimpenny_laser
+      state:
+        tag: value
+        value: External pyrometer
+      locator: *id001
   other_facts:
   - name: sample_levitation_mode
     unit: null
     value:
-      state: {tag: value, value: {kind: categorical, categorical: Samples freely floated on a stream of Ar gas}}
-      locator: *wimpenny_laser
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Samples freely floated on a stream of Ar gas
+      locator: *id001
 experiments:
-- experiment_id: soil-laser-heating-series
+- experiment_id: wimpenny-2019-arkose-soil-17
   bench_id: ipgp-laser-levitation
   method: levitation
-  locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Laser-heating series of arkosic and rhyolitic soils; the closed method vocabulary has no levitation token.}
+  locator: &id002
+    published_page: 34
+    table: '1'
+    record: Arkose soil-17
   sample:
     mass_kg:
-      state: {tag: value, value: {kind: interval, interval_low: '0.000005', interval_high: '0.000040', approximate: true}}
-      locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Printed approximately 5-40 mg; unit conversion only.}
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
     composition_class:
-      state: {tag: value, value: Arkosic Trinity soil and rhyolitic soil}
-      locator: *wimpenny_laser
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id002
     form:
-      state: {tag: value, value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm}
-      locator: *wimpenny_laser
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id003
+        published_page: 5
+        section: 2.1 Laser melting experiments
     pretreatment:
-      state: {tag: value, value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'}
-      locator: *wimpenny_laser
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id003
   conditions:
     temperature_K:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Multiple target temperatures; no single series setpoint.}
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id002
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: *wimpenny_laser
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id003
     sweep_gas:
       state:
         tag: value
         value:
           species: Ar
-          flow_sccm: {tag: unknown, reason: not_published}
-          partial_pressure_Pa: {tag: unknown, reason: not_published}
-      locator: *wimpenny_laser
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id003
     regime:
-      regime_class: {tag: unknown, reason: not_published}
+      regime_class:
+        tag: unknown
+        reason: not_published
   thermal_schedule:
-    method:
-      state: {tag: value, value: 'Samples first melted above liquidus over 20-60 s, then rapidly ramped to target temperature.'}
-      locator: *wimpenny_laser
     total_duration_s:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 5, section: '2.1 Laser melting experiments', note: 'Printed 1-120 s is target-temperature duration after a separate 20-60 s melt stage, not total run duration.'}
-    setpoints_and_holds:
-    - temperature_K:
-        state: {tag: value, value: {kind: interval, interval_low: '1873.15', interval_high: '2473.15'}}
-        locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Printed 1600-2200 C target range; unit conversion only.}
-      hold_duration_s:
-        state: {tag: value, value: {kind: interval, interval_low: '1', interval_high: '120'}}
-        locator: {published_page: 5, section: '2.1 Laser melting experiments', note: Printed target-temperature duration range.}
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator: *id002
+- experiment_id: wimpenny-2019-arkose-soil-13
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id004
+    published_page: 34
+    table: '1'
+    record: Arkose soil-13
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id004
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id005
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id005
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id004
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id005
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id005
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id004
+- experiment_id: wimpenny-2019-arkose-soil-9
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id006
+    published_page: 34
+    table: '1'
+    record: Arkose soil-9
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id006
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id007
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id007
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id006
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id007
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id007
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator: *id006
+- experiment_id: wimpenny-2019-arkose-soil-5
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id008
+    published_page: 34
+    table: '1'
+    record: Arkose soil-5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id008
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id009
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id009
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id008
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id009
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id009
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+      locator: *id008
+- experiment_id: wimpenny-2019-arkose-soil-1
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id010
+    published_page: 34
+    table: '1'
+    record: Arkose soil-1
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id010
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id011
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id011
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id010
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id011
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id011
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+      locator: *id010
+- experiment_id: wimpenny-2019-arkose-soil-18
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id012
+    published_page: 34
+    table: '1'
+    record: Arkose soil-18
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id012
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id013
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id013
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id012
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id013
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id013
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator: *id012
+- experiment_id: wimpenny-2019-arkose-soil-14
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id014
+    published_page: 34
+    table: '1'
+    record: Arkose soil-14
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id014
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id015
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id015
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id014
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id015
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id015
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id014
+- experiment_id: wimpenny-2019-arkose-soil-10
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id016
+    published_page: 34
+    table: '1'
+    record: Arkose soil-10
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id016
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id017
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id017
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id016
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id017
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id017
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator: *id016
+- experiment_id: wimpenny-2019-arkose-soil-6
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id018
+    published_page: 34
+    table: '1'
+    record: Arkose soil-6
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id018
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id019
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id019
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id018
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id019
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id019
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+      locator: *id018
+- experiment_id: wimpenny-2019-arkose-soil-2
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id020
+    published_page: 34
+    table: '1'
+    record: Arkose soil-2
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id020
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id021
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id021
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id020
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id021
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id021
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+      locator: *id020
+- experiment_id: wimpenny-2019-arkose-soil-19
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id022
+    published_page: 34
+    table: '1'
+    record: Arkose soil-19
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id022
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id023
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id023
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator: *id022
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id023
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id023
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator: *id022
+- experiment_id: wimpenny-2019-arkose-soil-15
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id024
+    published_page: 34
+    table: '1'
+    record: Arkose soil-15
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id024
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id025
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id025
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator: *id024
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id025
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id025
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id024
+- experiment_id: wimpenny-2019-arkose-soil-11
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id026
+    published_page: 34
+    table: '1'
+    record: Arkose soil-11
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id026
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id027
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id027
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator: *id026
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id027
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id027
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator: *id026
+- experiment_id: wimpenny-2019-arkose-soil-7
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id028
+    published_page: 34
+    table: '1'
+    record: Arkose soil-7
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id028
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id029
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id029
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator: *id028
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id029
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id029
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+      locator: *id028
+- experiment_id: wimpenny-2019-arkose-soil-3
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id030
+    published_page: 34
+    table: '1'
+    record: Arkose soil-3
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id030
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id031
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id031
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator: *id030
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id031
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id031
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+      locator: *id030
+- experiment_id: wimpenny-2019-arkose-soil-16
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id032
+    published_page: 34
+    table: '1'
+    record: Arkose soil-16
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id032
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id033
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id033
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator: *id032
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id033
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id033
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id032
+- experiment_id: wimpenny-2019-arkose-soil-12
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id034
+    published_page: 34
+    table: '1'
+    record: Arkose soil-12
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id034
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id035
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id035
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator: *id034
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id035
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id035
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator: *id034
+- experiment_id: wimpenny-2019-arkose-soil-8
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id036
+    published_page: 34
+    table: '1'
+    record: Arkose soil-8
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator: *id036
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id037
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id037
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator: *id036
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id037
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id037
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+      locator: *id036
+- experiment_id: wimpenny-2019-rhyolite-soil-21
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id038
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-21
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id038
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id039
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id039
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id038
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id039
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id039
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator: *id038
+- experiment_id: wimpenny-2019-rhyolite-soil-20
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id040
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-20
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id040
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id041
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id041
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id040
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id041
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id041
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id040
+- experiment_id: wimpenny-2019-rhyolite-soil-19
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id042
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-19
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id042
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id043
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id043
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id042
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id043
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id043
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator: *id042
+- experiment_id: wimpenny-2019-rhyolite-soil-18
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id044
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-18
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id044
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id045
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id045
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id044
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id045
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id045
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+      locator: *id044
+- experiment_id: wimpenny-2019-rhyolite-soil-17
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id046
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-17
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id046
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id047
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id047
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator: *id046
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id047
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id047
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+      locator: *id046
+- experiment_id: wimpenny-2019-rhyolite-soil-2
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id048
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-2
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id048
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id049
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id049
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id048
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id049
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id049
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator: *id048
+- experiment_id: wimpenny-2019-rhyolite-soil-5
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id050
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-5
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id050
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id051
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id051
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id050
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id051
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id051
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id050
+- experiment_id: wimpenny-2019-rhyolite-soil-3
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id052
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-3
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id052
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id053
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id053
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id052
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id053
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id053
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator: *id052
+- experiment_id: wimpenny-2019-rhyolite-soil-1
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id054
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-1
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id054
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id055
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id055
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id054
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id055
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id055
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+      locator: *id054
+- experiment_id: wimpenny-2019-rhyolite-soil-4
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id056
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-4
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id056
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id057
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id057
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator: *id056
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id057
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id057
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+      locator: *id056
+- experiment_id: wimpenny-2019-rhyolite-soil-11
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id058
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-11
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id058
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id059
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id059
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator: *id058
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id059
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id059
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id058
+- experiment_id: wimpenny-2019-rhyolite-soil-7
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id060
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-7
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id060
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id061
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id061
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator: *id060
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id061
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id061
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+      locator: *id060
+- experiment_id: wimpenny-2019-rhyolite-soil-8
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id062
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-8
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id062
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id063
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id063
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator: *id062
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id063
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id063
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+      locator: *id062
+- experiment_id: wimpenny-2019-rhyolite-soil-13
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id064
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-13
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id064
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id065
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id065
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator: *id064
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id065
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id065
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator: *id064
+- experiment_id: wimpenny-2019-rhyolite-soil-10
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id066
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-10
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id066
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id067
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id067
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator: *id066
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id067
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id067
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+      locator: *id066
+- experiment_id: wimpenny-2019-rhyolite-soil-6
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id068
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-6
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id068
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id069
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id069
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator: *id068
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id069
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id069
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator: *id068
+- experiment_id: wimpenny-2019-rhyolite-soil-15
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id070
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-15
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id070
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id071
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id071
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator: *id070
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id071
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id071
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+      locator: *id070
+- experiment_id: wimpenny-2019-rhyolite-soil-12
+  bench_id: ipgp-laser-levitation
+  method: levitation
+  locator: &id072
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-12
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.000040'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator: *id072
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator: &id073
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    pretreatment:
+      state:
+        tag: value
+        value: 'Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons'
+      locator: *id073
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator: *id072
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator: *id073
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator: *id073
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '90'
+      locator: *id072
 species:
   Zn:
     observations:
     - observation_id: wimpenny_2019_laser_levitation_apparatus
-      experiment: soil-laser-heating-series
       type: rate_series
       class_tag: measured_direct
       locator:
@@ -104,7 +2697,8 @@ species:
         sample_materials:
         - arkosic soil from Trinity test site
         - rhyolitic soil from a second nuclear-test site
-        sample_preparation: crushed and homogenized with agate pestle and mortar; pelletized in Specac pellet die and hydraulic press
+        sample_preparation: crushed and homogenized with agate pestle and mortar; pelletized in Specac pellet die and hydraulic
+          press
         pellet_press_load_tons_about: 8
         introduced_sample_mass_mg_range:
         - 5
@@ -129,67 +2723,6 @@ species:
           rhyolitic: 21
       uncertainty:
         trace_element_analysis: typically better than 5 percent based on BCR-2 and NIST 1640a standards
-    - observation_id: wimpenny_2019_table1_experimental_zn_rows
-      experiment: soil-laser-heating-series
-      type: rate_series
-      class_tag: measured_direct
-      locator:
-        table: '1'
-        published_page: 33
-        pdf_page: 35
-        note: Table 1 heating parameters and Zn isotope ratios; uncertainties are printed 2sigma columns.
-      T_range_C:
-      - 1600
-      - 2200
-      phase: glass
-      regime: containerless_laser_heating
-      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
-      values:
-        quantity: isotope_delta
-        method_class: measured_direct
-        evidence_class: measured_direct
-        row_columns: [sample, diameter_mm, heating_time_s, temperature_C, delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm]
-        rows:
-        - {sample: Arkose soil, diameter_mm: null, heating_time_s: null, temperature_C: null, delta66Zn_permil: 0.22, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 51.46, Zn_2sigma_ppm: 0.78}
-        - {sample: Arkose soil-17, diameter_mm: 1.76, heating_time_s: 1, temperature_C: 1600, delta66Zn_permil: 0.36, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 19.40, Zn_2sigma_ppm: 0.34}
-        - {sample: Arkose soil-13, diameter_mm: 1.93, heating_time_s: 5, temperature_C: 1600, delta66Zn_permil: 0.33, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 12.08, Zn_2sigma_ppm: 0.23}
-        - {sample: Arkose soil-9, diameter_mm: 1.81, heating_time_s: 10, temperature_C: 1600, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 17.18, Zn_2sigma_ppm: 0.37}
-        - {sample: Arkose soil-5, diameter_mm: 1.91, heating_time_s: 60, temperature_C: 1600, delta66Zn_permil: 0.95, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 17.88, Zn_2sigma_ppm: 0.39}
-        - {sample: Arkose soil-1, diameter_mm: 2.02, heating_time_s: 120, temperature_C: 1600, delta66Zn_permil: 1.20, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 14.50, Zn_2sigma_ppm: 0.42}
-        - {sample: Arkose soil-18, diameter_mm: 1.49, heating_time_s: 1, temperature_C: 1800, delta66Zn_permil: 0.62, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 15.86, Zn_2sigma_ppm: 0.40}
-        - {sample: Arkose soil-14, diameter_mm: 1.38, heating_time_s: 5, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 4.88, Zn_2sigma_ppm: 0.17}
-        - {sample: Arkose soil-10, diameter_mm: 1.37, heating_time_s: 10, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 7.74, Zn_2sigma_ppm: 0.49}
-        - {sample: Arkose soil-6, diameter_mm: 1.49, heating_time_s: 60, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 3.04, Zn_2sigma_ppm: 0.33}
-        - {sample: Arkose soil-2, diameter_mm: 1.47, heating_time_s: 120, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 4.78, Zn_2sigma_ppm: 0.35}
-        - {sample: Arkose soil-19, diameter_mm: 1.26, heating_time_s: 1, temperature_C: 2000, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 3.15, Zn_2sigma_ppm: 0.19}
-        - {sample: Arkose soil-15, diameter_mm: 1.63, heating_time_s: 5, temperature_C: 2000, delta66Zn_permil: 1.22, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 6.20, Zn_2sigma_ppm: 0.22}
-        - {sample: Arkose soil-11, diameter_mm: 1.86, heating_time_s: 10, temperature_C: 2000, delta66Zn_permil: 1.42, delta66Zn_2sigma_permil: 0.04, Zn_ppm: 6.23, Zn_2sigma_ppm: 0.16}
-        - {sample: Arkose soil-7, diameter_mm: 1.51, heating_time_s: 60, temperature_C: 2000, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 2.73, Zn_2sigma_ppm: 0.22}
-        - {sample: Arkose soil-3, diameter_mm: 1.18, heating_time_s: 120, temperature_C: 2000, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 2.33, Zn_2sigma_ppm: 0.32}
-        - {sample: Arkose soil-16, diameter_mm: 1.72, heating_time_s: 5, temperature_C: 2200, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 5.90, Zn_2sigma_ppm: 0.18}
-        - {sample: Arkose soil-12, diameter_mm: 1.11, heating_time_s: 10, temperature_C: 2200, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 1.65, Zn_2sigma_ppm: 0.26}
-        - {sample: Arkose soil-8, diameter_mm: 0.82, heating_time_s: 60, temperature_C: 2200, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 7.18, Zn_2sigma_ppm: 0.64}
-        - {sample: Rhyolite soil, diameter_mm: null, heating_time_s: null, temperature_C: null, delta66Zn_permil: 0.28, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 153.0, Zn_2sigma_ppm: 6.0}
-        - {sample: Rhyolite soil-21, diameter_mm: 3.2, heating_time_s: 1, temperature_C: 1600, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 172.2, Zn_2sigma_ppm: 2.4}
-        - {sample: Rhyolite soil-20, diameter_mm: 3.2, heating_time_s: 5, temperature_C: 1600, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 161.6, Zn_2sigma_ppm: 4.5}
-        - {sample: Rhyolite soil-19, diameter_mm: 1.67, heating_time_s: 10, temperature_C: 1600, delta66Zn_permil: 0.57, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 135.4, Zn_2sigma_ppm: 3.2}
-        - {sample: Rhyolite soil-18, diameter_mm: 2.42, heating_time_s: 60, temperature_C: 1600, delta66Zn_permil: 0.42, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 143.2, Zn_2sigma_ppm: 4.8}
-        - {sample: Rhyolite soil-17, diameter_mm: 2.18, heating_time_s: 120, temperature_C: 1600, delta66Zn_permil: 0.40, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 149.5, Zn_2sigma_ppm: 5.3}
-        - {sample: Rhyolite soil-2, diameter_mm: 2.79, heating_time_s: 1, temperature_C: 1800, delta66Zn_permil: 0.26, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 167.1, Zn_2sigma_ppm: 4.6}
-        - {sample: Rhyolite soil-5, diameter_mm: 3.08, heating_time_s: 5, temperature_C: 1800, delta66Zn_permil: 0.33, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 172.4, Zn_2sigma_ppm: 2.7}
-        - {sample: Rhyolite soil-3, diameter_mm: 2.46, heating_time_s: 10, temperature_C: 1800, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 121.2, Zn_2sigma_ppm: 4.5}
-        - {sample: Rhyolite soil-1, diameter_mm: 1.81, heating_time_s: 60, temperature_C: 1800, delta66Zn_permil: 0.30, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 153.2, Zn_2sigma_ppm: 5.2}
-        - {sample: Rhyolite soil-4, diameter_mm: 1.74, heating_time_s: 120, temperature_C: 1800, delta66Zn_permil: 0.54, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 122.5, Zn_2sigma_ppm: 1.9}
-        - {sample: Rhyolite soil-11, diameter_mm: 1.95, heating_time_s: 5, temperature_C: 2000, delta66Zn_permil: 0.51, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 135.6, Zn_2sigma_ppm: 3.0}
-        - {sample: Rhyolite soil-7, diameter_mm: 1.26, heating_time_s: 60, temperature_C: 2000, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 166.6, Zn_2sigma_ppm: 4.6}
-        - {sample: Rhyolite soil-8, diameter_mm: 1.93, heating_time_s: 120, temperature_C: 2000, delta66Zn_permil: 0.85, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 102.7, Zn_2sigma_ppm: 2.6}
-        - {sample: Rhyolite soil-13, diameter_mm: 1.59, heating_time_s: 1, temperature_C: 2200, delta66Zn_permil: 0.65, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 119.3, Zn_2sigma_ppm: 3.5}
-        - {sample: Rhyolite soil-10, diameter_mm: 1.96, heating_time_s: 5, temperature_C: 2200, delta66Zn_permil: 0.70, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 116.5, Zn_2sigma_ppm: 1.2}
-        - {sample: Rhyolite soil-6, diameter_mm: 1.76, heating_time_s: 10, temperature_C: 2200, delta66Zn_permil: 0.79, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 117.7, Zn_2sigma_ppm: 3.7}
-        - {sample: Rhyolite soil-15, diameter_mm: 1.89, heating_time_s: 60, temperature_C: 2200, delta66Zn_permil: 1.49, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 83.33, Zn_2sigma_ppm: 2.98}
-        - {sample: Rhyolite soil-12, diameter_mm: 0.81, heating_time_s: 90, temperature_C: 2200, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 9.72, Zn_2sigma_ppm: 0.50}
-      uncertainty:
-        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
     - observation_id: wimpenny_2019_table2_fallout_tektite_zn_rows
       type: rate_series
       class_tag: measured_direct
@@ -206,27 +2739,102 @@ species:
         method_class: measured_direct
         evidence_class: measured_direct
         rows:
-        - {sample: Fallout-1, delta66Zn_permil: 0.59, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 45.77, Zn_2sigma_ppm: 1.08}
-        - {sample: Fallout-2, delta66Zn_permil: 0.33, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 77.22, Zn_2sigma_ppm: 2.56}
-        - {sample: Fallout-3, delta66Zn_permil: 0.47, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 86.89, Zn_2sigma_ppm: 3.31}
-        - {sample: Fallout-4, delta66Zn_permil: 0.67, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 55.81, Zn_2sigma_ppm: 1.10}
-        - {sample: Fallout-5, delta66Zn_permil: 0.40, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 89.99, Zn_2sigma_ppm: 1.62}
-        - {sample: Fallout-6, delta66Zn_permil: 0.33, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 79.22, Zn_2sigma_ppm: 2.32}
-        - {sample: Fallout-7, delta66Zn_permil: 0.40, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 75.09, Zn_2sigma_ppm: 1.94}
-        - {sample: Australite 1, delta66Zn_permil: 1.26, delta66Zn_2sigma_permil: 0.01, Zn_ppm: 22.22, Zn_2sigma_ppm: 0.22}
-        - {sample: Australite 2, delta66Zn_permil: 1.02, delta66Zn_2sigma_permil: 0.12, Zn_ppm: 25.78, Zn_2sigma_ppm: 1.43}
-        - {sample: Australite 3, delta66Zn_permil: 1.19, delta66Zn_2sigma_permil: 0.01, Zn_ppm: 20.00, Zn_2sigma_ppm: 1.28}
-        - {sample: Australite 4, delta66Zn_permil: 2.03, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 14.65, Zn_2sigma_ppm: 0.37}
-        - {sample: Australite 5, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 11.96, Zn_2sigma_ppm: 0.85}
-        - {sample: Australite 6, delta66Zn_permil: 2.04, delta66Zn_2sigma_permil: 0.16, Zn_ppm: 10.51, Zn_2sigma_ppm: 0.75}
-        - {sample: Australite 7, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 27.87, Zn_2sigma_ppm: 3.19}
-        - {sample: Australite 8, delta66Zn_permil: 1.30, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 20.30, Zn_2sigma_ppm: 0.54}
-        - {sample: Australite 9, delta66Zn_permil: null, delta66Zn_2sigma_permil: null, Zn_ppm: 28.19, Zn_2sigma_ppm: 1.94}
-        - {sample: Australite 10, delta66Zn_permil: 1.83, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 10.49, Zn_2sigma_ppm: 1.50}
-        - {sample: Australite 11, delta66Zn_permil: 1.94, delta66Zn_2sigma_permil: 0.03, Zn_ppm: 9.98, Zn_2sigma_ppm: 0.86}
-        - {sample: Australite 12, delta66Zn_permil: 1.49, delta66Zn_2sigma_permil: 0.02, Zn_ppm: 11.55, Zn_2sigma_ppm: 0.29}
+        - sample: Fallout-1
+          delta66Zn_permil: 0.59
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 45.77
+          Zn_2sigma_ppm: 1.08
+        - sample: Fallout-2
+          delta66Zn_permil: 0.33
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 77.22
+          Zn_2sigma_ppm: 2.56
+        - sample: Fallout-3
+          delta66Zn_permil: 0.47
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 86.89
+          Zn_2sigma_ppm: 3.31
+        - sample: Fallout-4
+          delta66Zn_permil: 0.67
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 55.81
+          Zn_2sigma_ppm: 1.1
+        - sample: Fallout-5
+          delta66Zn_permil: 0.4
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 89.99
+          Zn_2sigma_ppm: 1.62
+        - sample: Fallout-6
+          delta66Zn_permil: 0.33
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 79.22
+          Zn_2sigma_ppm: 2.32
+        - sample: Fallout-7
+          delta66Zn_permil: 0.4
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 75.09
+          Zn_2sigma_ppm: 1.94
+        - sample: Australite 1
+          delta66Zn_permil: 1.26
+          delta66Zn_2sigma_permil: 0.01
+          Zn_ppm: 22.22
+          Zn_2sigma_ppm: 0.22
+        - sample: Australite 2
+          delta66Zn_permil: 1.02
+          delta66Zn_2sigma_permil: 0.12
+          Zn_ppm: 25.78
+          Zn_2sigma_ppm: 1.43
+        - sample: Australite 3
+          delta66Zn_permil: 1.19
+          delta66Zn_2sigma_permil: 0.01
+          Zn_ppm: 20.0
+          Zn_2sigma_ppm: 1.28
+        - sample: Australite 4
+          delta66Zn_permil: 2.03
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 14.65
+          Zn_2sigma_ppm: 0.37
+        - sample: Australite 5
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 11.96
+          Zn_2sigma_ppm: 0.85
+        - sample: Australite 6
+          delta66Zn_permil: 2.04
+          delta66Zn_2sigma_permil: 0.16
+          Zn_ppm: 10.51
+          Zn_2sigma_ppm: 0.75
+        - sample: Australite 7
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 27.87
+          Zn_2sigma_ppm: 3.19
+        - sample: Australite 8
+          delta66Zn_permil: 1.3
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 20.3
+          Zn_2sigma_ppm: 0.54
+        - sample: Australite 9
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 28.19
+          Zn_2sigma_ppm: 1.94
+        - sample: Australite 10
+          delta66Zn_permil: 1.83
+          delta66Zn_2sigma_permil: 0.03
+          Zn_ppm: 10.49
+          Zn_2sigma_ppm: 1.5
+        - sample: Australite 11
+          delta66Zn_permil: 1.94
+          delta66Zn_2sigma_permil: 0.03
+          Zn_ppm: 9.98
+          Zn_2sigma_ppm: 0.86
+        - sample: Australite 12
+          delta66Zn_permil: 1.49
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 11.55
+          Zn_2sigma_ppm: 0.29
     - observation_id: wimpenny_2019_zn_fractionation_summary
-      experiment: soil-laser-heating-series
       type: alpha
       class_tag: measured_direct
       derived_from: wimpenny_2019_table1_experimental_zn_rows
@@ -267,7 +2875,8 @@ species:
           at_2200C:
           - 92
           - 98
-        reported_table3_context: enrichment factors normalize each element/Al ratio to the precursor soil; Table 3 is on published page 35.
+        reported_table3_context: enrichment factors normalize each element/Al ratio to the precursor soil; Table 3 is on published
+          page 35.
         pressure_context: experiments at atmospheric pressure; abstract also discusses high-vacuum theoretical comparison
     - observation_id: wimpenny_2019_zn_kinetic_theory_and_pressure_model
       type: alpha
@@ -298,15 +2907,1321 @@ species:
         alpha: 0.985
         elemental_Zn_vacuum_alpha: 0.985
         ZnCl2_vacuum_alpha: 0.993
-        ZnS_vacuum_alpha: 0.990
-        effective_pressure_relation: "alpha_prime - 1 approximately (alpha - 1) * (1 - Pi/Pi_sat)"
+        ZnS_vacuum_alpha: 0.99
+        effective_pressure_relation: alpha_prime - 1 approximately (alpha - 1) * (1 - Pi/Pi_sat)
         pressure_domain_discussed_bar:
-        - 1.0e-9
+        - 1.0e-09
         - 1.0
         modeled_interpretation: increasing Pi/Pi_sat drives effective alpha toward 1 through recondensation
         do_not_treat_as_measured: true
       uncertainty:
         note: model values and pressure relation are author calculations or quoted framework, not direct measurements.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::starting-materials
+      type: rate_series
+      class_tag: measured_direct
+      locator:
+        table: '1'
+        published_page: 33
+        pdf_page: 35
+        note: Table 1 heating parameters and Zn isotope ratios; uncertainties are printed 2sigma columns.
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil
+          diameter_mm: null
+          heating_time_s: null
+          temperature_C: null
+          delta66Zn_permil: 0.22
+          delta66Zn_2sigma_permil: 0.04
+          Zn_ppm: 51.46
+          Zn_2sigma_ppm: 0.78
+        - sample: Rhyolite soil
+          diameter_mm: null
+          heating_time_s: null
+          temperature_C: null
+          delta66Zn_permil: 0.28
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 153.0
+          Zn_2sigma_ppm: 6.0
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-17
+      experiment: wimpenny-2019-arkose-soil-17
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id002
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-17
+          diameter_mm: 1.76
+          heating_time_s: 1
+          temperature_C: 1600
+          delta66Zn_permil: 0.36
+          delta66Zn_2sigma_permil: 0.04
+          Zn_ppm: 19.4
+          Zn_2sigma_ppm: 0.34
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-13
+      experiment: wimpenny-2019-arkose-soil-13
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id004
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-13
+          diameter_mm: 1.93
+          heating_time_s: 5
+          temperature_C: 1600
+          delta66Zn_permil: 0.33
+          delta66Zn_2sigma_permil: 0.03
+          Zn_ppm: 12.08
+          Zn_2sigma_ppm: 0.23
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-9
+      experiment: wimpenny-2019-arkose-soil-9
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id006
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-9
+          diameter_mm: 1.81
+          heating_time_s: 10
+          temperature_C: 1600
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 17.18
+          Zn_2sigma_ppm: 0.37
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-5
+      experiment: wimpenny-2019-arkose-soil-5
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id008
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-5
+          diameter_mm: 1.91
+          heating_time_s: 60
+          temperature_C: 1600
+          delta66Zn_permil: 0.95
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 17.88
+          Zn_2sigma_ppm: 0.39
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-1
+      experiment: wimpenny-2019-arkose-soil-1
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id010
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-1
+          diameter_mm: 2.02
+          heating_time_s: 120
+          temperature_C: 1600
+          delta66Zn_permil: 1.2
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 14.5
+          Zn_2sigma_ppm: 0.42
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-18
+      experiment: wimpenny-2019-arkose-soil-18
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id012
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-18
+          diameter_mm: 1.49
+          heating_time_s: 1
+          temperature_C: 1800
+          delta66Zn_permil: 0.62
+          delta66Zn_2sigma_permil: 0.04
+          Zn_ppm: 15.86
+          Zn_2sigma_ppm: 0.4
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-14
+      experiment: wimpenny-2019-arkose-soil-14
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id014
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-14
+          diameter_mm: 1.38
+          heating_time_s: 5
+          temperature_C: 1800
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 4.88
+          Zn_2sigma_ppm: 0.17
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-10
+      experiment: wimpenny-2019-arkose-soil-10
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id016
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-10
+          diameter_mm: 1.37
+          heating_time_s: 10
+          temperature_C: 1800
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 7.74
+          Zn_2sigma_ppm: 0.49
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-6
+      experiment: wimpenny-2019-arkose-soil-6
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id018
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-6
+          diameter_mm: 1.49
+          heating_time_s: 60
+          temperature_C: 1800
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 3.04
+          Zn_2sigma_ppm: 0.33
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-2
+      experiment: wimpenny-2019-arkose-soil-2
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id020
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-2
+          diameter_mm: 1.47
+          heating_time_s: 120
+          temperature_C: 1800
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 4.78
+          Zn_2sigma_ppm: 0.35
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-19
+      experiment: wimpenny-2019-arkose-soil-19
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id022
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-19
+          diameter_mm: 1.26
+          heating_time_s: 1
+          temperature_C: 2000
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 3.15
+          Zn_2sigma_ppm: 0.19
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-15
+      experiment: wimpenny-2019-arkose-soil-15
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id024
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-15
+          diameter_mm: 1.63
+          heating_time_s: 5
+          temperature_C: 2000
+          delta66Zn_permil: 1.22
+          delta66Zn_2sigma_permil: 0.04
+          Zn_ppm: 6.2
+          Zn_2sigma_ppm: 0.22
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-11
+      experiment: wimpenny-2019-arkose-soil-11
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id026
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-11
+          diameter_mm: 1.86
+          heating_time_s: 10
+          temperature_C: 2000
+          delta66Zn_permil: 1.42
+          delta66Zn_2sigma_permil: 0.04
+          Zn_ppm: 6.23
+          Zn_2sigma_ppm: 0.16
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-7
+      experiment: wimpenny-2019-arkose-soil-7
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id028
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-7
+          diameter_mm: 1.51
+          heating_time_s: 60
+          temperature_C: 2000
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 2.73
+          Zn_2sigma_ppm: 0.22
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-3
+      experiment: wimpenny-2019-arkose-soil-3
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id030
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-3
+          diameter_mm: 1.18
+          heating_time_s: 120
+          temperature_C: 2000
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 2.33
+          Zn_2sigma_ppm: 0.32
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-16
+      experiment: wimpenny-2019-arkose-soil-16
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id032
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-16
+          diameter_mm: 1.72
+          heating_time_s: 5
+          temperature_C: 2200
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 5.9
+          Zn_2sigma_ppm: 0.18
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-12
+      experiment: wimpenny-2019-arkose-soil-12
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id034
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-12
+          diameter_mm: 1.11
+          heating_time_s: 10
+          temperature_C: 2200
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 1.65
+          Zn_2sigma_ppm: 0.26
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::arkose-soil-8
+      experiment: wimpenny-2019-arkose-soil-8
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id036
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Arkose soil-8
+          diameter_mm: 0.82
+          heating_time_s: 60
+          temperature_C: 2200
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 7.18
+          Zn_2sigma_ppm: 0.64
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-21
+      experiment: wimpenny-2019-rhyolite-soil-21
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id038
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-21
+          diameter_mm: 3.2
+          heating_time_s: 1
+          temperature_C: 1600
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 172.2
+          Zn_2sigma_ppm: 2.4
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-20
+      experiment: wimpenny-2019-rhyolite-soil-20
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id040
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-20
+          diameter_mm: 3.2
+          heating_time_s: 5
+          temperature_C: 1600
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 161.6
+          Zn_2sigma_ppm: 4.5
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-19
+      experiment: wimpenny-2019-rhyolite-soil-19
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id042
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-19
+          diameter_mm: 1.67
+          heating_time_s: 10
+          temperature_C: 1600
+          delta66Zn_permil: 0.57
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 135.4
+          Zn_2sigma_ppm: 3.2
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-18
+      experiment: wimpenny-2019-rhyolite-soil-18
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id044
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-18
+          diameter_mm: 2.42
+          heating_time_s: 60
+          temperature_C: 1600
+          delta66Zn_permil: 0.42
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 143.2
+          Zn_2sigma_ppm: 4.8
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-17
+      experiment: wimpenny-2019-rhyolite-soil-17
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id046
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-17
+          diameter_mm: 2.18
+          heating_time_s: 120
+          temperature_C: 1600
+          delta66Zn_permil: 0.4
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 149.5
+          Zn_2sigma_ppm: 5.3
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-2
+      experiment: wimpenny-2019-rhyolite-soil-2
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id048
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-2
+          diameter_mm: 2.79
+          heating_time_s: 1
+          temperature_C: 1800
+          delta66Zn_permil: 0.26
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 167.1
+          Zn_2sigma_ppm: 4.6
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-5
+      experiment: wimpenny-2019-rhyolite-soil-5
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id050
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-5
+          diameter_mm: 3.08
+          heating_time_s: 5
+          temperature_C: 1800
+          delta66Zn_permil: 0.33
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 172.4
+          Zn_2sigma_ppm: 2.7
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-3
+      experiment: wimpenny-2019-rhyolite-soil-3
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id052
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-3
+          diameter_mm: 2.46
+          heating_time_s: 10
+          temperature_C: 1800
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 121.2
+          Zn_2sigma_ppm: 4.5
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-1
+      experiment: wimpenny-2019-rhyolite-soil-1
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id054
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-1
+          diameter_mm: 1.81
+          heating_time_s: 60
+          temperature_C: 1800
+          delta66Zn_permil: 0.3
+          delta66Zn_2sigma_permil: 0.03
+          Zn_ppm: 153.2
+          Zn_2sigma_ppm: 5.2
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-4
+      experiment: wimpenny-2019-rhyolite-soil-4
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id056
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-4
+          diameter_mm: 1.74
+          heating_time_s: 120
+          temperature_C: 1800
+          delta66Zn_permil: 0.54
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 122.5
+          Zn_2sigma_ppm: 1.9
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-11
+      experiment: wimpenny-2019-rhyolite-soil-11
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id058
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-11
+          diameter_mm: 1.95
+          heating_time_s: 5
+          temperature_C: 2000
+          delta66Zn_permil: 0.51
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 135.6
+          Zn_2sigma_ppm: 3.0
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-7
+      experiment: wimpenny-2019-rhyolite-soil-7
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id060
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-7
+          diameter_mm: 1.26
+          heating_time_s: 60
+          temperature_C: 2000
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 166.6
+          Zn_2sigma_ppm: 4.6
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-8
+      experiment: wimpenny-2019-rhyolite-soil-8
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id062
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-8
+          diameter_mm: 1.93
+          heating_time_s: 120
+          temperature_C: 2000
+          delta66Zn_permil: 0.85
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 102.7
+          Zn_2sigma_ppm: 2.6
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-13
+      experiment: wimpenny-2019-rhyolite-soil-13
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id064
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-13
+          diameter_mm: 1.59
+          heating_time_s: 1
+          temperature_C: 2200
+          delta66Zn_permil: 0.65
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 119.3
+          Zn_2sigma_ppm: 3.5
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-10
+      experiment: wimpenny-2019-rhyolite-soil-10
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id066
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-10
+          diameter_mm: 1.96
+          heating_time_s: 5
+          temperature_C: 2200
+          delta66Zn_permil: 0.7
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 116.5
+          Zn_2sigma_ppm: 1.2
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-6
+      experiment: wimpenny-2019-rhyolite-soil-6
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id068
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-6
+          diameter_mm: 1.76
+          heating_time_s: 10
+          temperature_C: 2200
+          delta66Zn_permil: 0.79
+          delta66Zn_2sigma_permil: 0.03
+          Zn_ppm: 117.7
+          Zn_2sigma_ppm: 3.7
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-15
+      experiment: wimpenny-2019-rhyolite-soil-15
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id070
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-15
+          diameter_mm: 1.89
+          heating_time_s: 60
+          temperature_C: 2200
+          delta66Zn_permil: 1.49
+          delta66Zn_2sigma_permil: 0.02
+          Zn_ppm: 83.33
+          Zn_2sigma_ppm: 2.98
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+    - observation_id: wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-12
+      experiment: wimpenny-2019-rhyolite-soil-12
+      type: rate_series
+      class_tag: measured_direct
+      locator: *id072
+      T_range_C:
+      - 1600
+      - 2200
+      phase: glass
+      regime: containerless_laser_heating
+      units: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+      values:
+        quantity: isotope_delta
+        method_class: measured_direct
+        evidence_class: measured_direct
+        row_columns:
+        - sample
+        - diameter_mm
+        - heating_time_s
+        - temperature_C
+        - delta66Zn_permil
+        - delta66Zn_2sigma_permil
+        - Zn_ppm
+        - Zn_2sigma_ppm
+        rows:
+        - sample: Rhyolite soil-12
+          diameter_mm: 0.81
+          heating_time_s: 90
+          temperature_C: 2200
+          delta66Zn_permil: null
+          delta66Zn_2sigma_permil: null
+          Zn_ppm: 9.72
+          Zn_2sigma_ppm: 0.5
+      uncertainty:
+        note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
 deepening:
   class_ledger:
   - measured_direct: apparatus, run conditions, Table 1 experimental Zn rows, Table 2 measured sample rows
@@ -323,7 +4238,9 @@ deepening:
   - run-specific Zn evaporation flux; authors state mass cannot be constrained quantitatively and use Al normalization
   notes:
   - null isotope cells preserve unanalysed rows; they are not zero
-  - Table 3 enrichment factors were reviewed as author-reduced data but not copied as point values because the rendered table's OCR did not preserve several minus signs and decimal points reliably; the narrative preserves its reported Zn-loss ranges and alpha summaries
+  - Table 3 enrichment factors were reviewed as author-reduced data but not copied as point values because the rendered table's
+    OCR did not preserve several minus signs and decimal points reliably; the narrative preserves its reported Zn-loss ranges
+    and alpha summaries
 fidelity_samples:
 - path: species.Zn.observations[wimpenny_2019_zn_fractionation_summary].values.alpha
   value: 0.99879

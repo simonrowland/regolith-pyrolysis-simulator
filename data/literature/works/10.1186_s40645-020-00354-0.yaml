@@ -19,6 +19,216 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1186/s40645-020-00354-0
 experiments:
+- experiment_id: 10.1186/s40645-020-00354-0::experiment::allende-laser-boiling
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'laser_boiling' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000015'
+          approximate: true
+      locator:
+        page: 3
+        section: Experimental methods
+        note: Printed approximately 15 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 3
+              section: Experimental methods
+              note: Printed approximately 15 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 3
+              section: Experimental methods
+              note: Printed approximately 15 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - NaO0.5
+            - '0.0084'
+          - - MgO
+            - '0.3519'
+          - - AlO1.5
+            - '0.034'
+          - - SiO2
+            - '0.3282'
+          - - KO0.5
+            - '0.0004'
+          - - CaO
+            - '0.0247'
+          - - TiO2
+            - '0.001'
+          - - CrO1.5
+            - '0.0039'
+          - - MnO
+            - '0.0015'
+          - - FeO
+            - '0.246'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '1'
+        note: Allende row; mol% of MOx as printed (NaO0.5 0.84, MgO 35.19, AlO1.5 3.40, SiO2 32.82, KO0.5 0.04, CaO 2.47,
+          TiO2 0.10, CrO1.5 0.39, MnO 0.15, FeO 24.60, Total 100); stored as mole_fraction by /100 unit conversion only; not
+          renormalised; later evaporation-product tables not used as the charge
+    printed_composition:
+      state:
+        tag: value
+        value: Allende meteorite powder
+      locator:
+        page: 2
+        table: '1'
+        note: Label retained; numeric mol% of MOx in initial_composition; Total row omitted
+    form:
+      state:
+        tag: value
+        value: cylindrical pressed and fired charge
+      locator:
+        page: 3
+        section: Experimental methods
+    pretreatment:
+      state:
+        tag: value
+        value: Fired 12 h at 1000 C in H2/CO2 = 1/2
+      locator:
+        page: 2
+        section: Experimental methods
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30000'
+          approximate: false
+      locator:
+        page: 3
+        section: Apparatus
+        note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              page: 3
+              section: Apparatus
+              note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 3
+              section: Apparatus
+              note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: Apparatus
+        note: The registry SweepGas shape cannot represent the printed two-gas mixture without selecting one species.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00133322'
+        locator:
+          page: 3
+          section: Apparatus
+          note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00001'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
+          output_unit: Pa
+  work_id: 10.1186/s40645-020-00354-0
+  locator:
+    page: 3
+    section: Experimental methods; Apparatus
+    note: Allende charges in the own laser-heating and inert-gas-cooling experiments.
+  bench_id: 10.1186/s40645-020-00354-0::bench::co2-laser-boiling-chamber
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: laser heating followed by chamber-wall and copper-plate quench of droplets
+      locator:
+        page: 4
+        section: Experimental methods
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        table: '2'
+        note: Run-specific heating durations remain in observation rows; no one duration applies to the series.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Cu plate and chamber-wall quench of droplets
+      locator:
+        page: 4
+        section: Experimental methods
 - experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   kind: literature
   method:
@@ -66,6 +276,7 @@ experiments:
       locator:
         page: 2
         table: '1'
+        note: Label retained on the mixed series; numeric maps live on allende-laser-boiling and lsil-laser-boiling
     form:
       state:
         tag: value
@@ -170,7 +381,217 @@ experiments:
   locator:
     page: 3
     section: Experimental methods; Apparatus
-    note: Own laser-heating and inert-gas-cooling experiments.
+    note: Mixed Allende and Lsil observation bags; no single-charge oxide map assigned here
+  bench_id: 10.1186/s40645-020-00354-0::bench::co2-laser-boiling-chamber
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: laser heating followed by chamber-wall and copper-plate quench of droplets
+      locator:
+        page: 4
+        section: Experimental methods
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        table: '2'
+        note: Run-specific heating durations remain in observation rows; no one duration applies to the series.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Cu plate and chamber-wall quench of droplets
+      locator:
+        page: 4
+        section: Experimental methods
+- experiment_id: 10.1186/s40645-020-00354-0::experiment::lsil-laser-boiling
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'laser_boiling' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000015'
+          approximate: true
+      locator:
+        page: 3
+        section: Experimental methods
+        note: Printed approximately 15 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 3
+              section: Experimental methods
+              note: Printed approximately 15 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              page: 3
+              section: Experimental methods
+              note: Printed approximately 15 mg; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - NaO0.5
+            - '0.0182'
+          - - MgO
+            - '0.3729'
+          - - AlO1.5
+            - '0.0288'
+          - - SiO2
+            - '0.4098'
+          - - KO0.5
+            - '0.0068'
+          - - CaO
+            - '0.0222'
+          - - TiO2
+            - '0.0078'
+          - - CrO1.5
+            - '0.0041'
+          - - MnO
+            - '0.0046'
+          - - FeO
+            - '0.1248'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        table: '1'
+        note: Lsil row; mol% of MOx as printed (NaO0.5 1.82, MgO 37.29, AlO1.5 2.88, SiO2 40.98, KO0.5 0.68, CaO 2.22, TiO2
+          0.78, CrO1.5 0.41, MnO 0.46, FeO 12.48, Total 100); stored as mole_fraction by /100 unit conversion only; not renormalised;
+          later evaporation-product tables not used as the charge
+    printed_composition:
+      state:
+        tag: value
+        value: synthetic Lsil
+      locator:
+        page: 2
+        table: '1'
+        note: Label retained; numeric mol% of MOx in initial_composition; Total row omitted
+    form:
+      state:
+        tag: value
+        value: cylindrical pressed and fired charge
+      locator:
+        page: 3
+        section: Experimental methods
+    pretreatment:
+      state:
+        tag: value
+        value: Fired 12 h at 1100 C in H2/CO2 = 1
+      locator:
+        page: 2
+        section: Experimental methods
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30000'
+          approximate: false
+      locator:
+        page: 3
+        section: Apparatus
+        note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              page: 3
+              section: Apparatus
+              note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 3
+              section: Apparatus
+              note: Printed total pressure 0.3 bar; unit conversion only. H2 partial pressure is not added to derive a total.
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        section: Apparatus
+        note: The registry SweepGas shape cannot represent the printed two-gas mixture without selecting one species.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00133322'
+        locator:
+          page: 3
+          section: Apparatus
+          note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
+        inference:
+          relation: Torr_to_Pa
+          inputs:
+          - P_Pa = P_Torr × 101325 / 760
+          - original_unit=Torr
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00001'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '133.3223684210526315789473684'
+              locator:
+                page: 3
+                section: Apparatus
+                note: Evacuated to printed 10^-5 Torr before filling; unit conversion only
+          output_unit: Pa
+  work_id: 10.1186/s40645-020-00354-0
+  locator:
+    page: 3
+    section: Experimental methods; Apparatus
+    note: Synthetic Lsil charges in the own laser-heating and inert-gas-cooling experiments.
   bench_id: 10.1186/s40645-020-00354-0::bench::co2-laser-boiling-chamber
   thermal_schedule:
     method:

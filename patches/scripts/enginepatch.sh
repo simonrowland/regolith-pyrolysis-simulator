@@ -70,6 +70,32 @@ engine_fallback() {
   esac
 }
 
+pin_checkout() {
+  local e="$1" raw parent base top
+  raw="$(awk '$1=="checkout:" {print $2; exit}' "$PATCHES/$e/UPSTREAM.pin" 2>/dev/null || true)"
+  [ -n "$raw" ] && [ "$raw" != "absent" ] || return 1
+
+  if [[ "$raw" == "~/"* ]]; then
+    raw="$HOME/${raw:2}"
+  elif [[ "$raw" != /* ]]; then
+    raw="${COMMON_REPO_ROOT:-$REPO_ROOT}/$raw"
+  fi
+
+  if top="$(git -C "$raw" rev-parse --show-toplevel 2>/dev/null)"; then
+    (cd "$top" && pwd -P)
+  elif [ -d "$raw" ]; then
+    (cd "$raw" && pwd -P)
+  else
+    parent="$(dirname "$raw")"
+    base="$(basename "$raw")"
+    if [ -d "$parent" ]; then
+      printf '%s/%s\n' "$(cd "$parent" && pwd -P)" "$base"
+    else
+      printf '%s\n' "$raw"
+    fi
+  fi
+}
+
 select_python() {
   if [ -n "$PYTHON_ARG" ]; then
     [ -x "$PYTHON_ARG" ] || {
@@ -122,6 +148,7 @@ RESOLVE_ERROR=""
 CHECKOUT_STATUS=""
 RESOLUTION_KIND=""
 OVERRIDE_VAR=""
+PIN_CHECKOUT=""
 
 resolve_engine() {
   local e="$1" package source override fallback top override_var
@@ -318,37 +345,45 @@ cmd_verify() {
       fi
       continue
     fi
+    PIN_CHECKOUT=""
     resolve_engine "$e" || true
+    if [ "$RESOLUTION_KIND" = "imported" ]; then
+      PIN_CHECKOUT="$(pin_checkout "$e" 2>/dev/null || true)"
+    fi
+    if [ "$RESOLUTION_KIND" = "imported" ] && [ -n "$PIN_CHECKOUT" ] && \
+       [ "$RESOLVED_PATH" != "$PIN_CHECKOUT" ]; then
+      echo "WARNING: $e imported checkout differs from UPSTREAM.pin checkout; IMPORTED=$RESOLVED_PATH PIN=$PIN_CHECKOUT; verifying IMPORTED=$RESOLVED_PATH"
+    fi
     if ! validate_checkout "$e"; then
       if [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "fallback" ]; then
-        echo "$e: NOT-LOADED ($PYTHON) FALLBACK=$CHECKOUT_STATUS RESOLVED=${RESOLVED_PATH:-unresolved}"
+        echo "$e: NOT-LOADED ($PYTHON) RESOLUTION=fallback FALLBACK=$CHECKOUT_STATUS RESOLVED=${RESOLVED_PATH:-unresolved}"
         rc=1
       elif [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "not-loaded" ]; then
-        echo "$e: NOT-LOADED ($PYTHON) FALLBACK=UNRESOLVED RESOLVED=${RESOLVED_PATH:-unresolved} — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
+        echo "$e: NOT-LOADED ($PYTHON) RESOLUTION=$RESOLUTION_KIND FALLBACK=UNRESOLVED RESOLVED=${RESOLVED_PATH:-unresolved} — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
         if [ "$ALLOW_NOT_LOADED" -ne 1 ]; then
           rc=1
         fi
       else
-        echo "$e: FAIL RESOLVED=${RESOLVED_PATH:-unresolved} — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
+        echo "$e: FAIL RESOLVED=${RESOLVED_PATH:-unresolved} PYTHON=$PYTHON RESOLUTION=$RESOLUTION_KIND — ${RESOLVE_ERROR:-$CHECKOUT_STATUS}"
         rc=1
       fi
       continue
     fi
     compare_patchset "$e"
     if [ "$IMPORTABLE" -eq 0 ] && [ "$RESOLUTION_KIND" = "fallback" ]; then
-      echo "$e: NOT-LOADED ($PYTHON) FALLBACK=$PATCH_STATE RESOLVED=$RESOLVED_PATH"
+      echo "$e: NOT-LOADED ($PYTHON) RESOLUTION=fallback FALLBACK=$PATCH_STATE RESOLVED=$RESOLVED_PATH"
       if [ "$PATCH_STATE" != "MATCH" ] || [ "$ALLOW_NOT_LOADED" -ne 1 ]; then
         rc=1
       fi
     elif [ "$RESOLUTION_KIND" = "override" ]; then
-      echo "$e: ASSERTED PATCH=$PATCH_STATE RESOLVED=$RESOLVED_PATH (explicit ${OVERRIDE_VAR} override; not import-verified)"
+      echo "$e: ASSERTED PATCH=$PATCH_STATE RESOLVED=$RESOLVED_PATH (explicit ${OVERRIDE_VAR} override; not import-verified) PYTHON=$PYTHON"
       if [ "$PATCH_STATE" != "MATCH" ] || [ "$ALLOW_ASSERTED" -ne 1 ]; then
         rc=1
       fi
     elif [ "$PATCH_STATE" = "MATCH" ]; then
-      echo "$e: MATCH RESOLVED=$RESOLVED_PATH"
+      echo "$e: MATCH RESOLVED=$RESOLVED_PATH PYTHON=$PYTHON RESOLUTION=located"
     else
-      echo "$e: DRIFT — engine tree differs from patch set RESOLVED=$RESOLVED_PATH"
+      echo "$e: DRIFT — engine tree differs from patch set RESOLVED=$RESOLVED_PATH PYTHON=$PYTHON RESOLUTION=located"
       rc=1
     fi
   done

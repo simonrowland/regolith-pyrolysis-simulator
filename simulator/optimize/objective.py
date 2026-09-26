@@ -3605,6 +3605,9 @@ def product_summary(
     notice = _engine_commissioning_notice(sim)
     if notice:
         summary["engine_commissioning_notice"] = notice
+    diagnostic_gate_notice = _diagnostic_gate_authority_notice(sim)
+    if diagnostic_gate_notice:
+        summary["diagnostic_gate_authority_notice"] = diagnostic_gate_notice
     sulfsat = _sulfur_saturation_notice(sim)
     if sulfsat:
         summary["sulfur_saturation_notice"] = sulfsat
@@ -3633,6 +3636,16 @@ def product_summary(
 
 def _engine_commissioning_notice(sim: Any) -> Mapping[str, Any] | None:
     reader = getattr(sim, "engine_commissioning_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
+def _diagnostic_gate_authority_notice(sim: Any) -> Mapping[str, Any] | None:
+    reader = getattr(sim, "diagnostic_gate_authority_run_notice", None)
     if not callable(reader):
         return None
     notice = reader()

@@ -98,52 +98,6 @@ observations:
         published_page: 1337
         pdf_page_index: 1
         note: epsilon_P2O5^CaO = -23 +/- 3
-- observation_id: kems-058-ohara-1987::ohara_1987_feto_t_and_pO2_gate
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'FetO_stoichiometry_and_activity_proxy'
-    species:
-      formula: FeO
-      phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'FetO_stoichiometry_and_activity_proxy'; refusing
-      to pick a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: authors state a_FetO cannot be obtained from this experiment
-  evidence:
-    class:
-      tag: value
-      value: model_derived
-    original_method_class: model_derived
-    model: model_derived
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-058-ohara-1987
-  locator:
-    published_page: 1341
-    pdf_page_index: 5
-    equation: '17'
-    note: FetO t=0.95 used to estimate pO2 for L_P; a_FetO taken from Kambayashi binary, not measured here
-  read_from: pdf:kems-058-ohara-1987
 - observation_id: kems-058-ohara-1987::ohara_1987_fig1_a_p2o5_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
@@ -425,63 +379,6 @@ observations:
     pdf_page_index: 5
     note: Iwasaki et al. L_P about 5.5 x 10^2 at 1370 C vs this work samples 18-19
   read_from: pdf:kems-058-ohara-1987
-- observation_id: kems-058-ohara-1987::ohara_1987_kems_geometry_and_calibration
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'kems_method_geometry_reference'
-    species:
-      formula: P2O5
-      phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '1643'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
-      a number
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: Apparatus constant c about +/-15% cancelled by Fe internal standard. Geometry referred to Kambayashi 1985; orifice
-        diameter not restated here.
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-058-ohara-1987
-  locator:
-    published_page: 1338
-    pdf_page_index: 2
-    section: '2.1'
-    note: 'Method as Kambayashi et al. (ref 6): alumina Knudsen cell, Fe inner crucible, Fe(g) internal standard, 1370 C'
-  read_from: pdf:kems-058-ohara-1987
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1643'
-      locator:
-        published_page: 1338
-        pdf_page_index: 2
-        section: '2.1'
-        note: 'Method as Kambayashi et al. (ref 6): alumina Knudsen cell, Fe inner crucible, Fe(g) internal standard, 1370
-          C'
 - observation_id: kems-058-ohara-1987::ohara_1987_mgo_epsilon_p2o5
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
   identity:
@@ -1196,8 +1093,8 @@ observations:
         pdf_page_index: 3
         table: '1'
         note: Table 1 ion current ratios and partial pressures at 1643 K
-- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_1
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-1
   identity:
     quantity:
       tag: unknown
@@ -1222,9 +1119,7 @@ observations:
       to pick a number
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: no per-cell +/- on Table 2. Absolute a scale set by JANAF-extrapolated P_P4O10_sat = 700 atm at 1643 K.
+    kind: none
   evidence:
     class:
       tag: value
@@ -1240,7 +1135,799 @@ observations:
     published_page: 1339
     pdf_page_index: 3
     table: '2'
-    note: Table 2 mol% compositions, Raoultian a_P2O5, ln gamma_P2O5, L_P at 1643 K
+    note: Table 2 sample 1 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_10
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 10 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_11
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-11
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 11 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_12
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-12
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 12 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_13
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-13
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 13 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_14
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-14
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 14 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_15
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-15
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 15 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_16
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-16
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 16 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_17
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-17
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 17 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_18
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-18
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 18 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_19
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-19
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 19 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_2
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 2 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_3
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 3 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_4
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 4 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_5
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 5 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_6
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 6 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_7
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 7 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_8
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 8 composition and Raoultian a_P2O5 at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_9
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'raoultian_activity_and_composition'
+    species:
+      formula: P2O5
+      phase:
+        tag: unknown
+        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'raoultian_activity_and_composition'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 sample 9 composition and Raoultian a_P2O5 at 1643 K
   read_from: pdf:kems-058-ohara-1987
 - observation_id: kems-058-ohara-1987::ohara_1987_turkdogan_quoted_ln_gamma_eq11
   experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987

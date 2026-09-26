@@ -109,7 +109,7 @@ species:
         temperature_stability_C: {value: 1, semantics: less_than}
         initial_position: cold zone for approximately 2 min while CO-CO2 mixture equilibrated
         quench: gas flow stopped approximately 40 s before opening furnace lid; sample quenched in cold-water bath
-        experimental_pressure: {value: 1, units: bar, qualifier: atmospheric_pressure_as_discussed, locator: *pressure}
+        chamber_pressure: {value: 1, units: bar, qualifier: atmospheric_pressure_as_discussed, locator: *pressure}
         exposed_area: {status: absent, reason: no exposed evaporating area printed; no geometry inferred from approximate diameter}
         orifice_geometry: {status: not_applicable, reason: 'tube furnace experiment, no Knudsen effusion orifice'}
     - observation_id: flemetakis_2024_analytical_measurement_conditions
@@ -275,6 +275,7 @@ species:
       units: radius r in cm; duration d in min; values are model-derived
       values:
         quantity: time_to_boron_loss
+        T_C: 1350
         method_class: model_derived
         generator: authors' Eq. (2) with Table 3 ki and spherical samples
         columns: [r_cm, loss_pct, d_min_air_1350C, d_min_FMQminus4_1350C]

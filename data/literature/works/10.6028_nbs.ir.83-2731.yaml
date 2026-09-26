@@ -52,15 +52,100 @@ experiments:
         published_page: 15
         table: '3'
         note: Series I and II initial masses are separately printed; no single mass assigned to this aggregate series
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.562871824962'
+          - - Fe2O3
+            - '0.05278289609'
+          - - Al2O3
+            - '0.031000156787'
+          - - B2O3
+            - '0.068103589059'
+          - - Li2O
+            - '0.111009946581'
+          - - Na2O
+            - '0.10629819493'
+          - - MnO2
+            - '0.024313151875'
+          - - NiO
+            - '0.009142619817'
+          - - CaO
+            - '0.01844039113'
+          - - MgO
+            - '0.01097282716'
+          - - ZrO2
+            - '0.003694601161'
+          - - SrO
+            - '0.0005648861'
+          - - Cs2O
+            - '0.000230781783'
+          - - RuO2
+            - '0.000439872342'
+          - - Re2O7
+            - '0.000134260223'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 3
+        pdf_page_index: 9
+        table: '1'
+        note: Nominal Weight % column selected because the source says it was used for thermodynamic estimates; normalized
+          mole fractions derived from the printed oxide wt% values
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / sum_j(w_j / M_j)
+        - original_unit=wt_pct
+        - nominal column selected as printed for thermodynamic estimates
+        parameters: []
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
-        value: Simulated nuclear-waste borosilicate glass; analytical and nominal compositions in Table 1
+        value:
+          nominal:
+            SiO2: '52'
+            Fe2O3: '12.96'
+            Al2O3: '4.86'
+            B2O3: '7.29'
+            Li2O: '5.1'
+            Na2O: '10.13'
+            MnO2: '3.25'
+            NiO: '1.05'
+            CaO: '1.59'
+            MgO: '0.68'
+            ZrO2: '0.7'
+            SrO: '0.09'
+            Cs2O: '0.1'
+            RuO2: '0.09'
+            Re2O7: '0.1'
+          analytical:
+            SiO2: '53.76'
+            Fe2O3: '11.49'
+            Al2O3: '4.75'
+            B2O3: '6.49'
+            Li2O: '3.96'
+            Na2O: '8.59'
+            MnO2: '3.57'
+            NiO: '1.8'
+            CaO: '1.01'
+            MgO: '0.54'
+            ZrO2: '3.79'
+            SrO: '0.05'
+            Cs2O: '0.07'
+            RuO2: '0.11'
+            Re2O7: '0.03'
       locator:
-        published_page: 2
+        published_page: 3
+        pdf_page_index: 9
         table: '1'
-        note: ICP analysis except Cs, Ru, and Re by neutron activation analysis; nominal composition used for thermodynamic
-          estimates
+        note: SNW glass Table 1 Weight % columns; labels nominal and analytical as printed; Mole % columns not copied into
+          printed_composition; title Simulated Nuclear Waste (SNW) Glass Composition; footnote a Soper 1982; footnote b see
+          text for selection (nominal used for thermodynamic estimates)
   conditions:
     temperature_K:
       state:
@@ -211,13 +296,100 @@ experiments:
         published_page: 29
         section: '3.5'
         note: Sample mass not printed for this series
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.562871824962'
+          - - Fe2O3
+            - '0.05278289609'
+          - - Al2O3
+            - '0.031000156787'
+          - - B2O3
+            - '0.068103589059'
+          - - Li2O
+            - '0.111009946581'
+          - - Na2O
+            - '0.10629819493'
+          - - MnO2
+            - '0.024313151875'
+          - - NiO
+            - '0.009142619817'
+          - - CaO
+            - '0.01844039113'
+          - - MgO
+            - '0.01097282716'
+          - - ZrO2
+            - '0.003694601161'
+          - - SrO
+            - '0.0005648861'
+          - - Cs2O
+            - '0.000230781783'
+          - - RuO2
+            - '0.000439872342'
+          - - Re2O7
+            - '0.000134260223'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 3
+        pdf_page_index: 9
+        table: '1'
+        note: Nominal Weight % column selected because the source says it was used for thermodynamic estimates; normalized
+          mole fractions derived from the printed oxide wt% values
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / sum_j(w_j / M_j)
+        - original_unit=wt_pct
+        - nominal column selected as printed for thermodynamic estimates
+        parameters: []
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
-        value: Simulated nuclear-waste borosilicate glass
+        value:
+          nominal:
+            SiO2: '52'
+            Fe2O3: '12.96'
+            Al2O3: '4.86'
+            B2O3: '7.29'
+            Li2O: '5.1'
+            Na2O: '10.13'
+            MnO2: '3.25'
+            NiO: '1.05'
+            CaO: '1.59'
+            MgO: '0.68'
+            ZrO2: '0.7'
+            SrO: '0.09'
+            Cs2O: '0.1'
+            RuO2: '0.09'
+            Re2O7: '0.1'
+          analytical:
+            SiO2: '53.76'
+            Fe2O3: '11.49'
+            Al2O3: '4.75'
+            B2O3: '6.49'
+            Li2O: '3.96'
+            Na2O: '8.59'
+            MnO2: '3.57'
+            NiO: '1.8'
+            CaO: '1.01'
+            MgO: '0.54'
+            ZrO2: '3.79'
+            SrO: '0.05'
+            Cs2O: '0.07'
+            RuO2: '0.11'
+            Re2O7: '0.03'
       locator:
-        published_page: 29
-        section: '3.5'
+        published_page: 3
+        pdf_page_index: 9
+        table: '1'
+        note: SNW glass Table 1 Weight % columns; labels nominal and analytical as printed; Mole % columns not copied into
+          printed_composition; title Simulated Nuclear Waste (SNW) Glass Composition; footnote a Soper 1982; footnote b see
+          text for selection (nominal used for thermodynamic estimates)
   conditions:
     temperature_K:
       state:

@@ -19,6 +19,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '343.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'crd_water_extraction_and_analysis_conditions';
@@ -40,6 +43,35 @@ observations:
     pdf_page_index: 1
     section: Introduction
   read_from: unknown:lunarsurface-2020-5029
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '343.15'
+      locator:
+        pdf_page_index: 1
+        section: Introduction
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '70'
+            locator:
+              pdf_page_index: 1
+              section: Introduction
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 1
+              section: Introduction
+        output_unit: K
 - observation_id: lunarsurface-2020-5029::lunarsurface_2020_crd_isotope_figures
   experiment_id: b905ab5beb75930e6571b23413d2ce95dc7fc2fa5768a965a4cf5540a15f187b::lunarsurface-2020-5029
   identity:

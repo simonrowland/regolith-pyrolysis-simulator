@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-087-yamada-kato-1980.yaml
 observations:
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_P_plus_count_rate_1p52wt
-  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-1p52wt-fig9
   identity:
     quantity:
       tag: unknown
@@ -611,7 +611,7 @@ observations:
     note: Fig. 8. Integration curve for the Fe-P system at 1600 C
   read_from: pdf:kems-087-yamada-kato-1980
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_fig9_P_plus_peak_figure_only
-  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-1p52wt-fig9
   identity:
     quantity:
       tag: unknown
@@ -672,8 +672,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
@@ -701,6 +701,44 @@ observations:
     section: II
     note: Hitachi RM-6K; alumina cell; orifice 0.4-0.6 mm; 22 eV; sample ~1.5 g
   read_from: pdf:kems-087-yamada-kato-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 244
+        pdf_page_index: 1
+        figure: '1'
+        section: II
+        note: Hitachi RM-6K; alumina cell; orifice 0.4-0.6 mm; 22 eV; sample ~1.5 g
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 244
+              pdf_page_index: 1
+              figure: '1'
+              section: II
+              note: Hitachi RM-6K; alumina cell; orifice 0.4-0.6 mm; 22 eV; sample ~1.5 g
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 244
+              pdf_page_index: 1
+              figure: '1'
+              section: II
+              note: Hitachi RM-6K; alumina cell; orifice 0.4-0.6 mm; 22 eV; sample ~1.5 g
+        output_unit: K
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_p_vapor_pressure_estimate_1wt
   experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:

@@ -122,5 +122,9 @@ def test_ueda_series_refusals_are_not_collapsed(tmp_path: Path) -> None:
         obs = result.observations[f"kems-095-ueda-1986::{obs_id}"]
         assert set((obs.point_conditions or {}).keys()) == {"temperature_K"}
     # Table 2 prints each gamma at BOTH 1873 K and 1973 K: no single point route.
-    table2 = result.observations["kems-095-ueda-1986::ueda_1986_gamma_ti_table2"]
+    # The paper's pp. 1083 and 1085 identify separate weighed N-Co charges, so
+    # the per-charge observation identity is intentional rather than collapsed.
+    table2 = result.observations[
+        "kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_1p0"
+    ]
     assert not (table2.point_conditions or {}).get("temperature_K")

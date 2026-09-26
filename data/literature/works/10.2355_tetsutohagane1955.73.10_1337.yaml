@@ -50,7 +50,8 @@ experiments:
       locator:
         published_page: 1339
         table: '2'
-        note: Multiple published row compositions; no single series composition
+        note: Umbrella series for method, interaction parameters, figures, sample-20 ion ratios, and quoted comparisons; per-charge
+          mol% maps live on feto-p2o5-sample-* from Table 2
     characterization:
       state:
         tag: value
@@ -119,6 +120,2252 @@ experiments:
     section: '2.1'
     note: Measurements of FetO-P2O5 melts with targeted CaO, MgO, MnO, or SiO2 additions; individual charge compositions remain
       in Table 2 observations
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-1
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0392'
+          - - FetO
+            - '0.9246'
+          - - CaO
+            - '0.0364'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 1 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 1 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 1 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-10
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0451'
+          - - FetO
+            - '0.9076'
+          - - MnO
+            - '0.0472'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 10 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 10 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 10 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-11
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0584'
+          - - FetO
+            - '0.8957'
+          - - MnO
+            - '0.0459'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 11 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 11 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 11 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-12
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0606'
+          - - FetO
+            - '0.8942'
+          - - MnO
+            - '0.0452'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 12 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 12 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 12 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-13
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0833'
+          - - FetO
+            - '0.8726'
+          - - MnO
+            - '0.044'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 13 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 13 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 13 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-14
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0188'
+          - - FetO
+            - '0.9313'
+          - - SiO2
+            - '0.0498'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 14 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 14 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 14 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-15
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0435'
+          - - FetO
+            - '0.8987'
+          - - SiO2
+            - '0.0579'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 15 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 15 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 15 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-16
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0475'
+          - - FetO
+            - '0.9069'
+          - - SiO2
+            - '0.0456'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 16 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 16 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 16 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-17
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0635'
+          - - FetO
+            - '0.889'
+          - - SiO2
+            - '0.0475'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 17 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 17 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 17 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-18
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0679'
+          - - FetO
+            - '0.8349'
+          - - CaO
+            - '0.0444'
+          - - SiO2
+            - '0.0528'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 18 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 18 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 18 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-19
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0849'
+          - - FetO
+            - '0.8227'
+          - - CaO
+            - '0.0443'
+          - - SiO2
+            - '0.0481'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 19 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 19 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 19 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-2
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0713'
+          - - FetO
+            - '0.8807'
+          - - CaO
+            - '0.048'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 2 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 2 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 2 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-3
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0913'
+          - - FetO
+            - '0.8643'
+          - - CaO
+            - '0.0444'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 3 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 3 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 3 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-4
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0952'
+          - - FetO
+            - '0.8657'
+          - - CaO
+            - '0.0392'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 4 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 4 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 4 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-5
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0423'
+          - - FetO
+            - '0.9154'
+          - - MgO
+            - '0.0423'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 5 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 5 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 5 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-6
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.063'
+          - - FetO
+            - '0.8945'
+          - - MgO
+            - '0.0425'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 6 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 6 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 6 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-7
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0726'
+          - - FetO
+            - '0.8798'
+          - - MgO
+            - '0.0476'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 7 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 7 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 7 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-8
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.0812'
+          - - FetO
+            - '0.8765'
+          - - MgO
+            - '0.0423'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 8 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 8 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 8 charge
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  bench_id: 10.2355/tetsutohagane1955.73.10_1337::bench::ohara-kems
+- experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-sample-9
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - P2O5
+            - '0.018'
+          - - FetO
+            - '0.9321'
+          - - MnO
+            - '0.0499'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 9 mol% / 100 → mole_fraction (unit conversion only); only oxides present in the printed row;
+          Fe2+/Fe3+ ratio is not a composition component
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 9 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1370'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 1338
+              section: '2.1'
+              note: Printed 1370 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 9 charge
   apparatus:
     geometry:
       orifice_diameter_m:
@@ -210,3 +2457,87 @@ benches:
         published_page: 1338
         section: '2.1'
     unit: '-'
+context:
+- observation_id: ohara_1987_feto_t_and_pO2_gate
+  experiment: feto-p2o5-additive-series
+  type: apparatus
+  locator:
+    published_page: 1341
+    pdf_page_index: 5
+    equation: '17'
+    note: FetO t=0.95 used to estimate pO2 for L_P; a_FetO taken from Kambayashi binary, not measured here
+  T_range_K:
+  - '1643'
+  - '1643'
+  phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+  standard_state: a_FetO not measured in this work; Kambayashi FetO-P2O5 a_FetO used as approximation for L_P
+  regime: slag_metal_calculation
+  units: t dimensionless; a_FetO not tabulated here
+  values:
+    quantity: FetO_stoichiometry_and_activity_proxy
+    method_class: model_derived
+    t_average: '0.95'
+    t_source: mean of Fe2+/Fe3+ from Table 2
+    a_FetO: not_measured_this_work
+    a_FetO_proxy: Kambayashi FetO-P2O5 Raoultian a_FetO, used only for L_P
+  uncertainty:
+    note: authors state a_FetO cannot be obtained from this experiment
+  context_id: kems-058-ohara-1987::context::ohara_1987_feto_t_and_pO2_gate
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  source_id: kems-058-ohara-1987
+  species: FeO
+- observation_id: ohara_1987_kems_geometry_and_calibration
+  experiment: feto-p2o5-additive-series
+  type: apparatus
+  locator:
+    published_page: 1338
+    pdf_page_index: 2
+    section: '2.1'
+    note: 'Method as Kambayashi et al. (ref 6): alumina Knudsen cell, Fe inner crucible, Fe(g) internal standard, 1370 C'
+  T_range_K:
+  - '1643'
+  - '1643'
+  phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+  condensed_form:
+    state: liquid_melt
+    metastable: false
+    basis: explicit_author
+    note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina Knudsen cell
+  standard_state: method geometry; not a species observation
+  regime: kems_effusion
+  units: as published
+  values:
+    quantity: kems_method_geometry_reference
+    method_class: measured
+    semantics: method_geometry_reference_not_measured_species_observation
+    T_C_as_printed: 1370
+    T_K: '1643'
+    internal_standard: Fe(g) in equilibrium with solid iron
+    apparatus_constant_variation_percent: 15
+    Fe_crucible_P_wt_percent_less_than: '1'
+    Fe_activity_in_crucible: '1'
+    FetO_t_average: '0.95'
+    target_additive_mol_percent: '5'
+    detected_ions:
+    - P+
+    - P2+
+    - PO+
+    - PO2+
+    - Fe+
+    additive_oxide_ions_detected: false
+    additive_oxide_ions_note: ions expected from CaO, MgO, MnO, SiO2 were not detected because those oxides have low vapor
+      pressure
+    method_reference: Kambayashi, Awaka and Kato, Tetsu-to-Hagane 71 (1985) 1911
+    composition_determined: chemical analysis after the mass-spectrometric run
+    missing_for_motzfeldt:
+    - orifice_area
+    - orifice_diameter
+    - clausing_factor
+    - sample_surface_area
+  uncertainty:
+    note: Apparatus constant c about +/-15% cancelled by Fe internal standard. Geometry referred to Kambayashi 1985; orifice
+      diameter not restated here.
+  context_id: kems-058-ohara-1987::context::ohara_1987_kems_geometry_and_calibration
+  work_id: 10.2355/tetsutohagane1955.73.10_1337
+  source_id: kems-058-ohara-1987
+  species: P2O5

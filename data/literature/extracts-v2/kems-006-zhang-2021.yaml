@@ -2,8 +2,8 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/kems-006-zhang-2021.yaml
 observations:
-- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions
-  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c0h2
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c0h2
   identity:
     quantity:
       tag: unknown
@@ -21,7 +21,7 @@ observations:
         value: 0
     temperature_K:
       tag: unknown
-      reason: source T_range_K [1473.15, 1673.15]; no midpoint invented
+      reason: source T_range_K [1473.15, 1473.15]; no midpoint invented
     composition:
       tag: value
       value:
@@ -66,6 +66,610 @@ observations:
   locator:
     page: 71
     table: '1'
+    note: row=Bas1200C0h2
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c10h
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c10h
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'epma_residue_composition_vs_time'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1473.15, 1473.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1200C10h
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c1h
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c1h
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'epma_residue_composition_vs_time'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1473.15, 1473.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1200C1h
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c40h
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c40h
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'epma_residue_composition_vs_time'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1473.15, 1473.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1200C40h
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c4h
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c4h
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'epma_residue_composition_vs_time'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1473.15, 1473.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1200C4h
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c0m1
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c0m1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'epma_residue_composition_vs_time'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1400C0m1
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c15m
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c15m
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'epma_residue_composition_vs_time'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1400C15m
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c30m
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c30m
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'epma_residue_composition_vs_time'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1400C30m
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c60m
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c60m
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'epma_residue_composition_vs_time'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1400C60m
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c90m
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c90m
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'epma_residue_composition_vs_time'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    note: row=Bas1400C90m
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   read_from: unknown:kems-006-zhang-2021
 - observation_id: kems-006-zhang-2021::zhang_2021_table3_diffusion_limitation

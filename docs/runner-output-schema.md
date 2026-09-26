@@ -296,6 +296,14 @@ it does not introduce a new schema version.
       ...
     }
   },
+  "diagnostic_gate_authority_notice": {       // present when the gate authority cannot write ledger transitions
+    "kind": "diagnostic_provider_gate_authority",
+    "intent": "gate_liquid_fraction",
+    "provider_id": "alphamelts-diagnostic",
+    "authority_scope": "dispatch_only",
+    "ledger_transition_authority": false,
+    "message": "..."
+  },
   "kernel_commit_sha": "882250f10c...",       // repo HEAD; "unknown" off-tree
   "refusal_diagnostic": {                     // present only for a typed refusal
     "status": "refused",
@@ -348,6 +356,12 @@ it does not introduce a new schema version.
   did not request the O2 bubbler. `engines_used.active` is derived from the
   same filtered map, so an intent absent from either is not evidence that no
   provider is registered for it.
+* `diagnostic_gate_authority_notice` is emitted when the authoritative
+  `GATE_LIQUID_FRACTION` provider is dispatch-authoritative but lacks
+  ledger-transition authority. It is diagnostic provenance only: it does not
+  change the gate or any simulated number. The same notice is copied into
+  `product_classification` for operator markdown/P11 rendering and forwarded
+  into optimizer traces and product summaries.
 * Handled failure envelopes emit the same base fidelity fields as successful
   runs: `backend_status`, `backend_authoritative`, `backend_real_active`,
   `evidence_class`, `runtime_status`, `label_source`,

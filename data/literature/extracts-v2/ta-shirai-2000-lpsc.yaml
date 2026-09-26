@@ -2,17 +2,17 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/ta-shirai-2000-lpsc.yaml
 observations:
-- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1573.15:h=1f73f652b5d8
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_activity_fit_1300
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+      reason: unsupported quantity 'NaO0.5_activity_polynomial'
     species:
-      formula: Na
+      formula: Na2O
       phase:
         tag: unknown
-        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -20,19 +20,21 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: value
-      value: '1573.15'
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'NaO0.5_activity_polynomial'; refusing to pick
+      a number
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
-    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -40,52 +42,22 @@ observations:
   source_id: ta-shirai-2000-lpsc
   locator:
     page: 2
-    figure: 1a-1b
-    section: Estimation of alpha*
+    equation: '5'
+    note: Printed log a_NaO0.5 polynomial at 1300 C
   read_from: unknown:ta-shirai-2000-lpsc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1573.15'
-      locator:
-        page: 2
-        figure: 1a-1b
-        section: Estimation of alpha*
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1300'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        output_unit: K
-- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1573.15:h=49a9270c6c31
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_activity_fit_1400
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+      reason: unsupported quantity 'NaO0.5_activity_polynomial'
     species:
-      formula: Na
+      formula: Na2O
       phase:
         tag: unknown
-        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -93,19 +65,21 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: value
-      value: '1573.15'
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'NaO0.5_activity_polynomial'; refusing to pick
+      a number
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
-    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -113,72 +87,85 @@ observations:
   source_id: ta-shirai-2000-lpsc
   locator:
     page: 2
-    figure: 1a-1b
-    section: Estimation of alpha*
+    equation: '6'
+    note: Printed log a_NaO0.5 polynomial at 1400 C
   read_from: unknown:ta-shirai-2000-lpsc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1573.15'
-      locator:
-        page: 2
-        figure: 1a-1b
-        section: Estimation of alpha*
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1300'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        output_unit: K
-- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1573.15:h=57bed505b965
-  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1300_pO2_1e-10::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
       phase:
         tag: unknown
-        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
-      tag: value
-      value: '1573.15'
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.08'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
-    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -186,72 +173,104 @@ observations:
   source_id: ta-shirai-2000-lpsc
   locator:
     page: 2
-    figure: 1a-1b
-    section: Estimation of alpha*
+    figure: 1a
+    paragraph: Estimation of alpha*
+    note: Printed alpha*=0.08 at p(O2)=10^-10 bar
   read_from: unknown:ta-shirai-2000-lpsc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1573.15'
-      locator:
-        page: 2
-        figure: 1a-1b
-        section: Estimation of alpha*
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1300'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        output_unit: K
-- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1673.15:h=047813e93e6f
-  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: dimensionless alpha* as printed
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1300_pO2_1e-8::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
       phase:
         tag: unknown
-        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
-      tag: value
-      value: '1673.15'
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.13'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
-    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -259,72 +278,104 @@ observations:
   source_id: ta-shirai-2000-lpsc
   locator:
     page: 2
-    figure: 1a-1b
-    section: Estimation of alpha*
+    figure: 1a
+    paragraph: Estimation of alpha*
+    note: Printed alpha*=0.13 at p(O2)=10^-8 bar
   read_from: unknown:ta-shirai-2000-lpsc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1673.15'
-      locator:
-        page: 2
-        figure: 1a-1b
-        section: Estimation of alpha*
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1400'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        output_unit: K
-- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1673.15:h=77f05f932d35
-  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: dimensionless alpha* as printed
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1300_pO2_1e-9::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
       phase:
         tag: unknown
-        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
-      tag: value
-      value: '1673.15'
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.095'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
-    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -332,72 +383,104 @@ observations:
   source_id: ta-shirai-2000-lpsc
   locator:
     page: 2
-    figure: 1a-1b
-    section: Estimation of alpha*
+    figure: 1a
+    paragraph: Estimation of alpha*
+    note: Printed alpha*=0.095 at p(O2)=10^-9 bar
   read_from: unknown:ta-shirai-2000-lpsc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1673.15'
-      locator:
-        page: 2
-        figure: 1a-1b
-        section: Estimation of alpha*
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1400'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        output_unit: K
-- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_by_T_and_pO2::T=1673.15:h=87ef40786c1e
-  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: dimensionless alpha* as printed
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1400_pO2_1e-10::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_evaporation_coefficient_alpha_star'
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
       phase:
         tag: unknown
-        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
-      tag: value
-      value: '1673.15'
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.05'
     approximate: false
   uncertainty:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_derived_least_squares_fit_to_Na2O_vs_time
-    original_method_class: author_derived_least_squares_fit_to_Na2O_vs_time
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -405,52 +488,248 @@ observations:
   source_id: ta-shirai-2000-lpsc
   locator:
     page: 2
-    figure: 1a-1b
-    section: Estimation of alpha*
+    figure: 1b
+    paragraph: Estimation of alpha*
+    note: Printed alpha*=0.05 at p(O2)=10^-10 bar
   read_from: unknown:ta-shirai-2000-lpsc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1673.15'
-      locator:
-        page: 2
-        figure: 1a-1b
-        section: Estimation of alpha*
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1400'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 2
-              figure: 1a-1b
-              section: Estimation of alpha*
-        output_unit: K
-- observation_id: ta-shirai-2000-lpsc::shirai_2000_jNa_pO2_slopes::T=1573.15:h=4c0c9191d070
-  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: dimensionless alpha* as printed
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1400_pO2_1e-8::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'log_jNa_vs_log_pO2_slope'
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Na
       phase:
         tag: unknown
-        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.048'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    paragraph: Estimation of alpha*
+    note: Printed alpha*=0.048 at p(O2)=10^-8 bar
+  read_from: unknown:ta-shirai-2000-lpsc
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: dimensionless alpha* as printed
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1400_pO2_1e-9::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.043'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    paragraph: Estimation of alpha*
+    note: Printed alpha*=0.043 at p(O2)=10^-9 bar
+  read_from: unknown:ta-shirai-2000-lpsc
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
+  - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: dimensionless alpha* as printed
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -458,19 +737,1268 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: value
-      value: '1573.15'
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
   evidence:
     class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-10 bar, t=0 min, open triangle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
+  identity:
+    quantity:
       tag: unknown
-      reason: unmapped method_class author_derived_from_alpha_star_and_activity_model
-    original_method_class: author_derived_from_alpha_star_and_activity_model
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-10 bar, t=60 min, open triangle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:2
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-10 bar, t=120 min, open triangle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:3
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-10 bar, t=180 min, open triangle; 600 dpi shape-template centroid; overlaps the boxed-square marker
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but no numerical error-bar values are printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-8 bar, t=0 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but no numerical error-bar values are printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-8 bar, t=60 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but no numerical error-bar values are printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-8 bar, t=90 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but no numerical error-bar values are printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-8 bar, t=120 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but no numerical error-bar values are printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-8 bar, t=180 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but no numerical error-bar values are printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-8 bar, t=300 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but no numerical error-bar values are printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-8 bar, t=360 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:7
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but no numerical error-bar values are printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-8 bar, t=540 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-9 bar, t=0 min, boxed square; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-9 bar, t=60 min, boxed square; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-9 bar, t=180 min, boxed square; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1a
+    note: p(O2)=10^-9 bar, t=240 min, boxed square; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-10 bar, t=0 min, open triangle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-10 bar, t=10 min, open triangle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-10 bar, t=15 min, open triangle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-10 bar, t=20 min, open triangle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:4
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-10 bar, t=30 min, open triangle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-8 bar, t=0 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-8 bar, t=30 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-8 bar, t=60 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-8 bar, t=90 min, filled circle; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-9 bar, t=0 min, boxed square; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-9 bar, t=20 min, boxed square; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-9 bar, t=40 min, boxed square; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Na2O_concentration_time_series'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Fig. 1 error bars are visible but not numerically printed; digitized central markers are approximate.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: 1b
+    note: p(O2)=10^-9 bar, t=60 min, boxed square; 600 dpi shape-template centroid
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_evaporation_rate_vs_oxygen_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -479,51 +2007,19 @@ observations:
   locator:
     page: 2
     figure: '2'
-    section: The dependence of jNa on p(O2)
+    note: 1300 C dotted-line square at p(O2)=10^-10 bar
   read_from: unknown:ta-shirai-2000-lpsc
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1573.15'
-      locator:
-        page: 2
-        figure: '2'
-        section: The dependence of jNa on p(O2)
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1300'
-            locator:
-              page: 2
-              figure: '2'
-              section: The dependence of jNa on p(O2)
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 2
-              figure: '2'
-              section: The dependence of jNa on p(O2)
-        output_unit: K
-- observation_id: ta-shirai-2000-lpsc::shirai_2000_jNa_pO2_slopes::T=1673.15:h=d39f3009792b
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'log_jNa_vs_log_pO2_slope'
+      reason: unsupported quantity 'sodium_evaporation_rate_vs_oxygen_pressure'
     species:
       formula: Na
       phase:
         tag: unknown
-        reason: phase string 'Na2O-SiO2_melt' is not in the closed automatic map
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -531,19 +2027,21 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: value
-      value: '1673.15'
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      note: No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_derived_from_alpha_star_and_activity_model
-    original_method_class: author_derived_from_alpha_star_and_activity_model
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -552,37 +2050,317 @@ observations:
   locator:
     page: 2
     figure: '2'
-    section: The dependence of jNa on p(O2)
+    note: 1300 C dotted-line square at p(O2)=10^-9 bar
   read_from: unknown:ta-shirai-2000-lpsc
-  point_conditions:
-    temperature_K:
-      state:
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:2
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_evaporation_rate_vs_oxygen_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
         tag: value
-        value: '1673.15'
-      locator:
-        page: 2
-        figure: '2'
-        section: The dependence of jNa on p(O2)
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1400'
-            locator:
-              page: 2
-              figure: '2'
-              section: The dependence of jNa on p(O2)
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 2
-              figure: '2'
-              section: The dependence of jNa on p(O2)
-        output_unit: K
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    note: 1300 C dotted-line square at p(O2)=10^-8 bar
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:0
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_evaporation_rate_vs_oxygen_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    note: 1400 C solid-line circle at p(O2)=10^-10 bar
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:1
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_evaporation_rate_vs_oxygen_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    note: 1400 C solid-line circle at p(O2)=10^-9 bar
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:2
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_evaporation_rate_vs_oxygen_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric point uncertainties are printed on Fig. 2; values are approximate log-axis digitizations.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    note: 1400 C solid-line circle at p(O2)=10^-8 bar
+  read_from: unknown:ta-shirai-2000-lpsc
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fit_1300
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_evaporation_rate_power_law_fit'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sodium_evaporation_rate_power_law_fit'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    paragraph: The dependence of jNa on p(O2)
+    note: Printed dotted-line power-law fit for 1300 C
+  read_from: unknown:ta-shirai-2000-lpsc
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:2
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fit_1400
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_evaporation_rate_power_law_fit'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'sodium_evaporation_rate_power_law_fit'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    figure: '2'
+    paragraph: The dependence of jNa on p(O2)
+    note: Printed solid-line power-law fit for 1400 C
+  read_from: unknown:ta-shirai-2000-lpsc
+  derived_from:
+  - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:0
+  - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:1
+  - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:2
+- observation_id: ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
+  experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cited_Na2O-SiO2_activity_data'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1673.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'cited_Na2O-SiO2_activity_data'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ta-shirai-2000-lpsc
+  locator:
+    page: 2
+    section: Discussion
+    equation: 5-6
+    note: Reference [6] is the experimental activity source cited by the authors; its numeric source table is not reproduced
+      in this abstract
+  read_from: unknown:ta-shirai-2000-lpsc

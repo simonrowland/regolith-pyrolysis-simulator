@@ -79,7 +79,10 @@ def test_enginepatch_refresh_refuses_non_git_dir(tmp_path: Path) -> None:
 def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> None:
     """Verify the imported checkout, including staged drift, not a sibling."""
 
-    project = tmp_path / "project"
+    main_checkout = tmp_path / "main"
+    _init_git_checkout(main_checkout, "README.md", "main\n")
+    project = main_checkout / "worktrees" / "seat"
+    _git("worktree", "add", "-q", str(project), "HEAD", cwd=main_checkout)
     script = project / "patches" / "scripts" / "enginepatch.sh"
     script.parent.mkdir(parents=True)
     shutil.copy2(ROOT / "patches" / "scripts" / "enginepatch.sh", script)
@@ -101,7 +104,7 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
     patch_dir = project / "patches" / "vaporock"
     patch_dir.mkdir(parents=True)
     (patch_dir / "UPSTREAM.pin").write_text(
-        f"base_sha: {base_sha}\n", encoding="utf-8"
+        f"base_sha: {base_sha}\ncheckout: ../VapoRock\n", encoding="utf-8"
     )
     (patch_dir / "0001-test.patch").write_text("", encoding="utf-8")
 
@@ -147,6 +150,25 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
         "verify",
         "vaporock",
     ]
+    fixed_script = script.read_text(encoding="utf-8")
+    mutated_script = fixed_script.replace(
+        'source="$(python_import_root "$package" 2>/dev/null)"',
+        'source="$(pin_checkout "$e" 2>/dev/null)"',
+        1,
+    )
+    assert mutated_script != fixed_script
+    script.write_text(mutated_script, encoding="utf-8")
+    unfixed = subprocess.run(
+        verify,
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+    )
+    assert unfixed.returncode != 0
+    assert f"RESOLVED={stale_sibling}" in unfixed.stdout
+
+    script.write_text(fixed_script, encoding="utf-8")
     proc = subprocess.run(
         verify,
         capture_output=True,
@@ -158,7 +180,11 @@ def test_enginepatch_verify_follows_editable_import_location(tmp_path: Path) -> 
     assert proc.returncode == 0, proc.stdout + proc.stderr
     assert "vaporock: MATCH" in proc.stdout
     assert f"RESOLVED={loaded_checkout}" in proc.stdout
-    assert str(stale_sibling) not in proc.stdout
+    assert f"WARNING: vaporock imported checkout differs" in proc.stdout
+    assert f"IMPORTED={loaded_checkout}" in proc.stdout
+    assert f"PIN={stale_sibling}" in proc.stdout
+    assert f"PYTHON={sys.executable}" in proc.stdout
+    assert "RESOLUTION=located" in proc.stdout
 
     (loaded_checkout / "src/vaporock/__init__.py").write_text(
         "LOADED = False\n", encoding="utf-8"
@@ -237,6 +263,7 @@ def test_enginepatch_verify_does_not_match_unloaded_sulfliq_fallback(
 
     assert proc.returncode != 0
     assert f"sulfliq: NOT-LOADED ({no_import_python})" in proc.stdout
+    assert "RESOLUTION=fallback" in proc.stdout
     assert "FALLBACK=MATCH" in proc.stdout
     assert "sulfliq: MATCH" not in proc.stdout
     assert f"RESOLVED={fallback}" in proc.stdout
@@ -249,6 +276,26 @@ def test_enginepatch_verify_does_not_match_unloaded_sulfliq_fallback(
         env=env,
     )
     assert allowed.returncode == 0, allowed.stdout + allowed.stderr
+
+    (patch_dir / "0001-test.patch").write_text("", encoding="utf-8")
+    (patch_dir / "UPSTREAM.pin").write_text(
+        f"base_sha: {base_sha}\ncheckout: ../NoSuchSulfliq\n", encoding="utf-8"
+    )
+    hidden_fallback = subprocess.run(
+        ["bash", str(script), "--allow-not-loaded", *verify[2:]],
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+    )
+    assert hidden_fallback.returncode != 0
+    assert "FALLBACK=DRIFT" in hidden_fallback.stdout
+    assert f"RESOLVED={fallback}" in hidden_fallback.stdout
+
+    (patch_dir / "UPSTREAM.pin").write_text(
+        f"base_sha: {base_sha}\n", encoding="utf-8"
+    )
+    (patch_dir / "0001-test.patch").write_text(patch_text, encoding="utf-8")
 
     overridden = subprocess.run(
         verify,
@@ -275,6 +322,165 @@ def test_enginepatch_verify_does_not_match_unloaded_sulfliq_fallback(
         asserted_allowed.stdout + asserted_allowed.stderr
     )
     assert "sulfliq: ASSERTED PATCH=MATCH" in asserted_allowed.stdout
+
+
+def test_enginepatch_verify_keeps_located_tree_when_import_raises(
+    tmp_path: Path,
+) -> None:
+    """A package import failure must not redirect verification to the pin."""
+
+    project = tmp_path / "project"
+    script = project / "patches" / "scripts" / "enginepatch.sh"
+    script.parent.mkdir(parents=True)
+    shutil.copy2(ROOT / "patches" / "scripts" / "enginepatch.sh", script)
+
+    loaded_checkout = tmp_path / "loaded" / "VapoRock"
+    package_file = loaded_checkout / "src" / "vaporock" / "__init__.py"
+    base_sha = _init_git_checkout(
+        loaded_checkout,
+        "src/vaporock/__init__.py",
+        'raise RuntimeError("boom-found-but-unloadable")\n',
+    )
+    stale_sibling = tmp_path / "VapoRock"
+    _git("clone", "-q", str(loaded_checkout), str(stale_sibling), cwd=tmp_path)
+    (stale_sibling / "src/vaporock/__init__.py").write_text(
+        'raise RuntimeError("stale-decoy")\n',
+        encoding="utf-8",
+    )
+    _git("add", "src/vaporock/__init__.py", cwd=stale_sibling)
+
+    package_file.write_text(
+        'raise RuntimeError("boom-found-but-unloadable-drift")\n',
+        encoding="utf-8",
+    )
+    _git("add", "src/vaporock/__init__.py", cwd=loaded_checkout)
+
+    patch_dir = project / "patches" / "vaporock"
+    patch_dir.mkdir(parents=True)
+    (patch_dir / "UPSTREAM.pin").write_text(
+        f"base_sha: {base_sha}\ncheckout: ../VapoRock\n", encoding="utf-8"
+    )
+    (patch_dir / "0001-test.patch").write_text("", encoding="utf-8")
+
+    temp_dir = tmp_path / "tmp"
+    temp_dir.mkdir()
+    no_site_python = tmp_path / "no-site-python"
+    no_site_python.write_text(
+        f"#!/bin/sh\nexec {shlex.quote(sys.executable)} -S \"$@\"\n",
+        encoding="utf-8",
+    )
+    no_site_python.chmod(0o755)
+    env = {
+        **os.environ,
+        "PYTHONPATH": str(package_file.parent.parent),
+        "TMPDIR": str(temp_dir),
+    }
+    verify = [
+        "bash",
+        str(script),
+        "--python",
+        str(no_site_python),
+        "--allow-not-loaded",
+        "verify",
+        "vaporock",
+    ]
+
+    fixed_script = script.read_text(encoding="utf-8")
+    proc = subprocess.run(
+        verify,
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+    )
+
+    assert proc.returncode != 0
+    assert f"RESOLVED={loaded_checkout}" in proc.stdout
+    assert "vaporock: DRIFT" in proc.stdout
+    assert "RESOLUTION=located" in proc.stdout
+    assert "NOT-LOADED" not in proc.stdout
+    assert f"RESOLVED={stale_sibling}" not in proc.stdout
+
+    mutated_script = fixed_script.replace(
+        'source="$(python_import_root "$package" 2>/dev/null)"',
+        'source="$(pin_checkout "$e" 2>/dev/null)"',
+        1,
+    )
+    assert mutated_script != fixed_script
+    script.write_text(mutated_script, encoding="utf-8")
+    mutated = subprocess.run(
+        verify,
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+    )
+    assert mutated.returncode != 0
+    assert f"RESOLVED={stale_sibling}" in mutated.stdout
+    assert f"RESOLVED={loaded_checkout}" not in mutated.stdout
+
+
+def test_enginepatch_verify_spec_miss_ignores_drifted_pin(
+    tmp_path: Path,
+) -> None:
+    """A spec miss keeps the parent's unresolved allow semantics."""
+
+    project = tmp_path / "project"
+    script = project / "patches" / "scripts" / "enginepatch.sh"
+    script.parent.mkdir(parents=True)
+    shutil.copy2(ROOT / "patches" / "scripts" / "enginepatch.sh", script)
+
+    pin_tree = tmp_path / "VapoRock"
+    pin_file = pin_tree / "engine.py"
+    pin_sha = _init_git_checkout(pin_tree, "engine.py", "PIN = True\n")
+    pin_file.write_text("PIN = False\n", encoding="utf-8")
+    _git("add", "engine.py", cwd=pin_tree)
+
+    patch_dir = project / "patches" / "vaporock"
+    patch_dir.mkdir(parents=True)
+    (patch_dir / "UPSTREAM.pin").write_text(
+        f"base_sha: {pin_sha}\ncheckout: ../VapoRock\n", encoding="utf-8"
+    )
+    (patch_dir / "0001-test.patch").write_text("", encoding="utf-8")
+
+    no_site_python = tmp_path / "no-site-python"
+    no_site_python.write_text(
+        f"#!/bin/sh\nexec {shlex.quote(sys.executable)} -S \"$@\"\n",
+        encoding="utf-8",
+    )
+    no_site_python.chmod(0o755)
+    temp_dir = tmp_path / "tmp"
+    temp_dir.mkdir()
+    env = {
+        **os.environ,
+        "PYTHONPATH": "",
+        "TMPDIR": str(temp_dir),
+    }
+    verify = [
+        "bash",
+        str(script),
+        "--python",
+        str(no_site_python),
+        "--allow-not-loaded",
+        "verify",
+        "vaporock",
+    ]
+
+    proc = subprocess.run(
+        verify,
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+    )
+
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert f"vaporock: NOT-LOADED ({no_site_python})" in proc.stdout
+    assert "RESOLUTION=not-loaded" in proc.stdout
+    assert "FALLBACK=UNRESOLVED" in proc.stdout
+    assert "RESOLVED=unresolved" in proc.stdout
+    assert f"RESOLVED={pin_tree}" not in proc.stdout
+    assert "FALLBACK=DRIFT" not in proc.stdout
 
 
 def test_scripts_enable_errexit() -> None:

@@ -1170,8 +1170,13 @@ species:
           Na2O: 17
           CaO: 12
           SiO2: 71
+        starting_glass_wt_pct:
+          Na2O: 17
+          CaO: 12
+          SiO2: 71
         T_K: 1400.0
         P_total_atm: 1.0
+        total_pressure_atm: 1.0
         Na2O_activity_nonideal: 3.4e-8
         Na2O_activity_ideal: 0.162
         Na_P_atm_nonideal_N2: 3.1e-7
@@ -1206,6 +1211,7 @@ species:
         model: SOLGASMIX (Eriksson 1975); data base mainly JANAF (1971)
         T_K: 1400.0
         P_total_atm: 1.0
+        total_pressure_atm: 1.0
         columns:
           nonideal_N2_atm:
             Na: 3.1e-7

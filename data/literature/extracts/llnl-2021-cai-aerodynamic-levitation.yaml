@@ -47,7 +47,15 @@ species:
         quantity: oxide_composition_and_elemental_loss_series
         method_class: measured_direct
         material: B-type calcium-aluminium-rich inclusion (CAI) melt
-        starting_composition_wt_pct: {MgO: 12.0, SiO2: 46.0, Al2O3: 19.0, CaO: 23.0}
+        composition_wt_pct: {MgO: 12.0, SiO2: 46.0, Al2O3: 19.0, CaO: 23.0}
+        T_K:
+          value: 1873
+          locator: {pdf_page_index: 6, section: '3. Experiments and analyses', note: 'Printed evaporation temperature'}
+        log_fO2:
+          value: -9.1
+          units: log10(atm)
+          quote: 'oxygen_fugacity_log10_atm = -9.1 as printed'
+          locator: {pdf_page_index: 6, section: '3. Experiments and analyses'}
         samples:
         - {sample: VP1, MgO_wt_pct: 11.61, SiO2_wt_pct: 37.62, Al2O3_wt_pct: 22.99, CaO_wt_pct: 27.78, MgO_Al2O3: 0.5050, SiO2_Al2O3: 1.6364, f_Mg: 0.800, f_Si: 0.676}
         - {sample: VP2, MgO_wt_pct: 12.05, SiO2_wt_pct: 40.03, Al2O3_wt_pct: 21.74, CaO_wt_pct: 26.18, MgO_Al2O3: 0.5543, SiO2_Al2O3: 1.8413, f_Mg: 0.878, f_Si: 0.761}
@@ -63,9 +71,7 @@ species:
         initial_fusion_duration_s: 30
         initial_levitating_gas: pure O2
         quench_rate_C_per_s: 850
-        evaporation_temperature_K: 1873
         evaporation_gas_molar_ratio: {Ar_pct: 92.0, CO2_pct: 1.6, H2_pct: 6.4}
-        oxygen_fugacity_log10_atm: -9.1
         oxygen_fugacity_buffer_relation: 0.5 log unit below iron-wustite buffer, whose log fO2 is -8.6
         experiment_duration_as_printed_in_abstract_s: [60, 600]
         experiment_duration_as_printed_in_methods_s: [180, 900]

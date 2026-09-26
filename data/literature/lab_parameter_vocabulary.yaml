@@ -47,6 +47,10 @@ entries:
   - printed: tga_sample_mass_mg
     field: sample.mass_kg
     unit: mg
+  # common sample volume → sample.volume_m3
+  - printed: sample_volume_cm3
+    field: sample.volume_m3
+    unit: cm3
   - printed: initial_composition
     field: sample.initial_composition
     unit: null

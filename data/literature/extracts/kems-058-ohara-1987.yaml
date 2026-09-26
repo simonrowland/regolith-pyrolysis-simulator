@@ -28,14 +28,14 @@ fidelity_samples:
     published_page: 1339
     pdf_page_index: 3
     note: Table 1 sample 1, I(P2+)/I(Fe+) x 10^2 = 1.33
-- path: species.P2O5.observations[ohara_1987_table2_compositions_and_raoultian_a_p2o5].values.rows[0].P2O5_mol_percent
+- path: species.P2O5.observations[ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_1].values.row.P2O5_mol_percent
   value: 3.92
   locator:
     table: '2'
     published_page: 1339
     pdf_page_index: 3
     note: Table 2 sample 1 P2O5 = 3.92 mol%
-- path: species.P2O5.observations[ohara_1987_table2_compositions_and_raoultian_a_p2o5].values.rows[0].a_P2O5_times_1e17
+- path: species.P2O5.observations[ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_1].values.row.a_P2O5_times_1e17
   value: 2.5
   locator:
     table: '2'
@@ -70,105 +70,1533 @@ fidelity_samples:
     note: P_P4O10_sat = 700 atm at 1643 K from JANAF extrapolated past 1500 K
 benches:
 - id: ohara-kems
-  identity: {basis: described_in_this_work}
+  identity:
+    basis: described_in_this_work
   apparatus_family:
-    state: {tag: value, value: Knudsen-cell mass spectrometer}
-    locator: {published_page: 1338, section: '2.1'}
+    state:
+      tag: value
+      value: Knudsen-cell mass spectrometer
+    locator:
+      published_page: 1338
+      section: '2.1'
   cell_material_and_liner:
-    state: {tag: value, value: Alumina Knudsen cell with electrolytic-iron inner crucible}
-    locator: {published_page: 1338, section: '2.1'}
+    state:
+      tag: value
+      value: Alumina Knudsen cell with electrolytic-iron inner crucible
+    locator:
+      published_page: 1338
+      section: '2.1'
   detector:
-    state: {tag: value, value: Mass spectrometer}
-    locator: {published_page: 1338, section: '2.1'}
+    state:
+      tag: value
+      value: Mass spectrometer
+    locator:
+      published_page: 1338
+      section: '2.1'
   other_facts:
   - name: internal_standard
     unit: '-'
     value:
-      state: {tag: value, value: {kind: categorical, categorical: 'Fe(g) in equilibrium with solid iron'}}
-      locator: {published_page: 1338, section: '2.1'}
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Fe(g) in equilibrium with solid iron
+      locator:
+        published_page: 1338
+        section: '2.1'
 experiments:
 - experiment_id: feto-p2o5-additive-series
   bench_id: ohara-kems
   method: knudsen_effusion
-  locator: {published_page: 1338, section: '2.1', note: 'Measurements of FetO-P2O5 melts with targeted CaO, MgO, MnO, or SiO2 additions; individual charge compositions remain in Table 2 observations'}
+  locator:
+    published_page: 1338
+    section: '2.1'
+    note: Measurements of FetO-P2O5 melts with targeted CaO, MgO, MnO, or SiO2 additions; individual charge
+      compositions remain in Table 2 observations
   sample:
     printed_composition:
-      state: {tag: unknown, reason: not_published}
-      locator: {published_page: 1339, table: '2', note: 'Multiple published row compositions; no single series composition'}
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Umbrella series for method, interaction parameters, figures, sample-20 ion ratios, and quoted
+          comparisons; per-charge mol% maps live on feto-p2o5-sample-* from Table 2
     pretreatment:
-      state: {tag: value, value: Pre-melted in vacuum}
-      locator: {published_page: 1338, section: '2.1'}
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
     characterization:
-      state: {tag: value, value: Chemical analysis after measurement}
-      locator: {published_page: 1338, section: '2.1'}
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
   apparatus:
     geometry:
       orifice_diameter_m:
-        state: {tag: unknown, reason: in_cited_source}
-        locator: {published_page: 1338, section: '2.1', note: 'This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here'}
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
       orifice_channel_length_m:
-        state: {tag: unknown, reason: in_cited_source}
-        locator: {published_page: 1338, section: '2.1', note: 'No channel length printed in this paper'}
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
   conditions:
     temperature_K:
-      state: {tag: value, value: '1643.15'}
-      locator: {published_page: 1338, section: '2.1', note: 'Printed 1370 C; unit conversion only'}
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-1
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 1 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 1 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0392'
+          - - FetO
+            - '0.9246'
+          - - CaO
+            - '0.0364'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 1 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-2
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 2 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 2 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0713'
+          - - FetO
+            - '0.8807'
+          - - CaO
+            - '0.048'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 2 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-3
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 3 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 3 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0913'
+          - - FetO
+            - '0.8643'
+          - - CaO
+            - '0.0444'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 3 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-4
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 4 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 4 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0952'
+          - - FetO
+            - '0.8657'
+          - - CaO
+            - '0.0392'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 4 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-5
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 5 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 5 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0423'
+          - - FetO
+            - '0.9154'
+          - - MgO
+            - '0.0423'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 5 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-6
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 6 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 6 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.063'
+          - - FetO
+            - '0.8945'
+          - - MgO
+            - '0.0425'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 6 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-7
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 7 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 7 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0726'
+          - - FetO
+            - '0.8798'
+          - - MgO
+            - '0.0476'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 7 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-8
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 8 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 8 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0812'
+          - - FetO
+            - '0.8765'
+          - - MgO
+            - '0.0423'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 8 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-9
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 9 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 9 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.018'
+          - - FetO
+            - '0.9321'
+          - - MnO
+            - '0.0499'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 9 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-10
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 10 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 10 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0451'
+          - - FetO
+            - '0.9076'
+          - - MnO
+            - '0.0472'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 10 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-11
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 11 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 11 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0584'
+          - - FetO
+            - '0.8957'
+          - - MnO
+            - '0.0459'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 11 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-12
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 12 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 12 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0606'
+          - - FetO
+            - '0.8942'
+          - - MnO
+            - '0.0452'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 12 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-13
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 13 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 13 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0833'
+          - - FetO
+            - '0.8726'
+          - - MnO
+            - '0.044'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 13 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-14
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 14 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 14 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0188'
+          - - FetO
+            - '0.9313'
+          - - SiO2
+            - '0.0498'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 14 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-15
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 15 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 15 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0435'
+          - - FetO
+            - '0.8987'
+          - - SiO2
+            - '0.0579'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 15 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-16
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 16 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 16 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0475'
+          - - FetO
+            - '0.9069'
+          - - SiO2
+            - '0.0456'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 16 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-17
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 17 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 17 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0635'
+          - - FetO
+            - '0.889'
+          - - SiO2
+            - '0.0475'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 17 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-18
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 18 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 18 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0679'
+          - - FetO
+            - '0.8349'
+          - - CaO
+            - '0.0444'
+          - - SiO2
+            - '0.0528'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 18 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
+- experiment_id: feto-p2o5-sample-19
+  bench_id: ohara-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1339
+    table: '2'
+    note: Table 2 sample 19 charge
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Table 2 sample 19 FetO-P2O5 slag
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Label retained; numeric mole fractions in initial_composition
+    pretreatment:
+      state:
+        tag: value
+        value: Pre-melted in vacuum
+      locator:
+        published_page: 1338
+        section: '2.1'
+    characterization:
+      state:
+        tag: value
+        value: Chemical analysis after measurement
+      locator:
+        published_page: 1338
+        section: '2.1'
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - - P2O5
+            - '0.0849'
+          - - FetO
+            - '0.8227'
+          - - CaO
+            - '0.0443'
+          - - SiO2
+            - '0.0481'
+      locator:
+        published_page: 1339
+        table: '2'
+        note: Table 2 sample 19 mol% / 100 → mole_fraction (unit conversion only); only oxides present
+          in the printed row; Fe2+/Fe3+ ratio is not a composition component
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: This paper cites Kambayashi et al. for the apparatus; no orifice operand is printed here
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 1338
+          section: '2.1'
+          note: No channel length printed in this paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643.15'
+      locator:
+        published_page: 1338
+        section: '2.1'
+        note: Printed 1370 C; unit conversion only
 species:
   P2O5:
     observations:
-    - observation_id: ohara_1987_kems_geometry_and_calibration
-      experiment: feto-p2o5-additive-series
-      type: gibbs_table
-      locator:
-        published_page: 1338
-        pdf_page_index: 2
-        section: '2.1'
-        note: 'Method as Kambayashi et al. (ref 6): alumina Knudsen cell, Fe inner crucible, Fe(g) internal
-          standard, 1370 C'
-      T_range_K:
-      - 1643.0
-      - 1643.0
-      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
-          Knudsen cell
-      standard_state: method geometry; not a species observation
-      regime: kems_effusion
-      units: as published
-      values:
-        quantity: kems_method_geometry_reference
-        method_class: measured
-        semantics: method_geometry_reference_not_measured_species_observation
-        T_C_as_printed: 1370
-        T_K: 1643.0
-        internal_standard: Fe(g) in equilibrium with solid iron
-        apparatus_constant_variation_percent: 15
-        Fe_crucible_P_wt_percent_less_than: 1.0
-        Fe_activity_in_crucible: 1.0
-        FetO_t_average: 0.95
-        target_additive_mol_percent: 5.0
-        detected_ions:
-        - P+
-        - P2+
-        - PO+
-        - PO2+
-        - Fe+
-        additive_oxide_ions_detected: false
-        additive_oxide_ions_note: ions expected from CaO, MgO, MnO, SiO2 were not detected because those
-          oxides have low vapor pressure
-        method_reference: Kambayashi, Awaka and Kato, Tetsu-to-Hagane 71 (1985) 1911
-        composition_determined: chemical analysis after the mass-spectrometric run
-        missing_for_motzfeldt:
-        - orifice_area
-        - orifice_diameter
-        - clausing_factor
-        - sample_surface_area
-      uncertainty:
-        note: Apparatus constant c about +/-15% cancelled by Fe internal standard. Geometry referred to
-          Kambayashi 1985; orifice diameter not restated here.
     - observation_id: ohara_1987_table1_ion_current_ratios_1643k
       experiment: feto-p2o5-additive-series
       type: rate_series
@@ -461,308 +1889,6 @@ species:
             row
       uncertainty:
         note: no per-cell +/- on Table 1 ion ratios
-    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
-      experiment: feto-p2o5-additive-series
-      type: activity_coefficient
-      locator:
-        table: '2'
-        published_page: 1339
-        pdf_page_index: 3
-        note: Table 2 mol% compositions, Raoultian a_P2O5, ln gamma_P2O5, L_P at 1643 K
-      T_range_K:
-      - 1643.0
-      - 1643.0
-      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
-      condensed_form:
-        state: liquid_melt
-        metastable: false
-        basis: explicit_author
-        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
-          Knudsen cell
-      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
-      regime: kems_effusion
-      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
-      values:
-        quantity: raoultian_activity_and_composition
-        method_class: model_derived
-        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
-          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
-          eqs. (12)-(23), not a KEMS observable.
-        composition_basis: mol_percent as printed
-        sample_1_two_phase_note: Table 2 No. 1 (CaO addition) is suspected two-phase; authors did not
-          use it for the interaction-parameter fit
-        rows:
-        - sample_no: 1
-          P2O5_mol_percent: 3.92
-          FetO_mol_percent: 92.46
-          CaO_mol_percent: 3.64
-          Fe2_over_Fe3: 9.2
-          a_P2O5_times_1e17: 2.5
-          ln_gamma_P2O5: -35.05
-          L_P: 570
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 2.5000000000000003e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 2
-          P2O5_mol_percent: 7.13
-          FetO_mol_percent: 88.07
-          CaO_mol_percent: 4.8
-          Fe2_over_Fe3: 10.8
-          a_P2O5_times_1e17: 4.8
-          ln_gamma_P2O5: -34.89
-          L_P: 666
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 4.8000000000000003e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 3
-          P2O5_mol_percent: 9.13
-          FetO_mol_percent: 86.43
-          CaO_mol_percent: 4.44
-          Fe2_over_Fe3: 10.6
-          a_P2O5_times_1e17: 8.4
-          ln_gamma_P2O5: -34.64
-          L_P: 589
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 8.400000000000001e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 4
-          P2O5_mol_percent: 9.52
-          FetO_mol_percent: 86.57
-          CaO_mol_percent: 3.92
-          Fe2_over_Fe3: 9.3
-          a_P2O5_times_1e17: 6.3
-          ln_gamma_P2O5: -34.89
-          L_P: 690
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 6.3e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 5
-          P2O5_mol_percent: 4.23
-          FetO_mol_percent: 91.54
-          MgO_mol_percent: 4.23
-          Fe2_over_Fe3: 10.7
-          a_P2O5_times_1e17: 4.6
-          ln_gamma_P2O5: -34.44
-          L_P: 452
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 4.6e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 6
-          P2O5_mol_percent: 6.3
-          FetO_mol_percent: 89.45
-          MgO_mol_percent: 4.25
-          Fe2_over_Fe3: 8.6
-          a_P2O5_times_1e17: 4.8
-          ln_gamma_P2O5: -34.76
-          L_P: 615
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 4.8000000000000003e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 7
-          P2O5_mol_percent: 7.26
-          FetO_mol_percent: 87.98
-          MgO_mol_percent: 4.76
-          Fe2_over_Fe3: 9.4
-          a_P2O5_times_1e17: 5.9
-          ln_gamma_P2O5: -34.76
-          L_P: 615
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 5.900000000000001e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 8
-          P2O5_mol_percent: 8.12
-          FetO_mol_percent: 87.65
-          MgO_mol_percent: 4.23
-          Fe2_over_Fe3: 9.7
-          a_P2O5_times_1e17: 7.8
-          ln_gamma_P2O5: -34.54
-          L_P: 578
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 7.8e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 9
-          P2O5_mol_percent: 1.8
-          FetO_mol_percent: 93.21
-          MnO_mol_percent: 4.99
-          Fe2_over_Fe3: 9.7
-          a_P2O5_times_1e17: 2.0
-          ln_gamma_P2O5: -34.44
-          L_P: 310
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 2.0e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 10
-          P2O5_mol_percent: 4.51
-          FetO_mol_percent: 90.76
-          MnO_mol_percent: 4.72
-          Fe2_over_Fe3: 10.1
-          a_P2O5_times_1e17: 5.8
-          ln_gamma_P2O5: -34.28
-          L_P: 416
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 5.8e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 11
-          P2O5_mol_percent: 5.84
-          FetO_mol_percent: 89.57
-          MnO_mol_percent: 4.59
-          Fe2_over_Fe3: 8.5
-          a_P2O5_times_1e17: 6.8
-          ln_gamma_P2O5: -34.36
-          L_P: 477
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 6.800000000000001e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 12
-          P2O5_mol_percent: 6.06
-          FetO_mol_percent: 89.42
-          MnO_mol_percent: 4.52
-          Fe2_over_Fe3: 9.2
-          a_P2O5_times_1e17: 8.2
-          ln_gamma_P2O5: -34.2
-          L_P: 447
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 8.2e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 13
-          P2O5_mol_percent: 8.33
-          FetO_mol_percent: 87.26
-          MnO_mol_percent: 4.4
-          Fe2_over_Fe3: 9.7
-          a_P2O5_times_1e17: 9.7
-          ln_gamma_P2O5: -34.36
-          L_P: 520
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 9.7e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 14
-          P2O5_mol_percent: 1.88
-          FetO_mol_percent: 93.13
-          SiO2_mol_percent: 4.98
-          Fe2_over_Fe3: 8.9
-          a_P2O5_times_1e17: 3.3
-          ln_gamma_P2O5: -34.01
-          L_P: 253
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 3.3e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 15
-          P2O5_mol_percent: 4.35
-          FetO_mol_percent: 89.87
-          SiO2_mol_percent: 5.79
-          Fe2_over_Fe3: 9.1
-          a_P2O5_times_1e17: 8.2
-          ln_gamma_P2O5: -33.9
-          L_P: 343
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 8.2e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 16
-          P2O5_mol_percent: 4.75
-          FetO_mol_percent: 90.69
-          SiO2_mol_percent: 4.56
-          Fe2_over_Fe3: 9.2
-          a_P2O5_times_1e17: 7.8
-          ln_gamma_P2O5: -34.07
-          L_P: 379
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 7.8e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 17
-          P2O5_mol_percent: 6.35
-          FetO_mol_percent: 88.9
-          SiO2_mol_percent: 4.75
-          Fe2_over_Fe3: 8.7
-          a_P2O5_times_1e17: 11.0
-          ln_gamma_P2O5: -34.01
-          L_P: 406
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 1.1000000000000001e-16
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 18
-          P2O5_mol_percent: 6.79
-          FetO_mol_percent: 83.49
-          CaO_mol_percent: 4.44
-          SiO2_mol_percent: 5.28
-          Fe2_over_Fe3: 10.9
-          a_P2O5_times_1e17: 3.3
-          ln_gamma_P2O5: -34.23
-          L_P: 784
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 3.3e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-        - sample_no: 19
-          P2O5_mol_percent: 8.49
-          FetO_mol_percent: 82.27
-          CaO_mol_percent: 4.43
-          SiO2_mol_percent: 4.81
-          Fe2_over_Fe3: 12.2
-          a_P2O5_times_1e17: 6.1
-          ln_gamma_P2O5: -34.9
-          L_P: 665
-          T_C: 1370
-          T_K: 1643.0
-          a_P2O5: 6.1e-17
-          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
-          standard_state_as_printed: P2O5(s)
-          composition_basis: mol_percent as printed
-      uncertainty:
-        note: no per-cell +/- on Table 2. Absolute a scale set by JANAF-extrapolated P_P4O10_sat = 700
-          atm at 1643 K.
     - observation_id: ohara_1987_interaction_parameters_1643k
       experiment: feto-p2o5-additive-series
       type: activity_coefficient
@@ -923,6 +2049,881 @@ species:
         curve: Kambayashi FetO-P2O5 L_P
       uncertainty:
         note: figure-only calculated L_P; not digitised
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_1
+      experiment: feto-p2o5-sample-1
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 1 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        sample_1_two_phase_note: Table 2 No. 1 (CaO addition) is suspected two-phase; authors did not
+          use it for the interaction-parameter fit
+        row:
+          sample_no: 1
+          P2O5_mol_percent: 3.92
+          FetO_mol_percent: 92.46
+          CaO_mol_percent: 3.64
+          Fe2_over_Fe3: 9.2
+          a_P2O5_times_1e17: 2.5
+          ln_gamma_P2O5: -35.05
+          L_P: 570
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 2.5000000000000003e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_2
+      experiment: feto-p2o5-sample-2
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 2 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 2
+          P2O5_mol_percent: 7.13
+          FetO_mol_percent: 88.07
+          CaO_mol_percent: 4.8
+          Fe2_over_Fe3: 10.8
+          a_P2O5_times_1e17: 4.8
+          ln_gamma_P2O5: -34.89
+          L_P: 666
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 4.8000000000000003e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_3
+      experiment: feto-p2o5-sample-3
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 3 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 3
+          P2O5_mol_percent: 9.13
+          FetO_mol_percent: 86.43
+          CaO_mol_percent: 4.44
+          Fe2_over_Fe3: 10.6
+          a_P2O5_times_1e17: 8.4
+          ln_gamma_P2O5: -34.64
+          L_P: 589
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 8.400000000000001e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_4
+      experiment: feto-p2o5-sample-4
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 4 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 4
+          P2O5_mol_percent: 9.52
+          FetO_mol_percent: 86.57
+          CaO_mol_percent: 3.92
+          Fe2_over_Fe3: 9.3
+          a_P2O5_times_1e17: 6.3
+          ln_gamma_P2O5: -34.89
+          L_P: 690
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 6.3e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_5
+      experiment: feto-p2o5-sample-5
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 5 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 5
+          P2O5_mol_percent: 4.23
+          FetO_mol_percent: 91.54
+          MgO_mol_percent: 4.23
+          Fe2_over_Fe3: 10.7
+          a_P2O5_times_1e17: 4.6
+          ln_gamma_P2O5: -34.44
+          L_P: 452
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 4.6e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_6
+      experiment: feto-p2o5-sample-6
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 6 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 6
+          P2O5_mol_percent: 6.3
+          FetO_mol_percent: 89.45
+          MgO_mol_percent: 4.25
+          Fe2_over_Fe3: 8.6
+          a_P2O5_times_1e17: 4.8
+          ln_gamma_P2O5: -34.76
+          L_P: 615
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 4.8000000000000003e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_7
+      experiment: feto-p2o5-sample-7
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 7 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 7
+          P2O5_mol_percent: 7.26
+          FetO_mol_percent: 87.98
+          MgO_mol_percent: 4.76
+          Fe2_over_Fe3: 9.4
+          a_P2O5_times_1e17: 5.9
+          ln_gamma_P2O5: -34.76
+          L_P: 615
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 5.900000000000001e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_8
+      experiment: feto-p2o5-sample-8
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 8 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 8
+          P2O5_mol_percent: 8.12
+          FetO_mol_percent: 87.65
+          MgO_mol_percent: 4.23
+          Fe2_over_Fe3: 9.7
+          a_P2O5_times_1e17: 7.8
+          ln_gamma_P2O5: -34.54
+          L_P: 578
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 7.8e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_9
+      experiment: feto-p2o5-sample-9
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 9 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 9
+          P2O5_mol_percent: 1.8
+          FetO_mol_percent: 93.21
+          MnO_mol_percent: 4.99
+          Fe2_over_Fe3: 9.7
+          a_P2O5_times_1e17: 2.0
+          ln_gamma_P2O5: -34.44
+          L_P: 310
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 2.0e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_10
+      experiment: feto-p2o5-sample-10
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 10 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 10
+          P2O5_mol_percent: 4.51
+          FetO_mol_percent: 90.76
+          MnO_mol_percent: 4.72
+          Fe2_over_Fe3: 10.1
+          a_P2O5_times_1e17: 5.8
+          ln_gamma_P2O5: -34.28
+          L_P: 416
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 5.8e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_11
+      experiment: feto-p2o5-sample-11
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 11 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 11
+          P2O5_mol_percent: 5.84
+          FetO_mol_percent: 89.57
+          MnO_mol_percent: 4.59
+          Fe2_over_Fe3: 8.5
+          a_P2O5_times_1e17: 6.8
+          ln_gamma_P2O5: -34.36
+          L_P: 477
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 6.800000000000001e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_12
+      experiment: feto-p2o5-sample-12
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 12 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 12
+          P2O5_mol_percent: 6.06
+          FetO_mol_percent: 89.42
+          MnO_mol_percent: 4.52
+          Fe2_over_Fe3: 9.2
+          a_P2O5_times_1e17: 8.2
+          ln_gamma_P2O5: -34.2
+          L_P: 447
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 8.2e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_13
+      experiment: feto-p2o5-sample-13
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 13 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 13
+          P2O5_mol_percent: 8.33
+          FetO_mol_percent: 87.26
+          MnO_mol_percent: 4.4
+          Fe2_over_Fe3: 9.7
+          a_P2O5_times_1e17: 9.7
+          ln_gamma_P2O5: -34.36
+          L_P: 520
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 9.7e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_14
+      experiment: feto-p2o5-sample-14
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 14 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 14
+          P2O5_mol_percent: 1.88
+          FetO_mol_percent: 93.13
+          SiO2_mol_percent: 4.98
+          Fe2_over_Fe3: 8.9
+          a_P2O5_times_1e17: 3.3
+          ln_gamma_P2O5: -34.01
+          L_P: 253
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 3.3e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_15
+      experiment: feto-p2o5-sample-15
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 15 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 15
+          P2O5_mol_percent: 4.35
+          FetO_mol_percent: 89.87
+          SiO2_mol_percent: 5.79
+          Fe2_over_Fe3: 9.1
+          a_P2O5_times_1e17: 8.2
+          ln_gamma_P2O5: -33.9
+          L_P: 343
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 8.2e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_16
+      experiment: feto-p2o5-sample-16
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 16 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 16
+          P2O5_mol_percent: 4.75
+          FetO_mol_percent: 90.69
+          SiO2_mol_percent: 4.56
+          Fe2_over_Fe3: 9.2
+          a_P2O5_times_1e17: 7.8
+          ln_gamma_P2O5: -34.07
+          L_P: 379
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 7.8e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_17
+      experiment: feto-p2o5-sample-17
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 17 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 17
+          P2O5_mol_percent: 6.35
+          FetO_mol_percent: 88.9
+          SiO2_mol_percent: 4.75
+          Fe2_over_Fe3: 8.7
+          a_P2O5_times_1e17: 11.0
+          ln_gamma_P2O5: -34.01
+          L_P: 406
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 1.1000000000000001e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_18
+      experiment: feto-p2o5-sample-18
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 18 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 18
+          P2O5_mol_percent: 6.79
+          FetO_mol_percent: 83.49
+          CaO_mol_percent: 4.44
+          SiO2_mol_percent: 5.28
+          Fe2_over_Fe3: 10.9
+          a_P2O5_times_1e17: 3.3
+          ln_gamma_P2O5: -34.23
+          L_P: 784
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 3.3e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    - observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_19
+      experiment: feto-p2o5-sample-19
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1339
+        pdf_page_index: 3
+        note: Table 2 sample 19 composition and Raoultian a_P2O5 at 1643 K
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: Raoultian a_P2O5 and gamma_P2O5 relative to P2O5(s)
+      regime: kems_effusion
+      units: mol% as printed; a_P2O5 x 10^17 dimensionless; ln gamma dimensionless; L_P as printed
+      values:
+        quantity: raoultian_activity_and_composition
+        method_class: model_derived
+        model_or_data_source: a_P2O5 = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (6)-(8); P_P4O10_sat = 700
+          atm at 1643 K from JANAF P4O10(s) extrapolated past 1500 K. L_P from slag-metal calculation
+          eqs. (12)-(23), not a KEMS observable.
+        composition_basis: mol_percent as printed
+        row:
+          sample_no: 19
+          P2O5_mol_percent: 8.49
+          FetO_mol_percent: 82.27
+          CaO_mol_percent: 4.43
+          SiO2_mol_percent: 4.81
+          Fe2_over_Fe3: 12.2
+          a_P2O5_times_1e17: 6.1
+          ln_gamma_P2O5: -34.9
+          L_P: 665
+          T_C: 1370
+          T_K: 1643.0
+          a_P2O5: 6.1e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+          composition_basis: mol_percent as printed
+    context:
+    - observation_id: ohara_1987_kems_geometry_and_calibration
+      experiment: feto-p2o5-additive-series
+      type: apparatus
+      locator:
+        published_page: 1338
+        pdf_page_index: 2
+        section: '2.1'
+        note: 'Method as Kambayashi et al. (ref 6): alumina Knudsen cell, Fe inner crucible, Fe(g) internal
+          standard, 1370 C'
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO solvent, dilute P2O5, with ~5 mol% CaO, MgO, MnO or SiO2; Fe crucible inside alumina
+          Knudsen cell
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        T_C_as_printed: 1370
+        T_K: 1643.0
+        internal_standard: Fe(g) in equilibrium with solid iron
+        apparatus_constant_variation_percent: 15
+        Fe_crucible_P_wt_percent_less_than: 1.0
+        Fe_activity_in_crucible: 1.0
+        FetO_t_average: 0.95
+        target_additive_mol_percent: 5.0
+        detected_ions:
+        - P+
+        - P2+
+        - PO+
+        - PO2+
+        - Fe+
+        additive_oxide_ions_detected: false
+        additive_oxide_ions_note: ions expected from CaO, MgO, MnO, SiO2 were not detected because those
+          oxides have low vapor pressure
+        method_reference: Kambayashi, Awaka and Kato, Tetsu-to-Hagane 71 (1985) 1911
+        composition_determined: chemical analysis after the mass-spectrometric run
+        missing_for_motzfeldt:
+        - orifice_area
+        - orifice_diameter
+        - clausing_factor
+        - sample_surface_area
+      uncertainty:
+        note: Apparatus constant c about +/-15% cancelled by Fe internal standard. Geometry referred to
+          Kambayashi 1985; orifice diameter not restated here.
   CaO:
     observations:
     - observation_id: ohara_1987_cao_epsilon_p2o5
@@ -1601,10 +3602,11 @@ species:
       uncertainty:
         note: JANAF extrapolation past 1500 K; no numeric +/- printed
   FeO:
-    observations:
+    observations: []
+    context:
     - observation_id: ohara_1987_feto_t_and_pO2_gate
       experiment: feto-p2o5-additive-series
-      type: activity_coefficient
+      type: apparatus
       locator:
         published_page: 1341
         pdf_page_index: 5

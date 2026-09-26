@@ -19,6 +19,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '750'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'Brownian_motion_validation_setup'; refusing to
@@ -42,6 +45,15 @@ observations:
     figure: '14'
     section: B.2 Validation of expression for Brownian motion
   read_from: unknown:arxiv-2509-sio-flame-nucleation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '750'
+      locator:
+        page: 20
+        figure: '14'
+        section: B.2 Validation of expression for Brownian motion
 - observation_id: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model
   experiment_id: 2a77b9fada6343d85dd693d9d8e5e27631d2ae12b240b599646ac0e8f56a65f0::arxiv-2509-sio-flame-nucleation
   identity:

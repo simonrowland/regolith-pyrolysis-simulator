@@ -44,10 +44,86 @@ composition_wt_pct:
   MnO: 0.22
   H2O: 1.04
   P2O5: 0.36
+experiments:
+- experiment_id: sf04-tholeiite-workbook-grid
+  method: engine_evaluation
+  locator:
+    published_page: 227
+    pdf_page_index: 12
+    figure: 10a
+    record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
+    note: Shared tholeiite input and extracted workbook temperature grid; species pressures below are outputs, not chamber pressure.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: {SiO2: 50.71, MgO: 4.68, Al2O3: 14.48, TiO2: 1.70, Fe2O3: 4.89, FeO: 9.07, CaO: 8.83, Na2O: 3.16, K2O: 0.77, MnO: 0.22, H2O: 1.04, P2O5: 0.36}
+      locator:
+        published_page: 227
+        table: '5'
+        note: Tholeiite composition supplied by the paper and reused by the companion workbook.
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.561712451127652']
+          - [MgO, '0.0772804695853422']
+          - [Al2O3, '0.0945171149074712']
+          - [TiO2, '0.0141665622663591']
+          - [Fe2O3, '0.0203803363216040']
+          - [FeO, '0.0840211907933131']
+          - [CaO, '0.104796790278981']
+          - [Na2O, '0.0339326517983188']
+          - [K2O, '0.00544041660906938']
+          - [MnO, '0.00206405679436486']
+          - [P2O5, '0.00168795951752513']
+      locator:
+        published_page: 227
+        table: '5'
+        note: Derived from the printed oxide wt% recipe; H2O and non-oxide total are retained in printed_composition but omitted from the engine oxide vector.
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - Printed Table 5 oxide mass percentages above.
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j) over supported oxide components.
+        output_unit: mole_fraction
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
+        note: Extracted workbook grid is a range, not a single scalar setpoint; typed interval is retained in thermal_schedule.setpoints_and_holds.
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 227
+        figure: 10a
+        note: Workbook values are species partial-pressure outputs; chamber total pressure is not printed.
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 227
+        figure: 10a
+        note: No sweep-gas configuration is printed for this companion model grid.
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1750.0', interval_high: '2500.0'}}
+        locator:
+          record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
+          note: Extracted workbook grid range; interval retained rather than inventing a single setpoint.
 species:
   O:
     observations:
     - observation_id: sf04_workbook_tho_o_pressure_series
+      experiment: sf04-tholeiite-workbook-grid
       type: psat_series
       locator: &sf04_locator
         published_page: 227
@@ -72,6 +148,7 @@ species:
   O2:
     observations:
     - observation_id: sf04_workbook_tho_o2_pressure_series
+      experiment: sf04-tholeiite-workbook-grid
       type: psat_series
       locator: *sf04_locator
       T_range_K: [1750.0, 2500.0]
@@ -91,6 +168,7 @@ species:
   Mg:
     observations:
     - observation_id: sf04_workbook_tho_mg_pressure_series
+      experiment: sf04-tholeiite-workbook-grid
       type: psat_series
       locator: *sf04_locator
       T_range_K: [1750.0, 2500.0]
@@ -110,6 +188,7 @@ species:
   SiO:
     observations:
     - observation_id: sf04_workbook_tho_sio_pressure_series
+      experiment: sf04-tholeiite-workbook-grid
       type: psat_series
       locator: *sf04_locator
       T_range_K: [1750.0, 2500.0]
@@ -129,6 +208,7 @@ species:
   Fe:
     observations:
     - observation_id: sf04_workbook_tho_fe_pressure_series
+      experiment: sf04-tholeiite-workbook-grid
       type: psat_series
       locator: *sf04_locator
       T_range_K: [1750.0, 2500.0]
@@ -148,6 +228,7 @@ species:
   Na:
     observations:
     - observation_id: sf04_workbook_tho_na_pressure_series
+      experiment: sf04-tholeiite-workbook-grid
       type: psat_series
       locator: *sf04_locator
       T_range_K: [1750.0, 2500.0]
@@ -167,6 +248,7 @@ species:
   K:
     observations:
     - observation_id: sf04_workbook_tho_k_pressure_series
+      experiment: sf04-tholeiite-workbook-grid
       type: psat_series
       locator: *sf04_locator
       T_range_K: [1750.0, 2500.0]

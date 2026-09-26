@@ -49,42 +49,10 @@ experiments:
         value:
           kind: point
           point: '0.00338'
-          approximate: false
+          approximate: true
       locator:
-        published_page: 7
-        pdf_page_index: 8
-        figure: 4b
-        section: '4.1'
-        note: Oxygen production and mass yield from the reported EAC-1 run
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=3.38 g
-        - printed=sample_mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '3.38'
-            locator:
-              published_page: 7
-              pdf_page_index: 8
-              figure: 4b
-              section: '4.1'
-              note: Oxygen production and mass yield from the reported EAC-1 run
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              published_page: 7
-              pdf_page_index: 8
-              figure: 4b
-              section: '4.1'
-              note: Oxygen production and mass yield from the reported EAC-1 run
-        output_unit: kg
+        section: 4.1 Experimental results
+        note: Approximately 3.38 g initial pellet mass
     printed_composition:
       state:
         tag: value

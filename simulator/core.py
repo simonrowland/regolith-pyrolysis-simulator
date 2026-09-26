@@ -2138,6 +2138,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self._is_alphamelts_backend(backend):
             from engines.alphamelts import AlphaMELTSProvider
 
+            # Intentional per-intent exception: the selected MELTS provider is
+            # the only liquid-fraction source for this narrow freeze dispatch.
+            # Its registry authority is dispatch-only; the diagnostic provider
+            # still has no ledger-transition authority. Runner provenance
+            # exposes this through run_metadata.diagnostic_gate_authority_notice
+            # and the operator product-classification notice channel.
             self._chem_registry.register_idempotent(
                 AlphaMELTSProvider(backend=backend),
                 [ChemistryIntent.GATE_LIQUID_FRACTION],
@@ -9119,6 +9125,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return aggregate_engine_commissioning_notice(
             getattr(self, '_engine_commissioning_steps', ())
         )
+
+    def diagnostic_gate_authority_run_notice(self) -> Dict[str, Any] | None:
+        """Notice when the authoritative freeze gate is dispatch-only."""
+
+        intent = ChemistryIntent.GATE_LIQUID_FRACTION
+        provider = self._chem_registry.authoritative_for(intent)
+        if provider is None:
+            return None
+        profile = provider.capability_profile()
+        if not profile.is_authoritative(intent):
+            return None
+        if profile.may_emit_ledger_transition(intent):
+            return None
+        return {
+            'kind': 'diagnostic_provider_gate_authority',
+            'intent': intent.value,
+            'provider_id': profile.provider_id,
+            'authority_scope': 'dispatch_only',
+            'ledger_transition_authority': False,
+            'message': (
+                f'The authoritative freeze-gate liquid-fraction provider '
+                f'`{profile.provider_id}` is '
+                'diagnostic-only for ledger transitions; it controls dispatch '
+                'for this gate but cannot write authoritative ledger transitions.'
+            ),
+        }
 
     def _refresh_vapor_pressures_from_kernel(self, result) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.

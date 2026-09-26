@@ -75,6 +75,17 @@ experiments:
     tag: value
     value: knudsen_effusion
   sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.001'
+          approximate: true
+      locator:
+        published_page: 489
+        section: '2.2'
+        note: About 1 g total sample
     printed_composition:
       state:
         tag: unknown

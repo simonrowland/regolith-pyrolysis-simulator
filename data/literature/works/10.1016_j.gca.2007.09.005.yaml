@@ -62,7 +62,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2007.09.005
 experiments:
-- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-vacuum-evaporation-series
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-11
   kind: literature
   method:
     tag: unknown
@@ -107,12 +107,6 @@ experiments:
               table: '1'
               note: Printed 5-200 mg; unit conversion only
         output_unit: kg
-    printed_composition:
-      state:
-        tag: value
-        value: Type B CAI-like SiO2-Al2O3-MgO-CaCO3 glass
-      locator:
-        section: 3.1 Starting materials and experimental procedure
     form:
       state:
         tag: value
@@ -122,11 +116,10 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: not_published
+        tag: value
+        value: '2073.15'
       locator:
-        section: 3.1 Starting materials and experimental procedure
-        note: Printed 1600-1900 C and per-run Table 1 values; no single series setpoint
+        table: '1'
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -172,7 +165,127 @@ experiments:
         reason: not_published
   work_id: 10.1016/j.gca.2007.09.005
   locator:
-    section: 3.1 Starting materials and experimental procedure
+    published_page: 5549
+    table: '1'
+    note: row=R-11
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5400'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-13
   apparatus:
     cell_material_and_liner:
       state:
@@ -182,19 +295,6123 @@ experiments:
         section: 3.1 Starting materials and experimental procedure
   bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
   thermal_schedule:
-    method:
-      state:
-        tag: value
-        value: heated at 20.0 C/min; power cut for cooling
-      locator:
-        section: 3.1 Starting materials and experimental procedure
     total_duration_s:
       state:
-        tag: unknown
-        reason: not_published
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
       locator:
         table: '1'
-        note: Per-run durations vary; no single series duration
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-14
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-14
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1800'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-15
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2700'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-16
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-16
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-17
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-17
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-18
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-18
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5400'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-2
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-3
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1800'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-4
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5400'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-6
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-7
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-8
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1800'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r-9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R-9
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-1
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '6300'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-10
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '14400'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-11
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '25200'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-12
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '28800'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-13
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '54000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-14
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-14
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '90000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-15
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '72000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-16
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-16
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '19800'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-17
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-17
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10800'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-18
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-18
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7200'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-19
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-19
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '9000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-2
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '32400'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-20
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-20
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5400'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-21
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-21
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-3
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10800'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-4
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7200'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-5
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10800'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-7
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '16200'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-8
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '135000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r2-9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R2-9
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '108000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-1
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '108000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-10
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '900'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-11
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1200'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-12
+  apparatus:
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0000224'
+            approximate: false
+        locator:
+          table: '1'
+          paragraph: R3-12 Init area 22.4 mm2
+          source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+        inference:
+          relation: extract_inference
+          inputs:
+          - inferred=true
+          - A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+          - extract_value=2.24e-05 m2
+          - extract_field=sample_surface_area
+          - unit_conversion=identity:m2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.0000224'
+              locator:
+                table: '1'
+                paragraph: R3-12 Init area 22.4 mm2
+                source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+          output_unit: m2
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-13
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1500'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-14
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-14
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '6000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-15
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1500'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-18
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-18
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '180000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-19
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-19
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '180000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-2
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-20
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-20
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '144000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-21
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-21
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '144000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-4
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '162000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-5
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '257100'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-7
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '179880'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-8
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '216000'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
+- experiment_id: 10.1016/j.gca.2007.09.005::experiment::cai-r3-9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.0002'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed 5-200 mg; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: '1'
+              note: Printed 5-200 mg; unit conversion only
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: partially molten glass on iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <
+          bound_value: '0.0001333223684210526315789473684'
+          approximate: false
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+        note: Printed <10^-6 Torr; unit conversion only
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000001'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5549
+    table: '1'
+    note: row=R3-9
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: iridium wire loops
+      locator:
+        section: 3.1 Starting materials and experimental procedure
+  bench_id: 10.1016/j.gca.2007.09.005::bench::hashimoto-vacuum-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1800'
+          approximate: false
+      locator:
+        table: '1'
+        note: Minutes converted to seconds
 - experiment_id: 10.1016/j.gca.2007.09.005::kems-010-richter-2007
   kind: literature
   method:

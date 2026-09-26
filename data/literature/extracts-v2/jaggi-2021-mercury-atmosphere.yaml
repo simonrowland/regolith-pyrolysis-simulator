@@ -2,27 +2,798 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/jaggi-2021-mercury-atmosphere.yaml
 observations:
-- observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_compositions
-  experiment_id: 10.3847/psj/ac2dfb::experiment::mercury-magma-ocean-model-cases
+- observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_h2_partial_pressure::T=2000:row=lv:h=08abb7cbaf57
+  experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'magma_ocean_surface_composition'
+      tag: value
+      value: p_partial
     species:
-      formula: Mercury_magma_ocean
+      formula: H2
       phase:
-        tag: unknown
-        reason: phase string 'model_magma_ocean_surface' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '580000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jaggi-2021-mercury-atmosphere
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+    record: LV row; H2 pressure column
+  read_from: unknown:jaggi-2021-mercury-atmosphere
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        record: LV row; H2 pressure column
+  derived_from:
+  - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:jaggi-2021-mercury-atmosphere
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '5.8'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: LV row; H2 pressure column
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: LV row; H2 pressure column
+    output_unit: Pa
+- observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_h2_partial_pressure::T=2000:row=sv:h=a9364a9943c4
+  experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: H2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '320000'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jaggi-2021-mercury-atmosphere
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+    record: SV row; H2 pressure column
+  read_from: unknown:jaggi-2021-mercury-atmosphere
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        record: SV row; H2 pressure column
+  derived_from:
+  - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:jaggi-2021-mercury-atmosphere
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '3.2'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: SV row; H2 pressure column
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: SV row; H2 pressure column
+    output_unit: Pa
+- observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=ln3:h=3f7010acaf9c
+  experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '14'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jaggi-2021-mercury-atmosphere
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+    record: LN3 row; SiO pressure column
+  read_from: unknown:jaggi-2021-mercury-atmosphere
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        record: LN3 row; SiO pressure column
+  derived_from:
+  - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:jaggi-2021-mercury-atmosphere
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00014'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: LN3 row; SiO pressure column
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: LN3 row; SiO pressure column
+    output_unit: Pa
+- observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=ln5:h=621b1346e428
+  experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '14'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jaggi-2021-mercury-atmosphere
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+    record: LN5 row; SiO pressure column
+  read_from: unknown:jaggi-2021-mercury-atmosphere
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        record: LN5 row; SiO pressure column
+  derived_from:
+  - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:jaggi-2021-mercury-atmosphere
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00014'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: LN5 row; SiO pressure column
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: LN5 row; SiO pressure column
+    output_unit: Pa
+- observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=sn3:h=87cb8d50abe0
+  experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '14'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jaggi-2021-mercury-atmosphere
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+    record: SN3 row; SiO pressure column
+  read_from: unknown:jaggi-2021-mercury-atmosphere
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        record: SN3 row; SiO pressure column
+  derived_from:
+  - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:jaggi-2021-mercury-atmosphere
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00014'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: SN3 row; SiO pressure column
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: SN3 row; SiO pressure column
+    output_unit: Pa
+- observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=sn5:h=3d462b42da42
+  experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '14'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: jaggi-2021-mercury-atmosphere
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+    record: SN5 row; SiO pressure column
+  read_from: unknown:jaggi-2021-mercury-atmosphere
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        record: SN5 row; SiO pressure column
+  derived_from:
+  - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
+  derivation:
+    relation: bar_to_Pa
+    inputs:
+    - unknown:jaggi-2021-mercury-atmosphere
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00014'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: SN5 row; SiO pressure column
+    - - factor
+      - state:
+          tag: value
+          value: '100000'
+        locator:
+          published_page: 4
+          pdf_page_index: 4
+          table: '1'
+          record: SN5 row; SiO pressure column
+    output_unit: Pa
+- observation_id: jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
+  experiment_id: 10.3847/psj/ac2dfb::jaggi-2021-mercury-atmosphere
+  identity:
+    quantity:
+      tag: value
+      value: liquidus_composition
+    species:
+      formula: Mercury_model
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile liquidus_composition does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'magma_ocean_surface_composition'; refusing to
-      pick a number
+    unavailable_reason: 'no mapped liquidus_composition field selected; source fields: quantity, method_class, evidence_class,
+      source_compositions'
     approximate: false
   uncertainty:
     kind: none
@@ -30,15 +801,16 @@ observations:
     class:
       tag: value
       value: compilation_assessed
-    original_method_class: secondary_compilation
+    original_method_class: compilation_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: jaggi-2021-mercury-atmosphere
   locator:
+    published_page: 5
     pdf_page_index: 5
     table: '2'
-    note: Table 2. Magma ocean surface composition. Literature compilations used as model inputs, not measurements by these
-      authors.
+    section: 2.4 Magma ocean composition
+    note: Typed parent records the printed composition-input set; complete oxide rows remain in context below.
   read_from: unknown:jaggi-2021-mercury-atmosphere

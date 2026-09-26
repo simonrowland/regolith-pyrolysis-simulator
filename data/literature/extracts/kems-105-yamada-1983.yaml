@@ -8,18 +8,74 @@ source:
   url: https://doi.org/10.2355/isijinternational1966.23.51
   year: 1983
 extraction:
-  method: Official J-STAGE OA PDF (corpus raw/kems-105-yamada-1983/kems-105-yamada-1983.pdf, sha256 2c85d228997723d880339bc4d808254677163f807de65bda16a13b0dba7caf5b).
+  method: 'Official J-STAGE OA PDF (corpus raw/kems-105-yamada-1983/kems-105-yamada-1983.pdf, sha256
+    2c85d228997723d880339bc4d808254677163f807de65bda16a13b0dba7caf5b; ferry pdfs-l3-l5/kems-105-yamada-1983.pdf).
     No MinerU decode. Tables 1-2 and printed interaction coefficients transcribed from a 400 dpi pdftoppm
     render of PDF pages 1-5 (published pp. 51-55). pdftotext-layout is a noisy OCR layer and was not used
-    as data. Authors' own ε_P^i / e_P^i labelled measured. Table 2 comparison rows labelled quoted_measurement.
-    ε_P^Si = 12.6±0.6 using Fruehan a_Fe labelled model_derived. Figs 1-5 listed figure-only; no numbers
-    off axes. Body p. 53 prints ε_P^Al = 4.0±0.7; synopsis, Fig. 2, Table 2 and conclusions print 4.6±0.7
-    — both retained as printed, not reconciled. Chamber pressure and sample mass unstated.
+    as data. Authors own epsilon_P^i / e_P^i labelled measured. Table 2 comparison rows labelled quoted_measurement.
+    epsilon_P^Si = 12.6+/-0.6 using Fruehan a_Fe labelled model_derived. Figs 1-5 listed figure-only; no numbers
+    off axes. Body p. 53 prints epsilon_P^Al = 4.0+/-0.7; synopsis, Fig. 2, Table 2 and conclusions print 4.6+/-0.7
+    — both retained as printed, not reconciled. Chamber pressure and sample mass unstated. L4b 2026-09-22:
+    verified ferry PDF title/authors match; added yamada-kato-rm6k bench + fep-i-1wtP-series experiment.
+    Samples printed as 1 wt% P and various concentrations of solute i — no numeric X_i charge table; Figs 1-4
+    remain figure-only (do not invent X_i). Series printed_composition is the 1 wt% P label only; structured
+    initial_composition refused for missing solute fractions. Vacuum KEMS: no fO2 invented.'
   date: '2026-09-13'
   worker: extract-alloys-b2
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
 review_status: draft
 corrections: []
+benches:
+- id: yamada-kato-rm6k
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen cell-mass spectrometer (apparatus as in Yamada and Kato 1980 Trans. ISIJ 20:244)}
+    locator: {published_page: 51, pdf_page_index: 1, section: '1. Experimental Apparatus'}
+  method:
+    state: {tag: value, value: Knudsen effusion mass spectrometry}
+    locator: {published_page: 51, pdf_page_index: 1, section: '3. Experimental Procedure'}
+  cell_material_and_liner:
+    state: {tag: value, value: Beryllia Knudsen cells for Fe-P-Al and Fe-P-Ti; alumina Knudsen cells for other Fe-P-i systems}
+    locator: {published_page: 51, pdf_page_index: 1, section: '3. Experimental Procedure'}
+  geometry:
+    orifice_diameter_m:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 51, pdf_page_index: 1, note: 'Orifice diameter, orifice area, Clausing factor and sample surface area are not restated in this paper'}
+  detector:
+    state: {tag: value, value: Mass spectrometer with computer-controlled ion-current measurement (as previous paper)}
+    locator: {published_page: 51, pdf_page_index: 1, section: '1. Experimental Apparatus'}
+experiments:
+- experiment_id: fep-i-1wtP-series
+  bench_id: yamada-kato-rm6k
+  method: knudsen_effusion
+  locator: {published_page: 51, pdf_page_index: 1, section: '2. Preparation of Materials; 3. Experimental Procedure'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: 'Fe-P-i alloys, about 1 wt% P and various concentrations of solute i (Si, Al, Ti, V, Cr, Co, Ni, Nb, Mo)'}
+      locator: {published_page: 52, pdf_page_index: 2, note: 'Series label only. No numeric X_i charge table is printed; solute concentrations appear only on Figs 1-4 (figure-only). Do not invent initial_composition components from axes.'}
+    pretreatment:
+      state: {tag: value, value: 'Alloys made in situ in the Knudsen cell from pure Fe, Fe-P (from Fe + Fe3P) and the alloying element; compositions computed from materials charged. Al or Be used as deoxidizer in some runs.'}
+      locator: {published_page: 51, pdf_page_index: 1, section: '2. Preparation of Materials'}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1873.15'}
+      locator: {published_page: 51, pdf_page_index: 1, note: '1600 C; unit conversion only'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 53, pdf_page_index: 3, note: 'Chamber / ion-source pressure unstated; Be deoxidation described as melted under high vacuum.'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 51, pdf_page_index: 1, note: 'Vacuum KEMS measurement.'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Ion-intensity ratio P+/Fe+ measured at 1600 C; procedure as previous Fe-P work'}
+      locator: {published_page: 51, pdf_page_index: 1, section: '3. Experimental Procedure'}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 51, pdf_page_index: 1}
 fidelity_samples:
 - species: P
   observable: activity_coefficient
@@ -100,6 +156,7 @@ species:
             section: 2. The Fe-P-Al Systems
             paragraph: it was melted in a Beryllia Knudsen cell under high vacuum.
       observation_id: yamada_1983_kems_geometry_and_calibration
+      experiment: fep-i-1wtP-series
       type: gibbs_table
       locator:
         published_page: 51
@@ -162,6 +219,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_table1_source_and_purity
+      experiment: fep-i-1wtP-series
       type: gibbs_table
       locator:
         table: '1'
@@ -217,6 +275,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_epsilon_P_i_this_work_1600C
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         table: '2'
@@ -346,6 +405,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_epsilon_P_Al_body_4p0_printed
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         published_page: 53
@@ -375,6 +435,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_epsilon_P_Si_fruehan_aFe_12p6
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         published_page: 53
@@ -405,6 +466,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_table2_quoted_interaction_coefficients
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         table: '2'
@@ -481,6 +543,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_fig1_Si_figure_only
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         figure: '1'
@@ -510,6 +573,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_fig2_Al_figure_only
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         figure: '2'
@@ -543,6 +607,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_fig3_3d_metals_figure_only
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         figure: '3'
@@ -576,6 +641,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_fig4_Nb_Mo_figure_only
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         figure: '4'
@@ -605,6 +671,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_fig5a_epsilon_vs_atomic_number_figure_only
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         figure: 5(a)
@@ -634,6 +701,7 @@ species:
       regime: kems_effusion
       equipment: *id002
       observation_id: yamada_1983_fig5b_epsilon_S_quoted_figure_only
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         figure: 5(b)
@@ -653,6 +721,7 @@ species:
       uncertainty:
         note: figure-only reprint of other workers; no numbers off axes
     - observation_id: yamada_1983_Fe_P_Cu_Mn_not_measurable
+      experiment: fep-i-1wtP-series
       type: activity_coefficient
       locator:
         published_page: 54

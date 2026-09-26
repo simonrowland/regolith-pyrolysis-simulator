@@ -3,9 +3,10 @@ source_id: norris-2017-earth-volatiles-nature
 source:
   citation: Norris, C. Ashley & Wood, Bernard J. (2017), "Earth's volatile contents established by melting and vaporization", Nature, DOI 10.1038/nature23645
   doi: 10.1038/nature23645
+  url: https://pmc.ncbi.nlm.nih.gov/articles/PMC6485635/
   year: 2017
 extraction:
-  method: pdftotext -layout transcription of the 18-page publisher PDF; plotted results retained as figure-only because the PDF contains no readable extended-data table cells
+  method: pdftotext -layout transcription of the 18-page publisher PDF plus verification against the lawful PMC online author manuscript; plotted results retained as figure-only
   date: '2026-09-19'
   worker: w3-norris-2017-earth-volatiles-nature
   source_pdf: /Users/simonrowland/Repos/regolith-corpus/raw/norris-2017-earth-volatiles-nature/norris-2017-earth-volatiles-nature.pdf
@@ -14,19 +15,19 @@ corrections:
 - The paper states a 4.5 cm3 crucible in the apparatus description and Methods, but says 4.5 mm2 in the later sample-description paragraph; both are retained below.
 fidelity_samples:
 - species: basaltic_silicate_melt
-  observable: apparatus
-  observation_id: norris_2017_one_atmosphere_stirred_gas_mixing_furnace
-  field: sample_mass_g_as_printed
-  value: 3
+  observable: rate_series
+  observation_id: norris_2017_volatile_loss_conditions
+  field: T_C
+  value: 1300
   locator:
     pdf_page_index: 11
     section: Methods
     note: Each experiment used 3 g of material.
 - species: trace_elements
-  observable: volatility_factor
-  observation_id: norris_2017_figure3_volatility_factors
-  field: log_fO2_range_as_printed
-  value: -7 to -13
+  observable: volatility_series
+  observation_id: norris_2017_figure3_volatility_factors_neg7
+  field: log_fO2
+  value: -7
   locator:
     pdf_page_index: 14
     figure: '3'
@@ -52,7 +53,7 @@ benches:
     state: {tag: value, value: EDS and LA-ICP-MS}
     locator: {pdf_page_index: 12, section: Analysis}
 experiments:
-- experiment_id: volatile-loss-series
+- experiment_id: volatile-loss-logfo2-neg7
   bench_id: stirred-gas-mixing-furnace
   method: quench_equilibration
   locator: {pdf_page_index: 11, section: Methods}
@@ -61,8 +62,45 @@ experiments:
       state: {tag: value, value: {kind: point, point: '0.003'}}
       locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
     printed_composition:
-      state: {tag: value, value: Natural Reykjanes Ridge basalt plus trace-element oxide mixture}
-      locator: {pdf_page_index: 11, section: Methods}
+      state:
+        tag: value
+        value:
+          SiO2: '50.66'
+          TiO2: '0.96'
+          Al2O3: '15.11'
+          FeO: '9.69'
+          MnO: '0.20'
+          MgO: '8.90'
+          CaO: '12.28'
+          Na2O: '1.96'
+          K2O: '0.07'
+      locator:
+        table: Extended Data Table 1
+        note: PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt% (N=5), with NiO printed 0 and Total 99.8 omitted.
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.522650878051']
+          - [TiO2, '0.007450970522']
+          - [Al2O3, '0.091861264160']
+          - [FeO, '0.083604832480']
+          - [MnO, '0.001747652235']
+          - [MgO, '0.136879989950']
+          - [CaO, '0.135741205945']
+          - [Na2O, '0.019602562538']
+          - [K2O, '0.000460644119']
+      locator: {table: Extended Data Table 1, note: 'Starting row; major-element wt% as printed'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
     form:
       state: {tag: value, value: 12 mm diameter pressed pellet}
       locator: {pdf_page_index: 11, section: Methods}
@@ -86,22 +124,7 @@ experiments:
     channel: {tag: value, value: gas_mix}
     buffer:
       state: {tag: unknown, reason: not_published}
-      locator: {pdf_page_index: 11, section: Methods}
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '1.01325e-8'
-          interval_high: '1.01325e-2'
-      locator:
-        pdf_page_index: 3
-        section: Experimental vaporisation experiments
-        note: >-
-          Printed log fO2 range -7 to -13 with fO2 in atm (values.log_fO2_range;
-          fidelity_samples.log_fO2_range_as_printed). Landed as pO2_Pa interval
-          by SI conversion only: pO2_Pa = 10^(log_fO2) * 101325. Range preserved;
-          not collapsed to a point. Author log remains in observation values.
+      locator: {pdf_page_index: 11, section: Methods, note: Constant CO/CO2 mixture; log fO2=-7 is carried by the mapped observation}
   thermal_schedule:
     total_duration_s:
       state: {tag: value, value: {kind: point, point: '3600'}}
@@ -109,11 +132,208 @@ experiments:
     cooling_or_quench:
       state: {tag: value, value: Drop quench into water bath}
       locator: {pdf_page_index: 11, section: Methods}
+- experiment_id: volatile-loss-logfo2-neg9
+  bench_id: stirred-gas-mixing-furnace
+  method: quench_equilibration
+  locator: {pdf_page_index: 11, section: Methods}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.003'}}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: {SiO2: '50.66', TiO2: '0.96', Al2O3: '15.11', FeO: '9.69', MnO: '0.20', MgO: '8.90', CaO: '12.28', Na2O: '1.96', K2O: '0.07'}}
+      locator: {table: Extended Data Table 1, note: "PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed"}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.522650878051']
+          - [TiO2, '0.007450970522']
+          - [Al2O3, '0.091861264160']
+          - [FeO, '0.083604832480']
+          - [MnO, '0.001747652235']
+          - [MgO, '0.136879989950']
+          - [CaO, '0.135741205945']
+          - [Na2O, '0.019602562538']
+          - [K2O, '0.000460644119']
+      locator: {table: Extended Data Table 1, note: 'Starting row; major-element wt% as printed'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: 12 mm diameter pressed pellet}
+      locator: {pdf_page_index: 11, section: Methods}
+    pretreatment:
+      state: {tag: value, value: Basalt crushed and ground; 60 g stored in desiccator}
+      locator: {pdf_page_index: 11, section: Methods}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 1300 C; unit conversion only}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {pdf_page_index: 3, section: Experimental apparatus, note: Printed one atmosphere; unit conversion only}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Methods, note: Flowing CO/CO2 mixture printed; component pressures not printed}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Methods, note: Constant CO/CO2 mixture; log fO2=-9 is carried by the mapped observation}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {pdf_page_index: 4, section: Experimental vaporisation experiments, note: Printed 60 min; unit conversion only}
+    cooling_or_quench:
+      state: {tag: value, value: Drop quench into water bath}
+      locator: {pdf_page_index: 11, section: Methods}
+- experiment_id: volatile-loss-logfo2-neg11
+  bench_id: stirred-gas-mixing-furnace
+  method: quench_equilibration
+  locator: {pdf_page_index: 11, section: Methods}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.003'}}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: {SiO2: '50.66', TiO2: '0.96', Al2O3: '15.11', FeO: '9.69', MnO: '0.20', MgO: '8.90', CaO: '12.28', Na2O: '1.96', K2O: '0.07'}}
+      locator: {table: Extended Data Table 1, note: "PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed"}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.522650878051']
+          - [TiO2, '0.007450970522']
+          - [Al2O3, '0.091861264160']
+          - [FeO, '0.083604832480']
+          - [MnO, '0.001747652235']
+          - [MgO, '0.136879989950']
+          - [CaO, '0.135741205945']
+          - [Na2O, '0.019602562538']
+          - [K2O, '0.000460644119']
+      locator: {table: Extended Data Table 1, note: 'Starting row; major-element wt% as printed'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: 12 mm diameter pressed pellet}
+      locator: {pdf_page_index: 11, section: Methods}
+    pretreatment:
+      state: {tag: value, value: Basalt crushed and ground; 60 g stored in desiccator}
+      locator: {pdf_page_index: 11, section: Methods}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 1300 C; unit conversion only}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {pdf_page_index: 3, section: Experimental apparatus, note: Printed one atmosphere; unit conversion only}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Methods, note: Flowing CO/CO2 mixture printed; component pressures not printed}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Methods, note: Constant CO/CO2 mixture; log fO2=-11 is carried by the mapped observation}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {pdf_page_index: 4, section: Experimental vaporisation experiments, note: Printed 60 min; unit conversion only}
+    cooling_or_quench:
+      state: {tag: value, value: Drop quench into water bath}
+      locator: {pdf_page_index: 11, section: Methods}
+- experiment_id: volatile-loss-logfo2-neg13
+  bench_id: stirred-gas-mixing-furnace
+  method: quench_equilibration
+  locator: {pdf_page_index: 11, section: Methods}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.003'}}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 3 g; unit conversion only}
+    printed_composition:
+      state: {tag: value, value: {SiO2: '50.66', TiO2: '0.96', Al2O3: '15.11', FeO: '9.69', MnO: '0.20', MgO: '8.90', CaO: '12.28', Na2O: '1.96', K2O: '0.07'}}
+      locator: {table: Extended Data Table 1, note: "PMC6485635 online Extended Data Table 1, Starting row; EBT1 major-element wt%, unit values as printed"}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [SiO2, '0.522650878051']
+          - [TiO2, '0.007450970522']
+          - [Al2O3, '0.091861264160']
+          - [FeO, '0.083604832480']
+          - [MnO, '0.001747652235']
+          - [MgO, '0.136879989950']
+          - [CaO, '0.135741205945']
+          - [Na2O, '0.019602562538']
+          - [K2O, '0.000460644119']
+      locator: {table: Extended Data Table 1, note: 'Starting row; major-element wt% as printed'}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
+        - "original_unit=wt_pct"
+        output_unit: mole_fraction
+    form:
+      state: {tag: value, value: 12 mm diameter pressed pellet}
+      locator: {pdf_page_index: 11, section: Methods}
+    pretreatment:
+      state: {tag: value, value: Basalt crushed and ground; 60 g stored in desiccator}
+      locator: {pdf_page_index: 11, section: Methods}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1573.15'}
+      locator: {pdf_page_index: 11, section: Methods, note: Printed 1300 C; unit conversion only}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101325'}}
+      locator: {pdf_page_index: 3, section: Experimental apparatus, note: Printed one atmosphere; unit conversion only}
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Methods, note: Flowing CO/CO2 mixture printed; component pressures not printed}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {pdf_page_index: 11, section: Methods, note: Constant CO/CO2 mixture; log fO2=-13 is carried by the mapped observation}
+  thermal_schedule:
+    total_duration_s:
+      state: {tag: value, value: {kind: point, point: '3600'}}
+      locator: {pdf_page_index: 4, section: Experimental vaporisation experiments, note: Printed 60 min; unit conversion only}
+    cooling_or_quench:
+      state: {tag: value, value: Drop quench into water bath}
+      locator: {pdf_page_index: 11, section: Methods}
 species:
   basaltic_silicate_melt:
     observations:
     - observation_id: norris_2017_volatile_loss_conditions
-      experiment: volatile-loss-series
       type: rate_series
       locator:
         pdf_page_index: 3
@@ -155,7 +375,6 @@ species:
         fO2_verification: before and after each experiment; no numeric sensor uncertainty stated
     context:
     - observation_id: norris_2017_one_atmosphere_stirred_gas_mixing_furnace
-      experiment: volatile-loss-series
       type: apparatus
       locator:
         pdf_page_index: 3
@@ -192,7 +411,6 @@ species:
         major_element_homogeneity_RSD_percent: approximately 2
         trace_element_homogeneity_RSD_percent: 5-10
     - observation_id: norris_2017_starting_material_preparation
-      experiment: volatile-loss-series
       type: sample_preparation
       locator:
         pdf_page_index: 11
@@ -224,7 +442,6 @@ species:
         pellet_press: 10 ton press
       uncertainty: {}
     - observation_id: norris_2017_analytical_measurement_performance
-      experiment: volatile-loss-series
       type: apparatus
       locator:
         pdf_page_index: 12
@@ -289,7 +506,6 @@ species:
         diffusion_into_nickel_max_distance_um: 200
         diffusion_worst_case_melt_volume_percent: no more than 5
     - observation_id: norris_2017_crucible_capacity_disagreement
-      experiment: volatile-loss-series
       type: apparatus
       locator:
         pdf_page_index: 13
@@ -308,7 +524,7 @@ species:
   trace_elements:
     observations:
     - observation_id: norris_2017_figure2_time_series
-      experiment: volatile-loss-series
+      experiment: volatile-loss-logfo2-neg7
       type: rate_series
       locator:
         pdf_page_index: 15
@@ -324,6 +540,16 @@ species:
         T_C: 1300
         temperature_C: 1300
         log_fO2: -7
+        composition_wt_pct:
+          SiO2: '50.66'
+          TiO2: '0.96'
+          Al2O3: '15.11'
+          FeO: '9.69'
+          MnO: '0.20'
+          MgO: '8.90'
+          CaO: '12.28'
+          Na2O: '1.96'
+          K2O: '0.07'
         plotted_elements:
         - Ag
         - Cd
@@ -334,9 +560,9 @@ species:
         volatility_order_as_printed: Cd>Ag>Cu>In>Zn
         error_bars: 1 SD
         digitised: false
-    - observation_id: norris_2017_figure3_volatility_factors
-      experiment: volatile-loss-series
-      type: rate_series
+    - observation_id: norris_2017_figure3_volatility_factors_neg7
+      experiment: volatile-loss-logfo2-neg7
+      type: volatility_series
       locator:
         pdf_page_index: 16
         figure: '3'
@@ -350,7 +576,7 @@ species:
         evidence_class: figure_only
         T_C: 1300
         temperature_C: 1300
-        log_fO2_range: -7 to -13
+        log_fO2: -7
         comparison_duration_min: 60
         plotted_elements:
         - Ag
@@ -368,8 +594,110 @@ species:
         - Zn
         figure_error_bars: indicative +10% and +20%; greater than 1 SD for virtually all elements and conditions
         digitised: false
-    - observation_id: norris_2017_figure4_bse_vs_volatility
-      experiment: volatile-loss-series
+    - observation_id: norris_2017_figure3_volatility_factors_neg9
+      experiment: volatile-loss-logfo2-neg9
+      type: volatility_series
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+      phase: trace_element_doped_basaltic_silicate_melt
+      regime: stirred_one_atmosphere_CO_CO2_vaporisation
+      units: final concentration divided by initial concentration; C; log fO2
+      values:
+        quantity: volatility_factor_vs_oxygen_fugacity
+        method_class: figure_only
+        evidence_class: figure_only
+        T_C: 1300
+        temperature_C: 1300
+        log_fO2: -9
+        comparison_duration_min: 60
+        plotted_elements:
+        - Ag
+        - Bi
+        - Cd
+        - Cr
+        - Cu
+        - Ga
+        - Ge
+        - In
+        - Pb
+        - Sb
+        - Sn
+        - Tl
+        - Zn
+        figure_error_bars: indicative +10% and +20%; greater than 1 SD for virtually all elements and conditions
+        digitised: false
+    - observation_id: norris_2017_figure3_volatility_factors_neg11
+      experiment: volatile-loss-logfo2-neg11
+      type: volatility_series
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+      phase: trace_element_doped_basaltic_silicate_melt
+      regime: stirred_one_atmosphere_CO_CO2_vaporisation
+      units: final concentration divided by initial concentration; C; log fO2
+      values:
+        quantity: volatility_factor_vs_oxygen_fugacity
+        method_class: figure_only
+        evidence_class: figure_only
+        T_C: 1300
+        temperature_C: 1300
+        log_fO2: -11
+        comparison_duration_min: 60
+        plotted_elements:
+        - Ag
+        - Bi
+        - Cd
+        - Cr
+        - Cu
+        - Ga
+        - Ge
+        - In
+        - Pb
+        - Sb
+        - Sn
+        - Tl
+        - Zn
+        figure_error_bars: indicative +10% and +20%; greater than 1 SD for virtually all elements and conditions
+        digitised: false
+    - observation_id: norris_2017_figure3_volatility_factors_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: volatility_series
+      locator:
+        pdf_page_index: 16
+        figure: '3'
+        note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+      phase: trace_element_doped_basaltic_silicate_melt
+      regime: stirred_one_atmosphere_CO_CO2_vaporisation
+      units: final concentration divided by initial concentration; C; log fO2
+      values:
+        quantity: volatility_factor_vs_oxygen_fugacity
+        method_class: figure_only
+        evidence_class: figure_only
+        T_C: 1300
+        temperature_C: 1300
+        log_fO2: -13
+        comparison_duration_min: 60
+        plotted_elements:
+        - Ag
+        - Bi
+        - Cd
+        - Cr
+        - Cu
+        - Ga
+        - Ge
+        - In
+        - Pb
+        - Sb
+        - Sn
+        - Tl
+        - Zn
+        figure_error_bars: indicative +10% and +20%; greater than 1 SD for virtually all elements and conditions
+        digitised: false
+    - observation_id: norris_2017_figure4_bse_vs_volatility_neg11
+      experiment: volatile-loss-logfo2-neg11
       type: gibbs_table
       locator:
         pdf_page_index: 17
@@ -384,15 +712,32 @@ species:
         evidence_class: figure_only
         T_C: 1300
         temperature_C: 1300
-        log_fO2:
-        - -11
-        - -13
+        log_fO2: -11
+        plotted_elements: Ag, Bi, Cd, Cr, Cu, Ga, Ge, In, Pb, Sb, Sn, Tl, Zn
+        horizontal_error_bars: 2 standard errors
+        digitised: false
+    - observation_id: norris_2017_figure4_bse_vs_volatility_neg13
+      experiment: volatile-loss-logfo2-neg13
+      type: gibbs_table
+      locator:
+        pdf_page_index: 17
+        figure: 4a,b
+        note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
+      phase: silicate_Earth_comparison
+      regime: comparison_of_measured_volatility_with_BSE_abundance
+      units: BSE/CI chondrite abundance normalized to Mg=1; volatility factor
+      values:
+        quantity: BSE_CI_abundance_vs_measured_volatility_factor
+        method_class: figure_only
+        evidence_class: figure_only
+        T_C: 1300
+        temperature_C: 1300
+        log_fO2: -13
         plotted_elements: Ag, Bi, Cd, Cr, Cu, Ga, Ge, In, Pb, Sb, Sn, Tl, Zn
         horizontal_error_bars: 2 standard errors
         digitised: false
     - observation_id: norris_2017_author_volatility_factor_definition
-      experiment: volatile-loss-series
-      type: model_derived
+      type: volatility_series
       locator:
         pdf_page_index: 5
         section: Results

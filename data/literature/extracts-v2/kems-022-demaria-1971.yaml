@@ -768,7 +768,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    reason: Figure-only values are inadmissible for this extraction; no source-tabulated Na pressure points exist.
     decided_by:
       worker: wave-WA-3
       date: '2026-09-06'
@@ -789,6 +789,46 @@ observations:
     note: figure-digitized absolute P series; not tabulated in source
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   read_from: unknown:kems-022-demaria-1971
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0005613405'
+          approximate: false
+      locator:
+        table: '1'
+        paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+        line_range: 103-105
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=5.54e-09 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000554'
+            locator:
+              table: '1'
+              paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+              line_range: 103-105
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              table: '1'
+              paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+              line_range: 103-105
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_na_psat_figure1_sample_12065_digitized
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
@@ -858,7 +898,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: rejected
-    reason: source admission_status=rejected_no_figure_reading
+    reason: Figure-only values are inadmissible for this extraction; no source-tabulated Na pressure points exist.
     decided_by:
       worker: wave-WA-3
       date: '2026-09-06'
@@ -877,6 +917,46 @@ observations:
     note: figure-digitized absolute P series; not tabulated in source
     source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
   read_from: unknown:kems-022-demaria-1971
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0003830085'
+          approximate: false
+      locator:
+        table: '1'
+        paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+        line_range: 103-105
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=3.78e-09 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000378'
+            locator:
+              table: '1'
+              paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+              line_range: 103-105
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              table: '1'
+              paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+              line_range: 103-105
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_o2_psat_table1_alkali_range
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:

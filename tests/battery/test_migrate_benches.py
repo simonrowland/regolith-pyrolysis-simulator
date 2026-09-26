@@ -227,7 +227,39 @@ def test_readiness_counts_unique_sources_not_experiments(tmp_path) -> None:
             )
 
 
-def _aggregation_readiness(experiment, bench, observation=None):
+def test_readiness_reports_per_run_counts_without_changing_source_status(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr("scripts.bench_readiness.consumer_readiness", _aggregation_readiness)
+    extract = _registry_extract()
+    ready = replace(
+        factories.kems_experiment(experiment_id="run-one", total_P=Decimal("0.1")),
+        bench_id="bench-one",
+        thermal_schedule=_schedule(),
+        sample=_charge(single=False),
+    )
+    extract["experiments"] = [
+        to_plain(ready),
+        to_plain(replace(ready, experiment_id="run-two", sample=replace(ready.sample, mass_kg=None))),
+        to_plain(replace(ready, experiment_id="run-three")),
+    ]
+    extract["species"]["Na"]["observations"][0]["experiment"] = "run-one"
+    root = _write_min_tree(tmp_path, extract)
+    write_outputs(Migrator(root=root).run(), root)
+    readiness = report(root)
+
+    source = readiness["sources"][0]
+    assert source["consumers"][0]["status"] == "partial"
+    assert source["run_counts"]["by_consumer"]["engine_point"] == {
+        "ready": 2, "partial": 0, "gap": 1, "not_applicable": 0,
+    }
+    assert readiness["summary"]["by_consumer"]["engine_point"] == {
+        "ready": 0, "partial": 1, "gap": 0, "not_applicable": 0,
+    }
+    assert readiness["summary"]["by_consumer_runs"]["engine_point"] == {
+        "ready": 2, "partial": 0, "gap": 1, "not_applicable": 0,
+    }
+
+
+def _aggregation_readiness(experiment, bench, observation=None, *, modelling_inputs=None):
     from simulator.battery.waypoints import ConsumerReadiness, ReadinessGap, ReadinessStatus, GapReason, ENGINE_POINT_CONSUMERS
     gaps = []
     if experiment.sample.mass_kg is None:

@@ -18,11 +18,11 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::ta-yamanaka-1997-metsoc
+- experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::experiment::yamanaka-1997-na-evaporation-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'thermogravimetry_low_pressure_gas_mixing' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: tga
   sample:
     initial_composition:
       state:
@@ -38,40 +38,13 @@ experiments:
       locator:
         page: 1
         section: Experiments
+        note: Derived from the printed Na2O-SiO2 wt% recipe.
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Na2O_wt_pct
-          - state:
-              tag: value
-              value: '24.99'
-            locator:
-              page: 1
-              section: Experiments
-        - - M_Na2O_g_mol
-          - state:
-              tag: value
-              value: '61.978538560000004'
-            locator:
-              page: 1
-              section: Experiments
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '75.01'
-            locator:
-              page: 1
-              section: Experiments
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 1
-              section: Experiments
+        - '{''Printed composition'': ''Na2O 24.99 wt%, SiO2 75.01 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -89,6 +62,106 @@ experiments:
       locator:
         page: 1
         section: Experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed range is not a single scalar setpoint; typed interval is retained in thermal_schedule.setpoints_and_holds.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101.325'
+          approximate: true
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed about 1e-3 atm; converted to Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - Printed nominal total pressure about 1e-3 atm
+        parameters: []
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Experiments
+        note: H2/CO2 mixing gases are printed, but component fractions and flows are not.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5
+  locator:
+    page: 1
+    section: Experiments
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Pt wire loop
+      locator:
+        page: 1
+        section: Experiments
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.0000000101325'
+          interval_high: '0.00101325'
+          approximate: false
+      locator:
+        page: 1
+        section: Experiments
+        note: Printed 1e-13 to 1e-8 atm; converted to Pa without selecting a point.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - Printed oxygen partial-pressure range 1e-13 to 1e-8 atm
+        parameters: []
+        output_unit: Pa
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1573.15'
+            interval_high: '1773.15'
+            approximate: false
+        locator:
+          page: 1
+          section: Experiments
+          note: Printed 1300-1500 C; converted with T_K = T_C + 273.15.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - Printed temperature range 1300-1500 C
+          parameters: []
+          output_unit: K
+- experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::ta-yamanaka-1997-metsoc
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermogravimetry_surface_controlled_evaporation' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
   conditions:
     temperature_K:
       state:
@@ -113,12 +186,5 @@ experiments:
   work_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5
   locator:
     page: 1
-    section: Experiments
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Pt wire loop
-      locator:
-        page: 1
-        section: Experiments
+    section: Results and discussion
+    equation: '4'

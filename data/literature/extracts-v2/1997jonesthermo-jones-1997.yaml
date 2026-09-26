@@ -19,6 +19,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'MgO_activity_vs_mole_fraction_relationship'; refusing
@@ -45,6 +48,44 @@ observations:
     note: Qualitative comparison only; curve coordinates and activity values are not digitized.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
   read_from: unknown:1997jonesthermo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 24
+        figure: '11'
+        section: 7.1 Ideal Mixing of Complex Components
+        note: Qualitative comparison only; curve coordinates and activity values are not digitized.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 24
+              figure: '11'
+              section: 7.1 Ideal Mixing of Complex Components
+              note: Qualitative comparison only; curve coordinates and activity values are not digitized.
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 24
+              figure: '11'
+              section: 7.1 Ideal Mixing of Complex Components
+              note: Qualitative comparison only; curve coordinates and activity values are not digitized.
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        output_unit: K
 - observation_id: 1997jonesthermo::jones_1997_mn_vapour_pressure_tabulation
   experiment_id: 1b08ad1e65d798adfc92c70f855200a6dfe1b95bd0b717cd64da6d02449c5e7a::1997jonesthermo
   identity:
@@ -62,6 +103,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1973.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'manganese_vapor_pressure'; refusing to pick a
@@ -88,3 +132,41 @@ observations:
     note: Explicit value in prose; Figure 10 is not digitized.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
   read_from: unknown:1997jonesthermo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        published_page: 18
+        figure: '10'
+        section: 5.3 Example 5 – Vapour pressure of manganese
+        note: Explicit value in prose; Figure 10 is not digitized.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1700'
+            locator:
+              published_page: 18
+              figure: '10'
+              section: 5.3 Example 5 – Vapour pressure of manganese
+              note: Explicit value in prose; Figure 10 is not digitized.
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 18
+              figure: '10'
+              section: 5.3 Example 5 – Vapour pressure of manganese
+              note: Explicit value in prose; Figure 10 is not digitized.
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/1997jonesthermo/1997jonesthermo.pdf
+        output_unit: K

@@ -136,8 +136,8 @@ observations:
     pdf_page_index: 4
     section: Experiment - Apparatus and Procedure
   read_from: unknown:ntrs-19650014783
-- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule
-  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-vapor-pressure-series
+- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule::run-1
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-1
   identity:
     quantity:
       tag: unknown
@@ -158,8 +158,8 @@ observations:
       reason: source T_range_K [1072, 2154]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: 'source column census (run: 49 numeric cells, T_K: 49 numeric cells, inv_T_1_per_K: 49 numeric cells,
-      p_atm: 49 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
+    unavailable_reason: 'source column census (run: 5 numeric cells, T_K: 5 numeric cells, inv_T_1_per_K: 5 numeric cells,
+      p_atm: 5 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
     approximate: false
   uncertainty:
     kind: printed
@@ -182,4 +182,197 @@ observations:
     pdf_page_index: 8
     table: I
     note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 1
+  read_from: unknown:ntrs-19650014783
+- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule::run-2
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'pure_vapor_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_sodium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1072, 2154]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: 'source column census (run: 12 numeric cells, T_K: 12 numeric cells, inv_T_1_per_K: 12 numeric cells,
+      p_atm: 12 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+      run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+      temperature: ±0.25 percent on the Kelvin scale
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19650014783
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 2
+  read_from: unknown:ntrs-19650014783
+- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule::run-3
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'pure_vapor_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_sodium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1072, 2154]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: 'source column census (run: 13 numeric cells, T_K: 13 numeric cells, inv_T_1_per_K: 13 numeric cells,
+      p_atm: 13 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+      run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+      temperature: ±0.25 percent on the Kelvin scale
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19650014783
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 3
+  read_from: unknown:ntrs-19650014783
+- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule::run-4
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'pure_vapor_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_sodium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1072, 2154]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: 'source column census (run: 7 numeric cells, T_K: 7 numeric cells, inv_T_1_per_K: 7 numeric cells,
+      p_atm: 7 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+      run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+      temperature: ±0.25 percent on the Kelvin scale
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19650014783
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 4
+  read_from: unknown:ntrs-19650014783
+- observation_id: ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule::run-5
+  experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-static-run-5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'pure_vapor_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_sodium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1072, 2154]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: 'source column census (run: 12 numeric cells, T_K: 12 numeric cells, inv_T_1_per_K: 12 numeric cells,
+      p_atm: 12 numeric cells); declared quantity is unknown; no mapped coordinate/value pair selected'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      runs_1_to_4: ±0.12 atm up to 50 atm; ±0.40 atm over 50 atm
+      run_5: ±0.013 atm for the 0-3.4 atm transducer; ±0.06 atm for the 0-34 atm transducer
+      temperature: ±0.25 percent on the Kelvin scale
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19650014783
+  locator:
+    published_page: 6
+    pdf_page_index: 8
+    table: I
+    note: Sodium vapor pressures from five static-capsule runs; all 49 rows transcribed below
+    record: Run 5
   read_from: unknown:ntrs-19650014783

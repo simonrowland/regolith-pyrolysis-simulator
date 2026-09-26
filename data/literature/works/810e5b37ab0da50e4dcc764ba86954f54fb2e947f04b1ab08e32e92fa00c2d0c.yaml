@@ -19,11 +19,11 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+- experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::experiment::lpsc-2014-thermal-program
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'dsc_qms_heated_carrier_gas' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: dta_dsc
   sample:
     container:
       state:
@@ -32,6 +32,104 @@ experiments:
       locator:
         page: 1
         section: Materials and Methods
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        section: Materials and Methods
+        note: 25-715 C is a program range, not one setpoint
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '3000'
+          interval_high: '7500'
+          approximate: false
+      locator:
+        page: 1
+        section: Materials and Methods
+        note: 30-75 mbar carrier-gas pressure; unit conversion only
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              page: 1
+              section: Materials and Methods
+              note: 30-75 mbar carrier-gas pressure; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '75'
+            locator:
+              page: 1
+              section: Materials and Methods
+              note: 30-75 mbar carrier-gas pressure; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              page: 1
+              section: Materials and Methods
+              note: 30-75 mbar carrier-gas pressure; unit conversion only
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: helium
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 1
+        section: Materials and Methods
+        note: He carrier gas; flow/partial pressure not published in typed units
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      pumping:
+        state:
+          tag: value
+          value: not_printed
+        locator:
+          page: 1
+          section: Materials and Methods
+  work_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c
+  locator:
+    page: 1
+    section: Materials and Methods
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 1
+        section: Materials and Methods
+- experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'differential_scanning_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
   conditions:
     temperature_K:
       state:
@@ -53,23 +151,7 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-    pumping:
-      pumping:
-        state:
-          tag: value
-          value: not_printed
-        locator:
-          page: 1
-          section: Materials and Methods
   work_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c
   locator:
     page: 1
-    section: Materials and Methods
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: not_printed
-      locator:
-        page: 1
-        section: Materials and Methods
+    section: Results and Discussion

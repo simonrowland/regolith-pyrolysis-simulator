@@ -53,17 +53,24 @@ benches:
       state: {tag: value, value: {kind: point, point: '49'}}
       locator: *homma_apparatus
 experiments:
-- experiment_id: alloy-vacuum-evaporation-series
+- &alloy_vacuum_common
+  experiment_id: fe-mn-6502-1
   bench_id: vif-ii-vacuum-induction
   method: vacuum_chamber_pyrolysis
-  locator: {page: 516, section: 'II. Experimental method'}
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Mn Melt 6502-1; common vacuum-induction protocol'}
   sample:
     mass_kg:
       state: {tag: value, value: {kind: point, point: '0.150'}}
       locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
     printed_composition:
-      state: {tag: value, value: {kind: categorical, categorical: 'Fe-Mn, Fe-C-Mn, Fe-Cu, or Fe-Sn master alloy'}}
-      locator: *homma_apparatus
+      state:
+        tag: value
+        value:
+          Mn: 1.05
+      locator:
+        page: 517
+        table: '1'
+        note: 'Mother alloy %Mn row; elemental wt%; Fe balance not printed; label Fe-Mn Melt 6502-1'
     form:
       state: {tag: value, value: master alloy}
       locator: *homma_apparatus
@@ -87,11 +94,473 @@ experiments:
       locator: {page: 516, section: 'II. Experimental method'}
     regime:
       regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-mn-6502-2
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Mn Melt 6502-2; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Mn: 1.74
+      locator:
+        page: 517
+        table: '1'
+        note: 'Mother alloy %Mn row; elemental wt%; Fe balance not printed; label Fe-Mn Melt 6502-2'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-mn-6412-14
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Mn Melt 6412-14; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Mn: 2.89
+      locator:
+        page: 517
+        table: '1'
+        note: 'Mother alloy %Mn row; elemental wt%; Fe balance not printed; label Fe-Mn Melt 6412-14'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-c-mn-6501-11
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-C-Mn Melt 6501-11; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          C: 4.85
+      locator:
+        page: 517
+        figure: '1'
+        note: 'Fig. 1 caption carbon wt% for alloys 6501-11 and 6501-12; elemental wt%; Mn mother-alloy % not printed for these melts; Fe balance not printed; label Fe-C-Mn Melt 6501-11'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-c-mn-6501-12
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-C-Mn Melt 6501-12; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          C: 4.69
+      locator:
+        page: 517
+        figure: '1'
+        note: 'Fig. 1 caption carbon wt% for alloys 6501-11 and 6501-12; elemental wt%; Mn mother-alloy % not printed for these melts; Fe balance not printed; label Fe-C-Mn Melt 6501-12'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-cu-6503-12
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Cu Melt 6503-12; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Cu: 1.04
+      locator:
+        page: 517
+        table: '2'
+        note: 'Mother alloy %Cu row; elemental wt%; Fe balance not printed; label Fe-Cu Melt 6503-12'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-cu-6503-11
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Cu Melt 6503-11; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Cu: 1.74
+      locator:
+        page: 517
+        table: '2'
+        note: 'Mother alloy %Cu row; elemental wt%; Fe balance not printed; label Fe-Cu Melt 6503-11'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-cu-6503-16
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Cu Melt 6503-16; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Cu: 2.65
+      locator:
+        page: 518
+        table: '2'
+        note: 'Mother alloy %Cu row; elemental wt%; Fe balance not printed; label Fe-Cu Melt 6503-16'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-cu-6503-28
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Cu Melt 6503-28; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Cu: 4.57
+      locator:
+        page: 518
+        table: '2'
+        note: 'Mother alloy %Cu row; elemental wt%; Fe balance not printed; label Fe-Cu Melt 6503-28'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-sn-6503-15
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Sn Melt 6503-15; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Sn: 0.98
+      locator:
+        page: 518
+        table: '3'
+        note: 'Mother alloy %Sn row; elemental wt%; Fe balance not printed; label Fe-Sn Melt 6503-15'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-sn-6503-14
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Sn Melt 6503-14; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Sn: 1.84
+      locator:
+        page: 518
+        table: '3'
+        note: 'Mother alloy %Sn row; elemental wt%; Fe balance not printed; label Fe-Sn Melt 6503-14'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
+- <<: *alloy_vacuum_common
+  experiment_id: fe-sn-6504-1
+  bench_id: vif-ii-vacuum-induction
+  method: vacuum_chamber_pyrolysis
+  locator: {page: 516, section: 'II. Experimental method', note: 'Fe-Sn Melt 6504-1; common vacuum-induction protocol'}
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.150'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 150 g; unit conversion only'}
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Sn: 3.13
+      locator:
+        page: 518
+        table: '3'
+        note: 'Mother alloy %Sn row; elemental wt%; Fe balance not printed; label Fe-Sn Melt 6504-1'
+    form:
+      state: {tag: value, value: master alloy}
+      locator: *homma_apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: categorical, categorical: '1600 C +/-20 C'}}
+        locator: {page: 516, section: 'II. Experimental method', note: 'Printed setpoint and envelope; not collapsed to a point'}
+    total_duration_s:
+      state: {tag: value, value: {kind: interval, interval_low: '300', interval_high: '1200'}}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Printed 5 to 20 min; unit conversion only'}
+    cooling_or_quench:
+      state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
+      locator: *homma_apparatus
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 516, section: 'II. Experimental method'}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
 species:
   Mn:
     observations:
     - observation_id: homma_1966_mn_specific_evaporation_constant
-      experiment: alloy-vacuum-evaporation-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
@@ -699,7 +1168,6 @@ species:
   Cu:
     observations:
     - observation_id: homma_1966_cu_specific_evaporation_constant
-      experiment: alloy-vacuum-evaporation-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
@@ -1294,7 +1762,6 @@ species:
   Sn:
     observations:
     - observation_id: homma_1966_sn_specific_evaporation_constant
-      experiment: alloy-vacuum-evaporation-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md

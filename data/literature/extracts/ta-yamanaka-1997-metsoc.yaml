@@ -15,10 +15,74 @@ extraction:
   worker: i3-ta-yamanaka-1997-metsoc
   provenance_path: raw/ta-yamanaka-1997-metsoc/ta-yamanaka-1997-metsoc.pdf
 review_status: draft
+experiments:
+- experiment_id: yamanaka-1997-na-evaporation-series
+  method: tga
+  locator: {page: 1, section: Experiments}
+  sample:
+    printed_composition:
+      state: {tag: value, value: {Na2O: '24.99', SiO2: '75.01'}}
+      locator: {page: 1, section: Experiments}
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mole_fraction
+          components:
+          - [Na2O, '0.2441229153990506254637715514']
+          - [SiO2, '0.7558770846009493745362284485']
+      locator: {page: 1, section: Experiments, note: Derived from the printed Na2O-SiO2 wt% recipe.}
+      method_class: calculated
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - Printed composition: Na2O 24.99 wt%, SiO2 75.01 wt%.
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        output_unit: mole_fraction
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Experiments, note: Printed range is not a single scalar setpoint; typed interval is retained in thermal_schedule.setpoints_and_holds.}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '101.325', approximate: true}}
+      locator: {page: 1, section: Experiments, note: 'Printed about 1e-3 atm; converted to Pa.'}
+      method_class: calculated
+      inference:
+        relation: atm_to_Pa
+        inputs: [Printed nominal total pressure about 1e-3 atm]
+        output_unit: Pa
+    sweep_gas:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 1, section: Experiments, note: 'H2/CO2 mixing gases are printed, but component fractions and flows are not.'}
+    regime:
+      regime_class: {tag: unknown, reason: not_published}
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: interval, interval_low: '1573.15', interval_high: '1773.15'}}
+        locator: {page: 1, section: Experiments, note: 'Printed 1300-1500 C; converted with T_K = T_C + 273.15.'}
+        method_class: calculated
+        inference:
+          relation: celsius_to_kelvin
+          inputs: [Printed temperature range 1300-1500 C]
+          output_unit: K
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    oxygen_partial_pressure_Pa:
+      state: {tag: value, value: {kind: interval, interval_low: '1.01325e-8', interval_high: '1.01325e-3'}}
+      locator: {page: 1, section: Experiments, note: 'Printed 1e-13 to 1e-8 atm; converted to Pa without selecting a point.'}
+      method_class: calculated
+      inference:
+        relation: atm_to_Pa
+        inputs: [Printed oxygen partial-pressure range 1e-13 to 1e-8 atm]
+        output_unit: Pa
 species:
   Na:
     observations:
     - observation_id: yamanaka_1997_na_thermogravimetry_conditions
+      experiment: yamanaka-1997-na-evaporation-series
       type: rate_series
       locator:
         page: 1

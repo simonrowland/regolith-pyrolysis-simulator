@@ -38,21 +38,79 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/isijinternational1966.20.244
 experiments:
-- experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
+- experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-1p52wt-fig9
   kind: literature
   method:
     tag: value
     value: knudsen_effusion
   sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0015'
+          approximate: true
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        note: Approximately 1.5 g; unit conversion only; series-level mass applied
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.5'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: Approximately 1.5 g; unit conversion only; series-level mass applied
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: Approximately 1.5 g; unit conversion only; series-level mass applied
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_metals
+          components:
+          - - P
+            - '0.0271'
+          - - Fe
+            - '0.9729'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 248
+        pdf_page_index: 5
+        figure: '9'
+        note: 2.71 at% P as printed for the Fig. 9 sample; Fe=1-0.0271 complement for the binary alloy; not renormalised.
+          Accompanying 1.52 wt% P is retained on printed_composition only (not converted).
+      inference:
+        relation: calculated_from_printed_recipe_or_aimed_target
+        inputs:
+        - 'printed recipe/aimed target: Fe-P alloy, 1.52 wt% (2.71 at%) P'
+        - component values retained exactly in initial_composition; locator above
+        parameters: []
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
-        value: Fe-P alloys, 0.7-3.2 wt% P (1.3-5.7 at% P)
+        value: Fe-P alloy, 1.52 wt% (2.71 at%) P
       locator:
-        published_page: 244
-        pdf_page_index: 1
-        note: P content used for activity determination was calculated from weighed Fe and Fe-P alloy because P analysis was
-          poor
+        published_page: 248
+        pdf_page_index: 5
+        figure: '9'
+        note: Label retained; numeric mole fractions in initial_composition from printed at%
     pretreatment:
       state:
         tag: value
@@ -97,18 +155,175 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
-          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
-          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
-          in this extract
+        reason: not_published
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        note: Chamber / ion-source pressure unstated. Body estimates P vapor pressure ~1e-9 atm at 1600 C when [wt% P]=1;
+          that is sample vapor pressure, not chamber total pressure.
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        note: Vacuum KEMS measurement.
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 248
+    pdf_page_index: 5
+    figure: '9'
+    note: Fig. 9 sample; 1.52 wt% (2.71 at%) P
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 244
+          pdf_page_index: 1
+          note: Bench prints an unassigned 0.4-0.6 mm range
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 244
+          pdf_page_index: 1
+  bench_id: 10.2355/isijinternational1966.20.244::bench::yamada-kato-rm6k
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: At 1600 C, ion-peak scanning repeated as many times as possible
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        section: 4. Procedure
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+- experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0015'
+          approximate: true
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        note: Approximately 1.5 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.5'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: Approximately 1.5 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: Approximately 1.5 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Fe-P alloys, 0.7-3.2 wt% P (1.3-5.7 at% P)
+      locator:
+        published_page: 244
+        pdf_page_index: 1
+        note: Series range only; no per-heat charge table. P content used for activity determination was calculated from weighed
+          Fe and Fe-P alloy because P analysis was poor. Numeric mole fractions for the discrete Fig. 9 sample land on fep-1p52wt-fig9.
+    pretreatment:
+      state:
+        tag: value
+        value: Iron melted in high vacuum and deoxidized by Al; samples again deoxidized in the Knudsen cell
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        section: 3. Samples
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        note: 1600 C; unit conversion only
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: 1600 C; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 245
+              pdf_page_index: 2
+              note: 1600 C; unit conversion only
+        output_unit: K
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        note: Chamber / ion-source pressure unstated. Body estimates P vapor pressure ~1e-9 atm at 1600 C when [wt% P]=1;
+          that is sample vapor pressure, not chamber total pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        note: Vacuum KEMS measurement.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
   work_id: 10.2355/isijinternational1966.20.244
   locator:
     published_page: 245

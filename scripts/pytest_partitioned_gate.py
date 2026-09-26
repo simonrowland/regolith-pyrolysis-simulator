@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Run the deterministic two-pass pytest gate.
+"""Run the deterministic two-pass PR-tier pytest gate.
 
 Bulk tests inherit pyproject's ``-n auto`` xdist addopts. Tests marked
 ``serial`` are run in a second ``-n0`` pass so coscheduling-sensitive families
-stay covered without making the whole suite serial.
+stay covered without making the whole suite serial. Nightly tests remain in the
+separate full-tier gate.
 """
 
 from __future__ import annotations
@@ -41,8 +42,14 @@ def main(argv: list[str] | None = None) -> int:
     repo_root = Path(__file__).resolve().parents[1]
     python = sys.executable
     buckets = [
-        ("bulk", [python, "-m", "pytest", "-m", "not serial", *extra]),
-        ("serial", [python, "-m", "pytest", "-n0", "-m", "serial", *extra]),
+        (
+            "bulk",
+            [python, "-m", "pytest", "-m", "not serial and not nightly", *extra],
+        ),
+        (
+            "serial",
+            [python, "-m", "pytest", "-n0", "-m", "serial and not nightly", *extra],
+        ),
     ]
 
     for name, cmd in buckets:
