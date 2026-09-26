@@ -45,8 +45,11 @@ def _build_lunar_12022_sim(vapor_pressure_data: dict) -> PyrolysisSimulator:
             "lunar_mare_basalt_12022_proxy"
         ],
     }
+    setpoints = yaml.safe_load(
+        (REPO_ROOT / "data" / "setpoints.yaml").read_text()
+    )
     sim = PyrolysisSimulator(
-        InternalAnalyticalBackend(), {"campaigns": {}}, feedstocks, vapor_pressure_data
+        InternalAnalyticalBackend(), setpoints, feedstocks, vapor_pressure_data
     )
     sim.load_batch("lunar_mare_12022", mass_kg=1000.0)
     sim.melt.p_total_mbar = 1.0e-3

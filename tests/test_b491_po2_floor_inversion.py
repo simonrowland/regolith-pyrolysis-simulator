@@ -49,6 +49,12 @@ def _request(*, pO2_bar: float, intrinsic_fO2_log: float) -> IntentRequest:
         pressure_bar=1e-6,
         control_inputs={
             "pO2_bar": max(pO2_bar, DEFAULT_VACUUM_FLOOR_BAR),
+            # Direct provider tests own both redox channels explicitly.  The
+            # transport rail remains floor-clamped for the floor-inversion
+            # exercise; surface release uses the physical melt/interface rail.
+            "interface_pO2_bar": physical_melt_dissociation_pO2_bar(
+                intrinsic_fO2_log
+            )[0],
             "intrinsic_fO2_log": intrinsic_fO2_log,
             "vacuum_floor_bar": DEFAULT_VACUUM_FLOOR_BAR,
         },

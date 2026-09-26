@@ -15,6 +15,7 @@ from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     feo_iw_log10_fO2_bar,
     kress91_fe3_over_sigma_fe,
+    kress91_furnace_activity_pressure_bar,
     kress91_ferrous_feo_activity,
     kress91_ln_fO2_temperature_delta,
     kress91_referenced_log_fO2,
@@ -61,6 +62,21 @@ def test_floor_vacuum_pressure_bar_preserves_nonfinite_for_validator(
         assert math.isnan(floored)
     else:
         assert floored == pressure_bar
+
+
+@pytest.mark.parametrize(
+    ('declared_total_bar', 'expected_bar'),
+    ((5.0e-3, 5.0e-3), (0.0, 1.0e-9), (-1.0, 1.0e-9)),
+)
+def test_kress91_furnace_activity_pressure_uses_total_pressure(
+    declared_total_bar: float,
+    expected_bar: float,
+) -> None:
+    # Kress91's f*P/T term is total furnace pressure. Only finite vacuum
+    # inputs receive the numerical guard; oxygen pO2 is not substituted.
+    assert kress91_furnace_activity_pressure_bar(
+        pressure_bar=declared_total_bar,
+    ) == pytest.approx(expected_bar)
 
 
 @pytest.mark.parametrize(

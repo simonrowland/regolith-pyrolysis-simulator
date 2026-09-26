@@ -44,6 +44,9 @@ FORMULA_FREE_MOLECULAR_TUBE = "free_molecular_tube_clausing_conductance"
 FORMULA_BESKOK_KARNIADAKIS_CIVAN = (
     "beskok_karniadakis_civan_transitional_conductance"
 )
+FORMULA_KNUDSEN_ENDPOINT_BRIDGE = (
+    "knudsen_endpoint_matched_transitional_conductance"
+)
 FORMULA_SINGLE_SPECIES_MFP = "single_species_hard_sphere_mean_free_path"
 FORMULA_MIXTURE_MFP = "carrier_mixture_hard_sphere_mean_free_path"
 
@@ -847,6 +850,87 @@ def beskok_karniadakis_civan_conductance_m3_s(
     )
 
 
+def knudsen_endpoint_matched_conductance_m3_s(
+    diameter_m: float,
+    length_m: float,
+    temperature_K: float,
+    mean_pressure_pa: float,
+    molar_mass_kg_mol: float,
+    dynamic_viscosity_pa_s: float,
+    *,
+    knudsen_number: float,
+) -> float:
+    """Bridge molecular and viscous duct conductance over ``.01 <= Kn < 10``.
+
+    Premise: the molecular and compressible-Poiseuille expressions are the
+    declared asymptotes, and no third fit is allowed to change their values at
+    the regime boundaries.  Algebra: interpolate *conductance* linearly on the
+    logarithmic Kn axis, with
+    ``w = ln(10/Kn) / ln(10/.01)``.  Thus ``w=0`` at Kn=10 and ``w=1`` at
+    Kn=.01, so ``C=(1-w) C_molecular + w C_viscous`` has the same one-sided
+    limits as both neighboring branches.  Units remain m³/s.  A conductance
+    bridge is used rather than a pressure jump or a fitted rarefaction factor;
+    it is positive and follows the two declared endpoints monotonically.
+    """
+
+    diameter_m = _require_positive(
+        diameter_m,
+        name="diameter_m",
+        category="invalid_geometry",
+    )
+    length_m = _require_positive(
+        length_m,
+        name="length_m",
+        category="invalid_geometry",
+    )
+    temperature_K = _require_positive(
+        temperature_K,
+        name="temperature_K",
+        category="invalid_temperature",
+    )
+    mean_pressure_pa = _require_positive(
+        mean_pressure_pa,
+        name="mean_pressure_pa",
+        category="invalid_pressure",
+    )
+    molar_mass_kg_mol = _require_positive(
+        molar_mass_kg_mol,
+        name="molar_mass_kg_mol",
+        category="invalid_molar_mass",
+    )
+    dynamic_viscosity_pa_s = _require_positive(
+        dynamic_viscosity_pa_s,
+        name="dynamic_viscosity_pa_s",
+        category="invalid_dynamic_viscosity",
+    )
+    knudsen_number = float(knudsen_number)
+    if not math.isfinite(knudsen_number) or not (
+        VISCOUS_KNUDSEN_MAX <= knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN
+    ):
+        _refuse(
+            "invalid_transitional_knudsen_number",
+            "endpoint-matched bridge requires .01 <= Kn < 10",
+        )
+
+    molecular_conductance = (
+        math.pi
+        / 12.0
+        * mean_molecular_speed_m_s(temperature_K, molar_mass_kg_mol)
+        * diameter_m ** 3
+        / length_m
+    )
+    viscous_conductance = poiseuille_conductance_m3_s(
+        diameter_m,
+        length_m,
+        mean_pressure_pa,
+        dynamic_viscosity_pa_s,
+    )
+    weight = math.log(FREE_MOLECULAR_KNUDSEN_MIN / knudsen_number) / math.log(
+        FREE_MOLECULAR_KNUDSEN_MIN / VISCOUS_KNUDSEN_MAX
+    )
+    return (1.0 - weight) * molecular_conductance + weight * viscous_conductance
+
+
 def _duct_conductance_at_mean_pressure(
     diameter_m: float,
     length_m: float,
@@ -934,19 +1018,19 @@ def _duct_conductance_at_mean_pressure(
         )
         formula_id = "poiseuille_mean_pressure_conductance"
     else:
-        # Premise: 0.01 <= Kn < 10 is transitional. Algebra: use the
-        # Beskok-Karniadakis-Civan rarefaction multiplier on the same
-        # mean-pressure Poiseuille C. Units remain m³/s because the multiplier
-        # is dimensionless. Sanity: as Kn approaches the viscous boundary the
-        # result approaches the continuum conductance with slip correction.
-        conductance_m3_s = beskok_karniadakis_civan_conductance_m3_s(
+        # Premise: 0.01 <= Kn < 10 is transitional. The endpoint-matched
+        # bridge is continuous with the molecular branch at Kn=10 and with
+        # Poiseuille at Kn=.01; the old BKC multiplier had neither property.
+        conductance_m3_s = knudsen_endpoint_matched_conductance_m3_s(
             diameter_m,
             length_m,
+            temperature_K,
             mean_pressure_pa,
+            molar_mass_kg_mol,
             dynamic_viscosity_pa_s,
             knudsen_number=knudsen_number,
         )
-        formula_id = FORMULA_BESKOK_KARNIADAKIS_CIVAN
+        formula_id = FORMULA_KNUDSEN_ENDPOINT_BRIDGE
     return conductance_m3_s, knudsen_number, regime, formula_id
 
 

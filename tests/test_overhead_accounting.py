@@ -1096,6 +1096,17 @@ def _sio_o2_train_sim():
         backend,
         {
             "campaigns": {},
+            "sso_r": {
+                "oxygen_exchange": {
+                    "k_O_ref_m_s": 2.0e-5,
+                    "k_O_min_m_s": 5.0e-6,
+                    "k_O_max_m_s": 5.0e-5,
+                    "T_ref_K": 1773.15,
+                    "Ea_J_mol": 150000.0,
+                    "effective_melt_depth_m": 0.2,
+                    "temperature_dependence_enabled": True,
+                },
+            },
             "chemistry_kernel": {
                 "allow_fallback_vapor": True,
                 "allow_unmeasured_alpha_fallback": True,

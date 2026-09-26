@@ -704,6 +704,8 @@ def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch)
     sim.melt = types.SimpleNamespace(temperature_C=1600.0, melt_fO2_log=-8.0)
     sim._allow_fallback_vapor = True
     sim._commanded_pO2_bar = lambda: 1e-6
+    sim._vapor_pressure_transport_pO2_bar = lambda: 1e-6
+    sim._vapor_pressure_dispatch_pO2_bar = lambda: 1e-6
     sim._compute_intrinsic_melt_fO2 = lambda: -8.0
 
     def dispatch_only(intent, *, control_inputs, fO2_log):
@@ -804,8 +806,11 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
             },
         }
     }
+    setpoints = yaml.safe_load(
+        (repo_root / "data" / "setpoints.yaml").read_text()
+    )
     sim = PyrolysisSimulator(
-        InternalAnalyticalBackend(), {"campaigns": {}}, feedstocks, vapor_pressures
+        InternalAnalyticalBackend(), setpoints, feedstocks, vapor_pressures
     )
     sim.load_batch("basalt_analog", mass_kg=1000.0)
     sim.melt.temperature_C = 1600.0

@@ -993,6 +993,7 @@ def test_production_p_carriers_share_parent_activity_and_never_sparsify() -> Non
         fO2_log=-9.0,
         control_inputs={
             "pO2_bar": 0.009,
+            "interface_pO2_bar": 0.009,
             "intrinsic_fO2_log": -9.0,
             "process_phase": "stage0",
         },
@@ -1009,13 +1010,13 @@ def test_production_p_carriers_share_parent_activity_and_never_sparsify() -> Non
     catalog = compile_vapour_rail_catalog(
         payload, emit_u0_request_rules=False
     )
-    intrinsic_fO2_bar = diagnostic["source_reaction_fO2_bar"]
+    interface_pO2_bar = diagnostic["interface_pO2_bar"]
     for species in carriers:
         evaluator = catalog.evaluator_for(species)
         expected = evaluator.evaluate(
             1473.15,
             source_activity=activities[species],
-            pO2_bar=intrinsic_fO2_bar,
+            pO2_bar=interface_pO2_bar,
         ).pressure_pa
         assert pressures[species] == pytest.approx(expected, rel=1.0e-12)
         provenance = diagnostic["vapor_pressure_numerator_provenance"][species]

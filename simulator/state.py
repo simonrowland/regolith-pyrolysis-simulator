@@ -462,6 +462,10 @@ class OxygenReservoirState:
     headspace_transport_regime: str = ""
     headspace_transport_conductance_m3_s: float = 0.0
     headspace_transport_knudsen: float = 0.0
+    headspace_co2_buffer_assumption: str = ""
+    interface_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
+    interface_pO2_limiting_regime: str = ""
+    interface_gas_side_k_m_s: float = 0.0
     k_O_m_s: float = 0.0
     k_O_source: str = ""
     effective_melt_depth_m: float = 0.0

@@ -2169,7 +2169,15 @@ def canonical_replay_key(
         if float(value) > 0.0
     )
     include_amount = _namespace_output_is_extensive(namespace_id)
-    transport_getter = getattr(sim, "_vapor_pressure_dispatch_pO2_bar", None)
+    # The PT-0 key records the gas-side transport control.  Surface release
+    # dispatch now resolves the universal melt/gas interface and may consult
+    # the redox gate while doing so; using that interface resolver here would
+    # recurse into the gate replay path and add a spurious replay call.  Keep
+    # the explicit transport getter as the cache-key channel, with the old
+    # dispatch name only as a compatibility fallback for minimal test doubles.
+    transport_getter = getattr(sim, "_vapor_pressure_transport_pO2_bar", None)
+    if not callable(transport_getter):
+        transport_getter = getattr(sim, "_vapor_pressure_dispatch_pO2_bar", None)
     transport_pO2 = (
         float(transport_getter())
         if callable(transport_getter)

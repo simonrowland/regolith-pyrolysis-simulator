@@ -22,6 +22,7 @@ from simulator.chemistry.melt_activity import (
 )
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
+    floor_vacuum_pressure_bar,
     kress91_furnace_activity_pressure_bar,
 )
 from simulator.environment import vacuum_floor_bar_for_environment
@@ -474,10 +475,11 @@ class EquilibriumMixin:
                 pseudo_warning_seen,
             )
 
-        # SSO-R keeps intrinsic melt fO2 and headspace transport pO2 as
-        # coupled but distinct channels: Fe redox reads the melt reservoir;
-        # SiO suppression reads the headspace reservoir.
+        # SSO-R keeps intrinsic melt fO2, the gas transport pO2, and the
+        # universal gas/melt interface pO2 as distinct channels: Fe redox reads
+        # the melt reservoir, while every surface release reads the interface.
         pO2_bar = self._headspace_transport_pO2_bar()
+        interface_pO2_bar = self._interface_pO2_bar()
         vacuum_floor_bar = self._vacuum_floor_bar()
         reservoir = getattr(self.melt, "oxygen_reservoir", None)
         intrinsic_fO2_value = getattr(
@@ -505,6 +507,10 @@ class EquilibriumMixin:
                 f"pO2_bar={melt_dissociation_pO2_bar:g}"
             )
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
+            pressure_bar=floor_vacuum_pressure_bar(
+                float(self.melt.p_total_mbar) / 1000.0,
+                floor_bar=vacuum_floor_bar,
+            ),
             floor_bar=vacuum_floor_bar,
         )
 
@@ -740,16 +746,15 @@ class EquilibriumMixin:
                 )
                 pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
                 if pO2_exponent:
-                    # Melt-dissolved non-FeO oxide dissociation sees the
-                    # melt's oxygen chemical potential; headspace pO2 is only
-                    # the transport/backpressure channel.
+                    # Every melt-surface release sees the same two-film
+                    # gas/melt interface oxygen potential.
                     pO2_reference_bar = max(
                         1e-30,
                         float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
                     )
                     P_effective_Pa = _require_finite_vapor_value(
                         P_effective_Pa
-                        * (melt_dissociation_pO2_bar / pO2_reference_bar)
+                        * (interface_pO2_bar / pO2_reference_bar)
                         ** pO2_exponent,
                         species=species,
                         field="P_effective_pO2",
@@ -828,7 +833,7 @@ class EquilibriumMixin:
                 # envelope-clamped) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=interface_pO2_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -937,7 +942,7 @@ class EquilibriumMixin:
                 # envelope-clamped) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=interface_pO2_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -1083,9 +1088,7 @@ class EquilibriumMixin:
             K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
 
             # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
-            dissociation_pO2_bar = (
-                pO2_bar if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
-            )
+            dissociation_pO2_bar = interface_pO2_bar
             # Premise: this fallback solves the melt-supported source pressure;
             # the later surface-flux layer owns overhead species backpressure.
             # For MgO(l) -> Mg(g) + 1/2 O2,
@@ -1095,9 +1098,8 @@ class EquilibriumMixin:
             # Unit check: K, activity, and reduced fugacities are dimensionless;
             # the gas/condensed pressure rail supplies Pa below. Sanity/limit:
             # fO2 down by 100 raises Mg by 10; fO2 -> infinity suppresses Mg.
-            # Thus non-FeO uses intrinsic melt fO2, while overhead pO2 remains
-            # available to transport/backpressure. FeO already carries melt
-            # redox through Kress91 activity and is intentionally unchanged.
+            # Every melt-surface release uses the interface value; the bulk
+            # intrinsic fO2 remains reserved for Kress91 Fe3+/Fe2+ speciation.
             numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 
             if numerator <= 0:
@@ -1260,7 +1262,7 @@ class EquilibriumMixin:
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
                 P_sat = _require_finite_vapor_value(
-                    P_sat * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
+                    P_sat * (interface_pO2_bar / pO2_reference_bar) ** pO2_exponent,
                     species=name,
                     field="P_sat_pO2",
                 )
@@ -1287,9 +1289,11 @@ class EquilibriumMixin:
             if (
                 name == 'SiO'
                 and not pO2_exponent
-                and pO2_bar > sio_reference_bar
+                and interface_pO2_bar > sio_reference_bar
             ):
-                suppression = math.sqrt(sio_reference_bar / pO2_bar)
+                suppression = math.sqrt(
+                    sio_reference_bar / interface_pO2_bar
+                )
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,
                     species=name,
@@ -1334,6 +1338,13 @@ class EquilibriumMixin:
             'vapor_pressure_authority': vapor_pressure_authority_diagnostic(
                 vapor_pressure_authority_limits,
                 consumer='legacy-equilibrium-fallback',
+            ),
+            'headspace_transport_pO2_bar': pO2_bar,
+            'interface_pO2_bar': interface_pO2_bar,
+            'interface_pO2_limiting_regime': getattr(
+                getattr(self.melt, 'oxygen_reservoir', None),
+                'interface_pO2_limiting_regime',
+                '',
             ),
         }
         # b-149: merge notes collected on the `_sz_omit` paths. This

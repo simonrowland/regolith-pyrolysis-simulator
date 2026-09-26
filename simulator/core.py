@@ -61,6 +61,14 @@ class RefusalStateSnapshotError(TypeError):
     """Typed refusal when rollback state contains an unsupported proxy graph."""
 
 
+class OxygenInterfaceConfigurationError(ValueError):
+    """Typed refusal for an unavailable SSO-R oxygen interface."""
+
+    def __init__(self, reason: str, detail: str) -> None:
+        self.reason = str(reason)
+        super().__init__(f'{self.reason}: {detail}')
+
+
 class _RefusalSnapshotHistoryPrefix:
     """O(1) rollback view of committed history with a copied mutable tail.
 
@@ -3696,6 +3704,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.melt,
                 None,
             )
+        if atmosphere_name == 'CO2_BACKPRESSURE':
+            # Until t-019 supplies a separate site-ambient boundary, the
+            # declared Mars total pressure is the CO₂ duct outlet. A pump or
+            # explicit downstream override has already returned above.
+            return max(
+                0.0,
+                float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0)
+                / 1000.0,
+            )
         return 0.0
 
     def _sync_c2a_staged_overhead_gas_control(self) -> None:
@@ -3881,6 +3898,274 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'got {depth!r}'
             )
         return depth
+
+    def _oxygen_interface_state(
+        self,
+        transport_pO2_bar: float,
+        *,
+        intrinsic_fO2_log: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """Resolve the universal gas/melt oxygen interface for release equilibria.
+
+        Premise: the SSO-R exchange configuration supplies the melt-side film;
+        the existing Sherwood evaporation path supplies the gas-side film. We
+        linearise each film in ``ln(pO2)`` because for an ideal gas
+        ``dC = C d(ln p)`` near the interface. With the same local O-bearing
+        concentration scale on both sides, O-flux continuity is
+        ``J = k_g C (ln p_g - ln p_i) = k_O C (ln p_i - ln p_m)``.
+        Solving gives ``ln p_i = (k_g ln p_g + k_O ln p_m)/(k_g+k_O)``.
+        Therefore a melt-side-limited film (k_O << k_g) tracks the headspace,
+        while a gas-side-limited film (k_g << k_O) tracks the bulk melt.
+        This log interpolation preserves positive pressure and is the local
+        multiplicative analogue of two series resistances.
+
+        The interpolation is not allowed to turn a ratio-limit redox state into
+        an artificial pressure source.  Kress91's Fe3+/ΣFe fraction is a
+        finite-buffer indicator; when either ferric or ferrous inventory is at
+        or below one part per million, the corresponding melt-side endpoint is
+        exhausted.  In that limit the formal ``ln(p_m)`` endpoint can run to
+        +/- infinity while the bulk melt no longer has the inventory required
+        to sustain it.  The physically bounded continuation is the gas-side
+        hold: ``p_i = p_g`` (the declared transport pressure), with a typed
+        diagnostic regime.  This keeps the interface in
+        ``[p_floor, p_headspace_or_hold]`` and prevents ratio-limit Kress91
+        inversions from driving surface release pressures.
+
+        The gas coefficient is the same ``Sh D_AB / L`` coefficient used by
+        ``engines.builtin.evaporation_flux`` for O2 as the tracer. At a vacuum
+        or transitional duct where that path has no declared continuum gas film,
+        ``k_g=inf`` is the declared free-molecular limit and the interface is
+        exactly the headspace value. Lunar C0 golden-hour sanity: the shipped
+        low-pressure point is in that limit: at the 475 C first-alkali hour,
+        ``k_O=5.0e-6 m/s`` (the declared lower clamp), ``k_g=inf`` because C0
+        is hard vacuum, and ``p_i=1.0e-9 bar`` (the lunar floor). No melt redox
+        pressure is silently substituted for the gas-side value.
+        """
+
+        config = self._oxygen_exchange_config()
+        required = (
+            'k_O_ref_m_s',
+            'k_O_min_m_s',
+            'k_O_max_m_s',
+            'T_ref_K',
+            'Ea_J_mol',
+            'effective_melt_depth_m',
+        )
+        missing = [key for key in required if key not in config]
+        if missing:
+            raise OxygenInterfaceConfigurationError(
+                'missing_sso_r_oxygen_exchange_config',
+                f'missing declared keys: {", ".join(missing)}',
+            )
+        # Validate the depth key with the same typed numeric guard used by the
+        # exchange update. The interface does not need the depth algebraically,
+        # but accepting an invalid SSO-R exchange configuration here would make
+        # the two-film boundary silently disagree with the exchange model.
+        self._oxygen_exchange_effective_melt_depth_m()
+        T_K = float(self.melt.temperature_C) + 273.15
+        if not math.isfinite(T_K) or T_K <= 0.0:
+            raise OxygenInterfaceConfigurationError(
+                'invalid_sso_r_oxygen_exchange_config',
+                f'non-positive temperature_K={T_K!r}',
+            )
+        k_O, k_source = self._oxygen_exchange_k_m_s(T_K)
+        if intrinsic_fO2_log is None:
+            reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+            intrinsic_fO2_log = getattr(
+                reservoir,
+                'melt_intrinsic_fO2_log',
+                getattr(self.melt, 'melt_fO2_log', -9.0),
+            )
+        try:
+            intrinsic_fO2_log = float(intrinsic_fO2_log)
+            transport_pO2_bar = max(
+                self._vacuum_floor_bar(), float(transport_pO2_bar)
+            )
+        except (TypeError, ValueError) as exc:
+            raise OxygenInterfaceConfigurationError(
+                'invalid_oxygen_interface_pressure',
+                'transport and intrinsic pressures must be numeric',
+            ) from exc
+        if not all(math.isfinite(value) for value in (
+            intrinsic_fO2_log,
+            transport_pO2_bar,
+            k_O,
+        )) or transport_pO2_bar <= 0.0 or k_O <= 0.0:
+            raise OxygenInterfaceConfigurationError(
+                'invalid_oxygen_interface_pressure',
+                f'transport={transport_pO2_bar!r} k_O={k_O!r}',
+            )
+
+        from engines.builtin.vapor_pressure import (
+            physical_melt_dissociation_pO2_bar,
+        )
+        melt_pO2_bar, _ = physical_melt_dissociation_pO2_bar(
+            intrinsic_fO2_log
+        )
+        redox_buffer_fraction: Optional[float] = None
+        redox_buffer_exhausted = False
+        comp = self._melt_oxide_wt_pct()
+        if self._feot_equivalent_wt_pct(comp) <= 0.0:
+            redox_buffer_exhausted = True
+            redox_buffer_fraction = 0.0
+        else:
+            pressure_bar = floor_vacuum_pressure_bar(
+                float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0)
+                / 1000.0,
+                floor_bar=self._vacuum_floor_bar(),
+            )
+            redox_buffer_fraction = self._fe3_over_sigma_fe_at_fO2(
+                comp,
+                fO2_log=intrinsic_fO2_log,
+                T_K=T_K,
+                pressure_bar=pressure_bar,
+            )
+            redox_buffer_limit = 1.0e-6 + 1.0e-12
+            redox_buffer_exhausted = (
+                redox_buffer_fraction <= redox_buffer_limit
+                or 1.0 - redox_buffer_fraction <= redox_buffer_limit
+            )
+        k_g, gas_source = self._oxygen_interface_gas_side_k_m_s(T_K)
+        if redox_buffer_exhausted:
+            interface_pO2_bar = transport_pO2_bar
+            limiting_regime = 'gas_side_redox_buffer_exhausted'
+        elif math.isinf(k_g):
+            interface_pO2_bar = transport_pO2_bar
+            limiting_regime = 'melt_side_limited'
+        else:
+            interface_ln = (
+                k_g * math.log(transport_pO2_bar)
+                + k_O * math.log(melt_pO2_bar)
+            ) / (k_g + k_O)
+            interface_pO2_bar = math.exp(interface_ln)
+            limiting_regime = (
+                'gas_side_limited' if k_g <= k_O else 'melt_side_limited'
+            )
+        return {
+            'interface_pO2_bar': interface_pO2_bar,
+            'limiting_regime': limiting_regime,
+            'gas_side_k_m_s': k_g,
+            'gas_side_source': gas_source,
+            'melt_side_k_O_m_s': k_O,
+            'melt_side_source': k_source,
+            'melt_intrinsic_pO2_bar': melt_pO2_bar,
+            'redox_buffer_fraction': redox_buffer_fraction,
+            'redox_buffer_exhausted': redox_buffer_exhausted,
+        }
+
+    def _oxygen_interface_gas_side_k_m_s(
+        self,
+        T_K: float,
+    ) -> tuple[float, str]:
+        """Return the O2 Sherwood gas-film velocity or its vacuum limit."""
+
+        from simulator.condensation import (
+            _chapman_enskog_d_ab_m2_s,
+            _knudsen_number,
+            _stirring_enhanced_sherwood,
+        )
+        from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
+
+        carrier_gas = self._resolve_condensation_carrier_gas()
+        # Reuse the evaporation path's upstream pressure seam exactly. Its
+        # melt-headspace/duct partials feed the same declared total-pressure
+        # floor used by evaporation dispatch. The post-condensation
+        # ``overhead.composition`` is a downstream report and cannot size this
+        # upstream Sherwood film.
+        upstream_composition = dict(
+            getattr(self, '_melt_headspace_composition_mbar', {}) or {}
+        )
+        partial_resolver = getattr(
+            self,
+            '_evaporation_bulk_partial_pressure_pa',
+            None,
+        )
+        if not callable(partial_resolver):
+            raise OxygenInterfaceConfigurationError(
+                'missing_evaporation_gas_film_pressure',
+                'existing upstream evaporation partial-pressure resolver is unavailable',
+            )
+        upstream_partials_pa = {
+            str(species): max(0.0, float(partial_resolver(species)))
+            for species in upstream_composition
+        }
+        pressure_resolver = getattr(
+            self,
+            '_evaporation_overhead_total_pressure_Pa',
+            None,
+        )
+        if not callable(pressure_resolver):
+            raise OxygenInterfaceConfigurationError(
+                'missing_evaporation_gas_film_pressure',
+                'existing upstream evaporation pressure resolver is unavailable',
+            )
+        pressure_pa = float(pressure_resolver(upstream_partials_pa))
+        diameter_m = float(getattr(self.overhead_model, 'pipe_diameter_m', 0.12))
+        gas_T_K = float(
+            getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
+        )
+        if pressure_pa <= 0.0:
+            return math.inf, 'free_molecular_vacuum_no_sherwood_film'
+        knudsen = _knudsen_number(
+            pressure_pa,
+            gas_T_K,
+            diameter_m,
+            carrier_gas=carrier_gas,
+        )
+        if knudsen >= VISCOUS_KNUDSEN_MAX:
+            return math.inf, 'noncontinuum_no_sherwood_film'
+        d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
+            'O2',
+            gas_T_K,
+            pressure_pa,
+            carrier=carrier_gas,
+        )
+        if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
+            raise OxygenInterfaceConfigurationError(
+                'invalid_oxygen_interface_gas_transport',
+                f'no Chapman-Enskog O2/{carrier_gas} coefficient',
+            )
+        sherwood = _stirring_enhanced_sherwood(
+            radial_stir_factor=clamp_stir_factor(
+                getattr(getattr(self.melt, 'stir_state', None), 'radial', None)
+            )
+        )
+        k_g = sherwood * d_ab_m2_s / diameter_m
+        if not math.isfinite(k_g) or k_g <= 0.0:
+            raise OxygenInterfaceConfigurationError(
+                'invalid_oxygen_interface_gas_transport',
+                f'non-positive k_g={k_g!r}',
+            )
+        return k_g, 'evaporation_sherwood_chapman_enskog_O2'
+
+    def _apply_oxygen_interface_diagnostic(
+        self,
+        reservoir: OxygenReservoirState,
+        *,
+        transport_pO2_bar: Optional[float] = None,
+        intrinsic_fO2_log: Optional[float] = None,
+    ) -> None:
+        if transport_pO2_bar is None:
+            transport_pO2_bar = getattr(
+                reservoir,
+                'headspace_transport_pO2_bar',
+                self._vapor_pressure_transport_pO2_bar(),
+            )
+        state = self._oxygen_interface_state(
+            float(transport_pO2_bar),
+            intrinsic_fO2_log=intrinsic_fO2_log,
+        )
+        reservoir.interface_pO2_bar = max(
+            self._vacuum_floor_bar(),
+            float(state['interface_pO2_bar']),
+        )
+        reservoir.interface_pO2_limiting_regime = str(
+            state['limiting_regime']
+        )
+        reservoir.interface_gas_side_k_m_s = float(
+            state['gas_side_k_m_s']
+        )
+        self._last_oxygen_interface_diagnostic = dict(state)
 
     def _headspace_control_floor_pO2_bar(self) -> float:
         atmosphere_name = str(getattr(self.melt.atmosphere, 'name', '') or '')
@@ -4214,6 +4499,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _headspace_co2_buffer_equilibrium(
         self,
         ledger_pO2_bar: float,
+        duct_source_pO2_bar: float = 0.0,
     ):
         """Equilibrate ambient CO₂ and the ledger O₂ in one O/C balance."""
 
@@ -4236,7 +4522,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         p_co2_bar = 0.96 * p_total_bar
         if p_co2_bar <= 0.0:
             return None
-        p_o2_initial_bar = max(0.0, float(ledger_pO2_bar))
+        # The committed ledger parcel and the current duct source are distinct
+        # inputs to the one O/C balance. Add each exactly once; returning the
+        # pure-carrier result or taking max(result, source) discards the
+        # co-evolved O2 from the source parcel.
+        p_o2_initial_bar = max(
+            0.0,
+            float(ledger_pO2_bar),
+        ) + max(0.0, float(duct_source_pO2_bar))
         p_co_initial_bar = max(
             0.0,
             float((getattr(self.overhead, 'composition', {}) or {}).get(
@@ -4261,6 +4554,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         basis: str,
         duct_result=None,
+        co2_buffer_assumption: str = '',
     ) -> None:
         self._last_headspace_transport_diagnostic = {
             'basis': str(basis),
@@ -4284,6 +4578,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if duct_result is not None
                 else ''
             ),
+            'co2_buffer_assumption': str(co2_buffer_assumption or ''),
         }
 
     def _apply_headspace_transport_diagnostic(
@@ -4306,6 +4601,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reservoir.headspace_transport_knudsen = max(
             0.0,
             float(diagnostic.get('knudsen_number', 0.0) or 0.0),
+        )
+        reservoir.headspace_co2_buffer_assumption = str(
+            diagnostic.get('co2_buffer_assumption', '') or ''
         )
 
     def _inert_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
@@ -4459,7 +4757,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         duct_result = self._headspace_venting_throughput()
         if atmosphere_name == 'CO2_BACKPRESSURE':
             buffer_result = self._headspace_co2_buffer_equilibrium(
-                ledger_pO2_bar
+                ledger_pO2_bar,
+                duct_source_pO2_bar=duct_result.p_o2_bar,
             )
             if buffer_result is not None:
                 # The equilibrium is an upper-bound source term for homogeneous
@@ -4467,11 +4766,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._set_headspace_transport_diagnostic(
                     basis='carrier_buffer_equilibrium',
                     duct_result=duct_result,
+                    co2_buffer_assumption=buffer_result.assumption,
                 )
-                return max(
-                    float(buffer_result.p_o2_bar),
-                    self._vacuum_floor_bar(),
-                )
+                return float(buffer_result.p_o2_bar)
 
         source_pO2 = max(0.0, float(duct_result.p_o2_bar))
         transport_pO2 = max(
@@ -4523,8 +4820,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return float(transport_pO2())
         return float(self._commanded_pO2_bar())
 
+    def _interface_pO2_bar(self) -> float:
+        """Return the single gas/melt interface pO2 for release equilibria."""
+
+        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        if reservoir is None:
+            raise OxygenInterfaceConfigurationError(
+                'missing_oxygen_reservoir',
+                'SSO-R interface requires a typed oxygen reservoir state',
+            )
+        transport_pO2_bar = self._vapor_pressure_transport_pO2_bar()
+        self._apply_oxygen_interface_diagnostic(
+            reservoir,
+            transport_pO2_bar=transport_pO2_bar,
+        )
+        return float(reservoir.interface_pO2_bar)
+
     def _vapor_pressure_dispatch_pO2_bar(self) -> float:
-        pO2_bar = self._vapor_pressure_transport_pO2_bar()
+        pO2_bar = self._interface_pO2_bar()
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'quantize_live_controls', False):
             return float(store.quantized_pO2_bar(self, pO2_bar=pO2_bar))
@@ -4710,6 +5023,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'headspace_transport_knudsen': _json_safe_number(
                 getattr(reservoir, 'headspace_transport_knudsen', 0.0)
+            ),
+            'headspace_co2_buffer_assumption': getattr(
+                reservoir,
+                'headspace_co2_buffer_assumption',
+                '',
+            ),
+            'interface_pO2_bar': _json_safe_number(
+                getattr(reservoir, 'interface_pO2_bar', None)
+            ),
+            'interface_pO2_limiting_regime': getattr(
+                reservoir,
+                'interface_pO2_limiting_regime',
+                '',
+            ),
+            'interface_gas_side_k_m_s': _json_safe_number(
+                getattr(reservoir, 'interface_gas_side_k_m_s', 0.0)
             ),
             'exchange_direction': getattr(reservoir, 'exchange_direction', ''),
         }
@@ -6662,6 +6991,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._sync_oxygen_reservoir_mirror()
             return reservoir
 
+        self._apply_oxygen_interface_diagnostic(
+            reservoir,
+            transport_pO2_bar=transport_pO2,
+            intrinsic_fO2_log=base_fO2_log,
+        )
         x_m = base_fO2_log * math.log(10.0)
         effective_transport_pO2 = max(transport_pO2, self._vacuum_floor_bar())
         if not math.isfinite(effective_transport_pO2) or effective_transport_pO2 <= 0.0:
@@ -6763,6 +7097,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
         self._apply_headspace_transport_diagnostic(reservoir)
+        self._apply_oxygen_interface_diagnostic(
+            reservoir,
+            transport_pO2_bar=reservoir.headspace_transport_pO2_bar,
+            intrinsic_fO2_log=reservoir.melt_intrinsic_fO2_log,
+        )
         reservoir.exchange_o2_mol = dn_ledger_to_headspace
         reservoir.exchange_o2_kg = (
             dn_ledger_to_headspace * OXYGEN_MOLAR_MASS_KG_PER_MOL
@@ -9523,7 +9862,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 }
                 if self._backend_accepts_kwarg('vapor_transport_pO2_bar'):
                     backend_kwargs['vapor_transport_pO2_bar'] = (
-                        self._vapor_pressure_dispatch_pO2_bar()
+                        self._vapor_pressure_transport_pO2_bar()
                     )
                 if self._backend_accepts_kwarg('composition_mol_by_account'):
                     backend_kwargs['composition_mol_by_account'] = (
@@ -9785,7 +10124,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
-        pO2_bar = self._vapor_pressure_dispatch_pO2_bar()
+        transport_pO2_bar = self._vapor_pressure_transport_pO2_bar()
+        interface_pO2_bar = self._vapor_pressure_dispatch_pO2_bar()
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         intrinsic_fO2_log = getattr(
             reservoir,
@@ -9822,7 +10162,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         kernel_result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
             control_inputs={
-                'pO2_bar': pO2_bar,
+                'pO2_bar': transport_pO2_bar,
+                'interface_pO2_bar': interface_pO2_bar,
                 'intrinsic_fO2_log': intrinsic_fO2_log,
                 'vacuum_floor_bar': vacuum_floor,
                 'body': getattr(self.melt, 'body', ''),
