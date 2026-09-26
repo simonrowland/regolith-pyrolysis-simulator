@@ -2629,15 +2629,19 @@ def _imcc_shadow_rows(
     return rows
 
 
-def _imcc_shadow_payload_base(temperature_K: float) -> dict[str, Any]:
+def _imcc_shadow_payload_base(temperature_K: float | None) -> dict[str, Any]:
     return {
         "schema": IMCC_ACTIVITY_SHADOW_SCHEMA,
         "behavior_authority": False,
-        "temperature_K": float(temperature_K),
+        "temperature_K": (
+            None if temperature_K is None else float(temperature_K)
+        ),
         "imcc_domain_K": list(IMCC_ACTIVITY_SHADOW_DOMAIN_K),
         "vaporock_cap_K": IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K,
         "above_vaporock_cap": (
-            float(temperature_K) > IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K
+            None
+            if temperature_K is None
+            else float(temperature_K) > IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K
         ),
         "flux_oxides": list(IMCC_ACTIVITY_SHADOW_FLUX_OXIDES),
         "flags": [],
@@ -2662,9 +2666,11 @@ def build_imcc_activity_shadow(
     try:
         temperature = float(temperature_K)
     except (TypeError, ValueError):
-        temperature = float("nan")
+        temperature = None
+    if temperature is not None and not math.isfinite(temperature):
+        temperature = None
     payload = _imcc_shadow_payload_base(temperature)
-    if not math.isfinite(temperature):
+    if temperature is None:
         payload.update(
             {
                 "status": "refused",

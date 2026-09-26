@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 import copy
+import json
+from dataclasses import asdict, replace
 
 import pytest
 
+import engines.builtin.vapor_pressure as builtin_vapor_pressure
+from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
+from simulator.state import HourSnapshot
 from simulator.vapour_rail.melt_activity_resolver import (
     IMCC_ACTIVITY_SHADOW_FLUX_OXIDES,
     build_imcc_activity_shadow,
@@ -69,6 +74,10 @@ def _physics_projection(payload: dict) -> dict:
 
 def test_option_off_is_bit_identical_to_base(lunar_runs: dict[str, dict]) -> None:
     assert lunar_runs["off"] == lunar_runs["base"]
+    assert all(
+        "imcc_activity_shadow" not in row
+        for row in lunar_runs["off"]["per_hour_summary"]
+    )
 
 
 def test_recipe_option_is_explicit_and_default_off() -> None:
@@ -170,11 +179,73 @@ def test_missing_openimcc_is_typed_refusal_and_not_a_run_failure(monkeypatch) ->
     )
 
 
-def test_flux_unchanged_invariant_rejects_shadow_feed_mutation() -> None:
-    baseline_flux = {"Na": 1.0}
-    shadow_ratio = 2.0
-    mutated_flux = {"Na": baseline_flux["Na"] * shadow_ratio}
+def test_option_on_hour_snapshot_is_declared_schema_field() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        allow_fallback_vapor=True,
+        sio_start_temperature_c=1800.0,
+        sio_hold_temperature_c=1800.0,
+        sio_ramp_c_per_hr=0.0,
+        imcc_activity_shadow=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-09-26T00:00:00Z",
+            "kernel_commit_sha": "c2-shadow-test",
+        },
+    )
+    session = run._start_session()
+    run._apply_sio_pre_run_controls(session.simulator)
+    execution = RunExecutor().execute_session(session, hours=1)
 
-    assert mutated_flux != baseline_flux
+    snapshot = execution.snapshots[0]
+    snapshot_payload = asdict(snapshot)
+    assert isinstance(snapshot, HourSnapshot)
+    assert snapshot_payload["imcc_activity_shadow"]
+    assert snapshot_payload["imcc_activity_shadow"]["schema"] == (
+        "imcc_activity_shadow.v1"
+    )
+
+
+def test_strict_json_refuses_nan_shadow_temperature() -> None:
+    payload = build_imcc_activity_shadow(
+        composition_mol=COMPOSITION_MOL,
+        temperature_K=float("nan"),
+    )
+
+    assert payload["status"] == "refused"
+    assert payload["reason_code"] == "imcc_shadow_invalid_temperature"
+    assert payload["temperature_K"] is None
+    json.dumps(payload, allow_nan=False)
+
+
+def test_flux_unchanged_invariant_rejects_shadow_feed_mutation(monkeypatch) -> None:
+    shadow = build_imcc_activity_shadow(
+        composition_mol=COMPOSITION_MOL,
+        temperature_K=2073.15,
+    )
+    shadow_activity = shadow["activities_by_oxide"]["K2O"][
+        "imcc_single_cation_activity"
+    ]
+    assert shadow_activity is not None
+
+    baseline = _lunar_run(imcc_activity_shadow=False)
+    original_melt_oxide_activity = builtin_vapor_pressure.melt_oxide_activity
+
+    def feed_shadow_activity(parent_oxide, *args, **kwargs):
+        result = original_melt_oxide_activity(parent_oxide, *args, **kwargs)
+        if parent_oxide == "K2O" and result is not None:
+            return replace(result, activity=shadow_activity)
+        return result
+
+    monkeypatch.setattr(
+        builtin_vapor_pressure,
+        "melt_oxide_activity",
+        feed_shadow_activity,
+    )
+    mutated = _lunar_run(imcc_activity_shadow=False)
+
     with pytest.raises(AssertionError):
-        assert mutated_flux == baseline_flux
+        assert mutated["per_hour_summary"][0]["vapor_species_kg_hr"] == (
+            baseline["per_hour_summary"][0]["vapor_species_kg_hr"]
+        )
