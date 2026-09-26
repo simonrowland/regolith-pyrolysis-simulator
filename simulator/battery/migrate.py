@@ -2596,6 +2596,35 @@ def wt_pct_to_mole_fraction_derivation(
     )
 
 
+def _composition_located_from_values(
+    values: object,
+    locator: Locator | None,
+) -> Located[Composition] | None:
+    """Keep a source-declared oxide complement beside the identity value."""
+
+    source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
+    if not isinstance(source_note, str) or not source_note.strip():
+        return None
+    wt = _initial_oxide_map_from_values(values)
+    if not wt:
+        return None
+    derivation = wt_pct_to_mole_fraction_derivation(wt, locator)
+    if "SiO2" in source_note and "K2O" in source_note and "100" in source_note:
+        # Plante prints K2O and declares SiO2 as 100-K2O; retain that source
+        # rule in the typed lineage instead of presenting the complement as a
+        # second measured oxide.
+        derivation = replace(
+            derivation,
+            relation=f"SiO2_wt_pct=100-K2O_wt_pct;{derivation.relation}",
+            inputs=(*derivation.inputs, "values.composition_derivation"),
+        )
+    return Located(
+        State.of(wt_pct_to_mole_fraction(wt)),
+        locator=locator,
+        inference=derivation,
+    )
+
+
 def composition_unknown_reason() -> str:
     return f"no composition field under keys {_COMPOSITION_LOOKED_FOR} in this extract"
 
@@ -7568,6 +7597,8 @@ _AUTHOR_RATIO_PO2_KEYS = (
     "P_O2_atm",
 )
 _AUTHOR_RATIO_REL_TOLERANCE = Decimal("1e-4")
+_CONGRUENT_VAPORIZATION_M_O2_G_MOL = Decimal("32.00")
+_CONGRUENT_VAPORIZATION_M_K_G_MOL = Decimal("39.10")
 _OXYGEN_TABLE_KEYS = frozenset({"series", "rows", "points"})
 _OXYGEN_LOG_UNITS = frozenset({
     "",
@@ -7844,9 +7875,10 @@ def collect_author_ratio_oxygen(
 
     Plante 1979 prints ``P_O2 = 0.226 P_K`` (eq. context p. 279) and tabulates
     ``P_K``. The extract stores the ratio, the printed ``P_K``, and the
-    arithmetic product ``P_O2_atm``. That product is not a printed cell: it is
-    derived from the printed ratio and printed ``P_K``, so the Located carries
-    a Derivation and never enters the printed-oxygen allowlist.
+    arithmetic product under ``oxygen_partial_pressure``. That product is not
+    a printed cell: it is derived from the printed ratio and printed ``P_K``,
+    so the Located carries a Derivation and never enters the printed-oxygen
+    allowlist.
 
     Engine-inferred siblings (``pO2_inference``) and ``inferred: true`` nodes
     stay refusals. Disagreeing ratio × P_K vs stored ``P_O2_atm`` refuses.
@@ -7864,7 +7896,22 @@ def collect_author_ratio_oxygen(
             continue
         ratio = _printed_decimal(payload.get("po2_over_pK_as_published"))
         p_k = _printed_decimal(payload.get("P_K_atm_as_published"))
+        p_o2_key = "P_O2_atm"
+        p_o2_locator = fallback_locator
         p_o2 = _printed_decimal(payload.get("P_O2_atm"))
+        p_o2_node = payload.get("oxygen_partial_pressure")
+        if p_o2 is None and isinstance(p_o2_node, Mapping):
+            raw_p_o2 = p_o2_node.get("value")
+            if _oxygen_node_rejected(p_o2_node, raw_p_o2):
+                continue
+            p_o2_units = str(
+                p_o2_node.get("units") or p_o2_node.get("unit") or ""
+            ).strip()
+            if p_o2_units.lower() != "atm":
+                continue
+            p_o2 = _printed_decimal(raw_p_o2)
+            p_o2_key = "oxygen_partial_pressure"
+            p_o2_locator = locator_from_mapping(p_o2_node.get("locator")) or fallback_locator
         if ratio is None or p_k is None or p_o2 is None:
             continue
         if ratio <= 0 or p_k <= 0 or p_o2 <= 0:
@@ -7875,19 +7922,22 @@ def collect_author_ratio_oxygen(
         si, trail = convert_pressure_to_pa(p_o2, "atm")
         if si is None or si <= 0 or trail is None:
             continue
-        unit = conversion_derivation(trail, p_o2, fallback_locator)
-        # Premise: author states P_O2 / P_K = r (printed ratio) with both
-        # pressures in atm; extract stores r, P_K, and the product.
-        # Algebra: P_O2_atm = r * P_K_atm; P_O2_Pa = P_O2_atm * 101325.
-        # Sanity: r=0.226, P_K=6.91e-7 atm -> P_O2=1.56166e-7 atm = 0.015824 Pa.
+        unit = conversion_derivation(trail, p_o2, p_o2_locator)
+        # DERIVED condition, not measurement: congruent vaporization of
+        # K2O(l) -> 2K + 1/2 O2 gives J_O2=J_K/4 and
+        # P_O2/P_K=(1/4)*sqrt(M_O2/M_K)=(1/4)*sqrt(32.00/39.10)=0.2262;
+        # Plante prints 0.226. Do not turn this assumption into a measurement.
         relation = (
-            "author_ratio_P_O2_atm=po2_over_pK_as_published*P_K_atm_as_published;"
+            "congruent_vaporization_P_O2_atm=po2_over_pK_as_published*P_K_atm_as_published;"
+            "P_O2/P_K=(1/4)*sqrt(M_O2/M_K)=0.2262;Plante_printed_ratio=0.226;"
             f"{trail}"
         )
         params: list[tuple[str, Located[Decimal]]] = [
             ("po2_over_pK_as_published", Located(State.of(ratio), locator=fallback_locator)),
             ("P_K_atm_as_published", Located(State.of(p_k), locator=fallback_locator)),
-            ("P_O2_atm", Located(State.of(p_o2), locator=fallback_locator)),
+            ("M_O2_g_mol", Located(State.of(_CONGRUENT_VAPORIZATION_M_O2_G_MOL), locator=p_o2_locator)),
+            ("M_K_g_mol", Located(State.of(_CONGRUENT_VAPORIZATION_M_K_G_MOL), locator=p_o2_locator)),
+            (p_o2_key, Located(State.of(p_o2), locator=p_o2_locator)),
         ]
         if unit is not None:
             params.extend(unit.parameters)
@@ -7896,7 +7946,8 @@ def collect_author_ratio_oxygen(
             inputs=(
                 "values.po2_over_pK_as_published",
                 "values.P_K_atm_as_published",
-                "values.P_O2_atm",
+                f"values.{p_o2_key}",
+                "assumption=congruent_vaporization",
             ),
             parameters=tuple(params),
             output_unit="Pa",
@@ -7905,12 +7956,25 @@ def collect_author_ratio_oxygen(
         return Located(
             State.of(point.value),
             locator=_locator_with_note(
-                fallback_locator,
-                "author ratio P_O2=r*P_K (derived; not a printed pO2 cell)",
+                p_o2_locator,
+                "DERIVED condition: congruent vaporization P_O2=0.226 P_K; not a measurement",
             ),
             inference=inference,
         )
     return None
+
+
+def _has_author_ratio_oxygen_payload(payloads: Iterable[object]) -> bool:
+    for payload in payloads:
+        if not isinstance(payload, Mapping):
+            continue
+        if (
+            payload.get("po2_over_pK_as_published") is not None
+            and payload.get("P_K_atm_as_published") is not None
+            and isinstance(payload.get("oxygen_partial_pressure"), Mapping)
+        ):
+            return True
+    return False
 
 
 def collect_printed_oxygen(
@@ -8694,17 +8758,26 @@ class Migrator:
         *,
         skip_tables: bool = False,
     ) -> dict[str, Located[Any]] | None:
+        ratio_oxygen = collect_author_ratio_oxygen(specific, locator)
         facts = collect_printed_oxygen(specific, locator, skip_tables=skip_tables)
-        if facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None and fallback:
-            facts = collect_printed_oxygen(fallback, locator, skip_tables=True)
-        ratio_oxygen = None
-        if facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None:
-            # Printed allowlist empty: try author-ratio product (derived only).
-            ratio_oxygen = collect_author_ratio_oxygen(specific, locator)
-            if ratio_oxygen is None and fallback:
-                ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
+        ratio_payload = _has_author_ratio_oxygen_payload(specific)
+        if ratio_oxygen is None and ratio_payload:
+            return point_conditions
+        if (
+            ratio_oxygen is None
+            and facts.log_fO2 is None
+            and facts.oxygen_partial_pressure_Pa is None
+            and fallback
+        ):
+            ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
             if ratio_oxygen is None:
-                return point_conditions
+                facts = collect_printed_oxygen(fallback, locator, skip_tables=True)
+        if ratio_oxygen is not None:
+            # The nested oxygen_partial_pressure is Plante's derived
+            # congruent-vaporization condition, not a printed pO2 cell.
+            facts = PrintedOxygenFacts(log_fO2=facts.log_fO2)
+        elif facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None:
+            return point_conditions
         merged = dict(point_conditions or {})
         if facts.log_fO2 is not None and "fO2_log" not in merged:
             merged["fO2_log"] = facts.log_fO2
@@ -9313,6 +9386,7 @@ class Migrator:
             quantity if isinstance(quantity, Quantity) else None
         )
         initial_oxide_map = _initial_oxide_map_from_values(values)
+        composition_located = _composition_located_from_values(values, locator)
         initial_composition, omitted_components = _mole_fraction_composition_from_values(
             values
         )
@@ -9544,16 +9618,21 @@ class Migrator:
             )
         elif initial_composition is not None:
             ident_kwargs["composition"] = State.of(initial_composition)
+        elif composition_located is not None:
+            ident_kwargs["composition"] = composition_located.state
         elif initial_oxide_map:
             ident_kwargs["composition"] = State.of(
                 wt_pct_to_mole_fraction(initial_oxide_map)
             )
         elif q_token in _BULK_PROPERTY_QUANTITIES:
             ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
+        derived_oxygen = collect_author_ratio_oxygen((values,), locator)
         if raw_adm == AdmissionStatus.ADMITTED.value:
-            oxygen = collect_printed_oxygen(
-                (values,), locator, skip_tables=True
-            ).oxygen_partial_pressure_Pa
+            oxygen = derived_oxygen
+            if oxygen is None and not _has_author_ratio_oxygen_payload((values,)):
+                oxygen = collect_printed_oxygen(
+                    (values,), locator, skip_tables=True
+                ).oxygen_partial_pressure_Pa
             if oxygen is not None and oxygen.state.is_value:
                 oxygen_value = oxygen.state.value
                 if (
@@ -9716,6 +9795,11 @@ class Migrator:
                     _temperature_field_raw(t_payload, t_sel.field_name),
                     locator,
                 )
+            }
+        if composition_located is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": composition_located,
             }
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
@@ -9917,6 +10001,36 @@ class Migrator:
             elif obs.get("uncertainty"):
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
+        observation_notices: list[Notice] = []
+        bulk_fence = _bulk_composition_pressure_fence(values)
+        if bulk_fence:
+            observation_notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.P_PARTIAL,),
+                    reason=bulk_fence,
+                    origin=obs_id,
+                    band=str(values["equilibrium_status"]),
+                )
+            )
+        if (
+            admission.status is AdmissionStatus.ADMITTED
+            and derived_oxygen is not None
+            and isinstance(q_token, Quantity)
+        ):
+            observation_notices.append(
+                Notice(
+                    kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+                    affected_quantities=(q_token,),
+                    reason=(
+                        "fO2_Pa is a DERIVED condition, not a measurement: "
+                        "congruent vaporization K2O(l) -> 2K + 1/2 O2; "
+                        "P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262 "
+                        "(Plante printed 0.226)."
+                    ),
+                    origin=obs_id,
+                )
+            )
         observation = Observation(
             observation_id=obs_id,
             experiment_id=experiment_id,
@@ -9925,13 +10039,7 @@ class Migrator:
             uncertainty=uncertainty,
             evidence=evidence,
             admission=admission,
-            notices=(Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.P_PARTIAL,),
-                reason=_bulk_composition_pressure_fence(values),
-                origin=obs_id,
-                band=str(values["equilibrium_status"]),
-            ),) if _bulk_composition_pressure_fence(values) else (),
+            notices=tuple(observation_notices),
             source_id=source_id,
             locator=locator,
             read_from=read_from,

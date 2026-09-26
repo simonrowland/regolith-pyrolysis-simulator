@@ -208,6 +208,31 @@ def _partial_prediction(engine, observation, **_kwargs):
     )
 
 
+def test_derived_oxygen_condition_notice_reaches_residual() -> None:
+    notice = Notice(
+        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason="fO2_Pa is a DERIVED condition under congruent vaporization, not a measurement",
+        origin="plante-row",
+    )
+    experiment = F.kems_experiment()
+    reference = F.observation(
+        "plante-derived-oxygen",
+        experiment.experiment_id,
+        _partial_identity(),
+        Decimal("1"),
+        source_id="plante-1979",
+        notices=(notice,),
+    )
+    prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
+    residual, _ = _compile(reference, experiment, prediction)
+    assert any(
+        item.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and "DERIVED condition" in item.reason
+        for item in residual.notices
+    )
+
+
 def _two_phase_notice():
     return Notice(
         kind=NoticeKind.OUT_OF_CERTIFIED_BAND,

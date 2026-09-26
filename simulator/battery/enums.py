@@ -113,6 +113,7 @@ class RefusalReason(StrEnum):
     METHOD_UNKNOWN = "method_unknown"
     EFFUSION_REGIME_UNVERIFIED = "effusion_regime_unverified"
     BACKGROUND_PRESSURE_HIGH = "background_pressure_high"
+    BACKGROUND_PRESSURE_INTERVAL_STRADDLES = "background_pressure_interval_straddles"
     IDENTITY_MISMATCH = "identity_mismatch"
     IDENTITY_UNKNOWN = "identity_unknown"
     INVALID_IDENTITY = "invalid_identity"

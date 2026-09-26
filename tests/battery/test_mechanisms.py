@@ -3099,6 +3099,57 @@ def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
     ).passed
 
 
+def test_kems_background_interval_uses_bounds_without_inventing_a_point() -> None:
+    from dataclasses import replace as _replace
+
+    def with_interval(low: str, high: str, *, kn: Decimal | None = Decimal("20")):
+        experiment = F.kems_experiment(kn=kn)
+        pressure = Located(
+            State.of(
+                Value(
+                    ValueKind.INTERVAL,
+                    interval_low=Decimal(low),
+                    interval_high=Decimal(high),
+                )
+            ),
+            locator=F.loc(),
+        )
+        return _replace(
+            experiment,
+            pressure_environment=_replace(
+                experiment.pressure_environment,
+                total_pressure_Pa=pressure,
+            ),
+        )
+
+    safe = background_pressure_high(
+        with_interval("1e-6", "1e-3"), Quantity.P_PARTIAL
+    )
+    assert safe.passed
+    assert safe.checks[0].detail["flag"] == "background_pressure_interval_upper_bound"
+    assert safe.checks[0].detail["upper_bound_Pa"] == "0.001"
+    calibrated_without_kn = with_interval("1e-6", "1e-3", kn=None)
+    regime = effusion_regime_unverified(calibrated_without_kn, Quantity.P_PARTIAL)
+    assert regime.passed
+    assert regime.checks[-1].detail["flag"] == "orifice_knudsen_not_published"
+    partial = _replace(F.psat_identity("K"), quantity=Quantity.P_PARTIAL)
+    assert run_validity_gates(
+        calibrated_without_kn,
+        F.observation("interval-kems", calibrated_without_kn.experiment_id, partial, Decimal("1")),
+    ).passed
+
+    high = background_pressure_high(
+        with_interval("0.02", "0.03"), Quantity.P_PARTIAL
+    )
+    assert high.reason is RefusalReason.BACKGROUND_PRESSURE_HIGH
+
+    straddled = background_pressure_high(
+        with_interval("0.001", "0.02"), Quantity.P_PARTIAL
+    )
+    assert straddled.reason is RefusalReason.BACKGROUND_PRESSURE_INTERVAL_STRADDLES
+    assert straddled.checks[0].detail["flag"] == "background_pressure_interval_straddles"
+
+
 def test_physics_false_refuse_compilation_not_applicable_axes_equal() -> None:
     """Legit compilation pairs with not_applicable fields must not refuse."""
 

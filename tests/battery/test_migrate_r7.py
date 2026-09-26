@@ -12,6 +12,7 @@ import yaml
 
 from simulator.battery.enums import (
     EvidenceClass,
+    NoticeKind,
     Phase,
     Quantity,
     ReferenceStateConvention,
@@ -349,7 +350,7 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
     assert len(buckets["pending"]) == 59
     assert len(measured) == 383
     assert all(o.value.kind is ValueKind.POINT and o.value.point is not None for o in measured)
-    assert sum(bool(o.notices) for o in measured) == 59
+    assert sum(bool(o.notices) for o in measured) == 221
     factor = Decimal("0.226")
     tolerance = Decimal("1e-12")
     for obs in buckets["admitted"]:
@@ -360,6 +361,19 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         fo2 = obs.identity.fO2_Pa
         assert fo2 is not None and fo2.is_value and fo2.value is not None
         assert abs(fo2.value - factor * obs.value.point) <= tolerance
+        composition_condition = (obs.point_conditions or {}).get("composition")
+        assert composition_condition is not None
+        assert composition_condition.inference is not None
+        assert "SiO2_wt_pct=100-K2O_wt_pct" in composition_condition.inference.relation
+        oxygen_condition = (obs.point_conditions or {}).get("fO2_Pa")
+        assert oxygen_condition is not None
+        assert oxygen_condition.inference is not None
+        assert "congruent_vaporization" in oxygen_condition.inference.relation
+        assert any(
+            notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            and "DERIVED condition" in notice.reason
+            for notice in obs.notices
+        )
         assert obs.derivation is not None
         assert "P_K = k_K I_K+ T" in obs.derivation.relation
         assert "sqrt(T)" not in obs.derivation.relation

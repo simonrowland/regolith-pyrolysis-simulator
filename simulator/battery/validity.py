@@ -14,7 +14,9 @@ Ambiguity resolutions:
   transport_constants. Kn is the *orifice* (cell-local) number, not chamber
   pressure masquerading as cell pressure. Unknown/missing chamber
   background also fails this gate (v2.1: missing pressure already fails
-  effusion; the background-high gate does not double-count).
+  effusion; the background-high gate does not double-count). A calibrated
+  KEMS pressure comparison with a wholly low typed background interval may
+  proceed without inventing an orifice Kn point; the check carries a flag.
 - Background ≥ 1e-2 Pa fails KEMS *equilibrium* pressure/activity only.
   Millibar bench kinetic experiments are out of this gate's scope.
 - Apparatus determinants are those the actual derivation needs: calibrated
@@ -107,6 +109,36 @@ def _located_decimal(located: Located[Value | Decimal] | None) -> Decimal | None
             return None
         return value.point
     return as_decimal(value)
+
+
+def _pressure_bounds(
+    located: Located[Value | Decimal] | None,
+) -> tuple[Decimal | None, Decimal | None, str] | None:
+    """Return inclusive lower/upper bounds without collapsing a range."""
+
+    if located is None or not located.state.is_value or located.state.value is None:
+        return None
+    value = located.state.value
+    if not isinstance(value, Value):
+        point = as_decimal(value)
+        return point, point, "point"
+    if value.kind is ValueKind.POINT and value.point is not None:
+        return value.point, value.point, "point"
+    if value.kind is ValueKind.INTERVAL:
+        if value.interval_low is None or value.interval_high is None:
+            return None
+        low = value.interval_low
+        high = value.interval_high
+        if low > high:
+            return None
+        return low, high, "interval"
+    if value.kind is ValueKind.BOUND and value.bound_value is not None:
+        bound = value.bound_value
+        if value.bound_operator in {"<", "<=", "≤"}:
+            return None, bound, "upper_bound"
+        if value.bound_operator in {">", ">=", "≥"}:
+            return bound, None, "lower_bound"
+    return None
 
 
 def _finite_positive(located: Located[Value | Decimal] | None) -> Decimal | None:
@@ -374,7 +406,7 @@ def effusion_regime_unverified(
     experiment: Experiment,
     quantity: Quantity,
 ) -> GateOutcome:
-    """KEMS equilibrium pressure/activity: orifice Kn ≥ 10 from cell-local gas."""
+    """Check KEMS regime without inventing a missing orifice Kn point."""
 
     method_state = experiment.method
     checks: list[GateCheck] = []
@@ -390,8 +422,8 @@ def effusion_regime_unverified(
         Quantity.ACTIVITY_COEFFICIENT,
     }:
         return _pass(checks)
-    total = _located_decimal(experiment.pressure_environment.total_pressure_Pa)
-    if total is None:
+    total_bounds = _pressure_bounds(experiment.pressure_environment.total_pressure_Pa)
+    if total_bounds is None:
         checks.append(
             GateCheck(
                 "background_pressure_stated",
@@ -408,6 +440,29 @@ def effusion_regime_unverified(
     kn_located = regime.knudsen_number_orifice
     kn = _located_decimal(kn_located)
     if kn is None:
+        _lower, upper, pressure_kind = total_bounds
+        calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
+        if (
+            _calibration_grounded(calibration)
+            and pressure_kind in {"interval", "upper_bound"}
+            and upper is not None
+            and upper <= KEMS_BACKGROUND_HIGH_PA
+        ):
+            checks.append(
+                GateCheck(
+                    "orifice_knudsen",
+                    True,
+                    {
+                        "reason": (
+                            "orifice Knudsen number not published; calibrated KEMS "
+                            "pressure and a wholly low background interval are retained"
+                        ),
+                        "flag": "orifice_knudsen_not_published",
+                        "background_upper_bound_Pa": str(upper),
+                    },
+                )
+            )
+            return _pass(checks)
         checks.append(
             GateCheck(
                 "orifice_knudsen",
@@ -440,7 +495,7 @@ def background_pressure_high(
     experiment: Experiment,
     quantity: Quantity,
 ) -> GateOutcome:
-    """KEMS equilibrium comparison with background ≥ 1e-2 Pa fails."""
+    """Apply the low-background ceiling to a point or typed pressure range."""
 
     method_state = experiment.method
     checks: list[GateCheck] = []
@@ -457,24 +512,38 @@ def background_pressure_high(
     }:
         # millibar bench kinetic experiments are not this gate
         return _pass(checks)
-    total = _located_decimal(experiment.pressure_environment.total_pressure_Pa)
-    if total is None:
+    bounds = _pressure_bounds(experiment.pressure_environment.total_pressure_Pa)
+    if bounds is None:
         # missing pressure already fails effusion; do not double-count here
         return _pass(checks)
-    ok = total < KEMS_BACKGROUND_HIGH_PA
+    lower, upper, pressure_kind = bounds
+    detail = {
+        "lower_bound_Pa": None if lower is None else str(lower),
+        "upper_bound_Pa": None if upper is None else str(upper),
+        "threshold_Pa": str(KEMS_BACKGROUND_HIGH_PA),
+        "pressure_kind": pressure_kind,
+    }
+    if upper is not None and upper <= KEMS_BACKGROUND_HIGH_PA:
+        if pressure_kind != "point":
+            detail["flag"] = "background_pressure_interval_upper_bound"
+        checks.append(GateCheck("background_pressure", True, detail))
+        return _pass(checks)
+    if lower is not None and lower > KEMS_BACKGROUND_HIGH_PA:
+        checks.append(GateCheck("background_pressure", False, detail))
+        return _fail(RefusalReason.BACKGROUND_PRESSURE_HIGH, checks, "background_pressure")
+    detail["flag"] = "background_pressure_interval_straddles"
     checks.append(
         GateCheck(
             "background_pressure",
-            ok,
-            {
-                "total_pressure_Pa": str(total),
-                "threshold_Pa": str(KEMS_BACKGROUND_HIGH_PA),
-            },
+            False,
+            detail,
         )
     )
-    if not ok:
-        return _fail(RefusalReason.BACKGROUND_PRESSURE_HIGH, checks, "background_pressure")
-    return _pass(checks)
+    return _fail(
+        RefusalReason.BACKGROUND_PRESSURE_INTERVAL_STRADDLES,
+        checks,
+        "background_pressure",
+    )
 
 
 def run_validity_gates(

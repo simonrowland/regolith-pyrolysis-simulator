@@ -183,6 +183,11 @@ experiments:
         note: >-
           Author oxygen is stoichiometric from dissociative vaporization,
           P_O2 = 0.226 P_K (printed). No commanded buffer or gas mix.
+          Assumption: congruent vaporization of K2O(l) -> 2K + 1/2 O2,
+          so J_O2 = J_K/4 and P_O2/P_K = (1/4) sqrt(M_O2/M_K)
+          = (1/4) sqrt(32.00/39.10) = 0.2262; Plante prints 0.226.
+          Since P_K ∝ a(K2O)^(1/2) P_O2^(-1/4), a factor-of-two P_O2
+          error moves log P_K by about 0.075 dex.
           Per-row P_O2 is derived from printed P_K × printed ratio and
           lands on observation point_conditions.fO2_Pa as DERIVED; no
           single experiment oxygen_partial_pressure_Pa is asserted.

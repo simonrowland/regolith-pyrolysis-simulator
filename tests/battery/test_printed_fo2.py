@@ -180,7 +180,8 @@ def test_author_ratio_po2_is_derived_not_printed() -> None:
     )
     assert located is not None
     assert located.inference is not None
-    assert "author_ratio_P_O2_atm" in located.inference.relation
+    assert "congruent_vaporization" in located.inference.relation
+    assert "sqrt(M_O2/M_K)=0.2262" in located.inference.relation
     assert located.state.value.point == atm_to_pa(Decimal("1.56166e-7"))
 
     assert collect_author_ratio_oxygen(
