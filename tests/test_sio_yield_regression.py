@@ -290,9 +290,13 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # measured fix/HEAD ratio, about -1.103% on evolved kg:
 # lunar 1.05260475258e-05 -> 1.04099243606e-05,
 # mars 1.0653327814e-05 -> 1.05357832376e-05.
+# 2026-09-26 b-573 projected-bulk freeze gate (melt fraction now continuous):
+# studio-3 regen, VapoRock 0001+0002; lunar -1.6e-7 rel, mars +2.35e-5 rel:
+# lunar 1.04099243606e-05 -> 1.0409922677e-05,
+# mars 1.05357832376e-05 -> 1.05360311732e-05.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.04099243606e-05,
-    "mars_basalt": 1.05357832376e-05,
+    "lunar_mare_low_ti": 1.0409922677e-05,
+    "mars_basalt": 1.05360311732e-05,
 }
 
 
@@ -400,9 +404,11 @@ BASELINE_STAGE4_SIO2_KG = {
 # docs-private/research/2026-08-02-train13-adjudication.md
 # Rebaselined 2026-08-28 after f7bcbf79 removed fabricated stage pressure
 # and b42d14ed carried per-carrier authority into the wall-routing model.
+# 2026-09-26 b-573 freeze-gate regen (studio-3): lunar 2.73730312429e-06 ->
+# 2.73730270602e-06, mars 2.7578902906e-06 -> 2.75788843064e-06.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 2.73730312429e-06,
-    "mars_basalt": 2.7578902906e-06,
+    "lunar_mare_low_ti": 2.73730270602e-06,
+    "mars_basalt": 2.75788843064e-06,
 }
 
 
@@ -553,12 +559,22 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     assert "wall_deposit_kg" in report
     # This projection subtracts nearly equal bulk-melt SiO2 inventories.  The
     # 03616bb20 Chapman-Enskog D_AB ratio (0.9879823545) changes wall routing
-    # and therefore the cancellation path.  Executable re-grounding gives the
-    # pins below; canonical atom-ledger closure remains independently bounded
+    # and therefore the cancellation path.  On 2026-09-25 b-573 re-grounding,
+    # green treated the projected MAGEMin liquidus as unavailable and used the
+    # Kress floor (F=0 through 1200 C, then F=1); tip uses projected bounds.
+    # The first projected bounds are lunar 918.75--1370.3125 C after dropping
+    # 0.308801 wt% MnO+P2O5, and Mars 1018.75--1320.3125 C after dropping
+    # 0.880961 wt% P2O5.  Both drops are within the 1.0 wt% ruling bound.
+    # Derivation: the freeze-gate fraction enters the active redox capacity as
+    # C_m_effective = C_m_full * F, and each hour applies
+    # delta_ln(fO2) = net_O2_equivalent_mol / C_m_effective before the SiO
+    # route and terminal ledger cancellation.  Re-running the 24-hour report
+    # therefore re-grounds the two cancellation residuals, not a free tuning
+    # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 1.5372763104166192e-6,
-        "mars_basalt": 1.548043317570604e-7,
+        "lunar_mare_low_ti": 5.717403344648834e-7,
+        "mars_basalt": 6.656418718358862e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15

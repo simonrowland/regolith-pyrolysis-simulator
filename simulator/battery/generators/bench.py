@@ -159,6 +159,9 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
                 payload["composition_method_class"] = "calculated"
                 payload["composition_notice"] = composition_route.notice
                 composition_output.update({"method_class": "calculated", "notice": composition_route.notice})
+            if composition_route is not None and composition_route.inference is not None:
+                composition_output["relation"] = composition_route.inference.relation
+                composition_output["inputs"] = list(composition_route.inference.inputs)
             oxygen_output = {
                 "waypoint": "oxygen_condition",
                 "authority": oxygen_route.authority.value,

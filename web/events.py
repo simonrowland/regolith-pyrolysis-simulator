@@ -84,6 +84,7 @@ from simulator.runner import (
     _attach_engine_commissioning_notice,
     _attach_rump_expectation_notice,
     _attach_sulfur_saturation_notice,
+    _composition_projected_liquidus_notice,
     _deep_merge_setpoints,
 )
 from simulator.session import (
@@ -2407,7 +2408,7 @@ def _completion_payload(sim):
         _safe_log(f'Product story unavailable; raw completion retained: {exc}')
         product_story = None
         product_story_status = 'unavailable'
-    return {
+    payload = {
         'total_hours': sim.melt.hour,
         'energy_electrical_plus_evaporation_kWh': (
             sim.energy_electrical_plus_evaporation_cumulative_kWh
@@ -2465,6 +2466,12 @@ def _completion_payload(sim):
         'stage_purity_report': stage_purity_report(sim.train),
         'knudsen_regime_diagnostic': _knudsen_regime_diagnostic_from_sim(sim),
     }
+    composition_projected_notice = _composition_projected_liquidus_notice(sim)
+    if composition_projected_notice:
+        payload['composition_projected_liquidus_notice'] = copy.deepcopy(
+            composition_projected_notice
+        )
+    return payload
 
 
 _PRODUCT_STORY_GLASS_SPECIES = frozenset({'SiO', 'SiO2'})

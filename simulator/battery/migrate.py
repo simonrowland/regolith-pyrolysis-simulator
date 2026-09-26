@@ -561,6 +561,12 @@ def _as_dec_or_none(value: object) -> Decimal | None:
         return None
 
 
+def _temperature_number(value: object) -> Decimal | None:
+    if isinstance(value, Value) and value.kind is ValueKind.POINT:
+        return value.point
+    return _as_dec_or_none(value)
+
+
 # ---------------------------------------------------------------------------
 # YAML plain codec (deterministic; no timestamps)
 # ---------------------------------------------------------------------------
@@ -1962,6 +1968,9 @@ def convert_pressure_to_pa(
     if lowered in {"kpa"}:
         # Premise: 1 kPa = 1000 Pa exactly (SI).
         return amount * Decimal("1000"), "kPa_to_Pa"
+    if lowered in {"gpa"}:
+        # Premise: 1 GPa = 1e9 Pa exactly (SI).
+        return amount * Decimal("1000000000"), "GPa_to_Pa"
     if lowered in {"bar"}:
         return bar_to_pa(amount), "bar_to_Pa"
     if lowered in {"atm", "atmosphere", "atmospheres"}:
@@ -2144,6 +2153,7 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     ),
     "bar_to_Pa": (Decimal("100000"), "P_Pa = P_bar × 1e5", "Pa", "bar"),
     "kPa_to_Pa": (Decimal("1000"), "P_Pa = P_kPa × 1000", "Pa", "kPa"),
+    "GPa_to_Pa": (Decimal("1000000000"), "P_Pa = P_GPa × 1e9", "Pa", "GPa"),
     "mbar_to_Pa": (Decimal("100"), "P_Pa = P_mbar × 100", "Pa", "mbar"),
     "celsius_to_kelvin": (
         Decimal("273.15"),
@@ -3548,6 +3558,50 @@ _MEASURED_OXYGEN_YIELD_FIELDS: tuple[tuple[str, Quantity], ...] = (
 
 
 _ORDINAL_POINT_SUFFIX_RE = re.compile(r"^(?P<stem>.*)::point:(?P<index>\d+)$")
+
+
+def _parent_bound_categorical(value_sel: SourceSelection) -> bool:
+    """A bound is one categorical observation, not a row of numeric children.
+
+    ``bound_not_point`` records the printed ordering as the observation.
+    Exploding its rows would drop that categorical and emit unavailable
+    stand-ins.
+    """
+
+    value = value_sel.value
+    return (
+        value.kind is ValueKind.CATEGORICAL
+        and value.categorical in {"bound_not_point_ordering", "bound_not_point"}
+    )
+
+
+def _exploded_point_id(
+    parent_id: str,
+    item: Mapping[str, Any],
+    coord: object | None,
+    raw_item: object,
+    row_extra: str | None,
+) -> str:
+    """Child id for an exploded row. No encounter ordinal.
+
+    A temperature uses the published-T key. A row without one uses the
+    printed row/content suffix from ``series_row_extra``. ``rows`` and
+    ``points`` are part of that suffix so two containers cannot merge.
+    """
+
+    if coord is not None:
+        return series_point_id(parent_id, temperature=coord, extra=row_extra)
+    container = item.get("container") if isinstance(item, Mapping) else None
+    # A list row has no field names. Hash the printed payload so two rows in
+    # the same container do not collapse to one id. The container name keeps
+    # values.rows distinct from values.points.
+    suffix = row_extra
+    if not suffix:
+        blob = json.dumps(raw_item, sort_keys=True, default=str, separators=(",", ":"))
+        suffix = "h=" + hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
+    if isinstance(container, str) and container:
+        suffix = f"{container}:{suffix}"
+    return series_point_id(parent_id, extra=suffix)
 
 
 def _rekey_ordinal_point_observation_id(
@@ -7885,6 +7939,9 @@ class Migrator:
         self._obs_source: dict[str, str] = {}
         self._obs_row_index: dict[str, int] = {}
         self._author_derivations: dict[str, Derivation] = {}
+        # Parents actually replaced by emitted children. Retarget uses this
+        # exact map, never a prefix search.
+        self._exploded_children: dict[str, list[str]] = {}
         self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
         self._oxygen_pressure_landed: dict[str, Decimal] = {}
         self._oxygen_pressure_conflict: set[str] = set()
@@ -9262,10 +9319,24 @@ class Migrator:
                     notices=point_notices,
                     equipment=obs.get("equipment"),
                     parent_values=values,
+                    parent_point_conditions=point_conditions,
                 )
             if self._count(source_key).observations_out > before:
                 return
-        if exploded and isinstance(values.get("series"), list):
+        row_point_containers: list[tuple[str, list[Any]]] = []
+        if isinstance(values, Mapping):
+            row_items = values.get("rows")
+            if isinstance(row_items, list) and row_items:
+                row_point_containers.append(("rows", row_items))
+            if yield_items is None:
+                point_items = values.get("points")
+                if isinstance(point_items, list) and point_items:
+                    row_point_containers.append(("points", point_items))
+        if (
+            exploded
+            and isinstance(values.get("series"), list)
+            and not _parent_bound_categorical(value_sel)
+        ):
             before = self._count(source_key).observations_out
             for item in exploded:
                 self._emit_exploded_point(
@@ -9286,6 +9357,7 @@ class Migrator:
                     source_derivation=source_derivation,
                     equipment=obs.get("equipment"),
                     parent_values=values,
+                    parent_point_conditions=point_conditions,
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -9298,6 +9370,40 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+        elif row_point_containers and not _parent_bound_categorical(value_sel):
+            # Same _emit_exploded_point path as series. Yield tables already
+            # returned. Explicit row point_conditions overwrite inferred ones.
+            before = self._count(source_key).observations_out
+            for container_name, container in row_point_containers:
+                for index, raw in enumerate(container):
+                    self._emit_exploded_point(
+                        parent_id=obs_id,
+                        item={
+                            "index": index,
+                            "item": raw,
+                            "units": obs.get("units"),
+                            "container": container_name,
+                        },
+                        work=work,
+                        source_id=source_id,
+                        source_key=source_key,
+                        experiment_id=experiment_id,
+                        locator=locator,
+                        identity_base=(quantity, species, ident_kwargs),
+                        evidence=evidence,
+                        admission=admission,
+                        uncertainty=uncertainty_for(obs.get("uncertainty")),
+                        units=str(obs.get("units") or ""),
+                        read_from=read_from,
+                        derived_from=derived_from,
+                        source_derivation=source_derivation,
+                        equipment=obs.get("equipment"),
+                        parent_values=values,
+                        parent_point_conditions=point_conditions,
+                        content_stable_id=True,
+                    )
+            if self._count(source_key).observations_out > before:
+                return
         elif not value_sel.available:
             self.result.add_queue(
                 work.work_id,
@@ -9371,6 +9477,8 @@ class Migrator:
         notices: tuple[Notice, ...] = (),
         equipment: object = None,
         parent_values: object = None,
+        parent_point_conditions: Mapping[str, Located[Any]] | None = None,
+        content_stable_id: bool = False,
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
@@ -9424,6 +9532,24 @@ class Migrator:
             t_trail = t_sel.unit_trail
             t_original = _temperature_field_raw(raw_item, t_sel.field_name)
             coord = t_sel.amount
+            row_extra = series_row_extra(
+                raw_item, include_locator=content_stable_id
+            )
+            if content_stable_id:
+                point_id = _exploded_point_id(
+                    parent_id, item, coord, raw_item, row_extra
+                )
+            elif coord is not None:
+                point_id = series_point_id(parent_id, temperature=coord, extra=row_extra)
+            else:
+                point_id = _rekey_ordinal_point_observation_id(
+                    f"{parent_id}::point:{index}",
+                    temperature=None,
+                )
+                if point_id.endswith(f"::point:{index}"):
+                    printed = raw_item.get("as_published") or raw_item.get("value")
+                    if printed is not None:
+                        point_id = f"{parent_id}::printed:{printed}"
             if t_sel.field_name and not t_sel.available:
                 self.result.add_queue(
                     work.work_id,
@@ -9431,7 +9557,7 @@ class Migrator:
                     ["temperature_K"],
                     t_sel.reason or "series temperature_K is not numeric",
                     source=source_key,
-                    observation_id=(series_point_id(parent_id, temperature=coord, extra=series_row_extra(raw_item) if isinstance(raw_item, Mapping) else None) if coord is not None else f"{parent_id}::point:{index}"),
+                    observation_id=point_id,
                 )
             q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
                 quantity if isinstance(quantity, Quantity) else None
@@ -9447,7 +9573,7 @@ class Migrator:
                     value_sel.reason
                     or "series P is not grounded in a source pressure unit",
                     source=source_key,
-                    observation_id=(series_point_id(parent_id, temperature=coord, extra=series_row_extra(raw_item) if isinstance(raw_item, Mapping) else None) if coord is not None else f"{parent_id}::point:{index}"),
+                    observation_id=point_id,
                 )
             for key in value_sel.unused_ancillary:
                 self.result.add_queue(
@@ -9459,29 +9585,37 @@ class Migrator:
                         "left out (own-quantity identity incomplete)"
                     ),
                     source=source_key,
-                    observation_id=(series_point_id(parent_id, temperature=coord, extra=series_row_extra(raw_item) if isinstance(raw_item, Mapping) else None) if coord is not None else f"{parent_id}::point:{index}"),
+                    observation_id=point_id,
                 )
             extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
-        row_extra = series_row_extra(raw_item) if isinstance(raw_item, Mapping) else None
-        if coord is not None:
-            point_id = series_point_id(parent_id, temperature=coord, extra=row_extra)
         else:
-            point_id = _rekey_ordinal_point_observation_id(
-                f"{parent_id}::point:{index}",
-                temperature=None,
-            )
-            # No T on the point: keep a deterministic content key from printed
-            # payload fields rather than the encounter index alone.
-            if point_id.endswith(f"::point:{index}") and isinstance(raw_item, Mapping):
-                printed = raw_item.get("as_published") or raw_item.get("value")
-                if printed is not None:
-                    point_id = f"{parent_id}::printed:{printed}"
-                else:
-                    point_id = f"{parent_id}::point:{index}"
+            if content_stable_id:
+                point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
+            else:
+                point_id = f"{parent_id}::point:{index}"
 
         ident_kwargs = dict(ident_kwargs)
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
+        else:
+            # A row that does not print T must not inherit a parent temperature
+            # that contradicts the experiment. That disagreement is an invalid
+            # identity, and the row did not state the number.
+            inherited = ident_kwargs.get("temperature_K")
+            experiment = self.result.experiments.get(experiment_id)
+            exp_t = experiment.conditions.get("temperature_K") if experiment is not None else None
+            inherited_n = (
+                _temperature_number(inherited.value)
+                if inherited is not None and getattr(inherited, "is_value", False)
+                else None
+            )
+            exp_n = (
+                _temperature_number(exp_t.state.value)
+                if exp_t is not None and exp_t.state.is_value
+                else None
+            )
+            if inherited_n is not None and exp_n is not None and inherited_n != exp_n:
+                ident_kwargs.pop("temperature_K", None)
         q_token_point = (
             quantity.value
             if isinstance(quantity, State) and quantity.is_value
@@ -9591,6 +9725,13 @@ class Migrator:
                     **(point_conditions or {}),
                     **explicit_point_conditions,
                 }
+        if parent_point_conditions:
+            # Parent located conditions, including conversion provenance, are
+            # defaults. The child replaces only the keys it printed.
+            point_conditions = {
+                **parent_point_conditions,
+                **(point_conditions or {}),
+            }
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,
@@ -9617,6 +9758,9 @@ class Migrator:
             derivation,
         )
         self._add_observation(observation, source_key)
+        children = self._exploded_children.setdefault(parent_id, [])
+        if point_id not in children:
+            children.append(point_id)
 
     def _queue_unstated_derived_lineage(
         self,
@@ -11192,10 +11336,74 @@ class Migrator:
                 ),
             )
 
+    def _expand_exploded_id(self, token: str, self_id: str) -> list[str]:
+        """Replace one id with the children of a parent this run exploded.
+
+        Exact id only. A missing ``parent`` must not attach to ``parent::x``.
+        A parent that is still in the store is not a replacement.
+        """
+
+        if token in self.result.observations:
+            return [token]
+        children = self._exploded_children.get(token)
+        if not children:
+            return [token]
+        live = [
+            child
+            for child in children
+            if child in self.result.observations and child != self_id
+        ]
+        return live or [token]
+
+    def _rewrite_lineage_ids(
+        self, items: tuple[str, ...] | None, self_id: str
+    ) -> tuple[str, ...] | None:
+        if not items:
+            return None
+        rewritten: list[str] = []
+        changed = False
+        for token in items:
+            replacement = self._expand_exploded_id(token, self_id)
+            if replacement != [token]:
+                changed = True
+            rewritten.extend(replacement)
+        if not changed:
+            return None
+        return tuple(dict.fromkeys(rewritten))
+
+    def _retarget_exploded_parents(self) -> None:
+        """Point author lineage at children of parents this run actually exploded.
+
+        derived_from, derivation.inputs, and the author-lineage registry move
+        together, and they move before admission closure. A prefix of an
+        unrelated id is not a parent.
+        """
+
+        for obs in list(self.result.observations.values()):
+            new_from = self._rewrite_lineage_ids(obs.derived_from, obs.observation_id)
+            if new_from is not None:
+                object.__setattr__(obs, "derived_from", new_from)
+            if obs.derivation is not None:
+                new_inputs = self._rewrite_lineage_ids(
+                    obs.derivation.inputs, obs.observation_id
+                )
+                if new_inputs is not None:
+                    object.__setattr__(
+                        obs, "derivation", replace(obs.derivation, inputs=new_inputs)
+                    )
+        for obs_id, derivation in list(self._author_derivations.items()):
+            new_inputs = self._rewrite_lineage_ids(derivation.inputs, obs_id)
+            if new_inputs is not None:
+                self._author_derivations[obs_id] = replace(derivation, inputs=new_inputs)
+        for parent_id in list(self._exploded_children):
+            if parent_id not in self.result.observations:
+                self._author_derivations.pop(parent_id, None)
+
     def finalize(self) -> None:
         self._rebuild_works()
         self._apply_supersedes()
         self._resolve_queue_ids()
+        self._retarget_exploded_parents()
         self._close_conditional_method_classes()
         # Drop superseded_by pointers that do not resolve in the corpus.
         for obs in list(self.result.observations.values()):
