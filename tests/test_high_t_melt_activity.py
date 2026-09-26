@@ -25,6 +25,7 @@ from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
     OpenImccCompositionPolicyRefusal,
     evaluate_cleaned_melt,
 )
+import simulator.melt_backend.imcc_sf04.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.runner import PyrolysisRun
 
@@ -226,6 +227,19 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
         row["openimcc_pack_digest"] == high_t["openimcc_pack_digest"]
         for row in flux_provenance
     )
+    fe_provenance = [
+        row
+        for row in result.diagnostic["vapor_pressure_numerator_provenance"].values()
+        if row.get("activity_basis") is not None
+    ]
+    assert fe_provenance
+    assert all(row["activity_basis"] != "kress91_ferrous" for row in fe_provenance)
+
+
+def test_provider_omitted_high_t_control_defaults_to_openimcc() -> None:
+    result = _provider().dispatch(_request(BASE_MELT_MOL, CAP_PLUS_T_K))
+
+    assert result.diagnostic["high_t_melt_activity"]["provider"] == "openimcc"
 
 
 def test_above_3000_k_uses_openimcc_extrapolation_and_flags_it() -> None:
@@ -306,7 +320,10 @@ def test_simulator_default_passes_openimcc_authority_into_flux_dispatch() -> Non
 
 def test_constant_gamma_reproduces_pre_c3_physics_above_cap() -> None:
     provider = _provider()
-    baseline = provider.dispatch(_request(BASE_MELT_MOL, CAP_PLUS_T_K))
+    # Pin the legacy value: omitted control now selects the owner-approved OpenIMCC default.
+    baseline = provider.dispatch(
+        _request(BASE_MELT_MOL, CAP_PLUS_T_K, high_t_melt_activity="constant_gamma")
+    )
     explicit_legacy = provider.dispatch(
         _request(BASE_MELT_MOL, CAP_PLUS_T_K, high_t_melt_activity="constant_gamma")
     )
@@ -347,6 +364,60 @@ def test_projection_over_one_percent_refuses_and_provider_flags_fallback() -> No
         "openimcc_refused_constant_gamma_fallback" in source
         for source in result.diagnostic["vapor_pressures_source"].values()
     )
+    fallback_provenance = result.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]
+    assert any(
+        row["composition_projection_classification"]["projection_verdict"]
+        == "over_threshold"
+        for row in fallback_provenance.values()
+        if "composition_projection_classification" in row
+    )
+
+
+@pytest.mark.parametrize(
+    ("invalid_value", "invalid_reason"),
+    (
+        (float("nan"), "component_not_finite:NaCl"),
+        (-0.25, "component_negative:NaCl"),
+    ),
+)
+def test_invalid_projection_verdict_maps_to_typed_refusal(
+    monkeypatch,
+    invalid_value: float,
+    invalid_reason: str,
+) -> None:
+    monkeypatch.setattr(
+        openimcc_bridge_module,
+        "_cleaned_melt_wt_pct",
+        lambda _composition: (
+            {"SiO2": 99.0, "NaCl": invalid_value},
+            {"SiO2": 99.0},
+            1.0,
+        ),
+    )
+
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as refusal:
+        openimcc_bridge_module._cleaned_melt_policy({"SiO2": 1.0})
+
+    assert refusal.value.code == "openimcc_projection_invalid_input"
+    classification = refusal.value.diagnostics["composition_projection_classification"]
+    assert classification["projection_verdict"] == "invalid_input"
+    assert classification["invalid_reason"] == invalid_reason
+
+
+def test_openimcc_na_k_parent_activities_are_numeric() -> None:
+    result = evaluate_cleaned_melt(
+        _moles_from_wt({"Na2O": 5.0, "K2O": 1.0, "SiO2": 94.0}),
+        CAP_PLUS_T_K,
+    )
+
+    for oxide in ("Na2O", "K2O"):
+        parent = float(result.bridge.parent_oxide_activities[oxide])
+        single = float(result.single_cation_activities[oxide])
+        assert parent > 0.0
+        assert single > 0.0
+        assert parent == pytest.approx(single**2, rel=1.0e-12)
 
 
 def test_fe2o3_fold_is_numeric_and_lookup_only() -> None:

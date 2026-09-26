@@ -541,6 +541,8 @@ def _build_high_t_melt_activity_authority(
     composition_mol: Mapping[str, float],
     temperature_K: float,
     controls: Mapping[str, Any],
+    below_cap_fe_activity: float,
+    below_cap_fe_activity_basis: str,
 ) -> dict[str, Any] | None:
     """Resolve C3's high-temperature activity source once per pressure call.
 
@@ -550,7 +552,7 @@ def _build_high_t_melt_activity_authority(
     """
 
     mode = normalize_high_t_melt_activity(
-        controls.get("high_t_melt_activity", "constant_gamma")
+        controls.get("high_t_melt_activity", "openimcc")
     )
     if temperature_K <= VAPOROCK_T_MAX_K or mode != "openimcc":
         return None
@@ -579,6 +581,12 @@ def _build_high_t_melt_activity_authority(
         )
     except Exception as exc:  # noqa: BLE001 - C3 is an hour-local fallback
         code = str(getattr(exc, "code", "openimcc_evaluation_refused"))
+        diagnostics = getattr(exc, "diagnostics", {})
+        classification = (
+            diagnostics.get("composition_projection_classification")
+            if isinstance(diagnostics, Mapping)
+            else None
+        )
         base.update(
             {
                 "provider": "constant_gamma",
@@ -592,6 +600,11 @@ def _build_high_t_melt_activity_authority(
                 "openimcc_extrapolated": False,
                 "openimcc_flags": [],
                 "openimcc_notices": [],
+                "composition_projection_classification": (
+                    dict(classification)
+                    if isinstance(classification, Mapping)
+                    else {}
+                ),
             }
         )
         return base
@@ -630,12 +643,17 @@ def _build_high_t_melt_activity_authority(
 
     max_abs_dex = 0.0
     for oxide in _HIGH_T_FLUX_OXIDES:
-        legacy = melt_oxide_activity(
-            oxide,
-            composition_mol,
-            temperature_K=temperature_K,
-        )
-        legacy_activity = None if legacy is None else float(legacy.activity)
+        if oxide == "FeO":
+            legacy_activity = float(below_cap_fe_activity)
+            legacy_basis = below_cap_fe_activity_basis
+        else:
+            legacy = melt_oxide_activity(
+                oxide,
+                composition_mol,
+                temperature_K=temperature_K,
+            )
+            legacy_activity = None if legacy is None else float(legacy.activity)
+            legacy_basis = "constant_gamma" if legacy_activity is not None else None
         openimcc_activity = float(
             cleaned.single_cation_activities.get(oxide, 0.0) or 0.0
         )
@@ -644,9 +662,10 @@ def _build_high_t_melt_activity_authority(
             ratio_dex = math.log10(openimcc_activity / legacy_activity)
             max_abs_dex = max(max_abs_dex, abs(ratio_dex))
         base["seam"][oxide] = {
-            "constant_gamma_activity": legacy_activity,
+            "below_cap_activity": legacy_activity,
+            "below_cap_activity_basis": legacy_basis,
             "openimcc_activity": openimcc_activity,
-            "ratio_dex_openimcc_over_constant_gamma": ratio_dex,
+            "ratio_dex_openimcc_over_below_cap": ratio_dex,
         }
 
     previous_temperature = controls.get(
@@ -671,7 +690,7 @@ def _build_high_t_melt_activity_authority(
                 "max_abs_ratio_dex": max_abs_dex,
                 "threshold_dex": _HIGH_T_ACTIVITY_SEAM_LIMIT_DEX,
                 "message": (
-                    "openimcc/constant-gamma activity source switch exceeds "
+                    "openimcc/below-cap activity source switch exceeds "
                     "the provisional cap seam screen"
                 ),
             }
@@ -782,13 +801,6 @@ def _attach_high_t_activity_provenance(
                     ),
                 }
             )
-            classification = authority.get(
-                "composition_projection_classification"
-            )
-            if classification:
-                provenance["composition_projection_classification"] = dict(
-                    classification
-                )
             token = "openimcc"
         else:
             provenance["melt_activity_fallback"] = True
@@ -796,6 +808,11 @@ def _attach_high_t_activity_provenance(
             token = "openimcc_refused_constant_gamma_fallback"
             if fallback_reason.get("code"):
                 token += f"_{fallback_reason['code']}"
+        classification = authority.get("composition_projection_classification")
+        if classification:
+            provenance["composition_projection_classification"] = dict(
+                classification
+            )
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):
             source = f"{source}:{token}"
@@ -1696,10 +1713,33 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         melt_account_mol = dict(
             request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
         )
+        feo_activity_pressure_bar = vacuum_floor_bar
+        if intrinsic_fO2_log is not None:
+            from simulator.fe_redox import (
+                kress91_ferrous_feo_activity,
+                kress91_furnace_activity_pressure_bar,
+            )
+
+            feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
+                floor_bar=vacuum_floor_bar,
+            )
+            below_cap_fe_activity = kress91_ferrous_feo_activity(
+                comp_wt=comp_wt,
+                fO2_log=intrinsic_fO2_log,
+                T_K=T_K,
+                pressure_bar=feo_activity_pressure_bar,
+                floor_bar=vacuum_floor_bar,
+            )
+            below_cap_fe_activity_basis = "kress91_ferrous"
+        else:
+            below_cap_fe_activity = comp_wt.get("FeO", 0.0) / 100.0
+            below_cap_fe_activity_basis = "feo_weight_fraction"
         high_t_activity_authority = _build_high_t_melt_activity_authority(
             composition_mol=melt_account_mol,
             temperature_K=T_K,
             controls=controls,
+            below_cap_fe_activity=below_cap_fe_activity,
+            below_cap_fe_activity_basis=below_cap_fe_activity_basis,
         )
         if high_t_activity_authority:
             for notice in high_t_activity_authority.get("notices", ()):
@@ -1711,11 +1751,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import (
                 calphad_ferrous_feo_activity_diagnostic,
-                kress91_furnace_activity_pressure_bar,
-            )
-
-            feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
-                floor_bar=vacuum_floor_bar,
             )
 
             feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
@@ -2302,6 +2337,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 continue
 
             fe_degraded_activity_basis = None
+            fe_activity_basis = None
             if parent_oxide == 'FeO':
                 candidate_activity = _high_t_activity_for_parent(
                     parent_oxide,
@@ -2316,17 +2352,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ):
                     oxide_activity = candidate_activity
                     a_oxide = oxide_activity.activity
+                    fe_activity_basis = "openimcc_single_cation"
                 elif intrinsic_fO2_log is not None:
                     oxide_activity = None
-                    from simulator.fe_redox import kress91_ferrous_feo_activity
-
-                    a_oxide = kress91_ferrous_feo_activity(
-                        comp_wt=comp_wt,
-                        fO2_log=intrinsic_fO2_log,
-                        T_K=T_K,
-                        pressure_bar=feo_activity_pressure_bar,
-                        floor_bar=vacuum_floor_bar,
-                    )
+                    a_oxide = below_cap_fe_activity
+                    fe_activity_basis = "kress91_ferrous"
                 else:
                     oxide_activity = None
                     # Documented degraded pre-existing public-caller path:
@@ -2336,6 +2366,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     # Matrix lock: do NOT splice VapoRock IW FeO activities.
                     a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
                     fe_degraded_activity_basis = "feo_weight_fraction"
+                    fe_activity_basis = fe_degraded_activity_basis
                     warnings.append(
                         "Fe degraded_activity_basis=feo_weight_fraction: "
                         "intrinsic_fO2_log absent; using FeO wt%/100 "
@@ -2565,7 +2596,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                             fe_degraded_activity_basis
                         )
                     else:
-                        provenance["activity_basis"] = "kress91_ferrous"
+                        provenance["activity_basis"] = fe_activity_basis
                         provenance["degraded_activity_basis"] = None
                 vapor_pressure_provenance[species] = provenance
                 if oxide_activity is not None:

@@ -233,7 +233,7 @@ def _cleaned_melt_policy(
     dropped = {
         name: value
         for name, value in source_wt_pct.items()
-        if name not in OPENIMCC_PARENT_OXIDES and name != "Fe2O3" and value > 0.0
+        if name not in OPENIMCC_PARENT_OXIDES and name != "Fe2O3"
     }
     dropped_mol_per_kg, unavailable_reasons = projected_component_moles_per_kg(
         dropped,
@@ -245,7 +245,19 @@ def _cleaned_melt_policy(
         dropped_component_mol_per_kg=dropped_mol_per_kg,
         dropped_component_mol_unavailable_reasons=unavailable_reasons,
     )
-    if not classification.within_threshold:
+    classification_record = classification.as_diagnostics()
+    if classification.verdict == "invalid_input":
+        raise OpenImccCompositionPolicyRefusal(
+            "openimcc_projection_invalid_input",
+            (
+                "cleaned-melt projected composition is invalid: "
+                f"{classification.invalid_reason or 'unknown reason'}"
+            ),
+            diagnostics={
+                PROJECTED_BULK_CLASSIFICATION_KEY: classification_record,
+            },
+        )
+    if classification.verdict == "over_threshold":
         raise OpenImccCompositionPolicyRefusal(
             "openimcc_projection_over_threshold",
             (
@@ -254,11 +266,10 @@ def _cleaned_melt_policy(
                 f"{classification.dropped_total_wt_pct:.12g} wt%"
             ),
             diagnostics={
-                PROJECTED_BULK_CLASSIFICATION_KEY: classification.as_diagnostics(),
+                PROJECTED_BULK_CLASSIFICATION_KEY: classification_record,
             },
         )
 
-    classification_record = classification.as_diagnostics()
     policy = dict(classification_record)
     policy[PROJECTED_BULK_CLASSIFICATION_KEY] = classification_record
     policy["status"] = "projected" if classification.components else "direct"
