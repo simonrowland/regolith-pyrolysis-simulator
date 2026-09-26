@@ -181,7 +181,6 @@ def main(argv: list[str] | None = None) -> int:
     if args.report_only:
         from simulator.battery.score import (
             load_residuals_jsonl,
-            load_score_context,
             render_score_report_from_payloads,
         )
 

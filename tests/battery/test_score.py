@@ -6,8 +6,13 @@ Expected values come from the schema contract, never from the code under test.
 from __future__ import annotations
 
 import ast
+import hashlib
 import inspect
+import json
 import math
+import shutil
+import subprocess
+import sys
 import warnings
 from collections import Counter
 from dataclasses import replace
@@ -65,6 +70,7 @@ from simulator.battery.score import (
     compute_metric,
     dumps_residual_line,
     engines_from_names,
+    load_score_context,
     parse_species_formula,
     resolve_source_relation,
     score_eligible_from_conjuncts,
@@ -903,6 +909,128 @@ def test_battery_score_script_runs_status_diff() -> None:
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
     assert "status_diff_rows" in called
+
+
+def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> None:
+    repo_root = Path(__file__).resolve().parents[2]
+    literature = tmp_path / "data" / "literature"
+    works = literature / "works"
+    observations = literature / "observations-v2"
+    battery = tmp_path / "data" / "battery"
+    works.mkdir(parents=True)
+    observations.mkdir()
+    battery.mkdir()
+    work_name = (
+        "94aef07ca77601ab38121f5c1f9ae3d4dad4a6404dab4bbcf595c56a9a049471.yaml"
+    )
+    shutil.copy2(
+        repo_root / "data" / "literature" / "works" / work_name,
+        works / work_name,
+    )
+    observation_name = "vacuum_pyrolysis_measurements.yaml"
+    shutil.copy2(
+        repo_root / "data" / "literature" / "observations-v2" / observation_name,
+        observations / observation_name,
+    )
+    (battery / "migration-report.md").write_text(
+        "\n".join(
+            (
+                "rows in: 1",
+                "records out (observations): 1",
+                "works: 1",
+                "experiments: 1",
+                "queue size: 0",
+                "hard issues: 0",
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (battery / "migration-queue.yaml").write_text("\n", encoding="utf-8")
+    subprocess.run(["git", "init", "--quiet", str(tmp_path)], check=True)
+    subprocess.run(["git", "-C", str(tmp_path), "add", "data"], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(tmp_path),
+            "-c",
+            "user.name=Battery score test",
+            "-c",
+            "user.email=battery-score-test@example.invalid",
+            "commit",
+            "--quiet",
+            "-m",
+            "test battery store",
+        ],
+        check=True,
+    )
+
+    source_id = "pomeroy_cardiff_2006_measurements"
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(repo_root / "scripts" / "battery_score.py"),
+            "--root",
+            str(tmp_path),
+            "--engines",
+            "internal-analytical",
+            "--work",
+            source_id,
+            "--limit",
+            "1",
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+
+    wrapper_rows = tuple(
+        json.loads(line)
+        for line in (tmp_path / "data" / "battery" / "residuals.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line.strip()
+    )
+    wrapper_records = tuple(
+        row for row in wrapper_rows if row.get("kind") != "battery_store_stamp"
+    )
+
+    engines = engines_from_names(["internal-analytical"])
+    context = load_score_context(tmp_path)
+    residuals, candidates = score_store(
+        context,
+        engines=engines,
+        work_id=source_id,
+        limit=1,
+    )
+    direct_records = tuple(
+        json.loads(
+            dumps_residual_line(residual, candidates.get(residual.candidate or ""))
+        )
+        for residual in residuals
+    )
+    assert wrapper_records == direct_records
+
+    wrapper_digest = hashlib.sha256(
+        "\n".join(
+            json.dumps(
+                record, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+            )
+            for record in wrapper_records
+        ).encode("utf-8")
+    ).hexdigest()
+    direct_digest = hashlib.sha256(
+        "\n".join(
+            json.dumps(
+                record, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+            )
+            for record in direct_records
+        ).encode("utf-8")
+    ).hexdigest()
+    assert wrapper_digest == direct_digest
 
 
 def test_status_diff_names_schema_axis_on_outcome_change() -> None:
