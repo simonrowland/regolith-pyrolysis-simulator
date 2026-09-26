@@ -1015,7 +1015,7 @@ def _assert_schema_shape(payload: dict) -> None:
         "retained_melt",
         "retained_redox_buffer",
     }.issubset(ideal_train["terms"])
-    assert ideal_train["status"] in {"ok", "refused"}
+    assert ideal_train["status"] in {"ok", "partial", "refused"}
     assert ideal_train["closure"]["maximum_residual_fraction"] <= 5.0e-12
     for row in ideal_train["rows"]:
         assert row["status"] in {"ok", "refused"}
@@ -1537,6 +1537,35 @@ def test_runner_golden_fixture_matches(scenario):
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
         "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
+
+
+def test_runner_short_c2a_derives_stage0_native_metal_taps():
+    """Short C2A runner proof for typed Stage-0 Co/Ni drain-tap provenance."""
+
+    payload = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    ).run()
+    ideal_train = payload["yield_disposition"]["ideal_train_melt_boundary"]
+    rows = {row["element"]: row for row in ideal_train["rows"]}
+
+    assert payload["status"] == "ok"
+    assert ideal_train["status"] == "ok"
+    for element in ("Co", "Ni"):
+        assert rows[element]["status"] == "ok"
+        assert rows[element]["drain_tapped_mol_atoms"] == pytest.approx(
+            rows[element]["feedstock_input_mol_atoms"]
+        )
+        assert rows[element]["ideal_train_fraction"] == pytest.approx(1.0)
+        assert rows[element]["partition_residual_fraction"] <= 5.0e-12
+        assert (
+            "drain_tapped_native_metal_seed"
+            in rows[element]["term_provenance"]["drain_tapped"]["flags"]
+        )
+    assert ideal_train["closure"]["maximum_residual_fraction"] <= 5.0e-12
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])

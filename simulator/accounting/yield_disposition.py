@@ -79,6 +79,8 @@ _CLOSURE_LIMIT_FRACTION = 5.0e-14
 _IDEAL_TRAIN_CLOSURE_LIMIT_FRACTION = 5.0e-12
 _IDEAL_TRAIN_EVAPORATION_PREFIX = "evaporate_"
 _IDEAL_TRAIN_TAP_ACCOUNT = "terminal.drain_tap_material"
+_IDEAL_TRAIN_NATIVE_METAL_SEED_SOURCE_SUFFIX = " Stage 0 metal alloy"
+_IDEAL_TRAIN_NATIVE_METAL_SEED_FLAG = "drain_tapped_native_metal_seed"
 _IDEAL_TRAIN_OXYGEN_EXCHANGE = "oxygen_reservoir_exchange"
 _IDEAL_TRAIN_IN_POT_DESTINATION_TERMS: Mapping[str, str] = {
     "melt_retained": "retained_melt",
@@ -1559,9 +1561,40 @@ def _build_ideal_train_melt_boundary(
     surface_transition_flags: defaultdict[str, set[str]] = defaultdict(set)
     surface_refusals: defaultdict[str, list[dict[str, str]]] = defaultdict(list)
     tap_refusals: defaultdict[str, list[dict[str, str]]] = defaultdict(list)
-    tap_transition_flags: defaultdict[str, set[str]] = defaultdict(set)
-    surface_transition_count = 0
-    tap_transition_count = 0
+    tap_provenance_flags: defaultdict[str, set[str]] = defaultdict(set)
+    oxygen_exchange_outward: defaultdict[str, float] = defaultdict(float)
+    oxygen_exchange_returned: defaultdict[str, float] = defaultdict(float)
+
+    # Derivation: Stage-0 native metal is a typed external load whose source
+    # record names the metal-alloy seed.  It already represents native metal
+    # leaving through the drain tap, so use that record as provenance instead
+    # of inferring yield from the terminal account balance.
+    for load in tuple(getattr(ledger, "external_loads", ())):
+        if (
+            str(getattr(load, "account", "")) != _IDEAL_TRAIN_TAP_ACCOUNT
+            or getattr(load, "material_origin", None) != "feedstock"
+            or not str(getattr(load, "source", "")).endswith(
+                _IDEAL_TRAIN_NATIVE_METAL_SEED_SOURCE_SUFFIX
+            )
+        ):
+            continue
+        seed_atoms, seed_refusals = _feedstock_atoms_from_lots(
+            (load,),
+            registry,
+            _IDEAL_TRAIN_TAP_ACCOUNT,
+        )
+        for element, amount in seed_atoms.items():
+            drain_tapped[element] += float(amount)
+            tap_provenance_flags[element].add(
+                _IDEAL_TRAIN_NATIVE_METAL_SEED_FLAG
+            )
+        for element in seed_refusals:
+            tap_refusals[element].append(
+                {
+                    "code": "native_metal_seed_origin_unresolved",
+                    "source": str(getattr(load, "source", "")),
+                }
+            )
 
     # Derivation: surface_crossed is the feedstock-origin atom content of the
     # melt debit on each committed evaporation transition.  Oxygen credited to
@@ -1572,7 +1605,6 @@ def _build_ideal_train_melt_boundary(
     for transition in tuple(getattr(ledger, "transitions", ())):
         name = str(getattr(transition, "name", ""))
         if name.startswith(_IDEAL_TRAIN_EVAPORATION_PREFIX):
-            surface_transition_count += 1
             species = name[len(_IDEAL_TRAIN_EVAPORATION_PREFIX) :]
             debit_atoms, debit_refusals = _transition_feedstock_atoms(
                 transition,
@@ -1668,18 +1700,30 @@ def _build_ideal_train_melt_boundary(
                     )
 
         if name == _IDEAL_TRAIN_OXYGEN_EXCHANGE:
-            # Derivation: an oxygen_reservoir_exchange debit from the melt's
-            # fo2 buffer to process.overhead_gas is a direct pot-boundary
-            # crossing.  Count its feedstock-origin debit; do not infer it
-            # from the eventual overhead/offgas account balance.
-            oxygen_atoms, oxygen_refusals = _transition_feedstock_atoms(
+            # Derivation: oxygen_reservoir_exchange is bidirectional.  Count
+            # feedstock-origin atoms on buffer debits as outward crossings and
+            # subtract feedstock-origin atoms on buffer credits returned from
+            # the overhead.  The net exchange is the only exchange-derived
+            # surface term, so returned O is not also retained in the buffer.
+            outward_atoms, outward_refusals = _transition_feedstock_atoms(
                 transition,
                 "debits",
                 "reservoir.fo2_buffer",
                 registry,
             )
-            for element in sorted(set(oxygen_atoms) | oxygen_refusals):
-                if element in oxygen_refusals:
+            returned_atoms, returned_refusals = _transition_feedstock_atoms(
+                transition,
+                "credits",
+                "reservoir.fo2_buffer",
+                registry,
+            )
+            for element in sorted(
+                set(outward_atoms)
+                | set(returned_atoms)
+                | outward_refusals
+                | returned_refusals
+            ):
+                if element in outward_refusals or element in returned_refusals:
                     surface_refusals[element].append(
                         {
                             "code": "oxygen_exchange_origin_unresolved",
@@ -1687,13 +1731,15 @@ def _build_ideal_train_melt_boundary(
                         }
                     )
                     continue
-                amount = float(oxygen_atoms.get(element, 0.0))
-                if amount > 0.0:
-                    surface_crossed[element] += amount
-                    surface_species_by_element[element].add("O2")
-                    surface_transition_flags[element].add(
-                        "oxygen_reservoir_exchange_authoritative"
-                    )
+                oxygen_exchange_outward[element] += float(
+                    outward_atoms.get(element, 0.0)
+                )
+                oxygen_exchange_returned[element] += float(
+                    returned_atoms.get(element, 0.0)
+                )
+
+        if name == _IDEAL_TRAIN_OXYGEN_EXCHANGE:
+            continue
 
         # Derivation: drain_tapped is the feedstock-origin atom content of
         # credits to the drain account on committed transitions.  A residual
@@ -1706,7 +1752,6 @@ def _build_ideal_train_melt_boundary(
             registry,
         )
         if tap_atoms or tap_origin_refusals:
-            tap_transition_count += 1
             for element, amount in tap_atoms.items():
                 drain_tapped[element] += float(amount)
             for element in tap_origin_refusals:
@@ -1718,9 +1763,39 @@ def _build_ideal_train_melt_boundary(
                 )
             if name == "native_fe_metal_partition":
                 for element in tap_atoms:
-                    tap_transition_flags[element].add(
+                    tap_provenance_flags[element].add(
                         "native_fe_metal_partition_authoritative"
                     )
+
+    for element in sorted(
+        set(oxygen_exchange_outward) | set(oxygen_exchange_returned)
+    ):
+        exchange_net = float(
+            oxygen_exchange_outward.get(element, 0.0)
+        ) - float(oxygen_exchange_returned.get(element, 0.0))
+        surface_value = float(surface_crossed.get(element, 0.0))
+        net_surface_value = surface_value + exchange_net
+        if net_surface_value < -_atom_tolerance(max(abs(net_surface_value), 1.0)):
+            surface_refusals[element].append(
+                {
+                    "code": "oxygen_exchange_return_exceeds_surface_evidence",
+                    "surface_mol_atoms": surface_value,
+                    "outward_mol_atoms": float(
+                        oxygen_exchange_outward.get(element, 0.0)
+                    ),
+                    "returned_mol_atoms": float(
+                        oxygen_exchange_returned.get(element, 0.0)
+                    ),
+                }
+            )
+            continue
+        surface_crossed[element] = max(0.0, net_surface_value)
+        if abs(exchange_net) > _atom_tolerance(max(abs(exchange_net), 1.0)):
+            surface_transition_flags[element].add(
+                "oxygen_reservoir_exchange_authoritative"
+            )
+        if surface_crossed[element] > 0.0:
+            surface_species_by_element[element].add("O2")
 
     feedstock_by_account = _feedstock_origin_by_account(ledger)
     tap_account_atoms = feedstock_by_account.get(_IDEAL_TRAIN_TAP_ACCOUNT, {})
@@ -1751,6 +1826,7 @@ def _build_ideal_train_melt_boundary(
     maximum_residual_fraction = 0.0
     maximum_residual_mol_atoms = 0.0
     refused_elements: list[str] = []
+    derived_elements: list[str] = []
     term_names = [
         *_IDEAL_TRAIN_IN_POT_DESTINATION_TERMS.values(),
         *_IDEAL_TRAIN_OTHER_DESTINATION_TERMS.values(),
@@ -1841,7 +1917,8 @@ def _build_ideal_train_melt_boundary(
                 "ledger.transitions: evaporate_* debits of "
                 "process.cleaned_melt, excluding same-transition "
                 "reservoir.fo2_buffer credits; plus direct "
-                "reservoir.fo2_buffer-to-overhead oxygen exchange debits"
+                "reservoir.fo2_buffer-to-overhead oxygen exchange net of "
+                "feedstock-origin buffer credits returned from overhead"
             ),
             "flags": [],
             "by_species": {},
@@ -1865,8 +1942,11 @@ def _build_ideal_train_melt_boundary(
         tap_provenance: dict[str, Any] = {
             "status": "derived" if tap_value is not None else "refused",
             "authority": "ledger_derived",
-            "source": "ledger.transitions: credits to terminal.drain_tap_material",
-            "flags": sorted(tap_transition_flags.get(element, ())),
+            "source": (
+                "ledger.transitions: credits to terminal.drain_tap_material; "
+                "ledger.external_loads: typed Stage-0 native-metal seed"
+            ),
+            "flags": sorted(tap_provenance_flags.get(element, ())),
         }
         if tap_value is None:
             tap_provenance["refusal"] = [
@@ -1922,6 +2002,8 @@ def _build_ideal_train_melt_boundary(
                 "flags": [],
                 "refusal": row_refusals,
             }
+        else:
+            derived_elements.append(element)
         ideal_train_mol_atoms = (
             None
             if row_refusals or surface_value is None or tap_value is None
@@ -1955,7 +2037,13 @@ def _build_ideal_train_melt_boundary(
     return {
         "basis": "feedstock_element_atom_fraction",
         "control_volume": "pot",
-        "status": "ok" if not refused_elements else "refused",
+        "status": (
+            "ok"
+            if derived_elements and not refused_elements
+            else "partial"
+            if derived_elements
+            else "refused"
+        ),
         "terms": ["surface_crossed", "drain_tapped", *term_names],
         "other_in_pot_terms": [
             term
@@ -1972,11 +2060,13 @@ def _build_ideal_train_melt_boundary(
                 "reservoir.fo2_buffer credits; plus the explicit Fe vapour "
                 "credit of native_fe_metal_partition and native Fe saturation "
                 "overhead-vapour credits, and oxygen_reservoir_exchange "
-                "debits from reservoir.fo2_buffer to process.overhead_gas"
+                "net feedstock-origin atoms: reservoir.fo2_buffer debits "
+                "outward minus buffer credits returned from process.overhead_gas"
             ),
             "drain_tapped": (
                 "feedstock-origin element atoms in ledger transition credits "
-                "to terminal.drain_tap_material"
+                "to terminal.drain_tap_material, plus the typed Stage-0 "
+                "native-metal external load"
             ),
             "retained_melt": (
                 "feedstock-origin atoms in accounts mapped to melt_retained"
@@ -2001,10 +2091,6 @@ def _build_ideal_train_melt_boundary(
             "maximum_residual_mol_atoms": maximum_residual_mol_atoms,
             "refused_elements": refused_elements,
         },
-        "evidence": {
-            "evaporation_transition_count": surface_transition_count,
-            "tap_transition_count": tap_transition_count,
-        },
     }
 
 
@@ -2014,9 +2100,20 @@ def _transition_feedstock_atoms(
     account: str,
     registry: Mapping[str, Any],
 ) -> tuple[dict[str, float], set[str]]:
+    return _feedstock_atoms_from_lots(
+        getattr(transition, side, ()),
+        registry,
+        account,
+    )
+
+
+def _feedstock_atoms_from_lots(
+    lots: Iterable[Any],
+    registry: Mapping[str, Any],
+    account: str,
+) -> tuple[dict[str, float], set[str]]:
     atoms: defaultdict[str, float] = defaultdict(float)
     unresolved: set[str] = set()
-    lots = getattr(transition, side, ())
     for lot in lots:
         if str(getattr(lot, "account", "")) != account:
             continue

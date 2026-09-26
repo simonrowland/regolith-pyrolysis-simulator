@@ -1661,6 +1661,63 @@ def test_native_metal_taps_remain_distinct_from_retained_metal_phase() -> None:
     )
 
 
+def test_ideal_train_stage0_native_metal_seed_is_drain_tapped() -> None:
+    co_kg = resolve_species_formula("Co", {}).molar_mass_kg_per_mol()
+    ni_kg = resolve_species_formula("Ni", {}).molar_mass_kg_per_mol()
+    ledger = AtomLedger()
+    ledger.load_external(
+        "terminal.drain_tap_material",
+        {"Co": co_kg, "Ni": ni_kg},
+        source="lunar_mare_low_ti Stage 0 metal alloy",
+        material_origin="feedstock",
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+    block = payload["ideal_train_melt_boundary"]
+    rows = {row["element"]: row for row in block["rows"]}
+
+    assert block["status"] == "ok"
+    for element in ("Co", "Ni"):
+        assert rows[element]["status"] == "ok"
+        assert rows[element]["drain_tapped_mol_atoms"] == pytest.approx(1.0)
+        assert rows[element]["ideal_train_fraction"] == pytest.approx(1.0)
+        assert rows[element]["partition_residual_fraction"] <= 5.0e-12
+        assert (
+            "drain_tapped_native_metal_seed"
+            in rows[element]["term_provenance"]["drain_tapped"]["flags"]
+        )
+
+
+def test_ideal_train_block_is_partial_when_rows_mix_derived_and_refused() -> None:
+    feo_kg = resolve_species_formula("FeO", {}).molar_mass_kg_per_mol()
+    co_kg = resolve_species_formula("Co", {}).molar_mass_kg_per_mol()
+    ledger = AtomLedger()
+    ledger.load_external(
+        "process.cleaned_melt",
+        {"FeO": feo_kg},
+        source="synthetic FeO feedstock",
+        material_origin="feedstock",
+    )
+    ledger.load_external(
+        "terminal.drain_tap_material",
+        {"Co": co_kg},
+        source="untyped direct tap",
+        material_origin="feedstock",
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+    rows = {
+        row["element"]: row
+        for row in payload["ideal_train_melt_boundary"]["rows"]
+    }
+
+    assert payload["ideal_train_melt_boundary"]["status"] == "partial"
+    assert rows["Fe"]["status"] == "ok"
+    assert rows["Fe"]["ideal_train_fraction"] == pytest.approx(0.0)
+    assert rows["Co"]["status"] == "refused"
+    assert rows["Co"]["ideal_train_fraction"] is None
+
+
 def test_ideal_train_wall_deposit_still_counts_surface_crossed() -> None:
     feo_kg = resolve_species_formula("FeO", {}).molar_mass_kg_per_mol()
     fe_kg = resolve_species_formula("Fe", {}).molar_mass_kg_per_mol()
@@ -1884,6 +1941,141 @@ def test_ideal_train_oxygen_reservoir_exchange_crosses_surface() -> None:
     assert "oxygen_reservoir_exchange_authoritative" in oxygen[
         "term_provenance"
     ]["surface_crossed"]["flags"]
+
+
+def test_ideal_train_oxygen_reservoir_exchange_nets_returned_feedstock_atoms() -> None:
+    o2_kg = resolve_species_formula("O2", {}).molar_mass_kg_per_mol()
+    ledger = AtomLedger()
+    ledger.load_external(
+        "reservoir.fo2_buffer",
+        {"O2": o2_kg},
+        source="synthetic oxygen-buffer feedstock",
+        material_origin="feedstock",
+    )
+    ledger.apply(
+        LedgerTransition(
+            name="oxygen_reservoir_exchange",
+            debits=(MaterialLot("reservoir.fo2_buffer", {"O2": o2_kg}),),
+            credits=(MaterialLot("process.overhead_gas", {"O2": o2_kg}),),
+        )
+    )
+    ledger.apply(
+        LedgerTransition(
+            name="oxygen_reservoir_exchange",
+            debits=(MaterialLot("process.overhead_gas", {"O2": o2_kg}),),
+            credits=(MaterialLot("reservoir.fo2_buffer", {"O2": o2_kg}),),
+        )
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+    oxygen = next(
+        row
+        for row in payload["ideal_train_melt_boundary"]["rows"]
+        if row["element"] == "O"
+    )
+
+    assert oxygen["status"] == "ok"
+    assert oxygen["surface_crossed_mol_atoms"] == pytest.approx(0.0)
+    assert oxygen["retained_redox_buffer"] == pytest.approx(2.0)
+    assert oxygen["ideal_train_fraction"] == pytest.approx(0.0)
+    assert oxygen["partition_residual_fraction"] <= 5.0e-12
+
+
+def test_ideal_train_exchange_return_cancels_surface_oxygen() -> None:
+    feo_kg = resolve_species_formula("FeO", {}).molar_mass_kg_per_mol()
+    fe_kg = resolve_species_formula("Fe", {}).molar_mass_kg_per_mol()
+    o2_kg = resolve_species_formula("O2", {}).molar_mass_kg_per_mol()
+    ledger = AtomLedger()
+    ledger.load_external(
+        "process.cleaned_melt",
+        {"FeO": feo_kg},
+        source="synthetic FeO saturation feedstock",
+        material_origin="feedstock",
+    )
+    ledger.apply(
+        LedgerTransition(
+            name="native_fe_saturation_split",
+            debits=(MaterialLot("process.cleaned_melt", {"FeO": feo_kg}),),
+            credits=(
+                MaterialLot("process.overhead_gas", {"O2": 0.5 * o2_kg}),
+                MaterialLot("terminal.drain_tap_material", {"Fe": fe_kg}),
+            ),
+        )
+    )
+    ledger.apply(
+        LedgerTransition(
+            name="oxygen_reservoir_exchange",
+            debits=(
+                MaterialLot("process.overhead_gas", {"O2": 0.5 * o2_kg}),
+            ),
+            credits=(
+                MaterialLot("reservoir.fo2_buffer", {"O2": 0.5 * o2_kg}),
+            ),
+        )
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+    rows = {
+        row["element"]: row
+        for row in payload["ideal_train_melt_boundary"]["rows"]
+    }
+
+    assert rows["Fe"]["status"] == "ok"
+    assert rows["O"]["status"] == "ok"
+    assert rows["O"]["surface_crossed_mol_atoms"] == pytest.approx(0.0)
+    assert rows["O"]["retained_redox_buffer"] == pytest.approx(1.0)
+    assert rows["O"]["ideal_train_fraction"] == pytest.approx(0.0)
+    assert rows["O"]["partition_residual_fraction"] <= 5.0e-12
+
+
+def test_ideal_train_evaporation_buffer_oxygen_then_exchange_counts_once() -> None:
+    feo_kg = resolve_species_formula("FeO", {}).molar_mass_kg_per_mol()
+    fe_kg = resolve_species_formula("Fe", {}).molar_mass_kg_per_mol()
+    o2_kg = resolve_species_formula("O2", {}).molar_mass_kg_per_mol()
+    ledger = AtomLedger()
+    ledger.load_external(
+        "process.cleaned_melt",
+        {"FeO": feo_kg},
+        source="synthetic FeO feedstock",
+        material_origin="feedstock",
+    )
+    ledger.apply(
+        LedgerTransition(
+            name="evaporate_Fe",
+            debits=(MaterialLot("process.cleaned_melt", {"FeO": feo_kg}),),
+            credits=(
+                MaterialLot("process.overhead_gas", {"Fe": fe_kg}),
+                MaterialLot("reservoir.fo2_buffer", {"O2": 0.5 * o2_kg}),
+            ),
+        )
+    )
+    ledger.apply(
+        LedgerTransition(
+            name="oxygen_reservoir_exchange",
+            debits=(
+                MaterialLot("reservoir.fo2_buffer", {"O2": 0.5 * o2_kg}),
+            ),
+            credits=(
+                MaterialLot("process.overhead_gas", {"O2": 0.5 * o2_kg}),
+            ),
+        )
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+    rows = {
+        row["element"]: row
+        for row in payload["ideal_train_melt_boundary"]["rows"]
+    }
+
+    assert rows["Fe"]["surface_crossed_mol_atoms"] == pytest.approx(1.0)
+    assert rows["Fe"]["ideal_train_fraction"] == pytest.approx(1.0)
+    assert rows["O"]["surface_crossed_mol_atoms"] == pytest.approx(1.0)
+    assert rows["O"]["retained_redox_buffer"] == pytest.approx(0.0)
+    assert rows["O"]["ideal_train_fraction"] == pytest.approx(1.0)
+    assert all(
+        rows[element]["partition_residual_fraction"] <= 5.0e-12
+        for element in ("Fe", "O")
+    )
 
 
 def test_known_metal_staging_and_condensation_holdup_accounts_are_mapped() -> None:
