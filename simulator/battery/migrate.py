@@ -9321,7 +9321,21 @@ class Migrator:
         )
         assert locator is not None
         obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
+        quantity, q_reason = map_quantity(
+            obs_type, values, units=obs.get("units"), row=obs
+        )
+        if q_reason:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["quantity"],
+                q_reason,
+                source=source_key,
+                observation_id=obs_id,
+            )
+        q_token = quantity.value if quantity.is_value else None
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
+        phase_provenance: str | None = None
         transition_reason = transition_phase_reason(obs_type, values)
         if (phase_raw is None or phase_raw == "") and transition_reason:
             phase, unmapped_phase = State.unknown(transition_reason), None
@@ -9333,6 +9347,21 @@ class Migrator:
                 token = janaf_extract_phase(source_id, unmapped_phase)
                 if token is not None:
                     phase, unmapped_phase = State.of(token), None
+        if source_id == "kems-042-plante-1979" and q_token is Quantity.P_PARTIAL:
+            phase = State.of(Phase.G)
+            unmapped_phase = None
+            source_standard_state = obs.get("standard_state") or values.get(
+                "standard_state"
+            )
+            if re.search(r"\bK\s*\(g\)", " ".join(str(source_standard_state).split())):
+                phase_provenance = (
+                    "species.phase=gas declared by source standard_state K(g)"
+                )
+            else:
+                phase_provenance = (
+                    "species.phase=gas derived from quantity=partial_pressure "
+                    "(partial pressure is a gas-phase quantity)"
+                )
         if phase_raw is None or phase_raw == "":
             measured.missing_phases += 1
             self.result.add_queue(
@@ -9359,18 +9388,6 @@ class Migrator:
         species = make_species(
             species_formula, phase, polymorph=polymorph_from_extract(obs)
         )
-        quantity, q_reason = map_quantity(
-            obs_type, values, units=obs.get("units"), row=obs
-        )
-        if q_reason:
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["quantity"],
-                q_reason,
-                source=source_key,
-                observation_id=obs_id,
-            )
         suffix_formula, suffix_derivation, suffix_reference = (None, None, None)
         raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
         if isinstance(raw_quantity, str):
@@ -9865,6 +9882,19 @@ class Migrator:
                 value_conversion,
                 read_from,
             )
+        if phase_provenance is not None:
+            if value_derivation is None:
+                value_derivation = Derivation(
+                    relation=phase_provenance,
+                    inputs=(read_from,),
+                    parameters=(),
+                    output_unit="phase",
+                )
+            else:
+                value_derivation = replace(
+                    value_derivation,
+                    relation=f"{value_derivation.relation}; {phase_provenance}",
+                )
         for prose_item in derived_prose:
             self.result.add_queue(
                 work.work_id,

@@ -349,6 +349,26 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
     assert len(buckets["admitted"]) == 162
     assert len(buckets["pending"]) == 59
     assert len(measured) == 383
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in measured
+    )
+    phase_relations = [
+        observation.derivation.relation
+        for observation in measured
+        if observation.derivation is not None
+    ]
+    assert len(phase_relations) == len(measured)
+    assert all("species.phase=gas " in relation for relation in phase_relations)
+    assert sum(
+        "declared by source standard_state K(g)" in relation
+        for relation in phase_relations
+    ) == 162
+    assert sum(
+        "derived from quantity=partial_pressure" in relation
+        for relation in phase_relations
+    ) == 221
     assert all(o.value.kind is ValueKind.POINT and o.value.point is not None for o in measured)
     assert sum(bool(o.notices) for o in measured) == 221
     factor = Decimal("0.226")
