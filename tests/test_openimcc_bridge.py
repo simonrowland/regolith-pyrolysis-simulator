@@ -86,9 +86,8 @@ def _openimcc_or_skip():
     return pytest.importorskip(
         "openimcc",
         reason=(
-            "openimcc is not importable; set "
-            "PYTHONPATH=/Users/simonrowland/Repos/openimcc/src or install it "
-            "before running the parity check"
+            "openimcc is not importable; install it or put an openimcc "
+            "checkout's src/ directory on PYTHONPATH before running the parity check"
         ),
     )
 
@@ -148,7 +147,8 @@ else:
     assert "OpenImccUnavailableError" in completed.stdout
     assert "openimcc_not_importable" in completed.stdout
     assert "remedy:" in completed.stdout
-    assert "PYTHONPATH=/Users/simonrowland/Repos/openimcc/src" in completed.stdout
+    assert "openimcc @ git+https://github.com/simonrowland/openimcc" in completed.stdout
+    assert "PYTHONPATH" in completed.stdout
 
 
 def test_bridge_maps_mol_kg_and_returns_labels() -> None:
