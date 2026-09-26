@@ -82,8 +82,68 @@ observations:
     paragraph: Because CaO and Al2O3 do not evaporate from the melt at the conditions of the experiments
     section: '4.1'
   read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
-- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::T=2173.15:row=func-10:h=78e3f117200d
-  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_shared_starting_and_standard
+  experiment_id: 10.1016/j.gca.2016.08.034::mendybaev-2017-fun-cai-lab-evaporation
+  identity:
+    quantity:
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
+    species:
+      formula: FUNC
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FUNC_forsterite_rich' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - MgO
+          - '0.4939703307923544594320550803'
+        - - Al2O3
+          - '0.05976372234900118543359010501'
+        - - SiO2
+          - '0.3750727285942844247092031078'
+        - - CaO
+          - '0.07119321826435993042515170709'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2σ
+      quote: Table 1 oxide and isotope columns are headed ±2σ. FUNC starting recipe has no printed 2-sigma. B133R-10 2-sigma
+        is printed on the oxide and isotope cells. Weight-loss % has no printed uncertainty.
+      locator:
+        table: '1'
+        pdf_page_index: 39
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2017-fun-cai-lab-evaporation
+  locator:
+    pdf_page_index: 39
+    table: '1'
+    paragraph: FUNC-5
+  read_from: unknown:mendybaev-2017-fun-cai-lab-evaporation
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-10::T=2173.15:row=func-10:h=78e3f117200d
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-10
   identity:
     quantity:
       tag: value
@@ -374,8 +434,8 @@ observations:
           table: '1'
           paragraph: FUNC-10
     output_unit: dimensionless
-- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::T=2173.15:row=func-1:h=b601263fde78
-  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-1::T=2173.15:row=func-1:h=b601263fde78
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-1
   identity:
     quantity:
       tag: value
@@ -666,8 +726,8 @@ observations:
           table: '1'
           paragraph: FUNC-1
     output_unit: dimensionless
-- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::T=2173.15:row=func-3:h=d27706270fe3
-  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-3::T=2173.15:row=func-3:h=d27706270fe3
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-3
   identity:
     quantity:
       tag: value
@@ -958,8 +1018,8 @@ observations:
           table: '1'
           paragraph: FUNC-3
     output_unit: dimensionless
-- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::T=2173.15:row=func-4:h=54f6bc9adb29
-  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-4::T=2173.15:row=func-4:h=54f6bc9adb29
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-4
   identity:
     quantity:
       tag: value
@@ -1250,8 +1310,8 @@ observations:
           table: '1'
           paragraph: FUNC-4
     output_unit: dimensionless
-- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::T=2173.15:row=func-5:h=a1e041d14f24
-  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-5::T=2173.15:row=func-5:h=3619cecf18f8
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-5
   identity:
     quantity:
       tag: value
@@ -1422,10 +1482,10 @@ observations:
       state:
         tag: value
         value:
-          MgO: '34.09'
-          Al2O3: '13.93'
-          SiO2: '42.93'
-          CaO: '9.05'
+          MgO: '37.9'
+          Al2O3: '11.6'
+          SiO2: '42.9'
+          CaO: '7.6'
       locator:
         pdf_page_index: 39
         table: '1'
@@ -1437,13 +1497,13 @@ observations:
           basis: printed_oxides
           components:
           - - MgO
-            - '0.4551489189825102823909682284'
+            - '0.4939703307923544594320550803'
           - - Al2O3
-            - '0.0735183287893979544307696039'
+            - '0.05976372234900118543359010501'
           - - SiO2
-            - '0.3844890215238969701546067974'
+            - '0.3750727285942844247092031078'
           - - CaO
-            - '0.08684373070419479302365537038'
+            - '0.07119321826435993042515170709'
           amount_basis: mole_fraction
       locator:
         pdf_page_index: 39
@@ -1458,7 +1518,7 @@ observations:
         - - original_MgO_wt_pct
           - state:
               tag: value
-              value: '34.09'
+              value: '37.9'
             locator:
               pdf_page_index: 39
               table: '1'
@@ -1474,7 +1534,7 @@ observations:
         - - original_Al2O3_wt_pct
           - state:
               tag: value
-              value: '13.93'
+              value: '11.6'
             locator:
               pdf_page_index: 39
               table: '1'
@@ -1490,7 +1550,7 @@ observations:
         - - original_SiO2_wt_pct
           - state:
               tag: value
-              value: '42.93'
+              value: '42.9'
             locator:
               pdf_page_index: 39
               table: '1'
@@ -1506,7 +1566,7 @@ observations:
         - - original_CaO_wt_pct
           - state:
               tag: value
-              value: '9.05'
+              value: '7.6'
             locator:
               pdf_page_index: 39
               table: '1'
@@ -1542,8 +1602,8 @@ observations:
           table: '1'
           paragraph: FUNC-5
     output_unit: dimensionless
-- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::T=2173.15:row=func-6:h=56123df7e2ac
-  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-6::T=2173.15:row=func-6:h=56123df7e2ac
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-6
   identity:
     quantity:
       tag: value
@@ -1834,8 +1894,8 @@ observations:
           table: '1'
           paragraph: FUNC-6
     output_unit: dimensionless
-- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::T=2173.15:row=func-7:h=6bcf77e226d5
-  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-7::T=2173.15:row=func-7:h=6bcf77e226d5
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-7
   identity:
     quantity:
       tag: value
@@ -2126,8 +2186,8 @@ observations:
           table: '1'
           paragraph: FUNC-7
     output_unit: dimensionless
-- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::T=2173.15:row=func-8:h=0999ff87981d
-  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-8::T=2173.15:row=func-8:h=0999ff87981d
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-8
   identity:
     quantity:
       tag: value
@@ -2418,8 +2478,8 @@ observations:
           table: '1'
           paragraph: FUNC-8
     output_unit: dimensionless
-- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::T=2173.15:row=func-9:h=95629dd65226
-  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-evaporation-series
+- observation_id: mendybaev-2017-fun-cai-lab-evaporation::mendybaev_2017_func_table1_mass_loss::func-9::T=2173.15:row=func-9:h=95629dd65226
+  experiment_id: 10.1016/j.gca.2016.08.034::experiment::func-9
   identity:
     quantity:
       tag: value

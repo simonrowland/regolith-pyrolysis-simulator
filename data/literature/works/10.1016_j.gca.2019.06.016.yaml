@@ -20,7 +20,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2019.06.016
 experiments:
-- experiment_id: 10.1016/j.gca.2019.06.016::experiment::soil-laser-heating-series
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-1
   kind: literature
   method:
     tag: unknown
@@ -79,10 +79,11 @@ experiments:
     composition_class:
       state:
         tag: value
-        value: Arkosic Trinity soil and rhyolitic soil
+        value: Arkosic soil
       locator:
-        published_page: 5
-        section: 2.1 Laser melting experiments
+        published_page: 34
+        table: '1'
+        record: Arkose soil-1
     pretreatment:
       state:
         tag: value
@@ -93,12 +94,12 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: not_published
+        tag: value
+        value: '1873.15'
       locator:
-        published_page: 5
-        section: 2.1 Laser melting experiments
-        note: Multiple target temperatures; no single series setpoint.
+        published_page: 34
+        table: '1'
+        record: Arkose soil-1
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -127,87 +128,4367 @@ experiments:
         reason: not_published
   work_id: 10.1016/j.gca.2019.06.016
   locator:
-    published_page: 5
-    section: 2.1 Laser melting experiments
-    note: Laser-heating series of arkosic and rhyolitic soils; the closed method vocabulary has no levitation token.
+    published_page: 34
+    table: '1'
+    record: Arkose soil-1
   bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
   thermal_schedule:
-    method:
+    total_duration_s:
       state:
         tag: value
-        value: Samples first melted above liquidus over 20-60 s, then rapidly ramped to target temperature.
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-1
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
       locator:
         published_page: 5
         section: 2.1 Laser melting experiments
-    setpoints_and_holds:
-    - temperature_K:
-        state:
-          tag: value
-          value:
-            kind: interval
-            interval_low: '1873.15'
-            interval_high: '2473.15'
-            approximate: false
-        locator:
-          published_page: 5
-          section: 2.1 Laser melting experiments
-          note: Printed 1600-2200 C target range; unit conversion only.
-        inference:
-          relation: celsius_to_kelvin
-          inputs:
-          - T_K = T_C + 273.15
-          - original_unit=C
-          parameters:
-          - - original_low
-            - state:
-                tag: value
-                value: '1600'
-              locator:
-                published_page: 5
-                section: 2.1 Laser melting experiments
-                note: Printed 1600-2200 C target range; unit conversion only.
-          - - original_high
-            - state:
-                tag: value
-                value: '2200'
-              locator:
-                published_page: 5
-                section: 2.1 Laser melting experiments
-                note: Printed 1600-2200 C target range; unit conversion only.
-          - - factor
-            - state:
-                tag: value
-                value: '273.15'
-              locator:
-                published_page: 5
-                section: 2.1 Laser melting experiments
-                note: Printed 1600-2200 C target range; unit conversion only.
-          output_unit: K
-      hold_duration_s:
-        state:
-          tag: value
-          value:
-            kind: interval
-            interval_low: '1'
-            interval_high: '120'
-            approximate: false
-        locator:
-          published_page: 5
-          section: 2.1 Laser melting experiments
-          note: Printed target-temperature duration range.
-    total_duration_s:
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-10
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-10
+  pressure_environment:
+    total_pressure_Pa:
       state:
         tag: unknown
         reason: not_published
       locator:
         published_page: 5
         section: 2.1 Laser melting experiments
-        note: Printed 1-120 s is target-temperature duration after a separate 20-60 s melt stage, not total run duration.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-10
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-10
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-11
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-11
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-11
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-11
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-12
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-12
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-12
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-12
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-13
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-13
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-13
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-13
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-14
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-14
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-14
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-14
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-14
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-15
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-15
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-15
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-16
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-16
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-16
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-16
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-16
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-17
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-17
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-17
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-17
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-17
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-18
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-18
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-18
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-18
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-18
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-19
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-19
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-19
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-19
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-19
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-2
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-2
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-2
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-2
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-3
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-3
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-3
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-3
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-5
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-5
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-5
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-6
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-6
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-6
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-6
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-7
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-7
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-7
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-7
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-8
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-8
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-8
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-8
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Arkosic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-9
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-9
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Arkose soil-9
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Arkose soil-9
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-1
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-1
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-1
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-1
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-10
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-10
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-10
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-10
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-11
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-11
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-11
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-11
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-12
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-12
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-12
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '90'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-12
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-13
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-13
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-13
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-13
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-15
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-15
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-15
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-15
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-17
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-17
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-17
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-17
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-17
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-18
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-18
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-18
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-18
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-18
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-19
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-19
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-19
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-19
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-19
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-2
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-2
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-2
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-2
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-20
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-20
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-20
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-20
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-20
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-21
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-21
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-21
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-21
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-21
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-3
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-3
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-3
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-3
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-4
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-4
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-4
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-4
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-5
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-5
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-5
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-6
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-6
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-6
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-6
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-7
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-7
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-7
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '60'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-7
+- experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'levitation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000005'
+          interval_high: '0.00004'
+          approximate: true
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+        note: Printed approximately 5-40 mg; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '5'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - original_high
+          - state:
+              tag: value
+              value: '40'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 5
+              section: 2.1 Laser melting experiments
+              note: Printed approximately 5-40 mg; unit conversion only.
+        output_unit: kg
+    form:
+      state:
+        tag: value
+        value: Pressed powder pellets cracked into fragments; heated products commonly spherical 0.8-3 mm
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    composition_class:
+      state:
+        tag: value
+        value: Rhyolitic soil
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-8
+    pretreatment:
+      state:
+        tag: value
+        value: Soils crushed and homogenized with agate pestle and mortar, then pelletized at approximately 8 tons
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-8
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 5
+        section: 2.1 Laser melting experiments
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2019.06.016
+  locator:
+    published_page: 34
+    table: '1'
+    record: Rhyolite soil-8
+  bench_id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        published_page: 34
+        table: '1'
+        record: Rhyolite soil-8
 - experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   kind: literature
   method:
     tag: unknown
-    reason: regime 'natural_or_impact_melt' is not a closed method token (kems_effusion alone is insufficient)
+    reason: regime 'containerless_laser_heating' is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -232,9 +4513,9 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1016/j.gca.2019.06.016
   locator:
-    published_page: 34
-    table: '2'
-    note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
+    published_page: 5
+    section: 2.1 Laser melting experiments
+    note: Apparatus and run schedule; pressure and imposed flow rate are not printed.; pdf_page=6
 benches:
 - id: 10.1016/j.gca.2019.06.016::bench::ipgp-laser-levitation
   work_id: 10.1016/j.gca.2019.06.016

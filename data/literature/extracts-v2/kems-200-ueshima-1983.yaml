@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-200-ueshima-1983.yaml
 observations:
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_geometry
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown
@@ -48,7 +48,7 @@ observations:
     note: Annealing apparatus; not a Knudsen cell. KEMS geometry is not in this paper
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_invariant_this_work
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown
@@ -127,7 +127,7 @@ observations:
               note: sigma (56 at% Mo) = L (38 at% Mo) + (Mo) (75 at% Mo), 1610 C
         output_unit: K
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown
@@ -171,8 +171,1812 @@ observations:
     table: '1'
     note: Table 1. Phases in heat treated samples. IPTS-68. Parentheses = aimed composition
   read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-1
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 1
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-10
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 10
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-11
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-11
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 11
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-12
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-12
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 12
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-13
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-13
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 13
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-14
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-14
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 14
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-15
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-15
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 15
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-16
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-16
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 16
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-17
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-17
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 17
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-18
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-18
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 18
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-19
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-19
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 19
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-2
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 2
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-20
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-20
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 20
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-21
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-21
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 21
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-23
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-23
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 23
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-24
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-24
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 24
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-25
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-25
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 25
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-26
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-26
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 26
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-27
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-27
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 27
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-28
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-28
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 28
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-29
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-29
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 29
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-3
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 3
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-30
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-30
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 30
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-31
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-31
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 31
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-37
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-37
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 37
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-38
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-38
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 38
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-48
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-48
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 48
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-49
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-49
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 49
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-5
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-5
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 5
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-51
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-51
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 51
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-52
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-52
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 52
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-53
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-53
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 53
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-54
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-54
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 54
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-55
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-55
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 55
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-56
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-56
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 56
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-57
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-57
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 57
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-59
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-59
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 59
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-6
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-6
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 6
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-60
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-60
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 60
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-7
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-7
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 7
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table1_phases::sh-8
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_treated_phase_identification'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_heat_treated' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1895.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_treated_phase_identification'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no numeric sigma on phase IDs; aimed compositions in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 558
+    table: '1'
+    record: SH 8
+  read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown
@@ -218,8 +2022,560 @@ observations:
     table: '2'
     note: Table 2. Phase boundary determination by EPMA. Result of analysis as at% of Mo
   read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-1
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-1
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 1
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-10
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 10
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-10-2
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 10
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-13
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-13
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 13
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-14
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-14
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 14
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-14-2
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-14
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 14
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-28
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-28
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 28
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-52
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-52
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 52
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-53
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-53
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 53
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-55
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-55
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 55
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-60
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-60
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 60
+  read_from: pdf:kems-200-ueshima-1983
+- observation_id: kems-200-ueshima-1983::ueshima_1983_femo_table2_epma::sh-8
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::ueshima-1983-sh-8
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'EPMA_phase_boundary_composition'
+    species:
+      formula: Mo
+      phase:
+        tag: unknown
+        reason: phase string 'Fe-Mo_two_phase_equilibria' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1802.15, 1889.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'EPMA_phase_boundary_composition'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Mo_AAS_sd_at_pct: '0.7'
+      Mo_AAS_mean_of_3_sd_at_pct: '0.4'
+      note: EPMA vs calculated calibration differs by 2-5 at% Mo (Fig. 1); authors adopt the measured calibration
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-200-ueshima-1983
+  locator:
+    published_page: 561
+    table: '2'
+    record: SH 8
+  read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_fig1_epma_calibration_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown
@@ -263,7 +2619,7 @@ observations:
     note: EPMA calibration curve for Fe-Mo alloy. Measured vs calculated I vs x_Mo
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_fig2_epma_results_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown
@@ -307,7 +2663,7 @@ observations:
     note: Results of EPMA analysis. Phase boundaries vs T
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_fig3_phase_diagram_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown
@@ -352,7 +2708,7 @@ observations:
       triangles Sykes; chain Gibson liquidus; KEMS thermal-analysis invariants as marks
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_pure_Fe_melting_check
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown
@@ -430,7 +2786,7 @@ observations:
               paragraph: pure Fe melting start 1538 C, matching Hultgren recommended 1538 C
         output_unit: K
 - observation_id: kems-200-ueshima-1983::ueshima_1983_quoted_kems_activities
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown
@@ -474,7 +2830,7 @@ observations:
       alloys'
   read_from: pdf:kems-200-ueshima-1983
 - observation_id: kems-200-ueshima-1983::ueshima_1983_quoted_kems_thermal_analysis
-  experiment_id: 10.2355/tetsutohagane1955.69.6_556::experiment::femo-annealing-series
+  experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
       tag: unknown

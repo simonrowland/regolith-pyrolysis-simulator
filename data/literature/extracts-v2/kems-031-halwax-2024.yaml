@@ -706,8 +706,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1650.0, 1800.0]; no midpoint invented
+      tag: value
+      value: '1727'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'enthalpy_of_sublimation'; refusing to pick a number
@@ -739,6 +739,18 @@ observations:
     note: row=This Study
     source_path: tables/kems-031-halwax-2024/t2.csv
   read_from: tables:kems-031-halwax-2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1727'
+      locator:
+        page: 826
+        published_page: 826
+        pdf_page_index: 6
+        table: II
+        note: row=This Study
+        source_path: tables/kems-031-halwax-2024/t2.csv
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iii_ionization_cross_sections
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:

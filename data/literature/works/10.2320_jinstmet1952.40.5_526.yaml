@@ -160,6 +160,17 @@ experiments:
         figure: '1'
         note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
     geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00018'
+            approximate: true
+        locator:
+          page: 528
+          published_page: 528
+          note: Printed about 0.18 mm diameter; Fig. 5 example separately labels 0.19 mm
       orifice_channel_length_m:
         state:
           tag: value

@@ -19,7 +19,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/s0009-2541(97)00030-2
 experiments:
-- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-equilibration-series
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-ad-10-29
   kind: literature
   method:
     tag: value
@@ -36,10 +36,12 @@ experiments:
       state:
         tag: value
         value:
-          kind: categorical
-          categorical: anorthite-diopside or komatiitic-basalt silicate with variable MgO
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
       locator:
-        page: 25
         table: '3'
     characterization:
       state:
@@ -51,8 +53,10 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: experiment temperature not published
+        tag: value
+        value: '1677'
+      locator:
+        table: '3'
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -72,7 +76,8 @@ experiments:
   work_id: 10.1016/s0009-2541(97)00030-2
   locator:
     page: 25
-    section: 2.2 New experimental results
+    table: '3'
+    note: row=AD 10
   fO2_control:
     channel:
       tag: value
@@ -82,67 +87,2611 @@ experiments:
         tag: unknown
         reason: not_published
       locator:
-        page: 25
         table: '3'
-        note: Values listed per run; control apparatus deferred to cited papers
   bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
   thermal_schedule:
-    setpoints_and_holds:
-    - temperature_K:
-        state:
-          tag: value
-          value:
-            kind: interval
-            interval_low: '1667'
-            interval_high: '1677'
-            approximate: false
-        locator:
-          page: 25
-          table: '3'
-          note: Table 3 new-run range; unit already K
     total_duration_s:
       state:
         tag: value
         value:
-          kind: interval
-          interval_low: '172800'
-          interval_high: '271080'
+          kind: point
+          point: '180000'
           approximate: false
       locator:
-        page: 25
         table: '3'
-        note: Printed 48 to 75.3 h; unit conversion only
-      inference:
-        relation: h_to_s
-        inputs:
-        - t_s = t_h × 3600
-        - original_unit=h
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '48'
-            locator:
-              page: 25
-              table: '3'
-              note: Printed 48 to 75.3 h; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '75.3'
-            locator:
-              page: 25
-              table: '3'
-              note: Printed 48 to 75.3 h; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '3600'
-            locator:
-              page: 25
-              table: '3'
-              note: Printed 48 to 75.3 h; unit conversion only
-        output_unit: s
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-ad-12-15
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1677'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=AD 12
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '172800'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-ad-12-2
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1677'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=AD 12
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '172800'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-bk57-23
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.1'
+          CaO: '19.2'
+          MgO: '10.6'
+          Al2O3: '14.1'
+          FeO: '7'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=BK57
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '237600'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-bk57-9
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.1'
+          CaO: '19.2'
+          MgO: '10.6'
+          Al2O3: '14.1'
+          FeO: '7'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 26
+    table: '3'
+    note: row=BK57
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '237600'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-11
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.1'
+          CaO: '19.2'
+          MgO: '10.6'
+          Al2O3: '14.1'
+          FeO: '7'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1675'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 26
+    table: '3'
+    note: row=V 64
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '176400'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-18
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1675'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 64
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '176400'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-25
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.1'
+          CaO: '19.2'
+          MgO: '10.6'
+          Al2O3: '14.1'
+          FeO: '7'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1675'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 64
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '176400'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-30
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1677'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 64
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '176400'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-4
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1675'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 64
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '176400'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-65-22
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 65
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '174600'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-65-8
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 65
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '174600'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-19
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 66
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '267480'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-21
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 66
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '267480'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-32
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 66
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '267480'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-33
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 66
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '267480'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-5
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 66
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '267480'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-7
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 66
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '267480'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-67-26
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.1'
+          CaO: '19.2'
+          MgO: '10.6'
+          Al2O3: '14.1'
+          FeO: '7'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 67
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '271080'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-10
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.1'
+          CaO: '19.2'
+          MgO: '10.6'
+          Al2O3: '14.1'
+          FeO: '7'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 26
+    table: '3'
+    note: row=V 68
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '176400'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-12
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.1'
+          CaO: '19.2'
+          MgO: '10.6'
+          Al2O3: '14.1'
+          FeO: '7'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 26
+    table: '3'
+    note: row=V 68
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '176400'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-24
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.1'
+          CaO: '19.2'
+          MgO: '10.6'
+          Al2O3: '14.1'
+          FeO: '7'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 68
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '176400'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-31
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 68
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '176400'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-1
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 69
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '180000'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-13
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 69
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '180000'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-14
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 69
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '180000'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-27
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 69
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '180000'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-28
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 69
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '180000'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-16
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 70
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '172800'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-17
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 70
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '172800'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-20
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 70
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '172800'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-3
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 70
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '172800'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
+- experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-6
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.9'
+          CaO: '24.9'
+          MgO: '10.4'
+          Al2O3: '13.8'
+          FeO: '0'
+      locator:
+        table: '3'
+    characterization:
+      state:
+        tag: value
+        value: electron microprobe for major elements; instrumental neutron activation analysis for Ni and Co
+      locator:
+        page: 25
+        section: 2.2 New experimental results
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1670'
+      locator:
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0009-2541(97)00030-2
+  locator:
+    page: 25
+    table: '3'
+    note: row=V 70
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '3'
+  bench_id: 10.1016/s0009-2541(97)00030-2::bench::cited-prior-equilibration-apparatus
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '172800'
+          approximate: false
+      locator:
+        table: '3'
+        note: Hours converted to seconds
 - experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   kind: literature
   method:

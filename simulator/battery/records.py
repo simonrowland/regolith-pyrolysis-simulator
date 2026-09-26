@@ -727,6 +727,7 @@ class Apparatus:
 @dataclass(frozen=True)
 class Sample:
     mass_kg: Located[Value] | None = None
+    volume_m3: Located[Value] | None = None
     initial_composition: Located[Composition] | None = None
     printed_composition: Located[Mapping[str, Any]] | None = None
     form: Located[str] | None = None
@@ -738,6 +739,7 @@ class Sample:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "mass_kg", _located_value(self.mass_kg))
+        object.__setattr__(self, "volume_m3", _located_value(self.volume_m3))
         object.__setattr__(self, "surface_area_m2", _located_value(self.surface_area_m2))
 
 

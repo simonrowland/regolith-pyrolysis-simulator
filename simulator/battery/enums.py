@@ -58,6 +58,7 @@ class Quantity(StrEnum):
 
     P_SAT = "p_sat"
     P_PARTIAL = "p_partial"
+    FUGACITY = "fugacity"
     P_REFERENCE = "p_reference"
     LOG10_KF = "log10_Kf"
     ACTIVITY = "activity"
@@ -65,6 +66,7 @@ class Quantity(StrEnum):
     EVAPORATION_COEFFICIENT_ALPHA = "evaporation_coefficient_alpha"
     MASS_LOSS_FRACTION = "mass_loss_fraction"
     MASS_LOSS_FRACTION_VS_T = "mass_loss_fraction_vs_T"
+    MASS_LOSS_AREAL_DENSITY = "mass_loss_areal_density"
     YIELD_FRACTION = "yield_fraction"
     O2_YIELD = "o2_yield"
     FE3_FE2_RATIO = "fe3_fe2_ratio"
@@ -276,6 +278,7 @@ class PerBasis(StrEnum):
 class AmountBasis(StrEnum):
     MOL_INVENTORY = "mol_inventory"
     MOLE_FRACTION = "mole_fraction"
+    MASS_PERCENT = "mass_percent"
 
 
 class MethodToken(StrEnum):
@@ -399,6 +402,7 @@ class StateTag(StrEnum):
 QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.P_SAT: "Pa",
     Quantity.P_PARTIAL: "Pa",
+    Quantity.FUGACITY: "Pa",
     Quantity.P_REFERENCE: "Pa",
     Quantity.LOG10_KF: "dimensionless",
     Quantity.ACTIVITY: "dimensionless",
@@ -406,6 +410,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: "dimensionless",
     Quantity.MASS_LOSS_FRACTION: "dimensionless",
     Quantity.MASS_LOSS_FRACTION_VS_T: "dimensionless",
+    Quantity.MASS_LOSS_AREAL_DENSITY: "kg_per_m2",
     Quantity.YIELD_FRACTION: "dimensionless",
     Quantity.O2_YIELD: "dimensionless",
     Quantity.FE3_FE2_RATIO: "dimensionless",

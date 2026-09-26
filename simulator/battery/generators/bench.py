@@ -15,11 +15,40 @@ from simulator.battery.waypoints import (
 )
 
 
+_FLAGGED_AUTHORITIES = {"assumed", "bound", "extrapolated"}
+
+
+def _readiness_flags(provenance: Mapping, payload) -> tuple[Mapping[str, object], ...]:
+    if payload is None:
+        return ()
+    flags = []
+    for output, route in (provenance.get("output_routes") or {}).items():
+        if not isinstance(route, Mapping):
+            continue
+        authority = str(route.get("authority") or "")
+        if authority not in _FLAGGED_AUTHORITIES:
+            continue
+        flag = {
+            "waypoint": str(route.get("waypoint") or output),
+            "authority": authority,
+            "flag_id": str(route.get("flag_id") or output),
+        }
+        if route.get("notice") is not None:
+            flag["notice"] = route["notice"]
+        flags.append(flag)
+    return tuple(flags)
+
+
 @dataclass(frozen=True)
 class GeneratedInput:
     readiness: ConsumerReadiness
     payload: Mapping | None
     provenance: Mapping
+
+    def __post_init__(self) -> None:
+        flags = _readiness_flags(self.provenance, self.payload)
+        if flags != self.readiness.flags:
+            object.__setattr__(self, "readiness", replace(self.readiness, flags=flags))
 
 
 def _provenance(inputs):
@@ -46,6 +75,13 @@ def _requirements(inputs, consumer, engine=None):
             missing = waypoint.absence.missing if waypoint.absence else ()
             if not absent and consumer == "engine_point" and name != "normalized_composition":
                 selected = waypoint.selected.value
+                if (name == "pressure_boundary"
+                        and isinstance(selected, Value)
+                        and selected.kind is ValueKind.BOUND
+                        and selected.bound_operator in {"<", "<=", "≤"}
+                        and inputs.waypoints["oxygen_condition"].selected is not None
+                        and inputs.waypoints["oxygen_condition"].selected.route == "vacuum_total_pressure_upper_bound"):
+                    continue
                 if not isinstance(selected, Value) or selected.kind is not ValueKind.POINT:
                     reason = (GapReason.INTERVAL_NEEDS_POINT
                               if isinstance(selected, Value) and selected.kind is ValueKind.INTERVAL
@@ -310,6 +346,15 @@ def _point(inputs, name):
     return value.point
 
 
+def _engine_pressure_point(inputs):
+    value = inputs.waypoints["pressure_boundary"].selected.value
+    if (value.kind is ValueKind.BOUND
+            and value.bound_operator in {"<", "<=", "≤"}
+            and inputs.waypoints["oxygen_condition"].selected.route == "vacuum_total_pressure_upper_bound"):
+        return value.bound_value
+    return _point(inputs, "pressure_boundary")
+
+
 def _document(inputs, name):
     value = inputs.waypoints[name].selected.value
     if not isinstance(value, Mapping):
@@ -337,22 +382,36 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
                     raise UnsupportedValue("normalized_composition." + species)
                 composition[species] = float(value)
             temperature = _point(inputs, "temperature_K")
-            pressure = _point(inputs, "pressure_boundary")
+            pressure = _engine_pressure_point(inputs)
             oxygen = _point(inputs, "oxygen_condition")
+            oxygen_route = inputs.waypoints["oxygen_condition"].selected
+            assert oxygen_route is not None
             if temperature <= 0 or pressure < 0 or not any(composition.values()):
                 raise UnsupportedValue("physical_inputs")
             # Definitions: Celsius = kelvin - 273.15; 1 bar = 100000 Pa.
             # Units: K -> degC, Pa/(Pa/bar) -> bar. 1500 K -> 1226.85 C;
             # 1 Pa -> 1e-5 bar. These projections are DERIVED, never PRINTED.
+            composition_route = inputs.waypoints["normalized_composition"].selected
             payload = {"engine": engine, "temperature_C": float(temperature - Decimal("273.15")),
                        "pressure_bar": float(pressure / Decimal(100000)), "fO2_log": float(oxygen),
                        "composition_mol": composition}
+            composition_output = {"waypoint": "normalized_composition", "authority": "derived"}
+            if composition_route is not None and composition_route.notice is not None:
+                payload["composition_method_class"] = "calculated"
+                payload["composition_notice"] = composition_route.notice
+                composition_output.update({"method_class": "calculated", "notice": composition_route.notice})
+            oxygen_output = {
+                "waypoint": "oxygen_condition",
+                "authority": oxygen_route.authority.value,
+                "flag_id": oxygen_route.route,
+            }
+            if oxygen_route.notice is not None:
+                oxygen_output.update({"notice": oxygen_route.notice, "method_class": "calculated"})
             results.append(GeneratedInput(readiness, payload, {**provenance, "output_routes": {
                 "temperature_C": {"authority": "derived", "waypoint": "temperature_K", "formula": "K - 273.15"},
                 "pressure_bar": {"authority": "derived", "waypoint": "pressure_boundary", "formula": "Pa / 100000"},
-                "fO2_log": {"waypoint": "oxygen_condition"},
-                "composition_mol": {"waypoint": "normalized_composition", "authority": "derived",
-                                    "formula": "x_i * 1 mol reference charge"},
+                "fO2_log": oxygen_output,
+                "composition_mol": {**composition_output, "formula": "x_i * 1 mol reference charge"},
             }}))
         except UnsupportedValue as exc:
             results.append(_refused(readiness, provenance, str(exc)))
@@ -610,14 +669,14 @@ def vacuum_pyrolysis_preset(inputs: ConsumerInputs, *, modelling_inputs=None) ->
     provenance["output_routes"] = {
         "lab_geometry.sample.mass_g": {"waypoint": "run_mass_kg", "authority": "derived", "formula": "kg * 1000"},
         "lab_geometry.surfaces.physical_fields": {"waypoint": "surfaces"},
-        "lab_geometry.surfaces.modelling_fields": {"authority": "assumed", "input": "operator.surfaces"},
+        "lab_geometry.surfaces.modelling_fields": {"waypoint": "surfaces", "authority": "assumed", "input": "operator.surfaces", "flag_id": "operator.surfaces"},
         "lab_schedule.melt_temperature_C": {"waypoint": "thermal_path", "authority": "derived", "formula": "(s / 3600, K - 273.15)"},
         "lab_schedule.duration_h": {"waypoint": "thermal_path", "authority": "derived", "formula": "final s / 3600"},
         "lab_schedule.chamber_pressure_mbar": {"waypoint": "run_pressure_boundary", "authority": "derived", "formula": "Pa / 100"},
         "lab_schedule.surface_temperature_C": {"waypoint": "surface_temperature_C"},
         "lab_schedule.gas_boundary": {"waypoint": "gas_boundary"},
-        "lab_schedule.furnace_ceiling_C": {"authority": "assumed", "input": "operator.furnace_ceiling_C"},
-        "pair.faithful.feedstock_id": {"authority": "assumed", "input": "operator.feedstock_id"},
+        "lab_schedule.furnace_ceiling_C": {"waypoint": "furnace_ceiling_C", "authority": "assumed", "input": "operator.furnace_ceiling_C", "flag_id": "operator.furnace_ceiling_C"},
+        "pair.faithful.feedstock_id": {"waypoint": "feedstock_id", "authority": "assumed", "input": "operator.feedstock_id", "flag_id": "operator.feedstock_id"},
     }
     if readiness.status is ReadinessStatus.NOT_APPLICABLE:
         return GeneratedInput(readiness, None, provenance)

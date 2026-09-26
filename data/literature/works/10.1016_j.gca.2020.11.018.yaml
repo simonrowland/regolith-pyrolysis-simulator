@@ -1,8 +1,8 @@
 schema_version: battery_work.v2.1
 work:
   work_id: 10.1016/j.gca.2020.11.018
-  citation: Thomas, R. W. & Wood, B. J. (2021), "The chemical behaviour of chlorine in silicate melts", Geochimica et Cosmochimica
-    Acta 294:28–42, DOI 10.1016/j.gca.2020.11.018
+  citation: Thomas, Richard W. & Wood, Bernard J. (2021), "The chemical behaviour of chlorine in silicate melts", Geochimica
+    et Cosmochimica Acta.
   source_ids:
   - thomas-wood-2021-chlorine-silicate-melts
   source_files:
@@ -19,7 +19,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1016/j.gca.2020.11.018
 experiments:
-- experiment_id: 10.1016/j.gca.2020.11.018::experiment::cl-solubility-cmas-icb-series
+- experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   kind: literature
   method:
     tag: value
@@ -28,8 +28,10 @@ experiments:
     printed_composition:
       state:
         tag: value
-        value: CMAS An50Di28Fo22 haplobasalt and Icelandic basalt (ICB); Ag-AgCl-AgI chlorine buffer
+        value: CMAS An50Di28Fo22 or natural Icelandic basalt; row-specific composition is retained in Table 2 observation
+          points
       locator:
+        published_page: 3
         pdf_page_index: 4
         table: '1'
     form:
@@ -37,57 +39,56 @@ experiments:
         tag: value
         value: Powdered silicate mixed with Ag/AgCl/AgI buffer inside Pt ± graphite or Re assemblies
       locator:
+        published_page: 3
         pdf_page_index: 4
-        section: 2. Experimental methods
+        section: 2. Experimental procedure
   conditions:
     temperature_K:
       state:
         tag: unknown
         reason: not_published
       locator:
+        published_page: 6
         pdf_page_index: 7
         table: '2'
-        note: Per-row T_C in Table 2; no single series setpoint
+        note: Table 2 contains row-specific temperatures from 1200 to 1500 °C
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
         reason: not_published
       locator:
+        published_page: 6
         pdf_page_index: 7
         table: '2'
-        note: Per-row P_GPa in Table 2; no single series pressure
+        note: Table 2 contains row-specific pressures from 0.5 to 2.0 GPa
     sweep_gas:
       state:
         tag: not_applicable
         reason: not_applicable
       locator:
+        published_page: 3
         pdf_page_index: 4
-        note: Solid-media piston-cylinder; no sweep gas
+        section: 2.1 Experimental procedure
+        note: Piston-cylinder charge; no sweep gas is used
     regime:
       regime_class:
         tag: unknown
         reason: not_published
   work_id: 10.1016/j.gca.2020.11.018
   locator:
+    published_page: 3
     pdf_page_index: 4
-    section: 2. Experimental methods
+    section: 2. Experimental methodology
   apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          pdf_page_index: 4
-          note: Piston-cylinder capsule; no Knudsen orifice
-      orifice_channel_length_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          pdf_page_index: 4
-          note: Piston-cylinder capsule; no effusion channel
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: CaF2 pressure medium, graphite furnace, MgO spacers, alumina thermocouple sheath
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
   fO2_control:
     channel:
       tag: value
@@ -95,57 +96,306 @@ experiments:
     buffer:
       state:
         tag: value
-        value: CCO (C-CO-CO2) or RRO (Re-ReO2) as printed per Table 2 row
+        value: CCO or Re-ReO2, as printed per Table 2 row
       locator:
+        published_page: 6
         pdf_page_index: 7
         table: '2'
-  bench_id: 10.1016/j.gca.2020.11.018::bench::oxford-boyd-england-piston-cylinder
+  bench_id: 10.1016/j.gca.2020.11.018::bench::oxford_end_loaded_piston_cylinder
 benches:
-- id: 10.1016/j.gca.2020.11.018::bench::oxford-boyd-england-piston-cylinder
+- id: 10.1016/j.gca.2020.11.018::bench::oxford_end_loaded_piston_cylinder
   work_id: 10.1016/j.gca.2020.11.018
   identity:
     basis: described_in_this_work
   apparatus_family:
     state:
       tag: value
-      value: End-loaded Boyd and England type 1/2 inch piston-cylinder apparatus
+      value: End-loaded Boyd and England-type 1/2 inch piston-cylinder apparatus at the University of Oxford
     locator:
+      published_page: 3
       pdf_page_index: 4
-      section: 2. Experimental methods
+      section: 2.1 Experimental procedure
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: CaF2 pressure medium, graphite furnace, MgO spacers, and 3 mm outer-diameter capsule
+    locator:
+      published_page: 3
+      pdf_page_index: 4
+      section: 2.1 Experimental procedure
   detector:
     state:
       tag: value
-      value: CAMECA SX-Five-FE and JEOL-8600 electron microprobes (University of Oxford)
+      value: CAMECA SX-Five-FE and JEOL-8600 electron microprobes
     locator:
+      published_page: 5
       pdf_page_index: 6
-      section: 2.3. Analytical techniques
+      section: 2.3 Analytical procedures
   temperature_measurement:
     sensor:
       state:
         tag: value
-        value: Alumina-sheathed C-type (W95Re5–W74Re26) thermocouple
+        value: Alumina-sheathed C-type W95Re5-W74Re26 thermocouple
       locator:
+        published_page: 3
         pdf_page_index: 4
-        section: 2. Experimental methods
-        note: Methods prose prints the alumina-sheathed C-type (W95Re5–W74Re26) thermocouple
-  other_facts: []
+        section: 2.1 Experimental procedure
+  temperature_calibration:
+    pressure:
+      state:
+        tag: value
+        value: McDade et al. calibration at 1 GPa and above; Vlach et al. calibration below 1 GPa
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+  heating_method:
+    state:
+      tag: value
+      value: graphite furnace
+    locator:
+      published_page: 3
+      pdf_page_index: 4
+      section: 2.1 Experimental procedure
+  other_facts:
+  - name: pressure_medium_length
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '32'
+          approximate: false
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+    unit: mm
+  - name: pressure_medium_outer_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '12.5'
+          approximate: false
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+    unit: mm
+  - name: pressure_medium_inner_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '8'
+          approximate: false
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+    unit: mm
+  - name: graphite_furnace_outer_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '8'
+          approximate: false
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+    unit: mm
+  - name: graphite_furnace_inner_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '6'
+          approximate: false
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+    unit: mm
+  - name: capsule_outer_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3'
+          approximate: false
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+    unit: mm
+  - name: cooling_rate
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '110'
+          approximate: true
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+        note: Cooling rate is approximately 110 °C/s
+    unit: °C/s
 context:
-- observation_id: thomas_wood_2021_henry_region_logCl_regressions
-  type: thermodynamic_example
+- observation_id: thomas_wood_2021_analytical_method
+  type: method
   locator:
-    pdf_page_index: 2
-    section: Abstract
-    note: Also restated in Results; author regressions over own data
-  units: logClmelt with Cl in wt%; P in GPa; T in K; f(O2) and f(Cl2) standard state pure gas at 0.1 MPa and T of interest
+    pdf_page_index: 6
+    published_page: 5
+    section: 2.3 Analytical procedures
+  units: analytical settings and detection limits as printed
   values:
-    quantity: henry_region_logClmelt_regression
+    method_class: method_only
+    instruments: CAMECA SX-Five-FE and JEOL-8600 electron microprobes
+    settings: 20 nA, 15 kV, 10 μm defocused beam; Cl/Na/Si analysed first; 80 s peak and 40 s background on Cl
+    chlorine_detection_limit: 120 ppm
+    glass_points: '>40 per glass; 10-20 buffer/metal points; standard deviation <0.2 wt%'
+    durango_check: 0.41 wt% standard measured 0.415 ± 0.015 wt% for 98 analyses
+  context_id: thomas-wood-2021-chlorine-silicate-melts::context::thomas_wood_2021_analytical_method
+  work_id: 10.1016/j.gca.2020.11.018
+  source_id: thomas-wood-2021-chlorine-silicate-melts
+  species: Cl
+- observation_id: thomas_wood_2021_chlorine_buffer_method
+  type: method
+  locator:
+    pdf_page_index: 4
+    published_page: 3
+    section: 2.1 Experimental procedure
+  units: reaction and buffer description as printed
+  values:
+    method_class: method_only
+    description: Ag/AgCl/AgI chlorine buffer; chlorine fugacity is controlled by the AgCl-AgI exchange and quantified after
+      quench from molar ratios.
+    reaction: AgCl + 1/2 I2 = AgI + 1/2 Cl2
+  context_id: thomas-wood-2021-chlorine-silicate-melts::context::thomas_wood_2021_chlorine_buffer_method
+  work_id: 10.1016/j.gca.2020.11.018
+  source_id: thomas-wood-2021-chlorine-silicate-melts
+  species: Cl
+- observation_id: thomas_wood_2021_oxygen_buffer_method
+  type: method
+  locator:
+    pdf_page_index: 5
+    published_page: 4
+    section: 2.2 Oxygen fugacity
+  units: buffer descriptions and equations as printed
+  values:
+    method_class: method_only
+    buffers:
+    - CCO
+    - Re-ReO2
+    log_fO2_CCO_equation: log f(O2) = 4.325 - 21803/T + 0.171((P-1)/T), with P in bar and T in K
+    sensor_test: At 1350 °C and 1.5 GPa, Pt-Fe bead XFe = 0.31 (11.34 wt% Fe) and silicate FeO = 5.22 wt%; measured fO2 was
+      1.79 log units below FMQ versus expected 1.82.
+  context_id: thomas-wood-2021-chlorine-silicate-melts::context::thomas_wood_2021_oxygen_buffer_method
+  work_id: 10.1016/j.gca.2020.11.018
+  source_id: thomas-wood-2021-chlorine-silicate-melts
+  species: Cl
+- observation_id: thomas_wood_2021_refusals
+  type: refusal
+  locator:
+    pdf_page_index: 7
+    published_page: 6
+    table: '2'
+    section: source coverage limits
+  units: typed absence/refusal records
+  values:
+    method_class: typed_refusal
+    refusals:
+    - item: complete analytical compositions from supplementary Table 1
+      reason: not_published
+      locator:
+        pdf_page_index: 7
+        published_page: 6
+        table: '2'
+        note: The complete analyses are cited as supplementary but are not present in the supplied corpus PDF/OCR.
+    - item: numeric apparatus values from Figures 1-2
+      reason: not_numeric
+      locator:
+        pdf_page_index: 5
+        published_page: 4
+        figure: 1-2
+        note: Images show apparatus/BSE context; no numeric result series extracted.
+    - item: typed f(Cl2) observable
+      reason: would_invent
+      locator:
+        pdf_page_index: 7
+        published_page: 6
+        table: '2'
+        column: f(Cl2)
+        note: Current schema has no fugacity quantity; values retained in each row with calculated method class and proposed
+          amendment.
+    - item: full Fe-bearing melt composition
+      reason: not_published
+      locator:
+        pdf_page_index: 8
+        published_page: 7
+        table: '2'
+        row: AgI/Cl-024 to AgI/Cl-026
+        note: Only CMAS label and FeO wt% are printed.
+  context_id: thomas-wood-2021-chlorine-silicate-melts::context::thomas_wood_2021_refusals
+  work_id: 10.1016/j.gca.2020.11.018
+  source_id: thomas-wood-2021-chlorine-silicate-melts
+  species: Cl
+- observation_id: thomas_wood_2021_thermodynamic_fits
+  type: thermodynamic_fit
+  locator:
+    pdf_page_index: 10
+    published_page: 9
+    section: Results
+    equation: 16-17
+  units: T in K; P in GPa; log K dimensionless
+  values:
     method_class: model_derived
-    evidence_class: author_regression_not_scored
-    as_printed_An50Di28Fo22: logClmelt = 1.206(32) - 940(T40)P - 0.25log(f(O2)) + 0.5log(f(Cl2))
-    as_printed_anhydrous_basalt: logClmelt = 0.984(64) - 930(T70)P - 0.25log(f(O2)) + 0.5log(f(Cl2))
-    note: Parenthetical coefficients are 1 standard error as printed. Retained as unscored context per model_derived cohort
-      ruling.
-  context_id: thomas-wood-2021-chlorine-silicate-melts::context::thomas_wood_2021_henry_region_logCl_regressions
+    derivation: Author regressions to the tabulated experimental constants; equations are printed, not newly fitted here.
+    standard_state_note: f(O2) and f(Cl2) use pure-gas standard states at 0.1 MPa and the temperature of interest.
+    standard_state_note_locator:
+      pdf_page_index: 2
+      published_page: 1
+      section: Abstract
+    fits:
+    - composition: CMAS
+      equation: log K_PT = 1.206(32) - 940(40) P/T
+      standard_error: '0.03'
+      locator:
+        pdf_page_index: 10
+        published_page: 9
+        equation: '16'
+    - composition: Icelandic Basalt
+      equation: log K_PT = 0.984(64) - 930(70) P/T
+      standard_error: '0.053'
+      locator:
+        pdf_page_index: 10
+        published_page: 9
+        equation: '17'
+    - composition: CMAS
+      equation: log K = -0.561 P + 1.21
+      locator:
+        pdf_page_index: 10
+        published_page: 9
+        figure: '6'
+        note: printed fit line
+    - composition: Icelandic Basalt
+      equation: log K = -0.539 P + 0.98
+      locator:
+        pdf_page_index: 10
+        published_page: 9
+        figure: '6'
+        note: printed fit line
+  context_id: thomas-wood-2021-chlorine-silicate-melts::context::thomas_wood_2021_thermodynamic_fits
   work_id: 10.1016/j.gca.2020.11.018
   source_id: thomas-wood-2021-chlorine-silicate-melts
   species: Cl

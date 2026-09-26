@@ -41,14 +41,14 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
       evidence:
-        page: 61
-        published_page: 61
-        pdf_page_index: 71
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
         figure: '11'
-        note: report figure page after captions; PDF page 71
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -89,8 +89,18 @@ observations:
     attribution: KMS data for variation of K2O activity coefficient with temperature and composition for the K1 slag. The
       numbers, ranging from 0.154 to 0.08, refer to the mole fraction of K2O remaining in the sample at each measurement point.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Parent digitization retained unchanged as archival derived evidence; plotted point coordinates are not printed
+      numeric cells. No re-digitization or invented cell quote in this deepening.
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -138,11 +148,12 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig15_kcl_std_pressure_printed_quoted_20260906
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
       evidence:
-        page: 63
-        pdf_page_index: 75
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
         figure: '15'
   notices: []
   source_id: kems-020-hastie-1981-nbsir
@@ -176,12 +187,22 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class derived'
+      tag: value
+      value: model_derived
     original_method_class: derived
+    attribution: The indicated reference state partial pressures were obtained from JANAF (1971).
+    model: derived
   admission:
-    status: pending
-    reason: source admission_status=equipment_metadata is not a closed v2.1 token
+    status: rejected
+    reason: JANAF reference pressure belongs to source_metadata; not a measured pressure series.
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '15'
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -373,8 +394,17 @@ observations:
     original_method_class: figure_only
     attribution: Partial pressure data for K, O2, and SiO over illite.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Plotted evidence, not a printed numeric table. See completeness ledger for individual figures.
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -429,13 +459,14 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
       evidence:
-        page: 58
-        published_page: 58
-        pdf_page_index: 64
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
         figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -477,8 +508,18 @@ observations:
     original_method_class: figure_only
     attribution: Partial pressure data for K, O2, and SiO over illite.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Parent digitization retained unchanged as archival derived evidence; plotted point coordinates are not printed
+      numeric cells. No re-digitization or invented cell quote in this deepening.
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -568,8 +609,17 @@ observations:
     attribution: Comparison of glass melt Na partial pressure data obtained by various workers (see text) for compositions
       (wt.%) similar to Na2O(17), CaO(12), and SiO2(71).
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Plotted evidence, not a printed numeric table. See completeness ledger for individual figures.
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -621,13 +671,14 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
       evidence:
-        page: 59
-        published_page: 59
-        pdf_page_index: 65
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
         figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -667,8 +718,18 @@ observations:
     attribution: Comparison of glass melt Na partial pressure data obtained by various workers (see text) for compositions
       (wt.%) similar to Na2O(17), CaO(12), and SiO2(71).
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Parent digitization retained unchanged as archival derived evidence; plotted point coordinates are not printed
+      numeric cells. No re-digitization or invented cell quote in this deepening.
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -716,8 +777,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig6_na2co3_gamma_figure_only_quoted_20260906
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
       evidence:
         page: 60
         pdf_page_index: 66
@@ -759,8 +820,17 @@ observations:
     original_method_class: figure_only
     attribution: Activity coefficient data (TMS) for Na2CO3 (0.45 wt.%) in glass
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Plotted evidence, not a printed numeric table. See completeness ledger for individual figures.
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '6'
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -808,8 +878,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
       evidence:
         page: 28
         figure: '20'
@@ -846,12 +916,22 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class derived'
+      tag: value
+      value: model_derived
     original_method_class: derived
+    attribution: KMS data with Pt-cell orifice diameter of 0.34 mm.
+    model: derived
   admission:
-    status: pending
-    reason: source admission_status=equipment_metadata is not a closed v2.1 token
+    status: rejected
+    reason: Geometry retained in source_metadata; not pressure or rate evidence.
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 53
+        published_page: 53
+        pdf_page_index: 58
+        figure: '20'
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1448,8 +1528,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_remaining_figures_ledger_quoted_20260906
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
       evidence:
         page: 51
         section: '15'
@@ -1492,8 +1572,17 @@ observations:
     attribution: Computer-calculated distribution of alkali-containing vapor species as a function of temperature for the
       non-ideal solution glass-combustion gas system specified in table 3.
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Plotted evidence, not a printed numeric table. See completeness ledger for individual figures.
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 53
+        published_page: 53
+        pdf_page_index: 58
+        figure: '21'
+        note: Caption locator; plotted pages recorded in completeness ledger.
   notices: []
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -1541,8 +1630,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_17k2o_A_as_printed_note_quoted_20260906
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
       evidence:
         page: 23
         published_page: 23
@@ -1746,6 +1835,18 @@ observations:
     temperature_K:
       tag: value
       value: '1400'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.1642467099008939029808868101'
+        - - CaO
+          - '0.1281402488755988200303977262'
+        - - SiO2
+          - '0.7076130412235072769887154639'
+        amount_basis: mole_fraction
   value:
     kind: categorical
     categorical: bound_not_point_ordering

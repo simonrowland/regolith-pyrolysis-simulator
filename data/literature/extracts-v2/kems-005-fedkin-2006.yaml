@@ -86,7 +86,7 @@ observations:
     line_range: 186-197
     source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
   read_from: unknown:kems-005-fedkin-2006
-- observation_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
+- observation_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=1973.0:h=1d21a3ff1eab
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
     quantity:
@@ -110,8 +110,210 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
       tag: unknown
-      reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.23'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        table: '3'
+        line_range: 186-197
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2073.0:h=d46e4f3675db
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2073'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.25'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        table: '3'
+        line_range: 186-197
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2173.0:h=8c30d44267dc
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -155,10 +357,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: ±0.02 on α_Fe from visual fit envelope (authors)
-      alpha_range:
-      - '0.21'
-      - '0.27'
+      sigma: '0.02'
+      parent: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
   evidence:
     class:
       tag: unknown
@@ -174,6 +374,122 @@ observations:
     line_range: 186-197
     source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
   read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173'
+      locator:
+        table: '3'
+        line_range: 186-197
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2273.0:h=1d21a3ff1eab
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2273'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.23'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        table: '3'
+        line_range: 186-197
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-005-fedkin-2006::fedkin_2006_k_class_b1
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -435,7 +751,7 @@ observations:
     line_range: 186-197
     source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
   read_from: unknown:kems-005-fedkin-2006
-- observation_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
+- observation_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=1973.0:h=54b5fe718864
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
     quantity:
@@ -459,8 +775,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
+      tag: value
+      value: '1973'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -504,7 +820,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: ±0.01 on each α_Mg value as printed in Table 3
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
   evidence:
     class:
       tag: unknown
@@ -521,6 +838,331 @@ observations:
     paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
   read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 212
+        table: '3'
+        paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2073.0:h=dc4d8a196fbc
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2073'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.28'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 212
+    table: '3'
+    paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
+  read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        page: 212
+        table: '3'
+        paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2173.0:h=dc4d8a196fbc
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.28'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 212
+    table: '3'
+    paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
+  read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173'
+      locator:
+        page: 212
+        table: '3'
+        paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2273.0:h=c383b1787018
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2273'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.27'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 212
+    table: '3'
+    paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
+  read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        page: 212
+        table: '3'
+        paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-005-fedkin-2006::fedkin_2006_na_class_b1
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -738,7 +1380,7 @@ observations:
     line_range: 186-197
     source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
   read_from: unknown:kems-005-fedkin-2006
-- observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
+- observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=1973.0:h=c900cec45e7a
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
     quantity:
@@ -762,8 +1404,112 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
       tag: unknown
-      reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    note: Table 3 SiO this-work column complete
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        table: '3'
+        line_range: 186-197
+        note: Table 3 SiO this-work column complete
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2073.0:h=eb12d425d670
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FCMAS_chondrule_analog' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2073'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -807,10 +1553,8 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: ±0.01 authors visual fit envelope
-      alpha_range:
-      - '0.11'
-      - '0.22'
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
   evidence:
     class:
       tag: value
@@ -828,7 +1572,231 @@ observations:
     note: Table 3 SiO this-work column complete
     source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
   read_from: unknown:kems-005-fedkin-2006
-- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_alexander_2001_inverse
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        table: '3'
+        line_range: 186-197
+        note: Table 3 SiO this-work column complete
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2173.0:h=efeb2f418fbe
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FCMAS_chondrule_analog' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    note: Table 3 SiO this-work column complete
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173'
+      locator:
+        table: '3'
+        line_range: 186-197
+        note: Table 3 SiO this-work column complete
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2273.0:h=707e960142f9
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_FCMAS_chondrule_analog' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2273'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.21'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    note: Table 3 SiO this-work column complete
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: unknown:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        table: '3'
+        line_range: 186-197
+        note: Table 3 SiO this-work column complete
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: dimensionless
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_alexander_2001_inverse::T=2073.0:h=42fff0b90293
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
     quantity:
@@ -846,12 +1814,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2073.0, 2273.0]; no midpoint invented
+      tag: value
+      value: '2073'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'inverse_fitted_evaporation_coefficient'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -874,7 +1841,7 @@ observations:
     model: model_derived_inverse_fit
   admission:
     status: rejected
-    reason: source admission_status=rejected_model_output_not_measurement
+    reason: model_output_not_measurement
     decided_by:
       worker: DEEP-kems-005-fedkin-2006
       date: '2026-09-06'
@@ -891,7 +1858,17 @@ observations:
     note: row=Mg; Alexander (2001)
     source_path: tables/kems-005-fedkin-2006/t4.csv
   read_from: tables:kems-005-fedkin-2006
-- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_this_work_inverse
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        page: 219
+        table: '4'
+        note: row=Mg; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_alexander_2001_inverse::T=2273.0:h=b23a6ba8ac78
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
     quantity:
@@ -909,22 +1886,89 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2073.0, 2273.0]; no midpoint invented
+      tag: value
+      value: '2273'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'inverse_fitted_evaporation_coefficient'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      per_temperature:
-      - T_K: '2073'
-        alpha_sigma: '0.01'
-      - T_K: '2273'
-        alpha_sigma: '0.01'
-      note: ±0.01 is printed for both this-work Mg coefficients.
+      reported_status: not_reported
+      note: Alexander (2001) did not present error bars for these estimates.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_inverse_fit
+    attribution: 'Table 4. Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments.
+
+      Species | 2073 K This work | 2073 K Alexander (2001) | 2273 K This work | 2273 K Alexander (2001)
+
+      Mg | 0.14 ± 0.01 | 0.19 | 0.19 ± 0.01 | 0.16
+
+      Because Alexander (2001) did not present error bars for his estimates, it is not known whether these are significant
+      differences.'
+    model: model_derived_inverse_fit
+  admission:
+    status: rejected
+    reason: model_output_not_measurement
+    decided_by:
+      worker: DEEP-kems-005-fedkin-2006
+      date: '2026-09-06'
+      evidence:
+        page: 219
+        table: '4'
+        note: row=Mg; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 219
+    table: '4'
+    note: row=Mg; Alexander (2001)
+    source_path: tables/kems-005-fedkin-2006/t4.csv
+  read_from: tables:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        page: 219
+        table: '4'
+        note: row=Mg; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_this_work_inverse::T=2073.0:h=630abe6cf480
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'inverse_fitted_evaporation_coefficient'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'FeO_free_CMAS_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2073'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_t4_mg_this_work_inverse
   evidence:
     class:
       tag: value
@@ -938,7 +1982,7 @@ observations:
     model: model_derived_inverse_fit
   admission:
     status: rejected
-    reason: source admission_status=rejected_model_output_not_measurement
+    reason: model_output_not_measurement
     decided_by:
       worker: DEEP-kems-005-fedkin-2006
       date: '2026-09-06'
@@ -955,7 +1999,86 @@ observations:
     note: row=Mg; This work
     source_path: tables/kems-005-fedkin-2006/t4.csv
   read_from: tables:kems-005-fedkin-2006
-- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_alexander_2001_inverse
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        page: 219
+        table: '4'
+        note: row=Mg; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_this_work_inverse::T=2273.0:h=501f066a6091
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'inverse_fitted_evaporation_coefficient'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'FeO_free_CMAS_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2273'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_t4_mg_this_work_inverse
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_inverse_fit
+    attribution: 'Table 4. Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments.
+
+      Species | 2073 K This work | 2073 K Alexander (2001) | 2273 K This work | 2273 K Alexander (2001)
+
+      Mg | 0.14 ± 0.01 | 0.19 | 0.19 ± 0.01 | 0.16'
+    model: model_derived_inverse_fit
+  admission:
+    status: rejected
+    reason: model_output_not_measurement
+    decided_by:
+      worker: DEEP-kems-005-fedkin-2006
+      date: '2026-09-06'
+      evidence:
+        page: 219
+        table: '4'
+        note: row=Mg; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 219
+    table: '4'
+    note: row=Mg; This work
+    source_path: tables/kems-005-fedkin-2006/t4.csv
+  read_from: tables:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        page: 219
+        table: '4'
+        note: row=Mg; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_alexander_2001_inverse::T=2073.0:h=d7608039bde4
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
     quantity:
@@ -973,12 +2096,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2073.0, 2273.0]; no midpoint invented
+      tag: value
+      value: '2073'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'inverse_fitted_evaporation_coefficient'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -1001,7 +2123,7 @@ observations:
     model: model_derived_inverse_fit
   admission:
     status: rejected
-    reason: source admission_status=rejected_model_output_not_measurement
+    reason: model_output_not_measurement
     decided_by:
       worker: DEEP-kems-005-fedkin-2006
       date: '2026-09-06'
@@ -1018,7 +2140,17 @@ observations:
     note: row=SiO; Alexander (2001)
     source_path: tables/kems-005-fedkin-2006/t4.csv
   read_from: tables:kems-005-fedkin-2006
-- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_this_work_inverse
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        page: 219
+        table: '4'
+        note: row=SiO; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_alexander_2001_inverse::T=2273.0:h=fd9b0e3f9877
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
     quantity:
@@ -1036,22 +2168,89 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2073.0, 2273.0]; no midpoint invented
+      tag: value
+      value: '2273'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'inverse_fitted_evaporation_coefficient'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      per_temperature:
-      - T_K: '2073'
-        alpha_sigma: '0.01'
-      - T_K: '2273'
-        alpha_sigma: '0.01'
-      note: ±0.01 is printed for both this-work SiO coefficients.
+      reported_status: not_reported
+      note: Alexander (2001) did not present error bars for these estimates.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_inverse_fit
+    attribution: 'Table 4. Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments.
+
+      Species | 2073 K This work | 2073 K Alexander (2001) | 2273 K This work | 2273 K Alexander (2001)
+
+      SiO | 0.07 ± 0.01 | 0.11 | 0.08 ± 0.01 | 0.08
+
+      Because Alexander (2001) did not present error bars for his estimates, it is not known whether these are significant
+      differences.'
+    model: model_derived_inverse_fit
+  admission:
+    status: rejected
+    reason: model_output_not_measurement
+    decided_by:
+      worker: DEEP-kems-005-fedkin-2006
+      date: '2026-09-06'
+      evidence:
+        page: 219
+        table: '4'
+        note: row=SiO; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 219
+    table: '4'
+    note: row=SiO; Alexander (2001)
+    source_path: tables/kems-005-fedkin-2006/t4.csv
+  read_from: tables:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        page: 219
+        table: '4'
+        note: row=SiO; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_this_work_inverse::T=2073.0:h=5f67b9012f83
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'inverse_fitted_evaporation_coefficient'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'FeO_free_CMAS_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2073'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_t4_sio_this_work_inverse
   evidence:
     class:
       tag: value
@@ -1065,7 +2264,7 @@ observations:
     model: model_derived_inverse_fit
   admission:
     status: rejected
-    reason: source admission_status=rejected_model_output_not_measurement
+    reason: model_output_not_measurement
     decided_by:
       worker: DEEP-kems-005-fedkin-2006
       date: '2026-09-06'
@@ -1082,3 +2281,82 @@ observations:
     note: row=SiO; This work
     source_path: tables/kems-005-fedkin-2006/t4.csv
   read_from: tables:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        page: 219
+        table: '4'
+        note: row=SiO; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_this_work_inverse::T=2273.0:h=55b2531c6b39
+  experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'inverse_fitted_evaporation_coefficient'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'FeO_free_CMAS_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2273'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: kems-005-fedkin-2006::fedkin_2006_t4_sio_this_work_inverse
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_inverse_fit
+    attribution: 'Table 4. Evaporation coefficients derived from the FeO-free portion of the Wang et al. (2001) experiments.
+
+      Species | 2073 K This work | 2073 K Alexander (2001) | 2273 K This work | 2273 K Alexander (2001)
+
+      SiO | 0.07 ± 0.01 | 0.11 | 0.08 ± 0.01 | 0.08'
+    model: model_derived_inverse_fit
+  admission:
+    status: rejected
+    reason: model_output_not_measurement
+    decided_by:
+      worker: DEEP-kems-005-fedkin-2006
+      date: '2026-09-06'
+      evidence:
+        page: 219
+        table: '4'
+        note: row=SiO; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 219
+    table: '4'
+    note: row=SiO; This work
+    source_path: tables/kems-005-fedkin-2006/t4.csv
+  read_from: tables:kems-005-fedkin-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        page: 219
+        table: '4'
+        note: row=SiO; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv

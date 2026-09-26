@@ -1,8 +1,8 @@
 schema_version: battery_work.v2.1
 work:
   work_id: 10.2355/tetsutohagane1955.68.16_2569
-  citation: Ueshima, Y., Ichise, E. & Mori, T. (1982), "Thermal Analysis of Fe-Mo Alloys by the Use of Knudsen Cell Mass Spectrometry",
-    Tetsu-to-Hagané 68(16):2569–2577, DOI 10.2355/tetsutohagane1955.68.16_2569
+  citation: Ueshima, Y., Ichise, E. & Mori, T. (1982). Thermal Analysis of Fe-Mo Alloys by the Use of Knudsen Cell Mass Spectrometry.
+    Tetsu-to-Hagane (鉄と鋼), 68(16), 2569-2577.
   source_ids:
   - ueshima-1982-fe-mo-thermal
   source_files:
@@ -19,11 +19,11 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.2355/tetsutohagane1955.68.16_2569
 experiments:
-- experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-thermal-analysis-series
+- experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::femo-kems-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'knudsen_effusion_thermal_analysis' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample:
     mass_kg:
       state:
@@ -35,15 +35,41 @@ experiments:
       locator:
         published_page: 2570
         pdf_page_index: 2
-        note: Printed sample volume 0.25 cm3 (~2 g for Fe-Mo); SI conversion of ~2 g only
+        section: 2. Experimental method
+        note: About 2 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 2570
+              pdf_page_index: 2
+              section: 2. Experimental method
+              note: About 2 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 2570
+              pdf_page_index: 2
+              section: 2. Experimental method
+              note: About 2 g; unit conversion only
+        output_unit: kg
     printed_composition:
       state:
         tag: value
-        value: Fe-Mo alloys, 25 to 67 at% Mo
+        value: Fe-Mo alloy, 25-67 at% Mo
       locator:
-        published_page: 2569
-        pdf_page_index: 1
-        note: English Synopsis composition range; section 2.2 also states 25-67 at% Mo
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2. Experimental method
     form:
       state:
         tag: value
@@ -51,28 +77,33 @@ experiments:
       locator:
         published_page: 2570
         pdf_page_index: 2
-        section: 2.2 Samples
+        section: 2. Experimental method
+    characterization:
+      state:
+        tag: value
+        value: Only 56Fe ion intensity was measured; Mo vapour pressure about 10^-11 atm at 1600 degC was not measurable
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        section: 2. Experimental method
     pretreatment:
       state:
         tag: value
-        value: Degas and melt-in under 10^-6 to 10^-7 Torr at >=1300 C before measurement
+        value: Degassed and melted above 1300 degC under 10^-6-10^-7 Torr before measurement
       locator:
         published_page: 2570
         pdf_page_index: 2
-        section: 2.3 Measurement method
+        section: 2. Experimental method
   conditions:
     temperature_K:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '1573.15'
-          interval_high: '1923.15'
-          approximate: false
+        tag: unknown
+        reason: not_published
       locator:
-        published_page: 2569
-        pdf_page_index: 1
-        note: Synopsis 1300-1650 C; T_K = T_C + 273.15 derived
+        published_page: 2573
+        pdf_page_index: 5
+        table: '4'
+        note: Series temperatures are row values, not one experiment setpoint
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -81,7 +112,8 @@ experiments:
       locator:
         published_page: 2570
         pdf_page_index: 2
-        note: Degas vacuum 10^-6 to 10^-7 Torr printed; run chamber total pressure not a single scored value
+        section: 2. Experimental method
+        note: Pre-measurement vacuum 10^-7 to 10^-6 Torr; unit conversion only; not promoted to operating pressure
     sweep_gas:
       state:
         tag: not_applicable
@@ -89,28 +121,38 @@ experiments:
       locator:
         published_page: 2570
         pdf_page_index: 2
-        note: Vacuum Knudsen effusion; no sweep gas
+        section: 2. Experimental method
+        note: High-purity He is used for alloy preparation, not a measurement sweep gas
     regime:
       regime_class:
         tag: unknown
-        reason: Knudsen effusion is the method; gas-flow regime class is not published
+        reason: not_published
     pumping:
       base_pressure_Pa:
         state:
           tag: value
           value:
             kind: interval
-            interval_low: '0.0000133'
-            interval_high: '0.000133'
-            approximate: true
+            interval_low: '0.00001333223684210526315789474'
+            interval_high: '0.0001333223684210526315789474'
         locator:
           published_page: 2570
           pdf_page_index: 2
-          note: Printed 10^-6 to 10^-7 Torr degas vacuum; Pa = Torr * 133.322 so 1e-7 Torr ≈ 1.33e-5 Pa (low) and 1e-6 Torr
-            ≈ 1.33e-4 Pa (high)
+          section: 2. Experimental method
+          note: Pre-measurement degassing vacuum only; unit conversion only
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Operating pressure during transformation runs is not separately printed; pre-measurement vacuum retained only
+          as context
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2. Experimental method
   work_id: 10.2355/tetsutohagane1955.68.16_2569
   locator:
-    published_page: 2569-2571
+    published_page: 2570
+    pdf_page_index: 2
     section: 2. Experimental method
   apparatus:
     geometry:
@@ -124,7 +166,33 @@ experiments:
         locator:
           published_page: 2570
           pdf_page_index: 2
-          note: Printed 0.5 mm orifice; SI conversion only
+          figure: '1'
+          note: 0.5 mm; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.5'
+              locator:
+                published_page: 2570
+                pdf_page_index: 2
+                figure: '1'
+                note: 0.5 mm; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                published_page: 2570
+                pdf_page_index: 2
+                figure: '1'
+                note: 0.5 mm; unit conversion only
+          output_unit: m
       orifice_channel_length_m:
         state:
           tag: unknown
@@ -132,20 +200,36 @@ experiments:
         locator:
           published_page: 2570
           pdf_page_index: 2
-          note: Lid thickness 1 mm printed; orifice channel length not separately stated
+          figure: '1'
+          note: Channel length not printed
   fO2_control:
     channel:
       tag: unknown
       reason: not_published
-    buffer:
+  bench_id: 10.2355/tetsutohagane1955.68.16_2569::bench::ueshima-rm6k
+  thermal_schedule:
+    method:
       state:
-        tag: unknown
-        reason: not_published
+        tag: value
+        value: Continuous heating/cooling with constant-temperature ion-intensity checks
       locator:
         published_page: 2570
         pdf_page_index: 2
-  bench_id: 10.2355/tetsutohagane1955.68.16_2569::bench::hitachi-rm6k-knudsen
-  thermal_schedule:
+        section: 2. Experimental method
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1573.15'
+            interval_high: '1923.15'
+            approximate: false
+        locator:
+          published_page: 2569
+          pdf_page_index: 1
+          section: Synopsis
+          note: Printed 1300-1650 °C campaign range; T_K = T_C + 273.15 derived
     total_duration_s:
       state:
         tag: unknown
@@ -153,20 +237,170 @@ experiments:
       locator:
         published_page: 2570
         pdf_page_index: 2
-        note: Heating/cooling rates typically 3-5 C/min printed; total duration not a single series value
+        section: 2. Experimental method
+        note: Equilibrium accepted after 10 min at constant intensity; no series duration printed
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Normal heating/cooling rate 3-5 degC/min; Δt held at 30 ± 0.5 degC
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2. Experimental method
+- experiment_id: 10.2355/tetsutohagane1955.68.16_2569::experiment::pure-metal-calibration-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.002'
+          approximate: true
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2. Experimental method
+        note: About 2 g; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 2570
+              pdf_page_index: 2
+              section: 2. Experimental method
+              note: About 2 g; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 2570
+              pdf_page_index: 2
+              section: 2. Experimental method
+              note: About 2 g; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: Pure Fe and Pd calibration standards
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
+    form:
+      state:
+        tag: value
+        value: Pure-metal calibration charge
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
+        note: Standards scanned over ranges; no single setpoint
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
+        note: Pre-measurement vacuum only; unit conversion only; no operating pressure printed
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
+        note: No measurement sweep gas printed
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '0.00001333223684210526315789474'
+            interval_high: '0.0001333223684210526315789474'
+        locator:
+          published_page: 2570
+          pdf_page_index: 2
+          section: 2. Experimental method
+          note: Pre-measurement degassing vacuum only; unit conversion only
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  locator:
+    published_page: 2571
+    pdf_page_index: 3
+    table: '2'
+    section: 2. Experimental method
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+  bench_id: 10.2355/tetsutohagane1955.68.16_2569::bench::ueshima-rm6k
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Fe scan 1370-1650 degC; Pd scan 1440-1660 degC at 20-30 degC intervals
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        section: 2. Experimental method
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
 benches:
-- id: 10.2355/tetsutohagane1955.68.16_2569::bench::hitachi-rm6k-knudsen
+- id: 10.2355/tetsutohagane1955.68.16_2569::bench::ueshima-rm6k
   work_id: 10.2355/tetsutohagane1955.68.16_2569
   identity:
     basis: described_in_this_work
   apparatus_family:
     state:
       tag: value
-      value: Hitachi RM-6K Knudsen cell mass spectrometer
+      value: Hitachi RM 6K Knudsen cell mass spectrometer
     locator:
-      published_page: 2569
-      pdf_page_index: 1
-      section: 2.1 Apparatus
+      published_page: 2570
+      pdf_page_index: 2
+      section: 2. Experimental method
+  method:
+    state:
+      tag: value
+      value: Knudsen-cell mass spectrometry with electron-bombardment ionization
+    locator:
+      published_page: 2570
+      pdf_page_index: 2
+      section: 2. Experimental method
   cell_material_and_liner:
     state:
       tag: value
@@ -174,7 +408,9 @@ benches:
     locator:
       published_page: 2570
       pdf_page_index: 2
+      figure: '1'
       section: 2.1 Apparatus
+      note: SSA-S designation is given in the apparatus footnote
   geometry:
     cell_internal_dimensions:
       diameter_m:
@@ -187,7 +423,33 @@ benches:
         locator:
           published_page: 2570
           pdf_page_index: 2
-          note: Printed ID 9 mm; SI conversion only
+          figure: '1'
+          note: 9 mm inner diameter; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '9'
+              locator:
+                published_page: 2570
+                pdf_page_index: 2
+                figure: '1'
+                note: 9 mm inner diameter; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                published_page: 2570
+                pdf_page_index: 2
+                figure: '1'
+                note: 9 mm inner diameter; unit conversion only
+          output_unit: m
       height_m:
         state:
           tag: value
@@ -198,39 +460,71 @@ benches:
         locator:
           published_page: 2570
           pdf_page_index: 2
-          note: Printed height 12 mm; SI conversion only
+          figure: '1'
+          note: 12 mm height; unit conversion only
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '12'
+              locator:
+                published_page: 2570
+                pdf_page_index: 2
+                figure: '1'
+                note: 12 mm height; unit conversion only
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                published_page: 2570
+                pdf_page_index: 2
+                figure: '1'
+                note: 12 mm height; unit conversion only
+          output_unit: m
   temperature_measurement:
-    sensor:
+    bottom_sensor:
       state:
         tag: value
-        value: Two pairs of W/W-Re 26% thermocouples (cell-bottom centre and cell-side upper)
+        value: W/W-Re26% thermocouple at cell-bottom centre; T_B
       locator:
         published_page: 2570
         pdf_page_index: 2
-        section: 2.1 Apparatus
+        section: 2. Experimental method
+    upper_sensor:
+      state:
+        tag: value
+        value: W/W-Re26% thermocouple at upper cell side; Δt = T_upper - T_B
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2. Experimental method
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: Fe A4 point, Fe melting point, and Pd melting point standards
+      locator:
+        published_page: 2571
+        pdf_page_index: 3
+        table: '2'
+        section: 2. Experimental method
   heating_method:
     state:
       tag: value
-      value: Electron bombardment from upper and lower W ring filaments; applied voltage 0.5-1.8 kV
+      value: Electron bombardment from independently controlled upper/lower W ring filaments
     locator:
       published_page: 2570
       pdf_page_index: 2
-      section: 2.1 Apparatus
+      figure: '1'
+      section: 2. Experimental method
   other_facts:
-  - name: orifice_diameter
-    value:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.5'
-          approximate: false
-      locator:
-        published_page: 2570
-        pdf_page_index: 2
-        note: Printed orifice diameter 0.5 mm
-    unit: mm
-  - name: crucible_outer_diameter
+  - name: outer_cell_diameter
     value:
       state:
         tag: value
@@ -241,7 +535,7 @@ benches:
       locator:
         published_page: 2570
         pdf_page_index: 2
-        note: Printed OD 11 mm
+        figure: '1'
     unit: mm
   - name: lid_thickness
     value:
@@ -254,37 +548,991 @@ benches:
       locator:
         published_page: 2570
         pdf_page_index: 2
+        figure: '1'
     unit: mm
-  - name: measured_ion
+  - name: orifice_diameter
     value:
       state:
         tag: value
         value:
-          kind: categorical
-          categorical: 56Fe ion intensity I_Fe only (Mo vapour pressure too low)
+          kind: point
+          point: '0.5'
           approximate: false
       locator:
+        published_page: 2570
+        pdf_page_index: 2
+        figure: '1'
+    unit: mm
+  - name: holder_filament_voltage
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.5'
+          interval_high: '1.8'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2. Experimental method
+    unit: kV
+  - name: bottom_temperature_readability
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.5'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2. Experimental method
+    unit: degC
+  - name: temperature_difference_readability
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        section: 2. Experimental method
+    unit: degC
+  - name: ion_acceleration_voltage
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3200'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+    unit: V
+  - name: chamber_voltage
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '80'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+    unit: V
+  - name: repellers_voltage
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '8'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+    unit: V
+  - name: target_voltage
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+    unit: V
+  - name: grid_voltage
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-20'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+    unit: V
+  - name: total_emission_current
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '25'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+    unit: μA
+  - name: target_current
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '18'
+          approximate: false
+      locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+    unit: μA
+context:
+- observation_id: ueshima_1982_fig11_regressions
+  type: figure_trace
+  experiment: femo-kems-series
+  locator:
+    published_page: 2575
+    pdf_page_index: 7
+    figure: '11'
+    panel: b
+    column: printed regressions
+  units: degC and degC/degC as printed
+  values:
+    quantity: supercooling_transition_regressions
+    method_class: model_derived
+    evidence_class: author_reduced_kems
+    regressions:
+    - reaction: L + (Mo) = σ
+      reference_T_C: '1610'
+      slope: '-0.73'
+      intercept_T_C: '1608'
+      derivation: Printed T_r = -0.73 ΔT_s + 1608 (°C)
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '11'
+        panel: b
+        row: L+(Mo)=σ
+        column: equation
+    - reaction: L + δ = α
+      reference_T_C: '1454'
+      slope: '-0.14'
+      intercept_T_C: '1455'
+      derivation: Printed T_r = -0.14 ΔT_s + 1455 (°C)
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '11'
+        panel: b
+        row: L+δ=α
+        column: equation
+    - reaction: x2
+      reference_T_C: '1391'
+      slope: '-0.84'
+      intercept_T_C: '1386'
+      derivation: Printed T_r = -0.84 ΔT_s + 1386 (°C)
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '11'
+        panel: b
+        row: x2
+        column: equation
+    refusal: No printed x1 regression; no coefficient invented
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_fig11_regressions
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  source_id: ueshima-1982-fe-mo-thermal
+  species: Fe
+- observation_id: ueshima_1982_fig6_slope_plot
+  type: figure_trace
+  experiment: femo-kems-series
+  locator:
+    published_page: 2573
+    pdf_page_index: 5
+    figure: '6'
+    column: ln(I_Fe T) vs 10^4/T
+  units: kcal/mol and degC as plotted
+  values:
+    quantity: ln_ion_intensity_temperature_slope_plot
+    method_class: figure_only
+    evidence_class: figure_only_digitized
+    digitized: false
+    labeled_values:
+    - label: transition, heat 159, x_Mo=0.613
+      value_C: '1610'
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        figure: '6'
+        row: transition annotation
+        column: value
+    - label: ΔH_Fe^(v,L+(Mo))
+      value_kcal_mol: '82'
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        figure: '6'
+        row: upper slope label
+        column: value
+    - label: ΔH_Fe^(v,σ+(Mo))
+      value_kcal_mol: '91.3'
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        figure: '6'
+        row: lower slope label
+        column: value
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_fig6_slope_plot
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  source_id: ueshima-1982-fe-mo-thermal
+  species: Fe
+- observation_id: ueshima_1982_fig8_to_10_digitized_points
+  type: figure_trace
+  experiment: pure-metal-calibration-series
+  locator:
+    published_page: 2574
+    pdf_page_index: 6
+    figure: 8-10
+    column: digitized marker points
+  units: degC, g, and mm as plotted
+  values:
+    quantity: apparatus_calibration_figure_points
+    method_class: figure_only
+    evidence_class: figure_only_digitized
+    digitized: true
+    approximate: true
+    fig8_delta_t_delta_T:
+    - delta_t_C: 18
+      delta_T_C: 37
+      row_locator:
+        published_page: 2574
+        pdf_page_index: 6
+        figure: '8'
+        row: point 1
+        column: Δt/ΔT
+    - delta_t_C: 23
+      delta_T_C: 42
+      row_locator:
+        published_page: 2574
+        pdf_page_index: 6
+        figure: '8'
+        row: point 2
+        column: Δt/ΔT
+    - delta_t_C: 28
+      delta_T_C: 45
+      row_locator:
+        published_page: 2574
+        pdf_page_index: 6
+        figure: '8'
+        row: point 3
+        column: Δt/ΔT
+    - delta_t_C: 38
+      delta_T_C: 49
+      row_locator:
+        published_page: 2574
+        pdf_page_index: 6
+        figure: '8'
+        row: point 4
+        column: Δt/ΔT
+    - delta_t_C: 50
+      delta_T_C: 53
+      row_locator:
+        published_page: 2574
+        pdf_page_index: 6
+        figure: '8'
+        row: point 5
+        column: Δt/ΔT
+    fig9_mass_delta_T:
+    - mass_g: '0.5'
+      delta_T_C: '53.5'
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '9'
+        row: point 1
+        column: mass/ΔT
+    - mass_g: '1'
+      delta_T_C: '49.2'
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '9'
+        row: point 2
+        column: mass/ΔT
+    - mass_g: '2'
+      delta_T_C: '46.5'
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '9'
+        row: point 3
+        column: mass/ΔT
+    - mass_g: '3'
+      delta_T_C: '45.2'
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '9'
+        row: point 4
+        column: mass/ΔT
+    fig10_orifice_delta_T:
+    - orifice_diameter_mm: '0.5'
+      delta_T_C: '46.5'
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '10'
+        row: point 1
+        column: diameter/ΔT
+    - orifice_diameter_mm: '0.7'
+      delta_T_C: '46.5'
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '10'
+        row: point 2
+        column: diameter/ΔT
+    - orifice_diameter_mm: '1'
+      delta_T_C: '49'
+      row_locator:
+        published_page: 2575
+        pdf_page_index: 7
+        figure: '10'
+        row: point 3
+        column: diameter/ΔT
+    note: Approximate visual digitization; Figure 10 error-bar endpoints not digitized
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_fig8_to_10_digitized_points
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  source_id: ueshima-1982-fe-mo-thermal
+  species: Fe
+- observation_id: ueshima_1982_figures_3_to_7
+  type: figure_trace
+  experiment: femo-kems-series
+  locator:
+    published_page: 2572
+    pdf_page_index: 4
+    figure: 3-5
+  units: as plotted
+  values:
+    quantity: analog_ion_intensity_and_phase_diagram_traces
+    method_class: figure_only
+    evidence_class: figure_only_digitized
+    digitized: false
+    figure_conditions:
+    - figure: '3'
+      x_Mo: '0.613'
+      cooling_rate_C_min: -3
+      heating_rate_C_min: 3
+      time_scale_min_per_div: 2
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        figure: '3'
+        panel: whole figure
+        row: conditions
+        column: all
+    - figure: '4'
+      x_Mo: '0.34'
+      cooling_rate_C_min: -4
+      heating_rate_C_min: 2
+      time_scale_min_per_div: 2
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        figure: '4'
+        panel: whole figure
+        row: conditions
+        column: all
+    - figure: '5'
+      x_Mo: '0.43'
+      cooling_rate_C_min: -8
+      heating_rate_C_min: 8
+      time_scale_min_per_div: 2
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        figure: '5'
+        panel: whole figure
+        row: conditions
+        column: all
+    figure_7_labels:
+    - label: σ decomposition
+      value_C: '1610'
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        figure: '7'
+        panel: whole figure
+        row: 1610 label
+        column: label
+    - label: σ decomposition comparator
+      value_C: '1542'
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        figure: '7'
+        panel: whole figure
+        row: 1542 label
+        column: label
+    refusal: No exact trace or off-axis phase-boundary coordinates digitized; OCR synthetic trace tables refused
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_figures_3_to_7
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  source_id: ueshima-1982-fe-mo-thermal
+  species: Fe
+- observation_id: ueshima_1982_table1_ion_source_settings
+  type: apparatus
+  experiment: femo-kems-series
+  locator:
+    published_page: 2570
+    pdf_page_index: 2
+    table: '1'
+    row: all
+    column: setting/value
+  units: printed V and μA
+  values:
+    quantity: ion_source_conditioning
+    method_class: measured
+    rows:
+    - setting: ion acceleration voltage
+      value: 3200
+      unit: V
+      row_locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+        row: ion acceleration voltage
+        column: value
+    - setting: chamber voltage
+      value: 80
+      unit: V
+      row_locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+        row: chamber voltage
+        column: value
+    - setting: repellers voltage
+      value: 8
+      unit: V
+      row_locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+        row: repellers voltage
+        column: value
+    - setting: target voltage
+      value: 30
+      unit: V
+      row_locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+        row: target voltage
+        column: value
+    - setting: grid voltage
+      value: -20
+      unit: V
+      row_locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+        row: grid voltage
+        column: value
+    - setting: total emission current
+      value: 25
+      unit: μA
+      row_locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+        row: total emission current
+        column: value
+    - setting: target current
+      value: 18
+      unit: μA
+      row_locator:
+        published_page: 2570
+        pdf_page_index: 2
+        table: '1'
+        row: target current
+        column: value
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_table1_ion_source_settings
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  source_id: ueshima-1982-fe-mo-thermal
+  species: Fe
+- observation_id: ueshima_1982_table3_external_iron_references
+  type: literature_reference_table
+  locator:
+    published_page: 2572
+    pdf_page_index: 4
+    table: '3'
+    row: all
+    column: author/A4/melting point
+  units: degC as printed
+  values:
+    quantity: external_iron_transition_references
+    method_class: quoted_measurement
+    rows:
+    - author: Schofield & Bacon (1953)
+      melting_C:
+        value: 1537
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Schofield & Bacon (1953)
+          column: melting point
+      missing_columns:
+      - A4 point
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        table: '3'
+        row: Schofield & Bacon (1953)
+        column: all
+    - author: Boulanger (1955)
+      A4_C:
+        value: 1394
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Boulanger (1955)
+          column: A4 point
+      melting_C:
+        value: 1538
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Boulanger (1955)
+          column: melting point
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        table: '3'
+        row: Boulanger (1955)
+        column: all
+    - author: Pattison & Willows (1956)
+      A4_C:
+        value: 1402
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Pattison & Willows (1956)
+          column: A4 point
+      melting_C:
+        value: 1535
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Pattison & Willows (1956)
+          column: melting point
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        table: '3'
+        row: Pattison & Willows (1956)
+        column: all
+    - author: Olette & Ferrier (1958)
+      A4_C:
+        value: 1397
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Olette & Ferrier (1958)
+          column: A4 point
+      missing_columns:
+      - melting point
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        table: '3'
+        row: Olette & Ferrier (1958)
+        column: all
+    - author: Dench & Kubaschewski (1963)
+      A4_C:
+        value: 1393
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Dench & Kubaschewski (1963)
+          column: A4 point
+      missing_columns:
+      - melting point
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        table: '3'
+        row: Dench & Kubaschewski (1963)
+        column: all
+    - author: Sinha, Buckley & Hume-Rothery (1967)
+      A4_C:
+        value: 1392
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Sinha, Buckley & Hume-Rothery (1967)
+          column: A4 point
+      missing_columns:
+      - melting point
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        table: '3'
+        row: Sinha, Buckley & Hume-Rothery (1967)
+        column: all
+    - author: Sinha & Hume-Rothery (1967)
+      melting_C:
+        value: 1535
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Sinha & Hume-Rothery (1967)
+          column: melting point
+      missing_columns:
+      - A4 point
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        table: '3'
+        row: Sinha & Hume-Rothery (1967)
+        column: all
+    - author: Cezairliyan & McClure (1974)
+      melting_C:
+        value: 1535
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: Cezairliyan & McClure (1974)
+          column: melting point
+      missing_columns:
+      - A4 point
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        table: '3'
+        row: Cezairliyan & McClure (1974)
+        column: all
+    - author: ibid. (1975)
+      A4_C:
+        value: 1410
+        method_class: quoted_measurement
+        locator:
+          published_page: 2572
+          pdf_page_index: 4
+          table: '3'
+          row: ibid. (1975)
+          column: A4 point
+      missing_columns:
+      - melting point
+      note: 'Asterisk: not adopted (IPTS-68)'
+      row_locator:
+        published_page: 2572
+        pdf_page_index: 4
+        table: '3'
+        row: ibid. (1975)
+        column: all
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_table3_external_iron_references
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  source_id: ueshima-1982-fe-mo-thermal
+  species: Fe
+- observation_id: ueshima_1982_table5_heat_vaporization
+  type: thermodynamic_example
+  experiment: femo-kems-series
+  locator:
+    published_page: 2576
+    pdf_page_index: 8
+    table: '5'
+    row: all
+    column: phase region/ΔH_Fe^v
+  units: kcal/mol as printed
+  values:
+    quantity: apparent_partial_molar_heat_of_vaporization
+    method_class: model_derived
+    model: Eq. (16) slope of ln(I_Fe T) versus 1/T
+    rows:
+    - phase_region: L + δ
+      delta_H_Fe_v_kcal_mol: '80.4'
+      method_class: model_derived
+      derivation: Eq. (16) slope reduction
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '5'
+        row: L + δ
+        column: ΔH_Fe^v (kcal/mol)
+    - phase_region: L + σ
+      delta_H_Fe_v_kcal_mol: '79.1'
+      method_class: model_derived
+      derivation: Eq. (16) slope reduction
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '5'
+        row: L + σ
+        column: ΔH_Fe^v (kcal/mol)
+    - phase_region: L + (Mo)
+      delta_H_Fe_v_kcal_mol: '81.6'
+      method_class: model_derived
+      derivation: Eq. (16) slope reduction
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '5'
+        row: L + (Mo)
+        column: ΔH_Fe^v (kcal/mol)
+    - phase_region: α + δ
+      delta_H_Fe_v_kcal_mol: '90.5'
+      method_class: model_derived
+      derivation: Eq. (16) slope reduction
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '5'
+        row: α + δ
+        column: ΔH_Fe^v (kcal/mol)
+    - phase_region: δ + σ
+      delta_H_Fe_v_kcal_mol: '91.7'
+      method_class: model_derived
+      derivation: Eq. (16) slope reduction
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '5'
+        row: δ + σ
+        column: ΔH_Fe^v (kcal/mol)
+    - phase_region: σ + (Mo)
+      delta_H_Fe_v_kcal_mol: '91.9'
+      method_class: model_derived
+      derivation: Eq. (16) slope reduction
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '5'
+        row: σ + (Mo)
+        column: ΔH_Fe^v (kcal/mol)
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_table5_heat_vaporization
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  source_id: ueshima-1982-fe-mo-thermal
+  species: Fe
+- observation_id: ueshima_1982_table6_slope_comparisons
+  type: thermodynamic_example
+  experiment: femo-kems-series
+  locator:
+    published_page: 2576
+    pdf_page_index: 8
+    table: '6'
+    row: all
+    column: i/j/k/ΔH/predicted change/phase-diagram change
+  units: kcal/mol and inequalities as printed
+  values:
+    quantity: author_slope_difference_comparison
+    method_class: model_derived
+    rows:
+    - transformation: α → L + δ
+      i: δ
+      j: α
+      k: L
+      delta_H_difference_kcal_mol: '-10.1'
+      predicted_change: δ/L < δ/α
+      phase_diagram_change: (δ/L < 0) < (δ/α ~ 0)
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '6'
+        row: α → L + δ
+        column: all
+    - transformation: δ → L + σ (1)
+      i: L
+      j: δ
+      k: σ
+      delta_H_difference_kcal_mol: '-1.3'
+      predicted_change: L/σ < L/δ
+      phase_diagram_change: (L/σ < 0) > (L/δ < 0)
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '6'
+        row: δ → L + σ (1)
+        column: all
+    - transformation: δ → L + σ (2)
+      i: σ
+      j: δ
+      k: L
+      delta_H_difference_kcal_mol: '-12.6'
+      predicted_change: σ/L < σ/δ
+      phase_diagram_change: (σ/L < 0) < (σ/δ > 0)
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '6'
+        row: δ → L + σ (2)
+        column: all
+    - transformation: σ → L + (Mo) (1)
+      i: L
+      j: σ
+      k: (Mo)
+      delta_H_difference_kcal_mol: '2.5'
+      predicted_change: L/(Mo) > L/σ
+      phase_diagram_change: (L/(Mo) < 0) > (L/σ < 0)
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '6'
+        row: σ → L + (Mo) (1)
+        column: all
+    - transformation: σ → L + (Mo) (2)
+      i: (Mo)
+      j: σ
+      k: L
+      delta_H_difference_kcal_mol: '-10.3'
+      predicted_change: (Mo)/L < (Mo)/σ
+      phase_diagram_change: ((Mo)/L < 0) < ((Mo)/σ > 0)
+      row_locator:
+        published_page: 2576
+        pdf_page_index: 8
+        table: '6'
+        row: σ → L + (Mo) (2)
+        column: all
+    derivation: Table 6 compares author slope differences from Table 5 with phase-diagram boundary changes; context only because
+      no closed scored quantity exists for this comparison
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_table6_slope_comparisons
+  work_id: 10.2355/tetsutohagane1955.68.16_2569
+  source_id: ueshima-1982-fe-mo-thermal
+  species: Fe
+- observation_id: ueshima_1982_thermal_analysis_summary
+  type: experiment_series
+  experiment: femo-kems-series
+  locator:
+    published_page: 2573
+    pdf_page_index: 5
+    section: 4. Results and discussion
+    paragraph: summary
+    column: phase/range
+  units: degC as printed
+  values:
+    quantity: printed_thermal_analysis_summary
+    method_class: model_derived
+    rows:
+    - label: σ decomposition
+      temperature_range_C:
+      - '1609'
+      - '1611'
+      derivation: printed 1610 ± 1 °C; summary of six readings
+      comparison_as_printed: about 70 °C above previous reports
+      comparison_locator:
         published_page: 2569
         pdf_page_index: 1
-        section: 2.1 Apparatus
-context:
-- observation_id: ueshima_1982_apparatus_and_protocol
-  type: apparatus
-  locator:
-    published_page: 2569-2571
-    section: 2. Experimental method
-  units: as printed
-  values:
-    quantity: kems_thermal_analysis_protocol
-    method_class: method_only
-    evidence_class: authors_methods_prose
-    instrument: Hitachi RM-6K Knudsen cell mass spectrometer
-    cell: Al2O3 SSA-S, OD 11 mm, ID 9 mm, height 12 mm, lid 1 mm, orifice 0.5 mm, in Ta container
-    heating_cooling_rate_C_per_min: typically 3-5
-    delta_t_control_C: 30 +/- 0.5
-    measured_ion: 56Fe (I_Fe)
-    mo_vapour_pressure_note: Mo vapour pressure approx 10^-11 atm at 1600 C; Mo ion intensity not measured
-  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_apparatus_and_protocol
+        section: Synopsis
+        row: σ = L + (Mo)
+        column: comparison
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        paragraph: σ decomposition
+        row: σ
+        column: temperature
+    - label: δ decomposition (published synopsis)
+      temperature_range_C:
+      - '1503'
+      - '1521'
+      derivation: printed 1503-1521 °C in the English Synopsis
+      row_locator:
+        published_page: 2569
+        pdf_page_index: 1
+        section: Synopsis
+        row: δ = L + σ
+        column: temperature range
+    - label: δ decomposition x_Mo=0.340
+      temperature_range_C:
+      - '1502.8'
+      - '1504.5'
+      derivation: range of Table 4 heating cells
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        table: '4'
+        row: δ = L + σ; heat 156
+        column: T_c
+    - label: δ decomposition x_Mo=0.427
+      temperature_range_C:
+      - '1520.6'
+      - '1520.6'
+      derivation: single Table 4 heating cell
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        table: '4'
+        row: δ = L + σ; heat 148
+        column: T_c
+    - label: α decomposition
+      temperature_range_C:
+      - '1452'
+      - '1456'
+      derivation: printed 1452-1456 °C; summary of Table 4
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        table: '4'
+        row: α = L + δ
+        column: T_c
+    - label: x1
+      temperature_range_C:
+      - '1345'
+      - '1374'
+      note: Unidentified source label; absent for x_Mo > 0.6
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        paragraph: x1/x2
+        row: x1
+        column: temperature range
+    - label: x2
+      temperature_range_C:
+      - '1383'
+      - '1400'
+      note: Unidentified source label; absent for x_Mo > 0.6
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        paragraph: x1/x2
+        row: x2
+        column: temperature range
+    - label: alloy preparation heat treatments
+      conditions: 'x_Mo≈0.25/0.34: 1600 °C 0.5 h, 1470 °C 2 h, solid 1300 or 1400 °C 1 h; x_Mo≈0.43: 1470 °C 3 h'
+      row_locator:
+        published_page: 2573
+        pdf_page_index: 5
+        paragraph: heat treatments
+        row: alloy preparation
+        column: temperature/time
+  context_id: ueshima-1982-fe-mo-thermal::context::ueshima_1982_thermal_analysis_summary
   work_id: 10.2355/tetsutohagane1955.68.16_2569
   source_id: ueshima-1982-fe-mo-thermal
   species: Fe

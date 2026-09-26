@@ -75,6 +75,45 @@ experiments:
     tag: value
     value: knudsen_effusion
   sample:
+    volume_m3:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00000025'
+          approximate: false
+      locator:
+        published_page: 550
+        pdf_page_index: 2
+        section: '2.3'
+        note: Hitachi RM6K; alumina Knudsen cell (details in ref 9); W/W-26Re thermocouple
+      inference:
+        relation: cm3_to_m3
+        inputs:
+        - V_m3 = V_cm3 / 1e6
+        - original_unit=cm3
+        - as_published=0.25 cm3
+        - printed=sample_volume_cm3
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 550
+              pdf_page_index: 2
+              section: '2.3'
+              note: Hitachi RM6K; alumina Knudsen cell (details in ref 9); W/W-26Re thermocouple
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 550
+              pdf_page_index: 2
+              section: '2.3'
+              note: Hitachi RM6K; alumina Knudsen cell (details in ref 9); W/W-26Re thermocouple
+        output_unit: m3
     printed_composition:
       state:
         tag: unknown

@@ -207,6 +207,19 @@ species:
         - T_K: 2273.0
           alpha: 0.23
           sigma: 0.02
+        series:
+        - T_K: 1973.0
+          alpha: 0.23
+          sigma: 0.02
+        - T_K: 2073.0
+          alpha: 0.25
+          sigma: 0.02
+        - T_K: 2173.0
+          alpha: 0.24
+          sigma: 0.02
+        - T_K: 2273.0
+          alpha: 0.23
+          sigma: 0.02
         missing_for_motzfeldt:
         - orifice_area
         - clausing_factor
@@ -284,6 +297,19 @@ species:
         material: Hashimoto_1983_FCMAS_silicate_melt
         sigma: 0.01
         per_temperature:
+        - T_K: 1973.0
+          alpha: 0.24
+          sigma: 0.01
+        - T_K: 2073.0
+          alpha: 0.28
+          sigma: 0.01
+        - T_K: 2173.0
+          alpha: 0.28
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.27
+          sigma: 0.01
+        series:
         - T_K: 1973.0
           alpha: 0.24
           sigma: 0.01
@@ -385,6 +411,13 @@ species:
         - T_K: 2273.0
           alpha: 0.19
           sigma: 0.01
+        series:
+        - T_K: 2073.0
+          alpha: 0.14
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.19
+          sigma: 0.01
       uncertainty:
         per_temperature:
         - T_K: 2073.0
@@ -429,6 +462,11 @@ species:
         material: Wang_et_al_2001_FeO_free_CMAS_residue
         model: Alexander_2001_EQR
         per_temperature:
+        - T_K: 2073.0
+          alpha: 0.19
+        - T_K: 2273.0
+          alpha: 0.16
+        series:
         - T_K: 2073.0
           alpha: 0.19
         - T_K: 2273.0
@@ -524,6 +562,19 @@ species:
         - T_K: 2273.0
           alpha: 0.21
           sigma: 0.01
+        series:
+        - T_K: 1973.0
+          alpha: 0.12
+          sigma: 0.01
+        - T_K: 2073.0
+          alpha: 0.17
+          sigma: 0.01
+        - T_K: 2173.0
+          alpha: 0.2
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.21
+          sigma: 0.01
         note: 'Table 3 this-work SiO row: 0.12/0.17/0.20/0.21 ±0.01 at 1973–2273 K. Authors note progressive
           increase with T. Mid-range pin alpha=0.17 at 2073 K.'
         missing_for_motzfeldt:
@@ -592,6 +643,13 @@ species:
         - T_K: 2273.0
           alpha: 0.08
           sigma: 0.01
+        series:
+        - T_K: 2073.0
+          alpha: 0.07
+          sigma: 0.01
+        - T_K: 2273.0
+          alpha: 0.08
+          sigma: 0.01
       uncertainty:
         per_temperature:
         - T_K: 2073.0
@@ -636,6 +694,11 @@ species:
         material: Wang_et_al_2001_FeO_free_CMAS_residue
         model: Alexander_2001_EQR
         per_temperature:
+        - T_K: 2073.0
+          alpha: 0.11
+        - T_K: 2273.0
+          alpha: 0.08
+        series:
         - T_K: 2073.0
           alpha: 0.11
         - T_K: 2273.0

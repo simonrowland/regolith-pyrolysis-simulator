@@ -37,8 +37,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-035-sauerborn-2005::sauerborn_2005_completeness_ledger_deep2
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
       evidence:
         page: 4
         paragraph: Inhaltsverzeichnis
@@ -179,7 +179,7 @@ observations:
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig523_ms1_epma_glass
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-ms1
   identity:
     quantity:
       tag: unknown
@@ -2770,8 +2770,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1911.15, 1911.15]; no midpoint invented
+      tag: value
+      value: '1911.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
@@ -2803,6 +2803,38 @@ observations:
     table: '5.2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1911.15'
+      locator:
+        page: 73
+        table: '5.2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1638'
+            locator:
+              page: 73
+              table: '5.2'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 73
+              table: '5.2'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        output_unit: K
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_cao_cold_trap_edx_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -2821,8 +2853,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1911.15, 1911.15]; no midpoint invented
+      tag: value
+      value: '1911.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
@@ -2845,6 +2877,35 @@ observations:
     page: 73
     table: '5.2'
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1911.15'
+      locator:
+        page: 73
+        table: '5.2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1638'
+            locator:
+              page: 73
+              table: '5.2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 73
+              table: '5.2'
+        output_unit: K
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_untreated_foil_sd
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -3221,7 +3282,7 @@ observations:
     note: unbehandelte Folie / blank foil block
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table54_ms1_cold_trap_edx
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-ms1
   identity:
     quantity:
       tag: unknown
@@ -3238,8 +3299,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1815.15, 1815.15]; no midpoint invented
+      tag: value
+      value: '1815.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
@@ -3271,6 +3332,38 @@ observations:
     table: '5.4'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1815.15'
+      locator:
+        page: 85
+        table: '5.4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1542'
+            locator:
+              page: 85
+              table: '5.4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 85
+              table: '5.4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+        output_unit: K
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table54_ms1_cold_trap_edx_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -3289,8 +3382,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1815.15, 1815.15]; no midpoint invented
+      tag: value
+      value: '1815.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
@@ -3313,8 +3406,37 @@ observations:
     page: 85
     table: '5.4'
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1815.15'
+      locator:
+        page: 85
+        table: '5.4'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1542'
+            locator:
+              page: 85
+              table: '5.4'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 85
+              table: '5.4'
+        output_unit: K
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table55_ms2_cold_trap_edx
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-ms2
   identity:
     quantity:
       tag: unknown
@@ -3331,8 +3453,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1836.15, 1836.15]; no midpoint invented
+      tag: value
+      value: '1836.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
@@ -3362,6 +3484,35 @@ observations:
     page: 91
     table: '5.5'
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1836.15'
+      locator:
+        page: 91
+        table: '5.5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1563'
+            locator:
+              page: 91
+              table: '5.5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 91
+              table: '5.5'
+        output_unit: K
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table55_ms2_cold_trap_edx_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -3380,8 +3531,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1836.15, 1836.15]; no midpoint invented
+      tag: value
+      value: '1836.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cold_trap_edx_atom_pct'; refusing to pick a number
@@ -3404,8 +3555,37 @@ observations:
     page: 91
     table: '5.5'
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1836.15'
+      locator:
+        page: 91
+        table: '5.5'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1563'
+            locator:
+              page: 91
+              table: '5.5'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 91
+              table: '5.5'
+        output_unit: K
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-ms5
   identity:
     quantity:
       tag: unknown
@@ -3497,7 +3677,7 @@ observations:
     table: '5.6'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma_full_grid
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-ms5
   identity:
     quantity:
       tag: unknown
@@ -3807,8 +3987,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-035-sauerborn-2005::sauerborn_2005_true_absence_alpha_gamma_psat_deep2
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
       evidence:
         page: 67
         paragraph: Kapitel 5 Ergebnisse und Diskussion

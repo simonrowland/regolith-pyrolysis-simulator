@@ -37,12 +37,18 @@ runs the simulator. Use `--python PATH` to select it; without that option the to
 repo's `.venv/bin/python`, the main checkout's `.venv/bin/python` when running from a pooled
 worktree, then `python3`. It uses import-spec lookup for the engine's top-level package and
 walks from the package source to the Git toplevel, so editable installs are checked where the
-simulator actually loads them. Every `status` and `verify` line prints `RESOLVED=...`.
+simulator actually loads them. Every `status` and `verify` line prints `RESOLVED=...`. During
+`verify`, a located tree that differs from the `UPSTREAM.pin` `checkout:` path emits a warning
+naming both paths and states that the located tree is the one being verified. If spec lookup
+finds nothing, `verify` reports `NOT-LOADED` and keeps its historical fallback selection;
+`UPSTREAM.pin` `checkout:` is not a verification target. Relative `checkout:` paths used for
+the warning are resolved from the main checkout, not a pooled worktree.
 
 If a package is not importable, set its explicit checkout override:
 `VAPOROCK_CHECKOUT`, `THERMOENGINE_CHECKOUT`, `PYSULFSAT_CHECKOUT`, or `SULFLIQ_CHECKOUT`
 (the latter retains its `~/Repos/sulfliq` default). `status` and `verify` fail when an importable checkout is not a
-Git tree at its pinned `UPSTREAM.pin` `base_sha`; they do not fall back to a sibling clone.
+Git tree at its pinned `UPSTREAM.pin` `base_sha`; `status` retains its normal checkout resolution,
+and `verify` does not use the pin checkout when spec lookup finds no package.
 `apply` and `refresh` act on the resolved tree and refuse an override path the selected
 interpreter does not load unless `--force-path` is supplied.
 
@@ -52,7 +58,7 @@ interpreter does not load unless `--force-path` is supplied.
 |---|---|---|
 | `MATCH` | Interpreter import, pinned base, and patch set all match. | yes |
 | `ASSERTED` | Tree came from an explicit `*_CHECKOUT` override; `PATCH=MATCH` or `PATCH=DRIFT` is printed, but import was not verified. | only with `--allow-asserted` and `PATCH=MATCH` |
-| `NOT-LOADED` | Engine is not importable; the fallback patch state is printed as `FALLBACK=...`. | only with `--allow-not-loaded` and `FALLBACK=MATCH` |
+| `NOT-LOADED` | Engine is not importable; the historical fallback state is printed as `FALLBACK=...`. | with `--allow-not-loaded` when `FALLBACK=MATCH` or `FALLBACK=UNRESOLVED` |
 | `DRIFT` / `MISSING` / `FAILED` | Patch contents, checkout, or validation failed. | no |
 
 ## Inventory

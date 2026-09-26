@@ -719,8 +719,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.0, 1925.0]; no midpoint invented
+      tag: value
+      value: '1800'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_partial_molar_enthalpy_of_sublimation';
@@ -752,6 +752,16 @@ observations:
     table: I
     note: Table I Fe column; second-law ΔH_sub at 1800 K
   read_from: pdf:kems-093-piacente-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        published_page: 292
+        pdf_page_index: 4
+        table: I
+        note: Table I Fe column; second-law ΔH_sub at 1800 K
 - observation_id: kems-093-piacente-1975::piacente_1975_feo_highT_re_detected_not_tabulated
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
@@ -1030,7 +1040,7 @@ observations:
   evidence:
     class:
       tag: unknown
-      reason: 'page_grounded: method_class author_derived'
+      reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
     status: pending
@@ -1060,8 +1070,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.0, 1925.0]; no midpoint invented
+      tag: value
+      value: '1800'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_partial_molar_enthalpy_of_sublimation';
@@ -1092,6 +1102,15 @@ observations:
     pdf_page_index: 4
     table: I
   read_from: pdf:kems-093-piacente-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        published_page: 292
+        pdf_page_index: 4
+        table: I
 - observation_id: kems-093-piacente-1975::piacente_1975_o2_absent_oxide_cells
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
@@ -1347,8 +1366,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1699.0, 1920.0]; no midpoint invented
+      tag: value
+      value: '1800'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_partial_molar_enthalpy_of_sublimation';
@@ -1377,6 +1396,15 @@ observations:
     pdf_page_index: 4
     table: I
   read_from: pdf:kems-093-piacente-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        published_page: 292
+        pdf_page_index: 4
+        table: I
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_cc_eq2
   experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
   identity:
@@ -1658,8 +1686,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.0, 1925.0]; no midpoint invented
+      tag: value
+      value: '1800'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_partial_molar_enthalpy_of_sublimation';
@@ -1690,3 +1718,12 @@ observations:
     pdf_page_index: 4
     table: I
   read_from: pdf:kems-093-piacente-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        published_page: 292
+        pdf_page_index: 4
+        table: I

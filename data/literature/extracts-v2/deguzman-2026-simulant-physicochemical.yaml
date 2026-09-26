@@ -31,8 +31,15 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=typed_refusal is not a closed v2.1 token
+    status: rejected
+    reason: curves have no printed numeric table and were not read from axes
+    decided_by:
+      worker: extract-deguzman-physicochemical
+      date: '2026-09-19'
+      evidence:
+        pdf_page_index: 8
+        figure: 6-7
+        section: Gas Adsorption Behavior and ISRU-Relevant Implications
   notices: []
   source_id: deguzman-2026-simulant-physicochemical
   locator:
@@ -301,6 +308,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'gas_adsorption_properties'; refusing to pick a
@@ -325,6 +335,38 @@ observations:
     table: '4'
     section: Gas Adsorption Behavior and ISRU-Relevant Implications
   read_from: unknown:deguzman-2026-simulant-physicochemical
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        pdf_page_index: 9
+        table: '4'
+        section: Gas Adsorption Behavior and ISRU-Relevant Implications
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              pdf_page_index: 9
+              table: '4'
+              section: Gas Adsorption Behavior and ISRU-Relevant Implications
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 9
+              table: '4'
+              section: Gas Adsorption Behavior and ISRU-Relevant Implications
+        output_unit: K
 - observation_id: deguzman-2026-simulant-physicochemical::deguzman_2026_tpr_oxygen_yields_and_conditions
   experiment_id: 974b5aba0b1aa5d339a5368973607339493726f4e4457d5a7793ba6101421824::experiment::hydrogen-tpr-series
   identity:

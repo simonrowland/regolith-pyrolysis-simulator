@@ -833,7 +833,10 @@ def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
             )
         ),
         factories.loc(),
-        Derivation("estimated_point", ("assumed",), (), "mol_fraction"),
+        Derivation(
+            "calculated_from_printed_recipe_or_aimed_target",
+            ("assumed",), (), "mol_fraction",
+        ),
     )
     observation = replace(
         factories.observation("obs", experiment.experiment_id, factories.o2_identity(), 1),
@@ -1112,6 +1115,174 @@ def _report_with_work(tmp_path, monkeypatch, work, experiment) -> "object":
     return module.report(tmp_path)
 
 
+def test_readiness_report_passes_modelling_inputs_to_consumer_path(
+    tmp_path, monkeypatch
+) -> None:
+    from tests.battery.test_bench_generators import complete_rps
+    import scripts.bench_readiness as module
+
+    experiment, bench, observation, modelling_inputs = complete_rps()
+    printed_experiment = replace(experiment, bench_id=bench.id)
+    printed_observation = observation
+    observation = replace(
+        observation,
+        point_conditions={
+            key: value
+            for key, value in observation.point_conditions.items()
+            if key != "fO2_log"
+        },
+    )
+    pressure = factories.located(
+        Value.point_of(Decimal("1")),
+        note="printed vacuum during run",
+    )
+    experiment = replace(
+        experiment,
+        bench_id=bench.id,
+        conditions={
+            **experiment.conditions,
+            "surfaces": observation.point_conditions["surfaces"],
+            "gas_boundary": observation.point_conditions["gas_boundary"],
+        },
+        pressure_environment=replace(
+            experiment.pressure_environment, total_pressure_Pa=pressure
+        ),
+    )
+    work = factories.work()
+    monkeypatch.setattr(
+        module,
+        "load_migrated_store",
+        lambda root: (
+            {work.work_id: work},
+            {experiment.experiment_id: experiment},
+            {observation.observation_id: observation},
+        ),
+    )
+    monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
+
+    direct = {
+        item.consumer: item
+        for item in consumer_readiness(
+            experiment, bench, observation, modelling_inputs=modelling_inputs
+        )
+    }
+    assert oxygen_condition(experiment, bench, observation).selected.route == (
+        "vacuum_total_pressure_upper_bound"
+    )
+    without = module.report(tmp_path)
+    with_model = module.report(tmp_path, modelling_inputs=modelling_inputs)
+
+    def consumer_rows(result):
+        return {
+            item["consumer"]: item
+            for item in result["sources"][0]["consumers"]
+        }
+
+    without_rps = consumer_rows(without)["rps"]
+    with_rps = consumer_rows(with_model)["rps"]
+    assert without_rps["status"] == ReadinessStatus.GAP.value
+    assert with_rps["status"] == direct["rps"].status.value == ReadinessStatus.READY.value
+    assert not any(
+        gap["waypoint"].startswith("operator.") for gap in with_rps["gaps"]
+    )
+    assert with_rps["flags"] == [
+        {"waypoint": "surfaces", "authority": "assumed", "flag_id": "operator.surfaces"},
+        {"waypoint": "furnace_ceiling_C", "authority": "assumed", "flag_id": "operator.furnace_ceiling_C"},
+        {"waypoint": "feedstock_id", "authority": "assumed", "flag_id": "operator.feedstock_id"},
+    ]
+    assert consumer_rows(without)["engine_point"]["flags"]
+    assert without["summary"]["by_consumer"]["rps"]["ready"] == 0
+    assert with_model["summary"]["by_consumer"]["rps"]["ready"] == 1
+    for consumer in ("kems", "engine_point"):
+        assert consumer_rows(with_model)[consumer]["status"] == direct[consumer].status.value
+
+    monkeypatch.setattr(
+        module,
+        "load_migrated_store",
+        lambda root: (
+            {work.work_id: work},
+            {printed_experiment.experiment_id: printed_experiment},
+            {printed_observation.observation_id: printed_observation},
+        ),
+    )
+    printed = module.report(tmp_path)
+    assert consumer_rows(printed)["engine_point"]["status"] == ReadinessStatus.READY.value
+    assert consumer_rows(printed)["engine_point"]["flags"] == []
+    assert all(item["flags"] == [] for item in printed["sources"][0]["engines"])
+
+
+def test_readiness_report_carries_vacuum_flag_for_real_source(
+    tmp_path, monkeypatch
+) -> None:
+    from pathlib import Path
+
+    from simulator.battery.migrate import (
+        bench_from_plain,
+        experiment_from_plain,
+        load_yaml,
+        observation_from_plain,
+        work_from_plain,
+    )
+    import scripts.bench_readiness as module
+
+    source_id = "mendybaev-2017-fun-cai-lab-evaporation"
+    root = Path(__file__).parents[2]
+    work_doc = load_yaml(
+        root / "data/literature/works/10.1016_j.gca.2016.08.034.yaml"
+    )
+    work = work_from_plain(work_doc["work"])
+    experiments = {
+        experiment.experiment_id: experiment
+        for experiment in (
+            experiment_from_plain(item) for item in work_doc["experiments"]
+        )
+    }
+    bench = bench_from_plain(work_doc["benches"][0])
+    source_doc = load_yaml(root / f"data/literature/extracts-v2/{source_id}.yaml")
+    observations = [
+        observation_from_plain(item) for item in source_doc["observations"]
+    ]
+    for item in observations:
+        experiment = experiments.get(item.experiment_id)
+        if experiment is None:
+            continue
+        condition = oxygen_condition(experiment, bench, item)
+        if (
+            condition.selected is not None
+            and condition.selected.route == "vacuum_total_pressure_upper_bound"
+        ):
+            observation = item
+            break
+    else:
+        raise AssertionError("no Mendybaev observation selected for a matching experiment")
+    monkeypatch.setattr(
+        module,
+        "load_migrated_store",
+        lambda root: (
+            {work.work_id: work},
+            {experiment.experiment_id: experiment},
+            {observation.observation_id: observation},
+        ),
+    )
+    monkeypatch.setattr(module, "load_migrated_benches", lambda root: {bench.id: bench})
+
+    result = module.report(
+        tmp_path,
+        modelling_inputs={"surfaces": {}, "feedstock_id": "test-feed", "furnace_ceiling_C": 1200},
+    )
+    source = next(row for row in result["sources"] if row["source_id"] == source_id)
+    engine = next(
+        row for row in source["engines"] if row["engine"] == "internal-analytical"
+    )
+    assert engine["status"] == ReadinessStatus.READY.value
+    assert len(engine["flags"]) == 1
+    flag = engine["flags"][0]
+    assert flag["waypoint"] == "oxygen_condition"
+    assert flag["authority"] == "extrapolated"
+    assert flag["flag_id"] == "vacuum_total_pressure_upper_bound"
+    assert "bound, not a measurement" in flag["notice"]
+
+
 def test_verdict_no_lead_is_not_an_apparatus_reference(tmp_path, monkeypatch) -> None:
     work = _lead_corpus(
         tmp_path,
@@ -1229,3 +1400,123 @@ def test_multi_cited_source_counts_as_unattributable_not_pending(tmp_path, monke
         "unattributable_by_construction": {"source_count": 1, "experiment_count": 1},
         "reference_not_yet_resolved": {"source_count": 0, "experiment_count": 0},
     }
+
+
+def test_oxygen_condition_graphite_c_co_is_derived_never_printed() -> None:
+    """Graphite / C–CO buffer derives log fO2; authority stays DERIVED."""
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("101325")),
+        conditions={"temperature_K": factories.located(Value.point_of("1473.15"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.BUFFER),
+            buffer=factories.located("C-CO"),
+        ),
+        pressure_environment=replace(
+            factories.kems_experiment(total_P=Decimal("101325")).pressure_environment,
+            sweep_gas=factories.located(
+                SweepGas(
+                    species="CO",
+                    flow_sccm=factories.State.unknown("not_published"),
+                    partial_pressure_Pa=factories.State.of(Decimal("101325")),
+                )
+            ),
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is not None
+    assert result.selected.route == "graphite_c_co_buffer"
+    assert result.selected.authority is WaypointAuthority.DERIVED
+    # Sanity vs published CCO at 1473.15 K, 1.01325 bar (Jakobsson & Oskarsson).
+    assert float(result.selected.value.point) == pytest.approx(-10.475256412619215, abs=1e-9)
+
+
+def test_oxygen_condition_c_co_prose_buffer_without_token_stays_refusal() -> None:
+    """Free-text CO/Ar prose is not a C–CO token and must not invent fO2."""
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("101325")),
+        conditions={"temperature_K": factories.located(Value.point_of("1473.15"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.COMMANDED),
+            buffer=factories.located("CO partial pressure controlled by CO/Ar mixing"),
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is None
+    assert not any(route.route == "graphite_c_co_buffer" for route in result.routes)
+
+
+def test_oxygen_condition_c_co_uses_total_p_when_co_is_the_stated_gas() -> None:
+    """When sweep CO PP is absent, printed total P is P_CO for a C–CO token."""
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("101325")),
+        conditions={"temperature_K": factories.located(Value.point_of("1373.15"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.BUFFER),
+            buffer=factories.located("graphite-CO"),
+        ),
+        pressure_environment=replace(
+            factories.kems_experiment(total_P=Decimal("101325")).pressure_environment,
+            sweep_gas=factories.located(
+                SweepGas(
+                    species="CO",
+                    flow_sccm=factories.State.unknown("not_published"),
+                    partial_pressure_Pa=factories.State.unknown("not_published"),
+                )
+            ),
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is not None
+    assert result.selected.route == "graphite_c_co_buffer"
+    assert result.selected.authority is WaypointAuthority.DERIVED
+    assert float(result.selected.value.point) == pytest.approx(-11.553088871754722, abs=1e-9)
+
+
+def test_oxygen_condition_c_co_refuses_co_ar_alternatives_without_printed_p() -> None:
+    """CO-or-CO/Ar alternatives without a printed P_CO must not pick a pressure."""
+    unknown = factories.State.unknown("not_published")
+    alternatives = (
+        SweepGas(species="CO", flow_sccm=unknown, partial_pressure_Pa=unknown),
+        SweepGas(
+            species=None,
+            flow_sccm=unknown,
+            partial_pressure_Pa=unknown,
+            components=(
+                SweepGasComponent(
+                    species="CO",
+                    mole_fraction=unknown,
+                    flow_sccm=unknown,
+                    partial_pressure_Pa=unknown,
+                ),
+                SweepGasComponent(
+                    species="Ar",
+                    mole_fraction=unknown,
+                    flow_sccm=unknown,
+                    partial_pressure_Pa=unknown,
+                ),
+            ),
+        ),
+    )
+    experiment = replace(
+        factories.kems_experiment(),
+        conditions={"temperature_K": factories.located(Value.point_of("1473.15"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.BUFFER),
+            buffer=factories.located("C-CO"),
+        ),
+        pressure_environment=replace(
+            factories.kems_experiment().pressure_environment,
+            total_pressure_Pa=factories.Located(factories.State.unknown("not_published")),
+            sweep_gas=factories.located(
+                SweepGas(
+                    species=None,
+                    flow_sccm=unknown,
+                    partial_pressure_Pa=unknown,
+                    alternatives=alternatives,
+                )
+            ),
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is None
+    assert not any(route.route == "graphite_c_co_buffer" for route in result.routes)

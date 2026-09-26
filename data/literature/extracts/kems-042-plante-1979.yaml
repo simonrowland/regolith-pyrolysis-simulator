@@ -124,11 +124,14 @@ experiments:
   locator: {page: 270, section: '3. Procedure', note: K2O-SiO2 solution measurements; per-row compositions and temperatures remain in observations}
   sample:
     printed_composition:
-      state: {tag: value, value: K2O-SiO2 liquid solutions spanning 43.9 to 11.9 wt percent K2O}
-      locator: {section: Abstract}
+      state: {tag: value, value: {K2O: 43.94, SiO2: 56.06}}
+      locator:
+        published_page: 276
+        table: '2'
+        note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     form:
-      state: {tag: value, value: Dried K2O-SiO2 melt}
-      locator: {page: 269, section: '3. Procedure'}
+      state: {tag: value, value: crystalline K2Si2O5}
+      locator: {page: 271, section: '3. Procedure'}
     pretreatment:
       state: {tag: value, value: Dried overnight at 500 C}
       locator: {page: 269, section: '3. Procedure'}
@@ -170,6 +173,19 @@ experiments:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 267, section: '2. Description of Mass Spectrometric System', note: Vacuum system}
     regime: {regime_class: {tag: unknown, reason: not_published}}
+  fO2_control:
+    channel: {tag: value, value: intrinsic}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        page: 279
+        equation: 'P_O2 = 0.226 P_K'
+        note: >-
+          Author oxygen is stoichiometric from dissociative vaporization,
+          P_O2 = 0.226 P_K (printed). No commanded buffer or gas mix.
+          Per-row P_O2 is derived from printed P_K × printed ratio and
+          lands on observation point_conditions.fO2_Pa as DERIVED; no
+          single experiment oxygen_partial_pressure_Pa is asserted.
   conditions:
     temperature_K:
       state: {tag: unknown, reason: not_published}
@@ -268,7 +284,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_001_1356K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -360,7 +376,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_002_1414K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -452,7 +468,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_003_1475K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -544,7 +560,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_004_1504K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -636,7 +652,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_005_1419K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -728,7 +744,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_006_1366K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -820,7 +836,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_007_1311K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -912,7 +928,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_008_1320K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1004,7 +1020,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_009_1359K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1096,7 +1112,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_010_1414K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1188,7 +1204,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_011_1462K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1280,7 +1296,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_012_1493K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1372,7 +1388,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_013_1407K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1464,7 +1480,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_014_1473K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1556,7 +1572,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_015_1524K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1648,7 +1664,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_016_1571K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1740,7 +1756,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_017_1571K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1832,7 +1848,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_018_1601K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -1924,7 +1940,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_019_1601K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2016,7 +2032,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_020_1640K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2108,7 +2124,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_021_1640K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2200,7 +2216,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_022_1594K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2292,7 +2308,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_023_1594K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2384,7 +2400,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_024_1542K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2476,7 +2492,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_025_1466K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2568,7 +2584,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_026_1436K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2660,7 +2676,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1104_027_1396K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2752,7 +2768,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_000_1352K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2844,7 +2860,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_001_1389K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -2936,7 +2952,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_002_1456K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3028,7 +3044,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_003_1508K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3120,7 +3136,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_004_1560K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3212,7 +3228,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_005_1615K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3304,7 +3320,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_006_1657K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3396,7 +3412,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_007_1630K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3488,7 +3504,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_008_1580K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3580,7 +3596,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_009_1547K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3672,7 +3688,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_010_1513K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3764,7 +3780,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_011_1308K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3856,7 +3872,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_012_1342K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -3948,7 +3964,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_013_1369K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4040,7 +4056,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_014_1388K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4132,7 +4148,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_015_1416K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4224,7 +4240,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_016_1292K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4316,7 +4332,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_017_1413K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4408,7 +4424,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_018_1379K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4500,7 +4516,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_019_1400K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4592,7 +4608,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_020_1411K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4684,7 +4700,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_021_1432K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4776,7 +4792,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_022_1489K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4868,7 +4884,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_023_1537K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -4960,7 +4976,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_024_1585K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5052,7 +5068,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_025_1625K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5144,7 +5160,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_026_1663K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5236,7 +5252,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_027_1720K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5328,7 +5344,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_028_1674K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5420,7 +5436,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_029_1624K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5512,7 +5528,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_030_1585K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5604,7 +5620,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_031_1550K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5696,7 +5712,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_032_1503K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5788,7 +5804,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_033_1450K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5880,7 +5896,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_034_1408K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -5972,7 +5988,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_035_1366K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6064,7 +6080,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_036_1343K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6156,7 +6172,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1110_037_1289K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6248,7 +6264,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_000_1259K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6340,7 +6356,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_001_1283K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6432,7 +6448,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_002_1320K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6524,7 +6540,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_003_1404K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6616,7 +6632,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_004_1435K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6708,7 +6724,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_005_1496K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6800,7 +6816,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_006_1544K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6892,7 +6908,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_007_1592K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -6984,7 +7000,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_008_1631K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7076,7 +7092,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_009_1681K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7168,7 +7184,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_010_1723K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7260,7 +7276,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_011_1719K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7352,7 +7368,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_012_1765K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7444,7 +7460,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_013_1722K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7536,7 +7552,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_014_1677K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7628,7 +7644,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_015_1633K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7720,7 +7736,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_016_1595K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7812,7 +7828,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_017_1549K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7904,7 +7920,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_018_1517K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -7996,7 +8012,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_019_1482K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8088,7 +8104,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_020_1445K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8180,7 +8196,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_021_1411K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8272,7 +8288,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_022_1388K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8364,7 +8380,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_023_1361K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8456,7 +8472,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_024_1328K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8548,7 +8564,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1115_025_1292K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8640,7 +8656,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_000_1294K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8732,7 +8748,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_001_1325K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8824,7 +8840,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_002_1369K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -8916,7 +8932,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_003_1403K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9008,7 +9024,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_004_1465K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9100,7 +9116,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_005_1506K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9192,7 +9208,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_006_1550K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9284,7 +9300,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_007_1585K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9376,7 +9392,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_008_1626K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9468,7 +9484,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_009_1669K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9560,7 +9576,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_010_1717K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9652,7 +9668,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_011_1760K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9744,7 +9760,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_012_1705K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9836,7 +9852,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_013_1666K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -9928,7 +9944,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_014_1621K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10020,7 +10036,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_015_1568K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10112,7 +10128,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_016_1527K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10204,7 +10220,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1122_017_1496K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10296,7 +10312,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_000_1337K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10388,7 +10404,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_001_1388K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10480,7 +10496,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_002_1428K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10572,7 +10588,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_003_1469K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10664,7 +10680,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_004_1521K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10756,7 +10772,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_005_1562K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10848,7 +10864,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_006_1620K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -10940,7 +10956,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_007_1660K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11032,7 +11048,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_008_1713K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11124,7 +11140,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_009_1758K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11216,7 +11232,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_010_1568K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11308,7 +11324,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_011_1352K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11400,7 +11416,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_012_1403K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11492,7 +11508,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_013_1451K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11584,7 +11600,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_014_1484K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11676,7 +11692,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_015_1535K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11768,7 +11784,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_016_1584K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11860,7 +11876,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_017_1634K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -11952,7 +11968,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_018_1681K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12044,7 +12060,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_019_1722K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12136,7 +12152,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_020_1770K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12228,7 +12244,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_021_1717K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12320,7 +12336,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_022_1679K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12412,7 +12428,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_023_1634K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12504,7 +12520,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_024_1587K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12596,7 +12612,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_025_1537K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12688,7 +12704,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_026_1484K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12780,7 +12796,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_027_1446K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12872,7 +12888,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1123_028_1398K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -12964,7 +12980,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_000_1409K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13056,7 +13072,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_001_1443K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13148,7 +13164,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_002_1487K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13240,7 +13256,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_003_1538K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13332,7 +13348,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_004_1583K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13424,7 +13440,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_005_1637K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13516,7 +13532,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_006_1676K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13608,7 +13624,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_007_1732K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13700,7 +13716,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_008_1783K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13792,7 +13808,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_009_1743K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13884,7 +13900,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_010_1702K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -13976,7 +13992,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_011_1656K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14068,7 +14084,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_012_1613K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14160,7 +14176,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_013_1656K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14252,7 +14268,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1126_014_1612K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14344,7 +14360,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1129_000_1589K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14436,7 +14452,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1129_001_1636K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14528,7 +14544,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1129_002_1681K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14620,7 +14636,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1129_003_1723K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14712,7 +14728,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1129_004_1767K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14804,7 +14820,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1129_005_1800K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14896,7 +14912,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1129_006_1741K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -14988,7 +15004,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_k2o_s1129_007_1693K
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -15080,7 +15096,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
   K:
     observations:
     - observation_id: plante1979_table2_s1104_r001_quoted
@@ -15179,7 +15195,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r002_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -15276,7 +15292,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r003_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -15373,7 +15389,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r004_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -15470,7 +15486,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r005_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -15567,7 +15583,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r006_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -15664,7 +15680,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r007_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -15761,7 +15777,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r008_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -15858,7 +15874,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r009_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -15955,7 +15971,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r010_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16052,7 +16068,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r011_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16149,7 +16165,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r012_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16246,7 +16262,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r013_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16343,7 +16359,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r014_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16440,7 +16456,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r015_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16537,7 +16553,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r016_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16634,7 +16650,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r017_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16731,7 +16747,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r018_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16828,7 +16844,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r019_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -16925,7 +16941,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r020_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17022,7 +17038,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r021_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17119,7 +17135,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r022_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17216,7 +17232,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r023_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17313,7 +17329,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r024_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17410,7 +17426,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r025_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17507,7 +17523,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r026_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17604,7 +17620,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r027_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17701,7 +17717,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1104_r028_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17798,7 +17814,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r001_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17895,7 +17911,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r002_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -17992,7 +18008,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r003_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18089,7 +18105,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r004_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18186,7 +18202,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r005_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18283,7 +18299,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r006_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18380,7 +18396,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r007_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18477,7 +18493,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r008_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18574,7 +18590,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r009_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18671,7 +18687,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r010_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18768,7 +18784,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r011_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18865,7 +18881,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r012_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -18962,7 +18978,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r013_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19059,7 +19075,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r014_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19156,7 +19172,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r015_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19253,7 +19269,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r016_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19350,7 +19366,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r017_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19447,7 +19463,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r018_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19544,7 +19560,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r019_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19641,7 +19657,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r020_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19738,7 +19754,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r021_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19835,7 +19851,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r022_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -19932,7 +19948,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r023_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20029,7 +20045,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r024_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20126,7 +20142,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r025_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20223,7 +20239,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r026_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20320,7 +20336,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r027_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20417,7 +20433,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r028_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20514,7 +20530,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r029_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20611,7 +20627,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r030_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20708,7 +20724,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r031_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20805,7 +20821,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r032_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20902,7 +20918,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r033_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -20999,7 +21015,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r034_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -21096,7 +21112,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r035_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -21193,7 +21209,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r036_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -21290,7 +21306,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r037_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -21387,7 +21403,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1110_r038_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -21484,7 +21500,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r001_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -21581,7 +21597,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r002_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -21678,7 +21694,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r003_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -21775,7 +21791,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r004_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -21970,7 +21986,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r006_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22067,7 +22083,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r007_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22164,7 +22180,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r008_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22261,7 +22277,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r009_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22358,7 +22374,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r010_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22455,7 +22471,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r011_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22552,7 +22568,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r012_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22649,7 +22665,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r013_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22746,7 +22762,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r014_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22843,7 +22859,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r015_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -22940,7 +22956,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r016_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23037,7 +23053,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r017_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23134,7 +23150,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r018_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23231,7 +23247,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r019_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23328,7 +23344,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r020_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23425,7 +23441,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r021_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23522,7 +23538,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r022_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23619,7 +23635,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r023_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23716,7 +23732,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r024_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23813,7 +23829,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r025_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -23910,7 +23926,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1115_r026_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24007,7 +24023,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r001_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24104,7 +24120,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r002_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24201,7 +24217,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r003_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24298,7 +24314,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r004_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24395,7 +24411,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r005_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24492,7 +24508,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r006_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24589,7 +24605,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r007_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24686,7 +24702,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r008_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24783,7 +24799,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r009_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24880,7 +24896,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r010_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -24977,7 +24993,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r011_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25074,7 +25090,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r012_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25171,7 +25187,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r013_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25268,7 +25284,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r014_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25365,7 +25381,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r015_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25462,7 +25478,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r016_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25559,7 +25575,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r017_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25656,7 +25672,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1122_r018_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25753,7 +25769,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r001_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25850,7 +25866,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r002_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -25947,7 +25963,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r003_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26044,7 +26060,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r004_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26141,7 +26157,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r005_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26238,7 +26254,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r006_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26335,7 +26351,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r007_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26432,7 +26448,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r008_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26529,7 +26545,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r009_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26626,7 +26642,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r010_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26723,7 +26739,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r011_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26820,7 +26836,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r012_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -26917,7 +26933,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r013_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27014,7 +27030,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r014_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27111,7 +27127,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r015_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27208,7 +27224,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r016_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27305,7 +27321,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r017_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27402,7 +27418,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r018_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27499,7 +27515,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r019_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27596,7 +27612,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r020_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27693,7 +27709,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r021_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27790,7 +27806,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r022_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27887,7 +27903,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r023_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -27984,7 +28000,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r024_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28081,7 +28097,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r025_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28178,7 +28194,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r026_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28275,7 +28291,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r027_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28372,7 +28388,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r028_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28469,7 +28485,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r029_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28566,7 +28582,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r002_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28663,7 +28679,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r003_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28760,7 +28776,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r004_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28857,7 +28873,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r005_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -28954,7 +28970,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r006_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29051,7 +29067,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r007_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29148,7 +29164,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r008_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29245,7 +29261,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r009_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29342,7 +29358,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r010_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29439,7 +29455,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r011_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29536,7 +29552,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r012_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29633,7 +29649,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r013_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29730,7 +29746,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r014_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29827,7 +29843,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r015_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -29924,7 +29940,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1126_r016_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -30021,7 +30037,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1129_r011_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -30118,7 +30134,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1129_r012_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -30215,7 +30231,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1129_r013_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -30312,7 +30328,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1129_r014_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -30409,7 +30425,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1129_r015_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -30506,7 +30522,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1129_r016_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -30603,7 +30619,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1129_r017_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -30700,7 +30716,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1129_r018_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
@@ -30797,7 +30813,7 @@ species:
           locator:
             published_page: 276
             table: '2'
-            note: Table 2 Series 1104 first row, 43.94 wt% K2O (K2Si2O5 charge). SiO2 is the binary complement already used in this extract. Loaded mass is not stated.
+            note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r030_quoted
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]

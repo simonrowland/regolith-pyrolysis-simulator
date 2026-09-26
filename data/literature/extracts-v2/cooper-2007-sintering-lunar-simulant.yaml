@@ -19,6 +19,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sintering_onset_conditions'; refusing to pick
@@ -43,6 +46,38 @@ observations:
     figure: '1'
     section: What Is Sintering, and Why Is It a Concern?
   read_from: unknown:cooper-2007-sintering-lunar-simulant
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        pdf_page_index: 1
+        figure: '1'
+        section: What Is Sintering, and Why Is It a Concern?
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              pdf_page_index: 1
+              figure: '1'
+              section: What Is Sintering, and Why Is It a Concern?
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 1
+              figure: '1'
+              section: What Is Sintering, and Why Is It a Concern?
+        output_unit: K
 - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_fluidization_fraction_1000c_model
   experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
   identity:
@@ -60,6 +95,9 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'fluidizing_fraction'; refusing to pick a number
@@ -84,6 +122,38 @@ observations:
     figure: '5'
     section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
   read_from: unknown:cooper-2007-sintering-lunar-simulant
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        pdf_page_index: 5
+        figure: '5'
+        section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 5
+              figure: '5'
+              section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 5
+              figure: '5'
+              section: A Wide Distribution of Grain Sizes Can Inhibit Fluidization
+        output_unit: K
 - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1_sintered_brick_strength
   experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
   identity:
@@ -226,9 +296,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped transition_temperature field selected; source fields: quantity, method_class, quoted_from,
-      temperature_C, duration_h, sample_form, outcome'
+    kind: point
+    point: '1323.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -248,6 +317,35 @@ observations:
     pdf_page_index: 2
     section: What Is Sintering, and Why Is It a Concern?
   read_from: unknown:cooper-2007-sintering-lunar-simulant
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        pdf_page_index: 2
+        section: What Is Sintering, and Why Is It a Concern?
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              pdf_page_index: 2
+              section: What Is Sintering, and Why Is It a Concern?
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 2
+              section: What Is Sintering, and Why Is It a Concern?
+        output_unit: K
 - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_sintering_1100c_quoted
   experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
   identity:
@@ -311,9 +409,8 @@ observations:
       tag: not_applicable
       reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped transition_temperature field selected; source fields: quantity, method_class, quoted_from,
-      temperature_C, onset_time, sample_form, outcome'
+    kind: point
+    point: '1373.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -333,6 +430,35 @@ observations:
     pdf_page_index: 2
     section: What Is Sintering, and Why Is It a Concern?
   read_from: unknown:cooper-2007-sintering-lunar-simulant
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        pdf_page_index: 2
+        section: What Is Sintering, and Why Is It a Concern?
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              pdf_page_index: 2
+              section: What Is Sintering, and Why Is It a Concern?
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 2
+              section: What Is Sintering, and Why Is It a Concern?
+        output_unit: K
 - observation_id: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_figure1_sintering_threshold
   experiment_id: 3cebfb2a02d5f137cd661706f50d2435a7824bde67ba4260f0a507d7fb026e7b::cooper-2007-sintering-lunar-simulant
   identity:

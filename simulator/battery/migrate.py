@@ -58,6 +58,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     ExperimentKind,
     FO2Channel,
+    MEASURED_EVIDENCE,
     MethodToken,
     NoticeKind,
     PerBasis,
@@ -250,6 +251,9 @@ class DuplicateContextIdError(ValueError):
 METHOD_CLASS_MAP: dict[str, EvidenceClass] = {
     "authors_estimate": EvidenceClass.AUTHOR_ESTIMATE,
     "authors_hypothesis": EvidenceClass.AUTHOR_ESTIMATE,
+    "calculated": EvidenceClass.MEASURED_REDUCED,
+    "author_derived": EvidenceClass.MEASURED_REDUCED,
+    "derived": EvidenceClass.MODEL_DERIVED,
     "authors_preferred_average_of_kems_derived_gammas": EvidenceClass.MEASURED_REDUCED,
     "derived_from_measured_kems_hertz_knudsen": EvidenceClass.MEASURED_REDUCED,
     "derived_gibbs_duhem": EvidenceClass.MODEL_DERIVED,
@@ -296,10 +300,8 @@ METHOD_CLASS_MAP: dict[str, EvidenceClass] = {
 # PAGE tokens: class stays unknown pending page adjudication.
 PAGE_METHOD_CLASSES = frozenset(
     {
-        "author_derived",
         "author_reported_envelope",
         "authors_reduced_from_ion_intensities",
-        "derived",
         "derived_from_figure_8_linear_portion",
         "derived_from_kems_equilibrium_constants",
         "measured_and_compiled_calorimetry",
@@ -343,6 +345,7 @@ PHASE_MAP: dict[str, Phase] = {
 
 TYPE_QUANTITY = {
     "psat_series": Quantity.P_SAT,
+    "fugacity_series": Quantity.FUGACITY,
     "gibbs_table": Quantity.DELTA_FG,
     "activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
     "alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
@@ -726,11 +729,118 @@ def _derivation_from_plain(payload: object) -> Derivation | None:
     )
 
 
-def _point_condition_from_plain(payload: object) -> Located[Any]:
+def _mass_percent_pairs(payload: object) -> list[tuple[str, Decimal]] | None:
+    if not isinstance(payload, Mapping):
+        return None
+    body: object = payload
+    if "state" in payload:
+        state = payload.get("state")
+        if not isinstance(state, Mapping) or str(state.get("tag") or "value") != "value":
+            return None
+        body = state.get("value")
+    if not isinstance(body, Mapping):
+        return None
+    basis = body.get("amount_basis")
+    if isinstance(basis, AmountBasis):
+        basis = basis.value
+    if str(basis or "") != AmountBasis.MASS_PERCENT.value:
+        return None
+    components = body.get("components")
+    if isinstance(components, Mapping):
+        items = components.items()
+    elif isinstance(components, (list, tuple)):
+        items = components
+    else:
+        return None
+    result: list[tuple[str, Decimal]] = []
+    for item in items:
+        if not isinstance(item, (list, tuple)) or len(item) != 2:
+            return None
+        name = str(item[0])
+        amount = _as_dec_or_none(item[1])
+        if amount is None:
+            return None
+        result.append((name, amount))
+    return result or None
+
+
+def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
+    pairs = _mass_percent_pairs(payload)
+    if pairs is None:
+        return None
+    names = [name for name, _amount in pairs]
+    if len(set(names)) != len(names) or any(name not in _OXIDE_COMPONENT_KEYS for name in names):
+        return None
+    return dict(pairs)
+
+
+def _mass_percent_printed_from_plain(
+    payload: object,
+) -> Located[Mapping[str, Any]] | None:
+    wt = _mass_percent_components(payload)
+    if wt is None or any(not n.is_finite() or n < 0 for n in wt.values()) or sum(wt.values()) <= 0:
+        if _mass_percent_pairs(payload) is not None:
+            return _located_from_plain(payload, lambda value: value)
+        return None
+    locator = (
+        _locator_from_plain(payload.get("locator"))
+        if isinstance(payload, Mapping)
+        else None
+    )
+    return located_value(_printed_map_payload(wt), locator)
+
+
+def _composition_located_from_plain(payload: object) -> Located[Composition]:
+    wt = _mass_percent_components(payload)
+    if wt is not None:
+        if isinstance(payload, Mapping) and "state" not in payload:
+            locator = _locator_from_plain(payload.get("locator"))
+        else:
+            source = _located_from_plain(payload, lambda value: value)
+            locator = source.locator
+        try:
+            composition = wt_pct_to_mole_fraction(wt)
+        except (ArithmeticError, ValueError) as exc:
+            return Located(
+                State.unknown(f"mass-percent composition is not usable: {exc}"),
+                locator=locator,
+            )
+        return Located(
+            State.of(composition),
+            locator=locator,
+            inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+        )
+    if _mass_percent_pairs(payload) is not None:
+        source = _located_from_plain(payload, lambda value: value)
+        return Located(
+            State.unknown(
+                "mass-percent composition contains invalid, duplicate, unsupported or ambiguous components"
+            ),
+            locator=source.locator,
+        )
+    if isinstance(payload, Mapping) and "state" not in payload:
+        return located_value(
+            _composition_from_plain(payload), _locator_from_plain(payload.get("locator"))
+        )
+    return _located_from_plain(payload, _composition_from_plain)
+
+
+def _point_condition_from_plain(
+    payload: object, *, key: str | None = None
+) -> Located[Any]:
     """Decimal lab axes, or a printed/derived composition map."""
 
     if isinstance(payload, Located):
         return payload
+    if isinstance(payload, Mapping) and "state" not in payload:
+        if "kind" in payload:
+            return _located_from_plain(payload, _value_or_point_from_plain)
+        if "amount_basis" in payload or "components" in payload:
+            if key == "printed_composition":
+                printed = _mass_percent_printed_from_plain(payload)
+                if printed is not None:
+                    return printed
+            return _composition_located_from_plain(payload)
     if not isinstance(payload, Mapping) or "state" not in payload:
         return _located_from_plain(payload, as_decimal)
     state_payload = payload.get("state")
@@ -740,7 +850,13 @@ def _point_condition_from_plain(payload: object) -> Located[Any]:
     if isinstance(value, Mapping) and (
         "amount_basis" in value or "components" in value
     ):
-        return _located_from_plain(payload, _composition_from_plain)
+        if key == "printed_composition":
+            printed = _mass_percent_printed_from_plain(payload)
+            if printed is not None:
+                return printed
+        return _composition_located_from_plain(payload)
+    if isinstance(value, Mapping) and "kind" in value:
+        return _located_from_plain(payload, _value_or_point_from_plain)
 
     def _as_printed_map(raw: object) -> dict[str, Any]:
         assert isinstance(raw, Mapping)
@@ -861,10 +977,18 @@ def _composition_from_plain(payload: object) -> Composition:
     assert isinstance(payload, Mapping)
     components = payload.get("components") or ()
     pairs = tuple((str(k), as_decimal(v)) for k, v in components)
+    amount_basis = _enum(AmountBasis, payload.get("amount_basis"))
+    if amount_basis is AmountBasis.MASS_PERCENT:
+        wt = _mass_percent_components(payload)
+        if wt is not None:
+            return wt_pct_to_mole_fraction(wt)
+        raise ValueError(
+            "mass-percent composition contains unsupported or ambiguous components"
+        )
     return Composition(
         basis=str(payload.get("basis") or "unknown"),
         components=pairs,
-        amount_basis=_enum(AmountBasis, payload.get("amount_basis")) or AmountBasis.MOLE_FRACTION,
+        amount_basis=amount_basis or AmountBasis.MOLE_FRACTION,
     )
 
 
@@ -1218,6 +1342,7 @@ def _sample_from_plain(payload: object) -> Sample:
     if not isinstance(payload, Mapping) or not payload:
         return Sample()
     mass = payload.get("mass_kg")
+    volume = payload.get("volume_m3")
     form = payload.get("form")
     container = payload.get("container")
     printed = payload.get("printed_composition")
@@ -1226,18 +1351,31 @@ def _sample_from_plain(payload: object) -> Sample:
     characterization = payload.get("characterization")
     surface_area = payload.get("surface_area_m2")
     pretreatment = payload.get("pretreatment")
+    printed_located = (
+        None
+        if printed is None
+        else _mass_percent_printed_from_plain(printed)
+        or _located_from_plain(printed, lambda value: value)
+    )
+    initial_located = (
+        None if initial is None else _composition_located_from_plain(initial)
+    )
+    if printed_located is None and initial is not None:
+        printed_located = _mass_percent_printed_from_plain(initial)
+    if initial_located is None and printed is not None:
+        if _mass_percent_pairs(printed) is not None:
+            initial_located = _composition_located_from_plain(printed)
     return Sample(
         mass_kg=None
         if mass is None
         else _located_from_plain(mass, _value_or_point_from_plain),
+        volume_m3=None
+        if volume is None
+        else _located_from_plain(volume, _value_or_point_from_plain),
         form=None if form is None else _located_from_plain(form, str),
         container=None if container is None else _located_from_plain(container, str),
-        printed_composition=None
-        if printed is None
-        else _located_from_plain(printed, lambda v: v),
-        initial_composition=None
-        if initial is None
-        else _located_from_plain(initial, _composition_from_plain),
+        printed_composition=printed_located,
+        initial_composition=initial_located,
         composition_class=None
         if composition_class is None
         else _located_from_plain(composition_class, str),
@@ -1632,7 +1770,8 @@ def observation_from_plain(payload: object) -> Observation:
     raw_pc = payload.get("point_conditions")
     if isinstance(raw_pc, Mapping):
         point_conditions = {
-            str(k): _point_condition_from_plain(v) for k, v in raw_pc.items()
+            str(k): _point_condition_from_plain(v, key=str(k))
+            for k, v in raw_pc.items()
         }
     derived_from = payload.get("derived_from")
     annotations = None
@@ -2005,6 +2144,35 @@ def convert_area_to_m2(
     return None, f"unmapped area unit {units!r}"
 
 
+def convert_areal_mass_to_kg_per_m2(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Convert printed mass-per-area values to kg/m²."""
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "areal mass value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing areal mass unit"
+    lowered = (
+        str(units).strip().lower().split(";", 1)[0].strip()
+        .replace(" ", "")
+        .replace("²", "2")
+        .replace("^", "")
+    )
+    if lowered in {"kg/m2", "kgperm2", "kg_per_m2", "kgm-2"}:
+        return amount, "identity:kg_per_m2"
+    if lowered in {"g/m2", "gperm2", "g_per_m2", "gm-2"}:
+        return amount / Decimal("1000"), "g_per_m2_to_kg_per_m2"
+    if lowered in {"mg/m2", "mgperm2", "mg_per_m2", "mgm-2"}:
+        return amount / Decimal("1000000"), "mg_per_m2_to_kg_per_m2"
+    if lowered in {"g/cm2", "gpercm2", "g_per_cm2", "gcm-2"}:
+        return amount * Decimal("10"), "g_per_cm2_to_kg_per_m2"
+    if lowered in {"mg/cm2", "mgpercm2", "mg_per_cm2", "mgcm-2"}:
+        return amount / Decimal("100"), "mg_per_cm2_to_kg_per_m2"
+    return None, f"unmapped areal mass unit {units!r}"
+
+
 def convert_mass_to_kg(
     value: object, units: str | None
 ) -> tuple[Decimal | None, str | None]:
@@ -2070,6 +2238,31 @@ def convert_volumetric_flow_to_m3_s(
     return None, f"unmapped volumetric-flow unit {units!r}"
 
 
+def convert_volume_to_m3(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Return (m³, conversion relation name) for printed sample volumes."""
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "volume value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing volume unit"
+    lowered = (
+        str(units)
+        .strip()
+        .lower()
+        .replace(" ", "")
+        .replace("³", "3")
+        .replace("^", "")
+    )
+    if lowered in {"m3", "m_3"}:
+        return amount, "identity:m3"
+    if lowered in {"cm3", "cm_3"}:
+        return amount / Decimal("1000000"), "cm3_to_m3"
+    return None, f"unmapped volume unit {units!r}"
+
+
 # trail -> (factor, arithmetic, output_unit, original_unit)
 _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     "Torr_to_Pa": (
@@ -2095,6 +2288,30 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
     ),
     "cm2_to_m2": (Decimal("10000"), "A_m2 = A_cm2 / 10000", "m2", "cm2"),
     "mm2_to_m2": (Decimal("1000000"), "A_m2 = A_mm2 / 1e6", "m2", "mm2"),
+    "g_per_m2_to_kg_per_m2": (
+        Decimal("1000"),
+        "m_kg_per_m2 = m_g_per_m2 / 1000",
+        "kg_per_m2",
+        "g_per_m2",
+    ),
+    "mg_per_m2_to_kg_per_m2": (
+        Decimal("1000000"),
+        "m_kg_per_m2 = m_mg_per_m2 / 1e6",
+        "kg_per_m2",
+        "mg_per_m2",
+    ),
+    "g_per_cm2_to_kg_per_m2": (
+        Decimal("10"),
+        "m_kg_per_m2 = m_g_per_cm2 × 10",
+        "kg_per_m2",
+        "g_per_cm2",
+    ),
+    "mg_per_cm2_to_kg_per_m2": (
+        Decimal("100"),
+        "m_kg_per_m2 = m_mg_per_cm2 / 100",
+        "kg_per_m2",
+        "mg_per_cm2",
+    ),
     "g_to_kg": (Decimal("1000"), "m_kg = m_g / 1000", "kg", "g"),
     "mg_to_kg": (Decimal("1000000"), "m_kg = m_mg / 1e6", "kg", "mg"),
     "cm_to_m": (Decimal("100"), "L_m = L_cm / 100", "m", "cm"),
@@ -2477,6 +2694,33 @@ def _compilation_conversion_derivation(
     # arithmetic text. The relation/output/parameters retain the conversion
     # trail while the source asset supplies the resolvable input.
     return replace(derivation, inputs=(read_from,))
+
+
+def _merge_source_conversion_derivation(
+    source: Derivation | None,
+    conversion: Derivation | None,
+    read_from: str,
+) -> Derivation | None:
+    """Retain author lineage while recording a canonical-unit conversion."""
+
+    if conversion is None:
+        return source
+    if source is None:
+        source = replace(conversion, inputs=(read_from,), parameters=())
+    parameters = tuple(
+        (name, replace(value, inference=conversion) if name == "original" else value)
+        for name, value in conversion.parameters
+    )
+    if not any(name == "original" for name, _ in parameters):
+        parameters += (("conversion", Located(
+            State.unknown("extractor transform does not state its original numeric input"),
+            inference=conversion,
+        )),)
+    return replace(
+        source,
+        parameters=source.parameters + parameters,
+        output_unit=conversion.output_unit,
+    )
 
 
 def _converted_temperature(
@@ -3102,6 +3346,10 @@ _UNIQUE_QUANTITY_FIELDS: dict[str, Quantity] = {
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
     "log10_formation_equilibrium_constant": Quantity.LOG10_KF,
+    "fCl2_bar": Quantity.FUGACITY,
+    "fugacity_bar": Quantity.FUGACITY,
+    "fugacity_Pa": Quantity.FUGACITY,
+    "fugacity": Quantity.FUGACITY,
 }
 
 
@@ -3310,6 +3558,24 @@ def _quantity_contradiction(
         if "partial pressure" in units_l or "lg p" in units_l or "lg p" in blob:
             return "source units name partial pressure, not mass_loss_rate"
 
+    if candidate is Quantity.MASS_LOSS_AREAL_DENSITY:
+        converted, _trail = convert_areal_mass_to_kg_per_m2("1", units)
+        if converted is None:
+            return f"source units {units!r} do not denote areal mass loss"
+
+    if candidate is Quantity.FUGACITY:
+        if isinstance(values, Mapping):
+            if any(key in values for key in QUANTITY_SOURCE_FIELDS[candidate]):
+                return None
+            series = values.get("series") or values.get("points")
+            if isinstance(series, list) and any(
+                isinstance(item, Mapping)
+                and any(key in item for key in QUANTITY_SOURCE_FIELDS[candidate])
+                for item in series
+            ):
+                return None
+        return f"source does not name a fugacity field"
+
     if semantics in {"bound_not_point_ordering", "bound_not_point"} and candidate not in {
         Quantity.EVAPORATION_COEFFICIENT_ALPHA,
         Quantity.ACTIVITY_COEFFICIENT,
@@ -3375,6 +3641,20 @@ def _quantity_corroborated(
         return "gamma" in values or "activity_coefficient" in values
     if candidate is Quantity.MASS_LOSS_RATE:
         return "mass_loss_rate" in values
+    if candidate is Quantity.MASS_LOSS_AREAL_DENSITY:
+        return values.get("quantity_as_printed") == "delta_q" or any(
+            key in values for key in QUANTITY_SOURCE_FIELDS[candidate]
+        )
+    if candidate is Quantity.FUGACITY:
+        series = values.get("series") or values.get("points")
+        return any(key in values for key in QUANTITY_SOURCE_FIELDS[candidate]) or (
+            isinstance(series, list)
+            and any(
+                isinstance(item, Mapping)
+                and any(key in item for key in QUANTITY_SOURCE_FIELDS[candidate])
+                for item in series
+            )
+        )
     return False
 
 
@@ -3728,6 +4008,17 @@ def map_quantity(
                     return State.unknown(contradiction), contradiction
                 return State.of(qualified), None
     quantity_absent = raw is None or raw == ""
+    if (
+        quantity_absent
+        and obs_type == "mass_loss"
+        and isinstance(values, Mapping)
+        and values.get("quantity_as_printed") == "delta_q"
+    ):
+        inferred = Quantity.MASS_LOSS_AREAL_DENSITY
+        contradiction = _quantity_contradiction(inferred, obs_type, values, units, row)
+        if contradiction:
+            return State.unknown(contradiction), contradiction
+        return State.of(inferred), None
     if quantity_absent and units is not None and str(units).strip():
         unit_mapped = UNIT_DECLARED_QUANTITY.get(str(units).strip().lower())
         if unit_mapped is not None:
@@ -4323,7 +4614,11 @@ def lineage_parents_from_source(
     if isinstance(raw, str):
         items = [raw]
     elif isinstance(raw, (list, tuple)):
-        items = [str(x) for x in raw if x]
+        items = []
+        for index, item in enumerate(raw):
+            if not isinstance(item, str) or not item.strip():
+                raise ValueError(f"malformed derived_from[{index}]: {item!r}")
+            items.append(item)
     else:
         return (), ()
     parents: list[str] = []
@@ -4344,6 +4639,67 @@ def lineage_parents_from_source(
         else:
             prose.append(item)
     return tuple(parents), tuple(prose)
+
+
+_CONDITIONAL_REDUCED_METHODS = frozenset({"calculated", "author_derived"})
+
+
+def source_derivation_from_source(
+    obs: Mapping[str, Any], values: Mapping[str, Any]
+) -> Derivation | None:
+    """Read an author-supplied derivation without inventing one."""
+
+    for payload in (values, obs):
+        raw = payload.get("derivation")
+        if not isinstance(raw, Mapping):
+            continue
+        if not raw.get("relation") or not raw.get("inputs"):
+            continue
+        try:
+            return _derivation_from_plain(raw)
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def conditional_reduced_lineage_is_measured(
+    observation: Observation,
+    observations: Mapping[str, Observation],
+    author_derivations: Mapping[str, Derivation],
+    *,
+    _seen: frozenset[str] = frozenset(),
+) -> bool:
+    """Whether a calculated observation has admissible measured ancestry."""
+
+    if observation.observation_id in _seen:
+        return False
+    derivation = author_derivations.get(observation.observation_id)
+    if (
+        derivation is None
+        or not observation.derived_from
+        or not set(derivation.inputs).issubset(observation.derived_from)
+    ):
+        return False
+    seen = _seen | {observation.observation_id}
+    for parent_id in observation.derived_from:
+        parent = observations.get(parent_id)
+        if parent is None or parent.admission.status is not AdmissionStatus.ADMITTED:
+            return False
+        if (
+            parent.evidence.original_method_class in _CONDITIONAL_REDUCED_METHODS
+            or parent.evidence.class_ == State.of(EvidenceClass.MEASURED_REDUCED)
+        ):
+            if not conditional_reduced_lineage_is_measured(
+                parent, observations, author_derivations, _seen=seen
+            ):
+                return False
+        elif (
+            not parent.evidence.class_.is_value
+            or parent.evidence.class_.value
+            not in MEASURED_EVIDENCE
+        ):
+            return False
+    return True
 
 
 def map_method(regime: object) -> State[MethodToken]:
@@ -4369,6 +4725,8 @@ def evidence_for(
     """Return Evidence and an optional queue reason."""
 
     original = None if method_class is None else str(method_class)
+    if not original and isinstance(regime, str) and regime.strip() in _CONDITIONAL_REDUCED_METHODS:
+        original = regime.strip()
     if evaluator_family:
         return (
             Evidence(
@@ -4413,6 +4771,16 @@ def evidence_for(
                 original_method_class=original,
             ),
             f"PAGE method_class {original}",
+        )
+    if original in _CONDITIONAL_REDUCED_METHODS:
+        return (
+            Evidence(
+                class_=State.unknown(
+                    f"{original} requires measured derived_from lineage and derivation"
+                ),
+                original_method_class=original,
+            ),
+            f"conditional method_class {original} lacks measured lineage",
         )
     mapped = METHOD_CLASS_MAP.get(original)
     if mapped is None:
@@ -4462,6 +4830,7 @@ def admission_for(
     superseded_by: str | None,
     extraction: Mapping[str, Any] | None,
     locator: Locator | None,
+    refusal_reason: str | None = None,
 ) -> Admission:
     if superseded_by:
         decided = None
@@ -4509,6 +4878,19 @@ def admission_for(
         return Admission(
             status=AdmissionStatus.REJECTED,
             reason=f"source admission_status={text}",
+            decided_by=decided,
+        )
+    if text == "typed_refusal":
+        decided = None
+        if isinstance(extraction, Mapping) and locator is not None:
+            decided = AdmissionDecision(
+                worker=str(extraction.get("worker") or "extract"),
+                date=str(extraction.get("date") or "unspecified"),
+                evidence=locator,
+            )
+        return Admission(
+            status=AdmissionStatus.REJECTED,
+            reason=refusal_reason or "source status=typed_refusal",
             decided_by=decided,
         )
     return Admission(
@@ -5032,6 +5414,19 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     + ("P", "p")
     + _PARTIAL_PRESSURE_FIELDS,
     Quantity.MASS_LOSS_RATE: ("mass_loss_rate",),
+    Quantity.MASS_LOSS_AREAL_DENSITY: (
+        "mass_loss_areal_density",
+        "delta_q",
+        "delta_q_replicate_1",
+        "delta_q_replicate_2",
+    ),
+    Quantity.FUGACITY: (
+        "fCl2_bar",
+        "fugacity_bar",
+        "fugacity_Pa",
+        "fugacity",
+        "value",
+    ),
     Quantity.EVAPORATION_RATE: ("evaporation_rate",),
     Quantity.ION_INTENSITY: ("ion_intensity",),
     Quantity.ION_INTENSITY_RATIO: ("ion_intensity_ratio", "ion_current_ratio"),
@@ -5559,6 +5954,32 @@ def _selection_from_named_field(
                 unit_trail=trail or "identity",
             )
         return None
+    if q_token is Quantity.FUGACITY:
+        for key in QUANTITY_SOURCE_FIELDS[q_token]:
+            if key not in payload:
+                continue
+            raw = payload.get(key)
+            field_units = units
+            if isinstance(raw, Mapping):
+                field_units = str(raw.get("units") or field_units or "")
+                raw = raw.get("value")
+            if key.endswith("_bar"):
+                field_units = "bar"
+            elif key.endswith("_Pa"):
+                field_units = "Pa"
+            amount, trail = convert_pressure_to_pa(raw, field_units)
+            if amount is not None:
+                return _point_selection(
+                    amount, key, trail or "identity:Pa", payload, condition_ranges
+                )
+            return _unavailable_selection(
+                trail or f"{key} is not a grounded fugacity",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+                unit_trail=trail or "identity",
+            )
+        return None
     for key in QUANTITY_SOURCE_FIELDS.get(q_token, ()):
         if key not in payload:
             continue
@@ -5577,6 +5998,19 @@ def _selection_from_named_field(
         amount = _numeric_field(payload, key)
         if amount is None:
             continue
+        if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
+            amount, trail = convert_areal_mass_to_kg_per_m2(amount, units)
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal mass loss",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
+            )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )
@@ -5615,6 +6049,19 @@ def _selection_from_named_field(
     if len(decorated) == 1:
         key, amount = decorated[0]
         assert amount is not None
+        if q_token is Quantity.MASS_LOSS_AREAL_DENSITY:
+            amount, trail = convert_areal_mass_to_kg_per_m2(amount, units)
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal mass loss",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
+            )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )
@@ -6137,6 +6584,8 @@ def _lab_kind(field: str) -> str:
         return "composition"
     if field.endswith("mass_kg"):
         return "mass"
+    if field.endswith("volume_m3"):
+        return "volume"
     if field.endswith("area_m2"):
         return "area"
     if field.endswith("_Pa"):
@@ -6158,6 +6607,8 @@ def _convert_lab_value(
     kind = _lab_kind(field)
     if kind == "mass":
         return convert_mass_to_kg(amount, units)
+    if kind == "volume":
+        return convert_volume_to_m3(amount, units)
     if kind == "area":
         return convert_area_to_m2(amount, units)
     if kind == "length":
@@ -6178,6 +6629,7 @@ def _output_unit_for(field: str) -> str:
     kind = _lab_kind(field)
     return {
         "mass": "kg",
+        "volume": "m3",
         "area": "m2",
         "length": "m",
         "pressure": "Pa",
@@ -6195,6 +6647,8 @@ def _looked_for_reason(field: str, vocabulary: tuple[VocabEntry, ...]) -> str:
         noun = "pressure"
     elif kind == "mass":
         noun = "mass"
+    elif kind == "volume":
+        noun = "volume"
     elif kind == "area":
         noun = "area"
     elif kind == "length":
@@ -6461,7 +6915,24 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
         )
         for key in ("inference", "qualifier", "note", "quote")
     )
-    state = State.of(si)
+    approximate = (
+        _lab_kind(hit.entry.field) == "pressure"
+        and isinstance(mapping, Mapping)
+        and (
+            str(mapping.get("kind") or "").lower() in {"about_nominal", "approximate"}
+            or bool(mapping.get("approximate"))
+            or bool(re.search(r"\b(?:about|approximately)\b|[~≈]", str(mapping.get("as_printed") or ""), re.I))
+        )
+    )
+    state = (
+        State.of(
+            _value_from_plain(
+                {"kind": ValueKind.POINT.value, "point": si, "approximate": True}
+            )
+        )
+        if approximate
+        else State.of(si)
+    )
     if non_point:
         state = State.unknown(
             f"extract {hit.entry.printed} is a bound or approximate value, not a point; "
@@ -6710,6 +7181,18 @@ def _prefer_located(
         return new
     if old.state.is_unknown and new.state.is_value:
         return new
+    if old.state.is_value and new.state.is_value:
+        old_value = old.state.value
+        new_value = new.state.value
+        if (
+            isinstance(old_value, Value)
+            and isinstance(new_value, Value)
+            and old_value.kind is ValueKind.POINT
+            and new_value.kind is ValueKind.POINT
+            and old_value.point == new_value.point
+            and old_value.approximate != new_value.approximate
+        ):
+            return new if new_value.approximate else old
     if old.state.is_value and new.state.is_value and old.state.value != new.state.value:
         return None
     if (
@@ -6833,6 +7316,7 @@ def _merge_experiment_lab_params(
 ) -> Experiment:
     merged_sample = Sample(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
+        volume_m3=_prefer_located(existing.sample.volume_m3, sample.volume_m3),
         initial_composition=_prefer_located(
             existing.sample.initial_composition, sample.initial_composition
         ),
@@ -6927,6 +7411,7 @@ def sample_from_equipment(
     roots = _lab_roots(equipment, values)
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
+    volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
     form_located = _unique_text_located(_hits_for(hits, "sample.form"))
     container_located = _unique_text_located(_hits_for(hits, "sample.container"))
     hard_form, hard_container = _form_and_container(equipment)
@@ -6951,6 +7436,7 @@ def sample_from_equipment(
                 _, initial = _located_printed_and_initial(wt, printed.locator or locator)
     if (
         mass_located is None
+        and volume_located is None
         and form_located is None
         and container_located is None
         and printed is None
@@ -6959,6 +7445,7 @@ def sample_from_equipment(
         return Sample()
     return Sample(
         mass_kg=mass_located,
+        volume_m3=volume_located,
         form=form_located,
         container=container_located,
         printed_composition=printed,
@@ -7072,6 +7559,15 @@ def _sample_matched_roots(equipment: object, series_item: object) -> list[object
 # not a printed fugacity, and must not be relabelled printed (b-526).
 _PRINTED_LOG_FO2_KEYS = frozenset({"log_fO2", "log10_fO2", "logfO2"})
 _PRINTED_PO2_KEYS = frozenset({"oxygen_partial_pressure"})
+# Author stoichiometric ratio × printed companion pressure (Plante 1979
+# ``P_O2 = 0.226 P_K``). Not a printed partial-pressure key: the product is
+# derived and must keep a Derivation stamp (t951 remainder).
+_AUTHOR_RATIO_PO2_KEYS = (
+    "po2_over_pK_as_published",
+    "P_K_atm_as_published",
+    "P_O2_atm",
+)
+_AUTHOR_RATIO_REL_TOLERANCE = Decimal("1e-4")
 _OXYGEN_TABLE_KEYS = frozenset({"series", "rows", "points"})
 _OXYGEN_LOG_UNITS = frozenset({
     "",
@@ -7338,6 +7834,83 @@ def _unique_oxygen(candidates: list[tuple[Decimal, object]]) -> object | None:
     if len(values) != 1:
         return None
     return candidates[0][1]
+
+
+def collect_author_ratio_oxygen(
+    payloads: Iterable[object],
+    fallback_locator: Locator | None,
+) -> Located[Value] | None:
+    """Land stoichiometric ratio × printed P as derived ``fO2_Pa``.
+
+    Plante 1979 prints ``P_O2 = 0.226 P_K`` (eq. context p. 279) and tabulates
+    ``P_K``. The extract stores the ratio, the printed ``P_K``, and the
+    arithmetic product ``P_O2_atm``. That product is not a printed cell: it is
+    derived from the printed ratio and printed ``P_K``, so the Located carries
+    a Derivation and never enters the printed-oxygen allowlist.
+
+    Engine-inferred siblings (``pO2_inference``) and ``inferred: true`` nodes
+    stay refusals. Disagreeing ratio × P_K vs stored ``P_O2_atm`` refuses.
+    Distinct per-row products must not collapse onto experiment.fO2_control.
+    """
+
+    if fallback_locator is None:
+        return None
+    for payload in payloads:
+        if not isinstance(payload, Mapping):
+            continue
+        if payload.get("pO2_inference") not in (None, ""):
+            continue
+        if payload.get("inferred") is True:
+            continue
+        ratio = _printed_decimal(payload.get("po2_over_pK_as_published"))
+        p_k = _printed_decimal(payload.get("P_K_atm_as_published"))
+        p_o2 = _printed_decimal(payload.get("P_O2_atm"))
+        if ratio is None or p_k is None or p_o2 is None:
+            continue
+        if ratio <= 0 or p_k <= 0 or p_o2 <= 0:
+            continue
+        expected = ratio * p_k
+        if abs(p_o2 - expected) / expected > _AUTHOR_RATIO_REL_TOLERANCE:
+            continue
+        si, trail = convert_pressure_to_pa(p_o2, "atm")
+        if si is None or si <= 0 or trail is None:
+            continue
+        unit = conversion_derivation(trail, p_o2, fallback_locator)
+        # Premise: author states P_O2 / P_K = r (printed ratio) with both
+        # pressures in atm; extract stores r, P_K, and the product.
+        # Algebra: P_O2_atm = r * P_K_atm; P_O2_Pa = P_O2_atm * 101325.
+        # Sanity: r=0.226, P_K=6.91e-7 atm -> P_O2=1.56166e-7 atm = 0.015824 Pa.
+        relation = (
+            "author_ratio_P_O2_atm=po2_over_pK_as_published*P_K_atm_as_published;"
+            f"{trail}"
+        )
+        params: list[tuple[str, Located[Decimal]]] = [
+            ("po2_over_pK_as_published", Located(State.of(ratio), locator=fallback_locator)),
+            ("P_K_atm_as_published", Located(State.of(p_k), locator=fallback_locator)),
+            ("P_O2_atm", Located(State.of(p_o2), locator=fallback_locator)),
+        ]
+        if unit is not None:
+            params.extend(unit.parameters)
+        inference = Derivation(
+            relation=relation,
+            inputs=(
+                "values.po2_over_pK_as_published",
+                "values.P_K_atm_as_published",
+                "values.P_O2_atm",
+            ),
+            parameters=tuple(params),
+            output_unit="Pa",
+        )
+        point = _point_selection(si, "P_O2_atm", trail, {}, ())
+        return Located(
+            State.of(point.value),
+            locator=_locator_with_note(
+                fallback_locator,
+                "author ratio P_O2=r*P_K (derived; not a printed pO2 cell)",
+            ),
+            inference=inference,
+        )
+    return None
 
 
 def collect_printed_oxygen(
@@ -7824,6 +8397,7 @@ class Migrator:
         self._work_index_row: dict[str, Mapping[str, Any] | None] = {}
         self._obs_source: dict[str, str] = {}
         self._obs_row_index: dict[str, int] = {}
+        self._author_derivations: dict[str, Derivation] = {}
         self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
         self._oxygen_pressure_landed: dict[str, Decimal] = {}
         self._oxygen_pressure_conflict: set[str] = set()
@@ -8034,6 +8608,15 @@ class Migrator:
                 source=source,
                 observation_id=observation_id,
             )
+        if sample.volume_m3 is not None and sample.volume_m3.state.is_unknown:
+            self.result.add_queue(
+                work_id,
+                locator,
+                ["sample.volume_m3"],
+                sample.volume_m3.state.reason or "missing volume unit",
+                source=source,
+                observation_id=observation_id,
+            )
         experiment = Experiment(
             experiment_id=experiment_id,
             kind=ExperimentKind.LITERATURE,
@@ -8114,8 +8697,14 @@ class Migrator:
         facts = collect_printed_oxygen(specific, locator, skip_tables=skip_tables)
         if facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None and fallback:
             facts = collect_printed_oxygen(fallback, locator, skip_tables=True)
+        ratio_oxygen = None
         if facts.log_fO2 is None and facts.oxygen_partial_pressure_Pa is None:
-            return point_conditions
+            # Printed allowlist empty: try author-ratio product (derived only).
+            ratio_oxygen = collect_author_ratio_oxygen(specific, locator)
+            if ratio_oxygen is None and fallback:
+                ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
+            if ratio_oxygen is None:
+                return point_conditions
         merged = dict(point_conditions or {})
         if facts.log_fO2 is not None and "fO2_log" not in merged:
             merged["fO2_log"] = facts.log_fO2
@@ -8127,6 +8716,10 @@ class Migrator:
             self._land_experiment_oxygen_pressure(
                 experiment_id, facts.oxygen_partial_pressure_Pa
             )
+        elif ratio_oxygen is not None and "fO2_Pa" not in merged:
+            # Per-row derived products span orders of magnitude; never collapse
+            # them onto experiment.fO2_control.oxygen_partial_pressure_Pa.
+            merged["fO2_Pa"] = ratio_oxygen
         return merged or None
 
     def _add_observation(
@@ -8773,9 +9366,55 @@ class Migrator:
                 measured.gibbs_reference_101325 += 1
 
         method_class = values.get("method_class")
+        if method_class is None:
+            method_class = obs.get("method_class")
         regime = obs.get("regime") or values.get("regime")
         if method_class is None:
             measured.absent_classes += 1
+        try:
+            derived_parents, derived_prose = lineage_parents_from_source(
+                obs, values, source_id, local_ids
+            )
+        except ValueError as exc:
+            derived_parents, derived_prose = (), (str(exc),)
+            self.result.registry_issues.append(ValidationIssue(
+                path=f"observations.{obs_id}.derived_from",
+                reason=RefusalReason.INVALID_SOURCE,
+                detail=str(exc),
+            ))
+        derived_from = derived_parents or None
+        source_derivation = source_derivation_from_source(obs, values)
+        if source_derivation is not None:
+            source_derivation = replace(
+                source_derivation,
+                inputs=tuple(
+                    f"{source_id}::{item}" if item in local_ids else item
+                    for item in source_derivation.inputs
+                ),
+            )
+            if not derived_prose:
+                self._author_derivations[obs_id] = source_derivation
+        conditional_method = str(method_class) if method_class else str(regime or "").strip()
+        if conditional_method not in _CONDITIONAL_REDUCED_METHODS:
+            source_derivation = None
+        for payload in (values, obs):
+            if not isinstance(payload.get("inference"), Mapping):
+                continue
+            try:
+                extractor_derivation = _derivation_from_plain(payload["inference"])
+            except (TypeError, ValueError):
+                continue
+            source_derivation = _merge_source_conversion_derivation(
+                source_derivation or Derivation(
+                    relation="as_published",
+                    inputs=(choose_read_from(work, locator),),
+                    parameters=(),
+                    output_unit="as_published",
+                ),
+                extractor_derivation,
+                choose_read_from(work, locator),
+            )
+            break
         evidence, ev_reason = self._evidence_for(
             method_class,
             evaluator_family=values.get("evaluator_family"),
@@ -8804,7 +9443,17 @@ class Migrator:
                 observation_id=obs_id,
             )
 
-        raw_adm = values.get("admission_status")
+        typed_refusal = any(
+            str(candidate or "") == "typed_refusal"
+            for candidate in (
+                values.get("status"),
+                obs.get("status"),
+                values.get("admission_status"),
+                obs.get("admission_status"),
+                method_class,
+            )
+        )
+        raw_adm = "typed_refusal" if typed_refusal else values.get("admission_status")
         if raw_adm is None and obs.get("admission_status") is None:
             measured.absent_admissions += 1
         else:
@@ -8838,6 +9487,22 @@ class Migrator:
             superseded_by=None,
             extraction=extraction,
             locator=locator,
+            refusal_reason=(
+                str(
+                    values.get("reason")
+                    or obs.get("reason")
+                    or values.get("refusal_reason")
+                    or obs.get("refusal_reason")
+                )
+                if typed_refusal
+                and (
+                    values.get("reason")
+                    or obs.get("reason")
+                    or values.get("refusal_reason")
+                    or obs.get("refusal_reason")
+                )
+                else None
+            ),
         )
 
         if obs.get("equipment"):
@@ -8855,6 +9520,24 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
+        value_derivation = source_derivation
+        value_conversion: Derivation | None = None
+        if (
+            q_token in {Quantity.MASS_LOSS_AREAL_DENSITY, Quantity.FUGACITY}
+            and value_sel.available
+            and value_sel.field_name
+        ):
+            original_raw = values.get(value_sel.field_name)
+            if isinstance(original_raw, Mapping):
+                original_raw = original_raw.get("value")
+            value_conversion = conversion_derivation(
+                value_sel.unit_trail, original_raw, locator
+            )
+            value_derivation = _merge_source_conversion_derivation(
+                source_derivation,
+                value_conversion,
+                choose_read_from(work, locator),
+            )
         if omitted_components:
             ident_kwargs["composition"] = State.unknown(
                 partial_composition_unknown_reason(omitted_components)
@@ -8960,17 +9643,38 @@ class Migrator:
                         observation_id=obs_id,
                     )
                 else:
-                    ident_kwargs["total_pressure_Pa"] = State.unknown(
-                        "source does not state a numeric total_pressure_Pa"
+                    # Explicit unknown point_conditions is the stated absence.
+                    raw_pc = obs.get("point_conditions")
+                    raw_pressure = (
+                        raw_pc.get("total_pressure_Pa")
+                        if isinstance(raw_pc, Mapping)
+                        else None
                     )
-                    self.result.add_queue(
-                        work.work_id,
-                        locator,
-                        ["total_pressure_Pa"],
-                        "source does not state a numeric total_pressure_Pa",
-                        source=source_key,
-                        observation_id=obs_id,
+                    raw_state = (
+                        raw_pressure.get("state")
+                        if isinstance(raw_pressure, Mapping)
+                        else None
                     )
+                    stated_reason = (
+                        raw_state.get("reason")
+                        if isinstance(raw_state, Mapping)
+                        and str(raw_state.get("tag") or "") == StateTag.UNKNOWN.value
+                        else None
+                    )
+                    if isinstance(stated_reason, str) and stated_reason.strip():
+                        ident_kwargs["total_pressure_Pa"] = State.unknown(stated_reason)
+                    else:
+                        ident_kwargs["total_pressure_Pa"] = State.unknown(
+                            "source does not state a numeric total_pressure_Pa"
+                        )
+                        self.result.add_queue(
+                            work.work_id,
+                            locator,
+                            ["total_pressure_Pa"],
+                            "source does not state a numeric total_pressure_Pa",
+                            source=source_key,
+                            observation_id=obs_id,
+                        )
         if q_token is Quantity.TRANSITION_TEMPERATURE and (
             value.kind in {ValueKind.UNAVAILABLE, ValueKind.INTERVAL}
         ):
@@ -9054,10 +9758,6 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        derived_parents, derived_prose = lineage_parents_from_source(
-            obs, values, source_id, local_ids
-        )
-        derived_from = derived_parents or None
         raw_derivation = values.get("derivation")
         if raw_derivation is None:
             raw_derivation = obs.get("derivation")
@@ -9075,6 +9775,12 @@ class Migrator:
             )
             else None
         )
+        if derivation is not None:
+            value_derivation = _merge_source_conversion_derivation(
+                derivation,
+                value_conversion,
+                read_from,
+            )
         for prose_item in derived_prose:
             self.result.add_queue(
                 work.work_id,
@@ -9152,6 +9858,7 @@ class Migrator:
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
                     derived_from=derived_from,
+                    source_derivation=source_derivation,
                     notices=point_notices,
                     equipment=obs.get("equipment"),
                     parent_values=values,
@@ -9176,6 +9883,7 @@ class Migrator:
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
                     derived_from=derived_from,
+                    source_derivation=source_derivation,
                     equipment=obs.get("equipment"),
                     parent_values=values,
                 )
@@ -9229,7 +9937,7 @@ class Migrator:
             read_from=read_from,
             point_conditions=point_conditions,
             derived_from=derived_from,
-            derivation=derivation,
+            derivation=value_derivation,
         )
         self._queue_unstated_derived_lineage(
             work.work_id,
@@ -9238,7 +9946,7 @@ class Migrator:
             obs_id,
             evidence,
             derived_from,
-            derivation,
+            value_derivation,
         )
         self._add_observation(observation, source_key)
 
@@ -9259,6 +9967,7 @@ class Migrator:
         units: str,
         read_from: str,
         derived_from: tuple[str, ...] | None = None,
+        source_derivation: Derivation | None = None,
         notices: tuple[Notice, ...] = (),
         equipment: object = None,
         parent_values: object = None,
@@ -9389,11 +10098,14 @@ class Migrator:
                     composition_unknown_reason()
                 )
         identity = fill_identity(quantity, species, **ident_kwargs)
+        converted: Derivation | None = None
         if value_sel is not None and value_sel.available:
             emitted = value_sel.value
             original_raw = None
             if isinstance(raw_item, Mapping) and value_sel.field_name:
                 original_raw = raw_item.get(value_sel.field_name)
+                if isinstance(original_raw, Mapping):
+                    original_raw = original_raw.get("value")
             converted = conversion_derivation(trail, original_raw, point_locator)
             derivation = Derivation(
                 relation=trail if converted is None else converted.relation,
@@ -9423,6 +10135,12 @@ class Migrator:
                 observation_id=point_id,
             )
             derivation = None
+        if source_derivation is not None:
+            derivation = _merge_source_conversion_derivation(
+                source_derivation, converted, read_from
+            )
+        if parent_id in self._author_derivations:
+            self._author_derivations[point_id] = self._author_derivations[parent_id]
         unc = uncertainty
         if extra_unc is not None:
             unc = Uncertainty(
@@ -9462,6 +10180,17 @@ class Migrator:
                 extra_pc["composition"] = residual
             if extra_pc:
                 point_conditions = {**(point_conditions or {}), **extra_pc}
+        if isinstance(raw_item, Mapping):
+            raw_point_conditions = raw_item.get("point_conditions")
+            if isinstance(raw_point_conditions, Mapping):
+                explicit_point_conditions = {
+                    str(key): _point_condition_from_plain(value, key=str(key))
+                    for key, value in raw_point_conditions.items()
+                }
+                point_conditions = {
+                    **(point_conditions or {}),
+                    **explicit_point_conditions,
+                }
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,
@@ -11046,10 +11775,28 @@ class Migrator:
                     if exp is not None and exp.work_id in works:
                         entry.work_id = exp.work_id
 
+    def _close_conditional_method_classes(self) -> None:
+        for observation_id, observation in self.result.observations.items():
+            if observation.evidence.original_method_class not in _CONDITIONAL_REDUCED_METHODS:
+                continue
+            admitted = conditional_reduced_lineage_is_measured(
+                observation, self.result.observations, self._author_derivations
+            )
+            self.result.observations[observation_id] = replace(
+                observation,
+                evidence=replace(
+                    observation.evidence,
+                    class_=State.of(EvidenceClass.MEASURED_REDUCED) if admitted else State.unknown(
+                        "author reduction requires an author derivation and admitted measured lineage"
+                    ),
+                ),
+            )
+
     def finalize(self) -> None:
         self._rebuild_works()
         self._apply_supersedes()
         self._resolve_queue_ids()
+        self._close_conditional_method_classes()
         # Drop superseded_by pointers that do not resolve in the corpus.
         for obs in list(self.result.observations.values()):
             target = obs.admission.superseded_by

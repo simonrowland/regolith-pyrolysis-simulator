@@ -19,11 +19,11 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.6100/ir630685
 experiments:
-- experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+- experiment_id: 10.6100/ir630685::experiment::borosilicate-glass-1
   kind: literature
   method:
-    tag: value
-    value: transpiration
+    tag: unknown
+    reason: experiment method not published
   sample:
     mass_kg:
       state:
@@ -59,13 +59,47 @@ experiments:
               section: 3.2.1
               note: Printed 25 gram glass grains; unit conversion only
         output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - B2O3
+            - '0.023489658619'
+          - - Na2O
+            - '0.00101479269'
+          - - Al2O3
+            - '0.08697763995'
+          - - SiO2
+            - '0.624944403663'
+          - - CaO
+            - '0.263573505079'
+          amount_basis: mole_fraction
+      locator:
+        page: 142
+        table: '4.3'
+        note: Glass 1 XRF/NAA oxide mass% row as printed; normalized mole fractions derived from the complete map
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / sum_j(w_j / M_j)
+        - original_unit=wt_pct
+        parameters: []
+        output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
-        value: Sodium-silicate, soda-lime-silicate, and alkali-borosilicate glass compositions
+        value:
+          B2O3: '2.6'
+          Na2O: '0.10'
+          Al2O3: '14.1'
+          SiO2: '59.7'
+          CaO: '23.5'
       locator:
-        page: 127
-        section: 3.2.1
+        page: 142
+        table: '4.3'
+        note: Glass 1 column; initial glass composition XRF/NAA mass% as printed; label alkali-lean borosilicate Glass 1
     form:
       state:
         tag: value
@@ -116,6 +150,7 @@ experiments:
   locator:
     page: 127
     section: 3.2.1-3.2.2
+    note: borosilicate glass 1 transpiration charge
   fO2_control:
     channel:
       tag: value
@@ -128,7 +163,6 @@ experiments:
         page: 153
         section: '4.4'
         note: Mixture controls oxygen conditions; no buffer stated
-  bench_id: 10.6100/ir630685::bench::glass-transpiration-rig
   thermal_schedule:
     method:
       state:
@@ -156,6 +190,1324 @@ experiments:
       locator:
         page: 127
         section: 3.2.2
+- experiment_id: 10.6100/ir630685::experiment::borosilicate-glass-2
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed 25 gram glass grains; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - B2O3
+            - '0.04528760694'
+          - - Na2O
+            - '0.00101738034'
+          - - Al2O3
+            - '0.084725684256'
+          - - SiO2
+            - '0.617092672278'
+          - - CaO
+            - '0.251876656186'
+          amount_basis: mole_fraction
+      locator:
+        page: 142
+        table: '4.3'
+        note: Glass 2 XRF/NAA oxide mass% row as printed; normalized mole fractions derived from the complete map
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / sum_j(w_j / M_j)
+        - original_unit=wt_pct
+        parameters: []
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          B2O3: '5.0'
+          Na2O: '0.10'
+          Al2O3: '13.7'
+          SiO2: '58.8'
+          CaO: '22.4'
+      locator:
+        page: 142
+        table: '4.3'
+        note: Glass 2 column; initial glass composition XRF/NAA mass% as printed; label alkali-lean borosilicate Glass 2
+    form:
+      state:
+        tag: value
+        value: Quenched cullet grains, 5-10 mm
+      locator:
+        page: 127
+        section: 3.2.1
+    pretreatment:
+      state:
+        tag: value
+        value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450
+          C
+      locator:
+        page: 127
+        section: 3.2.1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed experiment temperature range 1300-1500 C; endpoint conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Carrier-gas experiment; no total run pressure printed
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.2
+        note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.6100/ir630685
+  locator:
+    page: 127
+    section: 3.2.1-3.2.2
+    note: borosilicate glass 2 transpiration charge
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 153
+        section: '4.4'
+        note: Mixture controls oxygen conditions; no buffer stated
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heating rate 2 C/min; four to six sampling periods of 5-60 min
+      locator:
+        page: 127
+        section: 3.2.2
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '21600'
+          interval_high: '28800'
+          approximate: true
+      locator:
+        page: 127
+        section: 3.2.2
+        note: Printed about 6-8 h; endpoint conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water dosing stopped and furnace cooled
+      locator:
+        page: 127
+        section: 3.2.2
+- experiment_id: 10.6100/ir630685::experiment::borosilicate-glass-3
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed 25 gram glass grains; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        output_unit: kg
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - B2O3
+            - '0.069063983551'
+          - - Na2O
+            - '0.001531098969'
+          - - Al2O3
+            - '0.085625331946'
+          - - SiO2
+            - '0.569638051683'
+          - - CaO
+            - '0.27414153385'
+          amount_basis: mole_fraction
+      locator:
+        page: 142
+        table: '4.3'
+        note: Glass 3 XRF/NAA oxide mass% row as printed; normalized mole fractions derived from the complete map
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / sum_j(w_j / M_j)
+        - original_unit=wt_pct
+        parameters: []
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          B2O3: '7.6'
+          Na2O: '0.15'
+          Al2O3: '13.8'
+          SiO2: '54.1'
+          CaO: '24.3'
+      locator:
+        page: 142
+        table: '4.3'
+        note: Glass 3 column; initial glass composition XRF/NAA mass% as printed; label alkali-lean borosilicate Glass 3
+    form:
+      state:
+        tag: value
+        value: Quenched cullet grains, 5-10 mm
+      locator:
+        page: 127
+        section: 3.2.1
+    pretreatment:
+      state:
+        tag: value
+        value: Borosilicate batches melted at 1550 C for 2 h before quenching; cullet remelted in boat for 30-60 min at 1400-1450
+          C
+      locator:
+        page: 127
+        section: 3.2.1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed experiment temperature range 1300-1500 C; endpoint conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Carrier-gas experiment; no total run pressure printed
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.2
+        note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.6100/ir630685
+  locator:
+    page: 127
+    section: 3.2.1-3.2.2
+    note: borosilicate glass 3 transpiration charge
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 153
+        section: '4.4'
+        note: Mixture controls oxygen conditions; no buffer stated
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heating rate 2 C/min; four to six sampling periods of 5-60 min
+      locator:
+        page: 127
+        section: 3.2.2
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '21600'
+          interval_high: '28800'
+          approximate: true
+      locator:
+        page: 127
+        section: 3.2.2
+        note: Printed about 6-8 h; endpoint conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water dosing stopped and furnace cooled
+      locator:
+        page: 127
+        section: 3.2.2
+- experiment_id: 10.6100/ir630685::experiment::float-glass-with-so3
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed 25 gram glass grains; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '72.16'
+          Na2O: '14.18'
+          CaO: '7.88'
+          MgO: '4.32'
+          Al2O3: '0.85'
+          K2O: '0.20'
+          Fe2O3: '0.087'
+          SO3: '0.25'
+      locator:
+        page: 141
+        table: '4.2'
+        note: Float glass with SO3 column; XRF mass% as printed; label float glass with SO3; cells printed <0.01 omitted (Cl,
+          Sb2O3, BaO)
+    form:
+      state:
+        tag: value
+        value: Quenched cullet grains, 5-10 mm
+      locator:
+        page: 127
+        section: 3.2.1
+    pretreatment:
+      state:
+        tag: value
+        value: Cullet remelted in boat for 30-60 min at 1400-1450 C
+      locator:
+        page: 127
+        section: 3.2.1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed experiment temperature range 1300-1500 C; endpoint conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Carrier-gas experiment; no total run pressure printed
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.2
+        note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.6100/ir630685
+  locator:
+    page: 127
+    section: 3.2.1-3.2.2
+    note: float glass with so3 transpiration charge
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 153
+        section: '4.4'
+        note: Mixture controls oxygen conditions; no buffer stated
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heating rate 2 C/min; four to six sampling periods of 5-60 min
+      locator:
+        page: 127
+        section: 3.2.2
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '21600'
+          interval_high: '28800'
+          approximate: true
+      locator:
+        page: 127
+        section: 3.2.2
+        note: Printed about 6-8 h; endpoint conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water dosing stopped and furnace cooled
+      locator:
+        page: 127
+        section: 3.2.2
+- experiment_id: 10.6100/ir630685::experiment::float-glass-without-so3
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed 25 gram glass grains; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '72.85'
+          Na2O: '13.98'
+          CaO: '7.46'
+          MgO: '4.52'
+          Al2O3: '0.86'
+          K2O: '0.22'
+          Fe2O3: '0.095'
+      locator:
+        page: 141
+        table: '4.2'
+        note: Float glass without SO3 column; XRF mass% as printed; label float glass without SO3; cells printed <0.01 omitted
+          (SO3, Cl, Sb2O3, BaO)
+    form:
+      state:
+        tag: value
+        value: Quenched cullet grains, 5-10 mm
+      locator:
+        page: 127
+        section: 3.2.1
+    pretreatment:
+      state:
+        tag: value
+        value: Cullet remelted in boat for 30-60 min at 1400-1450 C
+      locator:
+        page: 127
+        section: 3.2.1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed experiment temperature range 1300-1500 C; endpoint conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Carrier-gas experiment; no total run pressure printed
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.2
+        note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.6100/ir630685
+  locator:
+    page: 127
+    section: 3.2.1-3.2.2
+    note: float glass without so3 transpiration charge
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 153
+        section: '4.4'
+        note: Mixture controls oxygen conditions; no buffer stated
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heating rate 2 C/min; four to six sampling periods of 5-60 min
+      locator:
+        page: 127
+        section: 3.2.2
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '21600'
+          interval_high: '28800'
+          approximate: true
+      locator:
+        page: 127
+        section: 3.2.2
+        note: Printed about 6-8 h; endpoint conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water dosing stopped and furnace cooled
+      locator:
+        page: 127
+        section: 3.2.2
+- experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  kind: literature
+  method:
+    tag: value
+    value: transpiration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.6100/ir630685
+  locator:
+    page: 127
+    section: 3.2.1-3.2.2
+    note: Series-level glass-melt transpiration context; per-charge experiments remain declared below
+  bench_id: 10.6100/ir630685::bench::glass-transpiration-rig
+- experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed 25 gram glass grains; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value: sodium-disilicate
+      locator:
+        page: 153
+        section: 4.3.1
+        note: Named sodium-disilicate melt; scout/Table search found no separate binary wt% starting assay; stoichiometric
+          oxide wt% not invented
+    form:
+      state:
+        tag: value
+        value: Quenched cullet grains, 5-10 mm
+      locator:
+        page: 127
+        section: 3.2.1
+    pretreatment:
+      state:
+        tag: value
+        value: Cullet remelted in boat for 30-60 min at 1400-1450 C
+      locator:
+        page: 127
+        section: 3.2.1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed experiment temperature range 1300-1500 C; endpoint conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Carrier-gas experiment; no total run pressure printed
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.2
+        note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.6100/ir630685
+  locator:
+    page: 153
+    section: 4.3.1
+    note: Sodium-disilicate melt transpiration series; no separate binary wt% table printed
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 153
+        section: '4.4'
+        note: Mixture controls oxygen conditions; no buffer stated
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heating rate 2 C/min; four to six sampling periods of 5-60 min
+      locator:
+        page: 127
+        section: 3.2.2
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '21600'
+          interval_high: '28800'
+          approximate: true
+      locator:
+        page: 127
+        section: 3.2.2
+        note: Printed about 6-8 h; endpoint conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water dosing stopped and furnace cooled
+      locator:
+        page: 127
+        section: 3.2.2
+- experiment_id: 10.6100/ir630685::experiment::tableware-glass-a
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed 25 gram glass grains; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '70.1'
+          Na2O: '10.5'
+          CaO: '8.00'
+          Al2O3: '1.09'
+          K2O: '4.98'
+          SO3: '0.01'
+          Sb2O3: '0.22'
+          BaO: '5.07'
+      locator:
+        page: 141
+        table: '4.2'
+        note: Tableware glass A column; XRF mass% as printed; measured (not parenthetical) values; cells printed <0.01 omitted
+          (MgO, Fe2O3, Cl); Sb2O3 uses measured 0.22 not batch (0.30)
+    form:
+      state:
+        tag: value
+        value: Quenched cullet grains, 5-10 mm
+      locator:
+        page: 127
+        section: 3.2.1
+    pretreatment:
+      state:
+        tag: value
+        value: Cullet remelted in boat for 30-60 min at 1400-1450 C
+      locator:
+        page: 127
+        section: 3.2.1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed experiment temperature range 1300-1500 C; endpoint conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Carrier-gas experiment; no total run pressure printed
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.2
+        note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.6100/ir630685
+  locator:
+    page: 127
+    section: 3.2.1-3.2.2
+    note: tableware glass a transpiration charge
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 153
+        section: '4.4'
+        note: Mixture controls oxygen conditions; no buffer stated
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heating rate 2 C/min; four to six sampling periods of 5-60 min
+      locator:
+        page: 127
+        section: 3.2.2
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '21600'
+          interval_high: '28800'
+          approximate: true
+      locator:
+        page: 127
+        section: 3.2.2
+        note: Printed about 6-8 h; endpoint conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water dosing stopped and furnace cooled
+      locator:
+        page: 127
+        section: 3.2.2
+- experiment_id: 10.6100/ir630685::experiment::tableware-glass-b
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed 25 gram glass grains; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '67.2'
+          Na2O: '10.0'
+          CaO: '8.00'
+          MgO: '0'
+          Al2O3: '0.97'
+          K2O: '5.03'
+          Fe2O3: '0'
+          SO3: '0'
+          Cl: '0.42'
+          Sb2O3: '0'
+          BaO: '8.41'
+      locator:
+        page: 141
+        table: '4.2'
+        note: Tableware glass B column; ONLY parenthetical theoretical batch mass% are printed (footnote 1); no measured XRF
+          column body; landed as printed theoretical values; zeros printed as 0 retained
+    form:
+      state:
+        tag: value
+        value: Quenched cullet grains, 5-10 mm
+      locator:
+        page: 127
+        section: 3.2.1
+    pretreatment:
+      state:
+        tag: value
+        value: Cullet remelted in boat for 30-60 min at 1400-1450 C
+      locator:
+        page: 127
+        section: 3.2.1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed experiment temperature range 1300-1500 C; endpoint conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Carrier-gas experiment; no total run pressure printed
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.2
+        note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.6100/ir630685
+  locator:
+    page: 127
+    section: 3.2.1-3.2.2
+    note: tableware glass b transpiration charge
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 153
+        section: '4.4'
+        note: Mixture controls oxygen conditions; no buffer stated
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heating rate 2 C/min; four to six sampling periods of 5-60 min
+      locator:
+        page: 127
+        section: 3.2.2
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '21600'
+          interval_high: '28800'
+          approximate: true
+      locator:
+        page: 127
+        section: 3.2.2
+        note: Printed about 6-8 h; endpoint conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water dosing stopped and furnace cooled
+      locator:
+        page: 127
+        section: 3.2.2
+- experiment_id: 10.6100/ir630685::experiment::tableware-glass-c
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed 25 gram glass grains; unit conversion only
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              section: 3.2.1
+              note: Printed 25 gram glass grains; unit conversion only
+        output_unit: kg
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '70.4'
+          Na2O: '10.4'
+          CaO: '8.25'
+          Al2O3: '1.06'
+          K2O: '4.67'
+          SO3: '0.13'
+          Cl: '0.03'
+          Sb2O3: '0.06'
+          BaO: '4.98'
+      locator:
+        page: 141
+        table: '4.2'
+        note: Tableware glass C column; XRF mass% as printed; measured values (parenthetical batch ignored); cells printed
+          <0.01 omitted (MgO, Fe2O3); SO3 uses measured 0.13 not (0.40); Cl uses 0.03 not (0.44); Sb2O3 uses 0.06 not (0.10)
+    form:
+      state:
+        tag: value
+        value: Quenched cullet grains, 5-10 mm
+      locator:
+        page: 127
+        section: 3.2.1
+    pretreatment:
+      state:
+        tag: value
+        value: Cullet remelted in boat for 30-60 min at 1400-1450 C
+      locator:
+        page: 127
+        section: 3.2.1
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Printed experiment temperature range 1300-1500 C; endpoint conversion only
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.1
+        note: Carrier-gas experiment; no total run pressure printed
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 127
+        section: 3.2.2
+        note: N2/O2/H2O carrier gas is printed, but component flow and partial pressures required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.6100/ir630685
+  locator:
+    page: 127
+    section: 3.2.1-3.2.2
+    note: tableware glass c transpiration charge
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 153
+        section: '4.4'
+        note: Mixture controls oxygen conditions; no buffer stated
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heating rate 2 C/min; four to six sampling periods of 5-60 min
+      locator:
+        page: 127
+        section: 3.2.2
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '21600'
+          interval_high: '28800'
+          approximate: true
+      locator:
+        page: 127
+        section: 3.2.2
+        note: Printed about 6-8 h; endpoint conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water dosing stopped and furnace cooled
+      locator:
+        page: 127
+        section: 3.2.2
+- experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'transpiration_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.025'
+          approximate: false
+      locator:
+        page: 127
+        figure: '3.2'
+        section: 3.2.1-3.2.2
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=25 g
+        - printed=sample_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 127
+              figure: '3.2'
+              section: 3.2.1-3.2.2
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 127
+              figure: '3.2'
+              section: 3.2.1-3.2.2
+              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+        output_unit: kg
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / pressure_Pa / pressure_pa
+          / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about
+          / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr
+          in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.6100/ir630685
+  locator:
+    page: 127
+    figure: '3.2'
+    section: 3.2.1-3.2.2
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
 benches:
 - id: 10.6100/ir630685::bench::glass-transpiration-rig
   work_id: 10.6100/ir630685

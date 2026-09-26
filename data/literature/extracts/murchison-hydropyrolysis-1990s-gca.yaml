@@ -410,6 +410,7 @@ species:
         quantity: stepped_combustion_carbon_yield
         method_class: measured_direct
         oxygen_pressure_as_printed: 10 mbar
+        oxygen_partial_pressure: {value: 10, units: mbar}
         step: 30 min heating with 10 mbar O2 then 20 min CuO resorb
         instruments:
         - Finesse

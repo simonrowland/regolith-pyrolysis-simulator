@@ -30,8 +30,16 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source admission_status=true_absence is not a closed v2.1 token
+    status: rejected
+    reason: Audit of all four tables and figure captions finds no kinetic evaporation coefficient. Quote identifies source
+      coverage, not an author claim of absence.
+    decided_by:
+      worker: hunt-RH-48
+      date: '2026-09-06'
+      evidence:
+        published_page: 44
+        pdf_page_index: 50
+        section: 8. Figure Captions
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -77,8 +85,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_absence_audited
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-48
+      date: '2026-09-06'
       evidence:
         published_page: 44
         pdf_page_index: 50
@@ -677,8 +685,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_thermodynamic_figures_quoted
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-48
+      date: '2026-09-06'
       evidence:
         published_page: 45
         pdf_page_index: 71
@@ -1226,8 +1234,15 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: Scatter not digitised; comparison JANAF curve is not measured. No invented temperature grid.
+    decided_by:
+      worker: hunt-RH-48
+      date: '2026-09-06'
+      evidence:
+        published_page: 44
+        pdf_page_index: 50
+        figure: 7 caption; plate 5
   notices: []
   source_id: kems-027-plante-hastie-1983
   locator:
@@ -1273,8 +1288,8 @@ observations:
     reason: superseded by a later observation in the same extract
     superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_o2_figure_only_quoted
     decided_by:
-      worker: extract-supersedes
-      date: unspecified
+      worker: hunt-RH-48
+      date: '2026-09-06'
       evidence:
         published_page: 50
         pdf_page_index: 56

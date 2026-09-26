@@ -24,7 +24,109 @@ experiments:
   method:
     tag: unknown
     reason: regime 'aerodynamic_levitation_evaporation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Al2O3
+            - '0.1122681465573851739507109501'
+          - - CaO
+            - '0.2471019490640973486482319334'
+          - - MgO
+            - '0.1793767712903764639477792358'
+          - - SiO2
+            - '0.4612531330881410134532778806'
+          amount_basis: mole_fraction
+      locator:
+        pdf_page_index: 5
+        table: '1'
+        section: Elemental and isotopic composition of the evaporated samples
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '19'
+            locator:
+              pdf_page_index: 5
+              table: '1'
+              section: Elemental and isotopic composition of the evaporated samples
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              pdf_page_index: 5
+              table: '1'
+              section: Elemental and isotopic composition of the evaporated samples
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '23'
+            locator:
+              pdf_page_index: 5
+              table: '1'
+              section: Elemental and isotopic composition of the evaporated samples
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              pdf_page_index: 5
+              table: '1'
+              section: Elemental and isotopic composition of the evaporated samples
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '12'
+            locator:
+              pdf_page_index: 5
+              table: '1'
+              section: Elemental and isotopic composition of the evaporated samples
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              pdf_page_index: 5
+              table: '1'
+              section: Elemental and isotopic composition of the evaporated samples
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46'
+            locator:
+              pdf_page_index: 5
+              table: '1'
+              section: Elemental and isotopic composition of the evaporated samples
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              pdf_page_index: 5
+              table: '1'
+              section: Elemental and isotopic composition of the evaporated samples
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '19'
+          CaO: '23'
+          MgO: '12'
+          SiO2: '46'
+      locator:
+        pdf_page_index: 5
+        table: '1'
+        section: Elemental and isotopic composition of the evaporated samples
   conditions:
     temperature_K:
       state:

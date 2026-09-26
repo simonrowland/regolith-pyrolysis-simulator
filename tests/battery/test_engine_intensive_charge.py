@@ -124,7 +124,7 @@ def test_losing_single_species_charge_does_not_veto_intensive():
         initial_composition=Located(
             State.of(Composition("mix", (("MgO", D(1)),), AmountBasis.MOL_INVENTORY)),
             locator=f.loc(),
-            inference=Derivation("derived_inventory", ("test",), (), "mol"))))
+            inference=Derivation("wt_pct_to_mole_fraction", ("wt_pct",), (), "mol"))))
     inputs = collect_consumer_inputs(experiment, bench, observation)
     assert list(inputs.charges) == ["MgO"]
     selected = inputs.waypoints["normalized_composition"].selected

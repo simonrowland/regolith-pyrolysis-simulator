@@ -623,8 +623,8 @@ observations:
         pdf_page_index: 5
         figure: '9'
         note: Fig. 9 Integration curves for the activity coefficients in the Ti-Co-O ternary system at 1973 K.
-- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2
-  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-kems-series
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p0
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p0
   identity:
     quantity:
       tag: value
@@ -688,7 +688,9 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
-      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, points'
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
     approximate: false
   uncertainty:
     kind: printed
@@ -710,10 +712,920 @@ observations:
     published_page: 1085
     pdf_page_index: 5
     table: '2'
-    note: Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+    note: Table 2 N_Co=0.0 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
   read_from: pdf:kems-095-ueda-1986
-- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2
-  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-kems-series
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p1
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p1
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.1 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p2
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.2 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p3
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p3
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.3 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p4
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p4
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.4 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p5
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p5
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.5 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p6
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p6
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.6 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p7
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p7
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.7 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p8
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p8
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.8 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_0p9
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p9
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.9 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_co_table2_nco_1p0
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-1p0
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Co
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Co_o_1873K,
+      gamma_Co_o_1973K_binary, gamma_Co_o_1973K_ternary, gamma_Co_o_1973K_abstract_and_conclusion, N_Co, composition_basis,
+      gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K, gamma_ternary_O_1973K, delta_pct_1973K,
+      composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co correction too large
+        if the neglected D-E ion-ratio term is restored.'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=1.0 row; Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p0
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p0
   identity:
     quantity:
       tag: value
@@ -777,7 +1689,8 @@ observations:
   value:
     kind: unavailable
     unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
-      gamma_Ti_o_1973K_liquid, points'
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
     approximate: false
   uncertainty:
     kind: printed
@@ -798,7 +1711,897 @@ observations:
     published_page: 1085
     pdf_page_index: 5
     table: '2'
-    note: Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+    note: Table 2 N_Co=0.0 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p1
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p1
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.1 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p2
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p2
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.2 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p3
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p3
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.3 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p4
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p4
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.4 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p5
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p5
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.5 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p6
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p6
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.6 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p7
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p7
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.7 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p8
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p8
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.8 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_0p9
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-0p9
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=0.9 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  read_from: pdf:kems-095-ueda-1986
+- observation_id: kems-095-ueda-1986::ueda_1986_gamma_ti_table2_nco_1p0
+  experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-nco-1p0
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Ti
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Ti-Co' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1973.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, gamma_Ti_o_1873K_liquid,
+      gamma_Ti_o_1973K_liquid, N_Co, composition_basis, gamma_binary_1873K, gamma_ternary_O_1873K, delta_pct_1873K, gamma_binary_1973K,
+      gamma_ternary_O_1973K, delta_pct_1973K, composition_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95% CI of repeated integrations.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-095-ueda-1986
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 N_Co=1.0 row; Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
   read_from: pdf:kems-095-ueda-1986
 - observation_id: kems-095-ueda-1986::ueda_1986_kems_geometry_and_calibration
   experiment_id: 10.2320/jinstmet1952.50.12_1081::experiment::ti-co-kems-series

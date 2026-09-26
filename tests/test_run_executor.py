@@ -814,17 +814,6 @@ def _c6_acquisition_refusal_run(**overrides) -> PyrolysisRun:
     return _run(**options)
 
 
-def _ledger_mol_by_account(simulator: object) -> dict[str, dict[str, float]]:
-    ledger = simulator.atom_ledger.mol_by_account()
-    return {
-        str(account): {
-            str(species): float(mol)
-            for species, mol in sorted(species_mol.items())
-        }
-        for account, species_mol in sorted(ledger.items())
-    }
-
-
 def _inject_hostile_melt_resistance(sim) -> None:
     setpoints = dict(getattr(sim, "setpoints", {}) or {})
     kernel = dict(setpoints.get("chemistry_kernel", {}) or {})
@@ -901,47 +890,78 @@ def _c4_point_two_mbar_transitional_run() -> PyrolysisRun:
     )
 
 
+def _assert_c4_transitional_flux_predicted_and_closed(sim, payload) -> None:
+    """Post-b24 contract: transitional flux is predicted, flagged, and closed.
+
+    ``drive_session`` / ``RunExecutor`` reach ``core.py``'s live-vs-solved
+    rate-set assertion before this helper runs. A divergent species set
+    aborts the hour there; completion is the consistency proof.
+    """
+    assert payload["status"] == "ok"
+    assert not payload.get("reason")
+    assert payload["run_metadata"]["hours_requested"] == 1
+    assert payload["run_metadata"]["hours_completed"] == 1
+    assert len(payload["per_hour_summary"]) == 1
+
+    diagnostic = sim._last_evaporation_flux_diagnostic
+    notice = diagnostic["continuum_extrapolation_notice"]
+    assert notice["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert notice["status"] == "extrapolated"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["evaporation_flux_status"] == "extrapolated"
+    assert notice["ledger_yields_authorized"] is True
+    assert 0.01 <= float(notice["knudsen_number"]) < 10.0
+    assert notice["commanded_pressure_mbar"] == pytest.approx(0.2)
+    assert "Mg" in notice["affected_species"]
+    assert notice["campaign_name"] == "C4"
+    assert notice["process_regime"] == "pyrolysis_extraction"
+    assert notice["asking_site"] == "engines.builtin.evaporation_flux"
+    assert notice["stage"] == "C4"
+
+    committed = {
+        str(species): float(rate)
+        for species, rate in dict(
+            payload["per_hour_summary"][0]["vapor_species_kg_hr"]
+        ).items()
+        if float(rate) > 1.0e-12
+    }
+    live_flux = {
+        str(species): float(rate)
+        for species, rate in dict(diagnostic["evaporation_flux_kg_hr"]).items()
+        if float(rate) > 1.0e-12
+    }
+    assert committed
+    assert "Mg" in committed
+    assert set(committed) <= set(notice["affected_species"])
+    assert set(committed) <= set(live_flux)
+    magnesium = diagnostic["evaporation_series_resistance"]["Mg"]
+    assert magnesium["continuum_extrapolation_notice"]["reason"] == (
+        "viscous_p_bulk_transport_out_of_domain"
+    )
+    assert magnesium["continuum_extrapolation_notice"]["evaporation_flux_status"] == (
+        "extrapolated"
+    )
+
+    close_report = sim.atom_ledger.close_report()
+    assert close_report["balanced"] is True
+    assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
+    assert abs(float(payload["per_hour_summary"][0]["mass_balance_pct"])) < 5e-12
+
+
 @pytest.mark.xdist_group("serial")
 def test_c4_transitional_flux_refusal_is_visible_and_preserves_ledger_closure():
     run = _c4_point_two_mbar_transitional_run()
     session = run._start_session()
     sim = session.simulator
     sim.melt.temperature_C = 1200.0
-    ledger_before = _ledger_mol_by_account(sim)
-    transitions_before = tuple(sim.atom_ledger.transitions)
-    drift_before = sim.atom_ledger.element_atom_drift_report()
 
     payload = run._run_session(session)
 
-    assert payload["status"] == "refused"
-    assert payload["reason"] == "viscous_p_bulk_transport_out_of_domain"
-    assert payload["run_metadata"]["hours_requested"] == 1
-    assert payload["run_metadata"]["hours_completed"] == 0
-    assert payload["per_hour_summary"] == []
-
-    diagnostic = payload["run_metadata"]["refusal_diagnostic"]
-    assert diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert diagnostic["evaporation_flux_kg_hr"] is None
-    assert 0.01 <= diagnostic["knudsen_number"] < 10.0
-    assert diagnostic["commanded_pressure_mbar"] == pytest.approx(0.2)
-    assert "Mg" in diagnostic["affected_species"]
-    assert diagnostic["campaign_name"] == "C4"
-    assert diagnostic["process_regime"] == "pyrolysis_extraction"
-    assert diagnostic["asking_site"] == "engines.builtin.evaporation_flux"
-    assert diagnostic["stage"] == "C4"
-
-    assert _ledger_mol_by_account(sim) == ledger_before
-    assert tuple(sim.atom_ledger.transitions) == transitions_before
-    assert sim.atom_ledger.element_atom_drift_report() == drift_before
-    assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
+    _assert_c4_transitional_flux_predicted_and_closed(sim, payload)
 
 
-@pytest.mark.xdist_group("serial")
-def test_finite_capacity_preserves_transitional_evaporation_refusal(monkeypatch):
-    from simulator.thermal_train import (
-        FiniteCapacity,
-        thermal_train_parameters_from_mapping,
-    )
+def _enforce_finite_cold_train(monkeypatch):
+    from simulator.thermal_train import thermal_train_parameters_from_mapping
 
     params = thermal_train_parameters_from_mapping()
     assert params.cold_train is not None
@@ -953,28 +973,160 @@ def test_finite_capacity_preserves_transitional_evaporation_refusal(monkeypatch)
         "simulator.thermal_train.thermal_train_parameters_from_mapping",
         lambda: enforced,
     )
+    return enforced
+
+
+@pytest.mark.xdist_group("serial")
+def test_finite_capacity_preserves_transitional_evaporation_refusal(monkeypatch):
+    from simulator.thermal_train import FiniteCapacity
+
+    _enforce_finite_cold_train(monkeypatch)
 
     run = _c4_point_two_mbar_transitional_run()
     session = run._start_session()
     session.simulator.melt.temperature_C = 1200.0
     sim = session.simulator
-    capacity, _cold_train = session.simulator._cold_train_capacity_policy()
+    capacity, _cold_train = sim._cold_train_capacity_policy()
     assert isinstance(capacity, FiniteCapacity)
-    ledger_before = _ledger_mol_by_account(sim)
-    transitions_before = tuple(sim.atom_ledger.transitions)
-    drift_before = sim.atom_ledger.element_atom_drift_report()
 
     payload = run._run_session(session)
 
-    assert payload["status"] == "refused"
-    assert payload["reason"] == "viscous_p_bulk_transport_out_of_domain"
-    diagnostic = payload["run_metadata"]["refusal_diagnostic"]
-    assert diagnostic["evaporation_flux_status"] == "not_evaluated"
-    assert diagnostic["evaporation_flux_kg_hr"] is None
-    assert _ledger_mol_by_account(sim) == ledger_before
-    assert tuple(sim.atom_ledger.transitions) == transitions_before
-    assert sim.atom_ledger.element_atom_drift_report() == drift_before
-    assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
+    _assert_c4_transitional_flux_predicted_and_closed(sim, payload)
+
+
+@pytest.mark.xdist_group("serial")
+def test_finite_capacity_flagged_transitional_species_keeps_rate_sets(
+    monkeypatch,
+):
+    """Flagged transitional species stay in both rate sets under finite capacity.
+
+    ``session.advance`` does not catch ``AssertionError``. Reverting the
+    batch-map handoff makes this fail at ``set(live_rates) == set(solved_rates)``
+    in ``simulator/core.py``.
+    """
+    from simulator.thermal_train import FiniteCapacity
+
+    _enforce_finite_cold_train(monkeypatch)
+    run = _c4_point_two_mbar_transitional_run()
+    session = run._start_session()
+    sim = session.simulator
+    sim.melt.temperature_C = 1200.0
+    run._apply_lab_area_bridge(sim, run._lab_area_bridge())
+    capacity, _cold_train = sim._cold_train_capacity_policy()
+    assert isinstance(capacity, FiniteCapacity)
+
+    results = list(
+        drive_session(session, 1, DecisionPolicy.AUTO_APPLY)
+    )
+
+    assert len(results) == 1
+    snapshot = results[0].snapshot
+    committed = {
+        str(species): float(rate)
+        for species, rate in dict(snapshot.evap_flux.species_kg_hr).items()
+        if float(rate) > 1.0e-12
+    }
+    diagnostic = sim._last_evaporation_flux_diagnostic
+    notice = diagnostic["continuum_extrapolation_notice"]
+    live_flux = {
+        str(species): float(rate)
+        for species, rate in dict(diagnostic["evaporation_flux_kg_hr"]).items()
+        if float(rate) > 1.0e-12
+    }
+    assert committed
+    assert "Mg" in committed
+    assert set(committed) <= set(live_flux)
+    assert set(committed) <= set(notice["affected_species"])
+    assert notice["reason"] == "viscous_p_bulk_transport_out_of_domain"
+    assert notice["evaporation_flux_status"] == "extrapolated"
+    assert notice["ledger_yields_authorized"] is True
+    assert sim.atom_ledger.close_report()["balanced"] is True
+    assert abs(snapshot.mass_balance_error_pct) < 5e-12
+
+
+@pytest.mark.xdist_group("serial")
+def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
+    monkeypatch,
+):
+    """Exercise the finite-capacity shadow at a hot, in-domain C4 point.
+
+    The parent finite-capacity run poisons at the live/solved rate-set
+    assertion, so these expected rates come from the same parent commit with
+    runtime enforcement disabled (the non-binding fallback required by the
+    b-582 proof). The external ``b582_probe_wrap.py`` records the fixed
+    shadow's non-empty rate map for this exact setup.
+    """
+    from simulator.thermal_train import FiniteCapacity
+
+    _enforce_finite_cold_train(monkeypatch)
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        mass_kg=10.0,
+        backend_name="internal-analytical",
+        setpoints_patch={
+            "furnace_max_T_C": 1700,
+            "campaigns": {"C4": {"p_total_mbar_default": 10.2}},
+        },
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-09-25T00:00:00Z",
+            "kernel_commit_sha": "b582-in-domain-identity",
+        },
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.melt.temperature_C = 1670.0
+    capacity, _cold_train = sim._cold_train_capacity_policy()
+    assert isinstance(capacity, FiniteCapacity)
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["run_metadata"]["hours_completed"] == 1
+    assert sim.melt.p_total_mbar - sim.melt.pO2_mbar == pytest.approx(10.0)
+    assert not sim._last_evaporation_flux_diagnostic.get(
+        "continuum_extrapolation_notice"
+    )
+    # Recorded on parent 5672e61d9 by the non-binding fallback probe:
+    # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
+    expected_rates = {
+        "Al": 1.776974630811854e-10,
+        "AlO": 2.622990526227972e-10,
+        "Ca": 6.00143229355403e-09,
+        "CaO_gas": 2.067737447801073e-11,
+        "Cr": 4.355218555260955e-05,
+        "CrO": 9.136286575214732e-06,
+        "CrO2": 3.1730720722299763e-06,
+        "CrO3": 9.294384109563237e-10,
+        "K": 1.800514280546788e-04,
+        "K2": 3.548691772158388e-04,
+        "K2O_gas": 1.7790168157799174e-06,
+        "Mg": 7.232662096170072e-05,
+        "MgO_gas": 1.0307259466430575e-07,
+        "Mn": 2.2585292315558916e-05,
+        "Na": 4.821729121050779e-03,
+        "Na2": 3.507806687556492e-03,
+        "Na2O_gas": 3.4956534691172018e-06,
+        "SiO": 7.769179203709372e-09,
+        "SiO2_gas": 4.598894711291365e-06,
+        "TiO": 2.8635316467141483e-09,
+        "TiO2_gas": 4.788176871001818e-08,
+    }
+    actual_rates = {
+        str(species): float(rate)
+        for species, rate in dict(
+            payload["per_hour_summary"][0]["vapor_species_kg_hr"]
+        ).items()
+        if float(rate) > 1.0e-12
+    }
+    assert actual_rates == pytest.approx(
+        expected_rates,
+        rel=1.0e-12,
+        abs=1.0e-15,
+    )
 
 
 def test_native_fe_helper_maps_melt_resistance_to_typed_refusal():
