@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import json
 import re
+from importlib import import_module
 from pathlib import Path
 
 import pytest
@@ -130,6 +131,28 @@ HEAVY_ROSTER = frozenset({
      "_hours"),
 })
 
+# b-586: these campaign-length yield nodes must stay out of the PR tier. They
+# are selected from the heavy roster so the guard cannot drift from its
+# existing node inventory.
+NIGHTLY_YIELD_HEAVY_ROSTER = frozenset(
+    entry for entry in HEAVY_ROSTER
+    if entry[0] == "tests/test_yield_root_cause.py"
+)
+
+
+def _nightly_yield_violations() -> list[str]:
+    yield_module = import_module("tests.test_yield_root_cause")
+    violations = []
+    for relpath, name in sorted(NIGHTLY_YIELD_HEAVY_ROSTER):
+        test_function = getattr(yield_module, name, None)
+        marks = getattr(test_function, "pytestmark", ())
+        if not any(mark.name == "nightly" for mark in marks):
+            violations.append(
+                f"{relpath}::{name}: yield full-track node must be marked "
+                "nightly to stay out of the PR tier"
+            )
+    return violations
+
 
 def _item_key(item) -> tuple[str, str]:
     # nodeid, not fspath: fspath is deprecated and empty in collect-only
@@ -186,6 +209,10 @@ def test_suite_shape_heavy_tests_are_grouped_and_rostered(request) -> None:
                 "shrink-only heavy roster — reduce its cost or demote a "
                 "roster entry (see module docstring)"
             )
+    # ``request.session.items`` contains only items surviving pytest's
+    # selection filters. Inspect the yield functions directly so this tiering
+    # invariant still sees nodes deselected by ``-m`` or ``-k``.
+    violations.extend(_nightly_yield_violations())
     # Phantom-roster check (2026-07-23 gate-3 catch): a roster row whose
     # name matches no collected test silently un-rosters the real heavy
     # test it was meant to cover (a truncated name survived exactly this
