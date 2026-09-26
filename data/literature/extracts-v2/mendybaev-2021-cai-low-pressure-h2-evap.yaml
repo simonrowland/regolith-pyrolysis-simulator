@@ -2,14 +2,14 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/mendybaev-2021-cai-low-pressure-h2-evap.yaml
 observations:
-- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-10:h=b40321e07273
   experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
   identity:
     quantity:
       tag: unknown
       reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
     species:
-      formula: Si
+      formula: CAI4B2-10
       phase:
         tag: unknown
         reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
@@ -21,8 +21,615 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes';
-      refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-12:h=ebb4d045959c
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-12
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-13:h=6f926a40b4ec
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-13
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-14:h=f2222679127d
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-14
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-16:h=a2192940d5f3
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-16
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-1:h=e0561ee1c1bf
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-1
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-21:h=0b0d6fd714c7
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-21
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-22:h=8e35f037a921
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-22
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-23:h=10a9583a3ca6
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-23
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-25:h=4267dba87f71
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-25
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-26:h=95500c58dbab
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-26
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-28:h=5bea32190050
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-28
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-29:h=c04623d3b2ef
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-29
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-2:h=e17d1e03064b
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-2
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-30:h=bd94f68602d6
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-30
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-31:h=26e42315e0de
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-31
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mendybaev-2021-cai-low-pressure-h2-evap
+  locator:
+    published_page: 29
+    table: '2'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  read_from: unknown:mendybaev-2021-cai-low-pressure-h2-evap
+- observation_id: mendybaev-2021-cai-low-pressure-h2-evap::mendybaev_2021_isotope_table2_readable_rows::rows:row=cai4b2-3:h=a09f2d1047e0
+  experiment_id: 86c3ba1373c4e0104112a728521d068c32ce28f1fdcedc7b87aa8105a59e11d0::mendybaev-2021-cai-low-pressure-h2-evap
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'readable_table2_fraction_evaporated_and_Mg_isotopes'
+    species:
+      formula: CAI4B2-3
+      phase:
+        tag: unknown
+        reason: phase string 'CAI4B2_evaporation_residue' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none

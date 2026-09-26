@@ -41,7 +41,7 @@ observations:
     figure: '1'
     section: Experimental methods
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
-- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups::T=2849.15:h=dec031884b50
   experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
     quantity:
@@ -58,10 +58,12 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '2849.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_and_corrected_mlb_surface_temperature';
-      refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -79,6 +81,518 @@ observations:
     page: 8
     table: '3'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2849.15'
+      locator:
+        page: 8
+        table: '3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2576'
+            locator:
+              page: 8
+              table: '3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '3'
+        output_unit: K
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups::T=2946.15:h=0658ded9f267
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_and_corrected_mlb_surface_temperature'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2946.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_pyrometry_corrected_for_window_transmittance_and_emissivity'
+    original_method_class: laser_pyrometry_corrected_for_window_transmittance_and_emissivity
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 8
+    table: '3'
+  read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2946.15'
+      locator:
+        page: 8
+        table: '3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2673'
+            locator:
+              page: 8
+              table: '3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '3'
+        output_unit: K
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups::T=2966.15:h=5beec74465b6
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_and_corrected_mlb_surface_temperature'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2966.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_pyrometry_corrected_for_window_transmittance_and_emissivity'
+    original_method_class: laser_pyrometry_corrected_for_window_transmittance_and_emissivity
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 8
+    table: '3'
+  read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2966.15'
+      locator:
+        page: 8
+        table: '3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2693'
+            locator:
+              page: 8
+              table: '3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '3'
+        output_unit: K
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups::T=3051.15:h=3d6f120428b6
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_and_corrected_mlb_surface_temperature'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3051.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_pyrometry_corrected_for_window_transmittance_and_emissivity'
+    original_method_class: laser_pyrometry_corrected_for_window_transmittance_and_emissivity
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 8
+    table: '3'
+  read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3051.15'
+      locator:
+        page: 8
+        table: '3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2778'
+            locator:
+              page: 8
+              table: '3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '3'
+        output_unit: K
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups::T=3138.15:h=33620e176b21
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_and_corrected_mlb_surface_temperature'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3138.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_pyrometry_corrected_for_window_transmittance_and_emissivity'
+    original_method_class: laser_pyrometry_corrected_for_window_transmittance_and_emissivity
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 8
+    table: '3'
+  read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3138.15'
+      locator:
+        page: 8
+        table: '3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2865'
+            locator:
+              page: 8
+              table: '3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '3'
+        output_unit: K
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups::T=3156.15:h=c0f1ba62fb30
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_and_corrected_mlb_surface_temperature'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3156.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_pyrometry_corrected_for_window_transmittance_and_emissivity'
+    original_method_class: laser_pyrometry_corrected_for_window_transmittance_and_emissivity
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 8
+    table: '3'
+  read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3156.15'
+      locator:
+        page: 8
+        table: '3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2883'
+            locator:
+              page: 8
+              table: '3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '3'
+        output_unit: K
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups::T=3177.15:h=ac2bdf6f30e4
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_and_corrected_mlb_surface_temperature'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3177.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_pyrometry_corrected_for_window_transmittance_and_emissivity'
+    original_method_class: laser_pyrometry_corrected_for_window_transmittance_and_emissivity
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 8
+    table: '3'
+  read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3177.15'
+      locator:
+        page: 8
+        table: '3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2904'
+            locator:
+              page: 8
+              table: '3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '3'
+        output_unit: K
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_corrected_temperature_groups::T=3361.15:h=199e12f91a36
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_and_corrected_mlb_surface_temperature'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '3361.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_pyrometry_corrected_for_window_transmittance_and_emissivity'
+    original_method_class: laser_pyrometry_corrected_for_window_transmittance_and_emissivity
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 8
+    table: '3'
+  read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3361.15'
+      locator:
+        page: 8
+        table: '3'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '3088'
+            locator:
+              page: 8
+              table: '3'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 8
+              table: '3'
+        output_unit: K
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_droplet_and_condensate_characterization
   experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:

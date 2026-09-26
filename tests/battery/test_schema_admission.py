@@ -429,7 +429,19 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
     sample = M._sample_from_plain(raw)
     sample = M._sample_from_plain(yaml.safe_load(yaml.safe_dump(M.to_plain(sample))))
     experiment = replace(F.tabulation_experiment(), sample=sample)
-    assert (normalized_composition(experiment, None).selected is not None) == valid
+    selected = normalized_composition(experiment, None).selected
+    feot_printed = any(
+        isinstance(item, (list, tuple)) and str(item[0]) == "FeOT" for item in components
+    )
+    if feot_printed:
+        assert selected is not None
+        assert set(selected.value) == {"SiO2", "FeO"}
+        assert selected.notice is not None
+        assert "total_iron_as_FeO" in selected.notice
+        assert "total iron reported as FeO; Fe3+/Fe2+ not printed" in selected.notice
+        assert "FeOT" in str(sample.printed_composition.state.value)
+    else:
+        assert (selected is not None) == valid
     assert bool(charge_moles_by_species(experiment, None).by_species) == valid
     assert sample.printed_composition.state.is_value
     if not valid:
@@ -502,8 +514,13 @@ def test_row_printed_composition_engine_boundary(monkeypatch, component):
     _, requests = _point_result(monkeypatch, conditions)
     assert len(requests) == 8
     for request in requests:
-        assert (request.payload is not None) == (component == "MgO")
-        if component != "MgO":
+        assert (request.payload is not None) == (component in {"MgO", "FeOT"})
+        if component == "FeOT":
+            assert "total_iron_as_FeO" in request.payload["composition_notice"]
+            assert "total iron reported as FeO; Fe3+/Fe2+ not printed" in request.payload["composition_notice"]
+            assert "FeOT" not in request.payload["composition_mol"]
+            assert "FeO" in request.payload["composition_mol"]
+        elif component != "MgO":
             assert request.readiness.status.value == "gap"
 
 
@@ -613,9 +630,18 @@ def test_review_printed_composition_matrix(boundary, reason, case, components):
     requests = engine_point_requests(inputs)
     valid = case == "valid" or (
         boundary.endswith("with_sample_initial") and case in ("negative", "zero", "infinite", "nan")
+    ) or (
+        case == "ambiguous" and not boundary.endswith("with_sample_initial")
     )
     assert len(requests) == 8
     assert all((request.payload is not None) == valid for request in requests)
+    if valid and case == "ambiguous":
+        assert all(
+            "total_iron_as_FeO" in request.payload["composition_notice"]
+            and "total iron reported as FeO; Fe3+/Fe2+ not printed" in request.payload["composition_notice"]
+            and "FeOT" not in request.payload["composition_mol"]
+            for request in requests
+        )
     if not valid:
         assert inputs.waypoints["normalized_composition"].selected is None
         assert all(request.readiness.status.value == "gap" for request in requests)
@@ -718,7 +744,7 @@ def test_real_sample_volume_and_unadopted_fugacity_are_preserved():
                 assert volume.locator is not None
                 assert volume.inference.relation == "cm3_to_m3"
         else:
-            assert len(result.observations) == 46
+            assert len(result.observations) == 88
             assert not any(quantity_token(o.identity) is Quantity.FUGACITY for o in result.observations.values())
             rows = [o for o in result.observations.values() if "table2_experimental_conditions_and_xaf" in o.observation_id]
             assert len(rows) == 43
@@ -756,15 +782,32 @@ def test_geometry_context_keeps_original_source_record():
     raw = M.load_yaml(source)
     original = next(row for body in raw["species"].values() for row in body.get("context", [])
                     if row["observation_id"].endswith("kems_method_geometry"))
+    source_row = next(row for _, row in M.iter_extract_observations(raw)
+                      if row["observation_id"] == "yakovlev_shornikov_2011_Po2_table_bar_calculated")
+    printed_rows = source_row["values"]["points"]
     migrator = M.Migrator(M.REPO_ROOT)
     migrator._migrate_extract(source)
     migrator.finalize()
     result = migrator.result
-    assert len(result.observations) == 5
+    prefix = f"{raw['source_id']}::{source_row['observation_id']}::"
+    children = [observation for observation_id, observation in result.observations.items()
+                if observation_id.startswith(prefix)]
+    assert len(children) == len(printed_rows)
+    assert children
     context = next(row for rows in result.context_by_work.values() for row in rows
                    if row["observation_id"] == original["observation_id"])
+    assert context["source_id"] == raw["source_id"]
     assert context["values"] == original["values"]
     assert context["locator"] == original["locator"]
+    for child in children:
+        assert child.source_id == raw["source_id"]
+        assert child.read_from == f"pdf:{raw['source_id']}"
+        experiment = result.experiments[child.experiment_id]
+        assert any(row["context_id"] == context["context_id"]
+                   and row["source_id"] == raw["source_id"]
+                   and row["values"] == original["values"]
+                   and row["locator"] == original["locator"]
+                   for row in result.context_by_work[experiment.work_id])
 
 
 @pytest.mark.parametrize("source", [

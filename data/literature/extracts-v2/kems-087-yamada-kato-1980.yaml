@@ -857,7 +857,86 @@ observations:
               pdf_page_index: 2
               note: vapor pressure of P in iron at 1600 C when [wt% P]=1 is considered to be about 1e-9 atm
         output_unit: K
-- observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P
+- observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P::T=1873.15:h=2ed932298972
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'self_interaction_parameter'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted; no uncertainties printed with these comparison values.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-087-yamada-kato-1980
+  locator:
+    published_page: 244
+    pdf_page_index: 1
+    figure: '6'
+    note: quoted epsilon_P^P of Urbain, Frohberg et al., Ban-ya and Suzuki, Schenck et al.; Fig. 6 overlays
+  read_from: pdf:kems-087-yamada-kato-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 244
+        pdf_page_index: 1
+        figure: '6'
+        note: quoted epsilon_P^P of Urbain, Frohberg et al., Ban-ya and Suzuki, Schenck et al.; Fig. 6 overlays
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 244
+              pdf_page_index: 1
+              figure: '6'
+              note: quoted epsilon_P^P of Urbain, Frohberg et al., Ban-ya and Suzuki, Schenck et al.; Fig. 6 overlays
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 244
+              pdf_page_index: 1
+              figure: '6'
+              note: quoted epsilon_P^P of Urbain, Frohberg et al., Ban-ya and Suzuki, Schenck et al.; Fig. 6 overlays
+        output_unit: K
+- observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P::points:h=61ec6a44d6e4
   experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
   identity:
     quantity:
@@ -879,8 +958,95 @@ observations:
       reason: source T_range_K [1573.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'self_interaction_parameter'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted; no uncertainties printed with these comparison values.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-087-yamada-kato-1980
+  locator:
+    published_page: 244
+    pdf_page_index: 1
+    figure: '6'
+    note: quoted epsilon_P^P of Urbain, Frohberg et al., Ban-ya and Suzuki, Schenck et al.; Fig. 6 overlays
+  read_from: pdf:kems-087-yamada-kato-1980
+- observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P::points:h=6216c4c3da13
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'self_interaction_parameter'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1873.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Quoted; no uncertainties printed with these comparison values.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-087-yamada-kato-1980
+  locator:
+    published_page: 244
+    pdf_page_index: 1
+    figure: '6'
+    note: quoted epsilon_P^P of Urbain, Frohberg et al., Ban-ya and Suzuki, Schenck et al.; Fig. 6 overlays
+  read_from: pdf:kems-087-yamada-kato-1980
+- observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P::points:h=8bfc73e72532
+  experiment_id: 10.2355/isijinternational1966.20.244::experiment::fep-kems-1600c-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'self_interaction_parameter'
+    species:
+      formula: P
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1873.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

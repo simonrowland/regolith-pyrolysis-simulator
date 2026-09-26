@@ -1623,6 +1623,43 @@ observations:
     figure: '6'
     note: point=CMAS-75-0.5
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '500000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=CMAS-75-0.5
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=0.5 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-75-0.5
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-75-0.5
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:1
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -1662,6 +1699,43 @@ observations:
     figure: '6'
     note: point=CMAS-75-1.0
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=CMAS-75-1.0
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=1.0 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-75-1.0
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-75-1.0
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:10
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -1701,6 +1775,43 @@ observations:
     figure: '6'
     note: point=ICB-2.0
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '2000000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=ICB-2.0
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=2.0 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=ICB-2.0
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=ICB-2.0
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:2
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -1740,6 +1851,43 @@ observations:
     figure: '6'
     note: point=CMAS-75-1.5
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1500000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=CMAS-75-1.5
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=1.5 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.5'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-75-1.5
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-75-1.5
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:3
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -1779,6 +1927,43 @@ observations:
     figure: '6'
     note: point=CMAS-75-2.0
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '2000000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=CMAS-75-2.0
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=2.0 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-75-2.0
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-75-2.0
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:4
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -1818,6 +2003,43 @@ observations:
     figure: '6'
     note: point=CMAS-90-1.0
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=CMAS-90-1.0
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=1.0 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-90-1.0
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-90-1.0
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:5
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -1857,6 +2079,43 @@ observations:
     figure: '6'
     note: point=CMAS-90-1.5
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1500000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=CMAS-90-1.5
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=1.5 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.5'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-90-1.5
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-90-1.5
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:6
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -1896,6 +2155,43 @@ observations:
     figure: '6'
     note: point=CMAS-90-2.0
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '2000000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=CMAS-90-2.0
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=2.0 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-90-2.0
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=CMAS-90-2.0
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:7
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -1935,6 +2231,43 @@ observations:
     figure: '6'
     note: point=ICB-0.5
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '500000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=ICB-0.5
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=0.5 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=ICB-0.5
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=ICB-0.5
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:8
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -1974,6 +2307,43 @@ observations:
     figure: '6'
     note: point=ICB-1.0
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1000000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=ICB-1.0
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=1.0 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=ICB-1.0
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=ICB-1.0
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure6_pressure_series::point:9
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -2013,6 +2383,43 @@ observations:
     figure: '6'
     note: point=ICB-1.5
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1500000000'
+      locator:
+        published_page: 9
+        pdf_page_index: 10
+        figure: '6'
+        note: point=ICB-1.5
+      inference:
+        relation: GPa_to_Pa
+        inputs:
+        - P_Pa = P_GPa × 1e9
+        - original_unit=GPa
+        - as_published=1.5 GPa
+        - printed=P_GPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.5'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=ICB-1.5
+        - - factor
+          - state:
+              tag: value
+              value: '1000000000'
+            locator:
+              published_page: 9
+              pdf_page_index: 10
+              figure: '6'
+              note: point=ICB-1.5
+        output_unit: Pa
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_figure7_temperature_series::point:0
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
@@ -2910,7 +3317,7 @@ observations:
     figure: '9'
     note: point=logf-5
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
-- observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table1_compositions
+- observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table1_compositions::rows:row=cmas-an50di28fo22:h=6ded3df9fa24
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:
     quantity:
@@ -2929,7 +3336,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -2947,8 +3354,336 @@ observations:
     published_page: 3
     pdf_page_index: 4
     table: '1'
-    section: 2. Experimental procedure
+    note: row=CMAS An50Di28Fo22; column=all
   read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '46.53'
+          Al2O3: '18.33'
+          MgO: '17.82'
+          CaO: '17.33'
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        table: '1'
+        note: row=CMAS An50Di28Fo22; column=all
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4541080981480069101206661198'
+          - - Al2O3
+            - '0.1054168691611334661572578274'
+          - - MgO
+            - '0.259261096252777077854074821'
+          - - CaO
+            - '0.1812139364380825458680012321'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        table: '1'
+        note: row=CMAS An50Di28Fo22; column=all
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.53'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=CMAS An50Di28Fo22; column=all
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=CMAS An50Di28Fo22; column=all
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '18.33'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=CMAS An50Di28Fo22; column=all
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=CMAS An50Di28Fo22; column=all
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '17.82'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=CMAS An50Di28Fo22; column=all
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=CMAS An50Di28Fo22; column=all
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.33'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=CMAS An50Di28Fo22; column=all
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=CMAS An50Di28Fo22; column=all
+        output_unit: mole_fraction
+- observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table1_compositions::rows:row=icelandic-basalt:h=96c2743a519c
+  experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: Cl
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt_starting_material' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: thomas-wood-2021-chlorine-silicate-melts
+  locator:
+    published_page: 3
+    pdf_page_index: 4
+    table: '1'
+    note: row=Icelandic Basalt; column=all
+  read_from: unknown:thomas-wood-2021-chlorine-silicate-melts
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '50.76'
+          TiO2: '1.02'
+          Al2O3: '15.32'
+          FeO: '9.61'
+          MgO: '9.19'
+          CaO: '12.26'
+          Na2O: '2.01'
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        table: '1'
+        note: row=Icelandic Basalt; column=all
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5212770477871351476042370672'
+          - - TiO2
+            - '0.007880291352433021182015208986'
+          - - Al2O3
+            - '0.09271013413096325875982558792'
+          - - FeO
+            - '0.08253373179694932299806996364'
+          - - MgO
+            - '0.1406908845432157063495890661'
+          - - CaO
+            - '0.134897623055569156030630957'
+          - - Na2O
+            - '0.02001028733373438707563214928'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        table: '1'
+        note: row=Icelandic Basalt; column=all
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.76'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.02'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15.32'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '9.61'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '9.19'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '12.26'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.01'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 3
+              pdf_page_index: 4
+              table: '1'
+              note: row=Icelandic Basalt; column=all
+        output_unit: mole_fraction
 - observation_id: thomas-wood-2021-chlorine-silicate-melts::thomas_wood_2021_table2_experimental_rows::T=1473.15:row=agi/cl-045:h=9e96f97a0ca9
   experiment_id: 10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series
   identity:

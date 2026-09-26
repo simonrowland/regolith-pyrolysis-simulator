@@ -887,7 +887,7 @@ observations:
     section: '2'
     note: Kay and Kontopoulos ZrO2(CaO) EMF, V<12 wt%, Henry's law
   read_from: pdf:kems-119-furukawa-1975
-- observation_id: kems-119-furukawa-1975::furukawa_1975_table1_starting_materials
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table1_starting_materials::rows:h=25791f0da635
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
   identity:
     quantity:
@@ -909,7 +909,7 @@ observations:
       reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'starting_metal_assay'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -931,7 +931,95 @@ observations:
     table: '1'
     note: Table 1 chemical composition of Fe, V, Cr starting metals
   read_from: pdf:kems-119-furukawa-1975
-- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table1_starting_materials::rows:h=670736345d9a
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_assay'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'starting_metals' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: assay table; no +/- printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3052
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 chemical composition of Fe, V, Cr starting metals
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table1_starting_materials::rows:h=7c2df948da26
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_assay'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'starting_metals' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: assay table; no +/- printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3052
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 chemical composition of Fe, V, Cr starting metals
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios::rows:h=177a5744cad2
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
   identity:
     quantity:
@@ -995,8 +1083,8 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C_as_printed,
-      T_K, T_K_conversion, composition_basis, ion_ratio, n_rows, rows'
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, d_log_IV_over_IFe_d_invT, log_IV_over_IFe_1600C,
+      N_Fe, composition_basis'
     approximate: false
   uncertainty:
     kind: printed
@@ -1029,7 +1117,791 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
-- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios::rows:h=4461b7eb2ecc
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: V
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, d_log_IV_over_IFe_d_invT, log_IV_over_IFe_1600C,
+      N_Fe, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio. 0.3 vs 0.5 mm orifice
+        agreed at N_V=0.796.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3054
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios::rows:h=4aaf2f184a46
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: V
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, d_log_IV_over_IFe_d_invT, log_IV_over_IFe_1600C,
+      N_Fe, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio. 0.3 vs 0.5 mm orifice
+        agreed at N_V=0.796.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3054
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios::rows:h=4eea1d2a1b5c
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: V
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, d_log_IV_over_IFe_d_invT, log_IV_over_IFe_1600C,
+      N_Fe, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio. 0.3 vs 0.5 mm orifice
+        agreed at N_V=0.796.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3054
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios::rows:h=77185fceeddf
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: V
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, d_log_IV_over_IFe_d_invT, log_IV_over_IFe_1600C,
+      N_Fe, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio. 0.3 vs 0.5 mm orifice
+        agreed at N_V=0.796.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3054
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios::rows:h=907d136e1f4b
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: V
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, d_log_IV_over_IFe_d_invT, log_IV_over_IFe_1600C,
+      N_Fe, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio. 0.3 vs 0.5 mm orifice
+        agreed at N_V=0.796.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3054
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios::rows:h=9ded01665624
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: V
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, d_log_IV_over_IFe_d_invT, log_IV_over_IFe_1600C,
+      N_Fe, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio. 0.3 vs 0.5 mm orifice
+        agreed at N_V=0.796.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3054
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios::rows:h=c556a2caec49
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: V
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, d_log_IV_over_IFe_d_invT, log_IV_over_IFe_1600C,
+      N_Fe, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio. 0.3 vs 0.5 mm orifice
+        agreed at N_V=0.796.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3054
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios::rows:h=ca1e56303b17
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: V
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, d_log_IV_over_IFe_d_invT, log_IV_over_IFe_1600C,
+      N_Fe, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio. 0.3 vs 0.5 mm orifice
+        agreed at N_V=0.796.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3054
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios::rows:h=0a88c5776f5e
   experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
   identity:
     quantity:
@@ -1093,8 +1965,687 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C_as_printed,
-      T_K, T_K_conversion, composition_basis, columns_as_printed, n_rows, mole_fraction_sum_note, rows'
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, N_Fe, N_Cr, log_ICr_over_IFe, log_ICr_over_IV,
+      mole_fraction_sum, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 3. Filled symbols on Fig. 10 are heating; open symbols cooling. N_V held at 0.2 or 0.3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    table: '3'
+    note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        table: '3'
+        note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios::rows:h=0e6ac553cb75
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, N_Fe, N_Cr, log_ICr_over_IFe, log_ICr_over_IV,
+      mole_fraction_sum, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 3. Filled symbols on Fig. 10 are heating; open symbols cooling. N_V held at 0.2 or 0.3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    table: '3'
+    note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        table: '3'
+        note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios::rows:h=3734cc82bbb5
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, N_Fe, N_Cr, log_ICr_over_IFe, log_ICr_over_IV,
+      mole_fraction_sum, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 3. Filled symbols on Fig. 10 are heating; open symbols cooling. N_V held at 0.2 or 0.3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    table: '3'
+    note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        table: '3'
+        note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios::rows:h=5507d638c154
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, N_Fe, N_Cr, log_ICr_over_IFe, log_ICr_over_IV,
+      mole_fraction_sum, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 3. Filled symbols on Fig. 10 are heating; open symbols cooling. N_V held at 0.2 or 0.3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    table: '3'
+    note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        table: '3'
+        note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios::rows:h=68f66dcd56cb
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, N_Fe, N_Cr, log_ICr_over_IFe, log_ICr_over_IV,
+      mole_fraction_sum, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 3. Filled symbols on Fig. 10 are heating; open symbols cooling. N_V held at 0.2 or 0.3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    table: '3'
+    note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        table: '3'
+        note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios::rows:h=785e747a9176
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, N_Fe, N_Cr, log_ICr_over_IFe, log_ICr_over_IV,
+      mole_fraction_sum, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 3. Filled symbols on Fig. 10 are heating; open symbols cooling. N_V held at 0.2 or 0.3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    table: '3'
+    note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        table: '3'
+        note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios::rows:h=872878b3c7b8
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, N_Fe, N_Cr, log_ICr_over_IFe, log_ICr_over_IV,
+      mole_fraction_sum, composition_basis'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 3. Filled symbols on Fig. 10 are heating; open symbols cooling. N_V held at 0.2 or 0.3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    table: '3'
+    note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        table: '3'
+        note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios::rows:h=f1dfe84b6095
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::experiment::fe-v-cr-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Cr
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_V, N_Fe, N_Cr, log_ICr_over_IFe, log_ICr_over_IV,
+      mole_fraction_sum, composition_basis'
     approximate: false
   uncertainty:
     kind: printed

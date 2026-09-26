@@ -490,9 +490,11 @@ def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> Non
         digest.update(b"\0")
         digest.update(path.read_bytes())
         digest.update(b"\0")
-    # Recorded from the current canonical migration output for this extract.
+    # Byte pin of this fixture after the merged migrator. The checks above
+    # are the behaviour; the digest moves when row identity or bench wiring
+    # changes the written tree.
     assert digest.hexdigest() == (
-        "6f41309a7dc5c83ecb9e5882c893558e155611e33401fd996eb80071ea9de566"
+        "f697c61a4b3e3291f2bebea78565a417f015458c7068d24633786034d3340fe3"
     )
 
 

@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/usgs-lunar-sourcebook-tab8-4.yaml
 observations:
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_amet_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_amet_srb::rows:h=2a1d50e45760
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -21,7 +21,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -40,7 +40,7 @@ observations:
     table: A8.4
     note: row_group=AMET S&RB
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_mbas
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_amet_srb::rows:h=50a39ea6e13b
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -59,7 +59,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 3
+    table: A8.4
+    note: row_group=AMET S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_amet_srb::rows:h=550b941ebf7f
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 3
+    table: A8.4
+    note: row_group=AMET S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_amet_srb::rows:h=9792cc3e1b87
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 3
+    table: A8.4
+    note: row_group=AMET S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_amet_srb::rows:h=c9e6a89665fb
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 3
+    table: A8.4
+    note: row_group=AMET S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_mbas::rows:h=114660ea49e0
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -78,7 +230,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 11 MBAS
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_mbas::rows:h=1cb6b9b718df
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -97,7 +249,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 11 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_mbas::rows:h=2c544b62ab8b
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 11 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_mbas::rows:h=6fb5a587202c
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 11 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_mbas::rows:h=73aaec211066
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 11 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_srb::rows:h=35b2c84d5ea3
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -116,7 +420,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 11 S&RB
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_mbas
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_srb::rows:h=4e3c8466a32a
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -135,7 +439,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 11 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_srb::rows:h=68657c0af7ee
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 11 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_srb::rows:h=a0deb88ff34e
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 11 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo11_srb::rows:h=bbc68f49404e
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 11 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_mbas::rows:h=0b33b2a17da8
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -154,7 +610,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 12 MBAS
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_mbas::rows:h=2e1e8678cc53
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -173,7 +629,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 12 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_mbas::rows:h=466e69cad6b4
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 12 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_mbas::rows:h=48fdba4abcf2
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 12 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_mbas::rows:h=950f7de5b002
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 12 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_srb::rows:h=7b6fa0f99091
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -192,7 +800,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 12 S&RB
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_mbas
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_srb::rows:h=829e522b258f
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -211,7 +819,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 12 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_srb::rows:h=c24300cc8bbc
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 12 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_srb::rows:h=d8101617f649
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 12 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo12_srb::rows:h=e5791b596535
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 12 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_mbas::rows:h=2af8985bf066
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -230,7 +990,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 14 MBAS
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_mbas::rows:h=3de302b58d70
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -249,7 +1009,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 14 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_mbas::rows:h=5cb6ebbae23e
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 14 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_mbas::rows:h=ae18167b3abd
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 14 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_mbas::rows:h=e376bb494d8b
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 14 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_srb::rows:h=02b4338cd330
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -268,7 +1180,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 14 S&RB
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_mbas
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_srb::rows:h=1c9236f643ce
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -287,7 +1199,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 14 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_srb::rows:h=232c14dc221a
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 14 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_srb::rows:h=2cb4875db99c
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 14 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo14_srb::rows:h=f57e7703ad0d
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 14 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_mbas::rows:h=039ec8e9943d
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -306,7 +1370,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 15 MBAS
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_mbas::rows:h=1fbcccfb1cf9
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -325,7 +1389,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 15 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_mbas::rows:h=24b565c3c267
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 15 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_mbas::rows:h=3bbad7072e30
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 15 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_mbas::rows:h=c5c1c71c88a0
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 15 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_srb::rows:h=0e4fd9a82668
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -344,7 +1560,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 15 S&RB
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_mbas
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_srb::rows:h=67be679940a2
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -363,7 +1579,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 15 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_srb::rows:h=92aab44e3236
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 15 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_srb::rows:h=946cc90cced2
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 15 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo15_srb::rows:h=b1901ff99fe1
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 15 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_mbas::rows:h=0321665be24b
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -382,7 +1750,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 16 MBAS (clast in breccia 60639)
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_mbas::rows:h=3847dd9a25a7
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -401,7 +1769,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 16 MBAS (clast in breccia 60639)
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_mbas::rows:h=3e7c4fc52747
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 16 MBAS (clast in breccia 60639)
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_mbas::rows:h=785032f59b25
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 16 MBAS (clast in breccia 60639)
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_mbas::rows:h=c57b4582c697
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 16 MBAS (clast in breccia 60639)
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_srb::rows:h=5b52746e34fa
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -420,7 +1940,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 16 S&RB
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_mbas
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_srb::rows:h=825eee04c1d4
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -439,7 +1959,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 16 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_srb::rows:h=a9a7e6da4221
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 16 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_srb::rows:h=c12e93f499ec
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 16 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo16_srb::rows:h=c44e3ba011c1
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 16 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_mbas::rows:h=12adbf5dd550
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -458,7 +2130,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 17 MBAS
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_mbas::rows:h=3778810c9b0e
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -477,7 +2149,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 17 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_mbas::rows:h=909b40da16b4
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 17 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_mbas::rows:h=bd6d180d0ed4
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 17 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_mbas::rows:h=c3f6d5c5c89a
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Apollo 17 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_srb::rows:h=1a13f457a183
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -496,7 +2320,7 @@ observations:
     table: A8.4
     note: row_group=Apollo 17 S&RB
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_mbas
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_srb::rows:h=65cfcf657385
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -515,7 +2339,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 17 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_srb::rows:h=a30d30fc789c
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 17 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_srb::rows:h=ccf009cd327e
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 17 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_apollo17_srb::rows:h=ed2bc202b37c
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Apollo 17 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_mbas::rows:h=38f4140a610e
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -534,7 +2510,7 @@ observations:
     table: A8.4
     note: row_group=Luna 16 MBAS
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_mbas::rows:h=55335f89407e
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -553,7 +2529,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Luna 16 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_mbas::rows:h=598754bd0cef
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Luna 16 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_mbas::rows:h=ba7033ba1688
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Luna 16 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_mbas::rows:h=f53c2a02c9fe
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Luna 16 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_srb::rows:h=17f1df94d100
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -572,7 +2700,7 @@ observations:
     table: A8.4
     note: row_group=Luna 16 S&RB
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna20_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_srb::rows:h=256f0a07b192
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -591,7 +2719,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Luna 16 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_srb::rows:h=4d452b693670
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Luna 16 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_srb::rows:h=9638be300e3d
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Luna 16 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna16_srb::rows:h=b6bec45c162d
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Luna 16 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna20_srb::rows:h=19f2ee7140d5
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -610,7 +2890,7 @@ observations:
     table: A8.4
     note: row_group=Luna 20 S&RB
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_mbas
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna20_srb::rows:h=941867339169
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -629,7 +2909,159 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Luna 20 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna20_srb::rows:h=985dfe162db0
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Luna 20 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna20_srb::rows:h=c120041d7541
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Luna 20 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna20_srb::rows:h=d88dfbc80d7f
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 2
+    table: A8.4
+    note: row_group=Luna 20 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_mbas::rows:h=299d76e3be82
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -648,7 +3080,7 @@ observations:
     table: A8.4
     note: row_group=Luna 24 MBAS
   read_from: unknown:usgs-lunar-sourcebook-tab8-4
-- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_srb
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_mbas::rows:h=2d8ce981be8d
   experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
   identity:
     quantity:
@@ -667,7 +3099,311 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Luna 24 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_mbas::rows:h=83b9bfa68e2f
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Luna 24 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_mbas::rows:h=8c229d6acfe4
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Luna 24 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_mbas::rows:h=f8e2c7d599a3
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 1
+    table: A8.4
+    note: row_group=Luna 24 MBAS
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_srb::rows:h=0525e6fd6b66
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 3
+    table: A8.4
+    note: row_group=Luna 24 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_srb::rows:h=20cee27f574c
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 3
+    table: A8.4
+    note: row_group=Luna 24 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_srb::rows:h=76ca021e5704
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 3
+    table: A8.4
+    note: row_group=Luna 24 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_srb::rows:h=c9f9ce9f0da7
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: usgs-lunar-sourcebook-tab8-4
+  locator:
+    page: 3
+    table: A8.4
+    note: row_group=Luna 24 S&RB
+  read_from: unknown:usgs-lunar-sourcebook-tab8-4
+- observation_id: usgs-lunar-sourcebook-tab8-4::usgs_tab8_4_luna24_srb::rows:h=e1a6abfb83ce
+  experiment_id: 81700a0b31f9a9dfe728fb99d41f6b0d9cd5476d0b55b178f3598a127fc3091e::usgs-lunar-sourcebook-tab8-4
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: siderophile_elements
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_material_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none

@@ -45,14 +45,14 @@ observations:
     note: Figure 2 plots station 2 soil composition against Apollo soil samples; no coordinate values were printed and none
       were digitised.
   read_from: unknown:lpi-compendium-62231
-- observation_id: lpi-compendium-62231::lpi_2010_62231_table1_chemistry
+- observation_id: lpi-compendium-62231::lpi_2010_62231_table1_chemistry::rows:row=62231:h=aba4d5c66446
   experiment_id: 494486a12e8ebacb2880ee0a1582fc723229718da96c49248ab29e9b6eaa5321::lpi-compendium-62231
   identity:
     quantity:
       tag: unknown
       reason: unsupported quantity 'named_sample_chemical_composition'
     species:
-      formula: lunar_sample_62231
+      formula: '62231'
       phase:
         tag: unknown
         reason: phase string 'lunar_soil' is not in the closed automatic map
@@ -64,8 +64,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'named_sample_chemical_composition'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

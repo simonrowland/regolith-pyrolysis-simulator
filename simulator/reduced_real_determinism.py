@@ -2829,7 +2829,7 @@ def canonical_json_bytes(value: Any) -> bytes:
 
 
 def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
-    return {
+    payload = {
         "source": str(curve.get("source", "")),
         "solidus_T_C": _json_ready(curve.get("solidus_T_C")),
         "liquidus_T_C": _json_ready(curve.get("liquidus_T_C")),
@@ -2841,10 +2841,14 @@ def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
             for point in tuple(curve.get("path") or ())
         ],
     }
+    notice = curve.get("composition_projected_notice")
+    if isinstance(notice, Mapping):
+        payload["composition_projected_notice"] = _json_ready(notice)
+    return payload
 
 
 def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
-    return {
+    curve = {
         "source": str(payload["source"]),
         "solidus_T_C": float(payload["solidus_T_C"]),
         "liquidus_T_C": float(payload["liquidus_T_C"]),
@@ -2853,6 +2857,10 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             for point in payload.get("path", ())
         ),
     }
+    notice = payload.get("composition_projected_notice")
+    if isinstance(notice, Mapping):
+        curve["composition_projected_notice"] = dict(notice)
+    return curve
 
 
 def _gate_curve_provider_role(curve: Mapping[str, Any]) -> str | None:

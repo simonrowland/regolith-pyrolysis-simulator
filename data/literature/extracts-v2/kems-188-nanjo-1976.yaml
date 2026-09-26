@@ -203,7 +203,7 @@ observations:
     table: '1'
     note: Table 1 literature column
   read_from: pdf:kems-188-nanjo-1976
-- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap
+- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap::rows:h=a1d87cfe7564
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
@@ -225,8 +225,7 @@ observations:
       reason: source T_range_K [726.0, 850.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_enthalpy_of_vaporization'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -248,7 +247,95 @@ observations:
     table: '1'
     note: Table 1 Te-species second-law heats between Te mp 726 K and 850 K
   read_from: pdf:kems-188-nanjo-1976
-- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se
+- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap::rows:h=b42b0b530642
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+    species:
+      formula: Te
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Te_and_Se-Te_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [726.0, 850.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- on present-work column; conclusions round Te to 29, 29, 14
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-188-nanjo-1976
+  locator:
+    published_page: 960
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 Te-species second-law heats between Te mp 726 K and 850 K
+  read_from: pdf:kems-188-nanjo-1976
+- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap::rows:h=c57bb4bcf163
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+    species:
+      formula: Te
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Te_and_Se-Te_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [726.0, 850.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- on present-work column; conclusions round Te to 29, 29, 14
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-188-nanjo-1976
+  locator:
+    published_page: 960
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 Te-species second-law heats between Te mp 726 K and 850 K
+  read_from: pdf:kems-188-nanjo-1976
+- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=05de94d4d535
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
@@ -270,8 +357,183 @@ observations:
       reason: source T_range_K [500.0, 800.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'second_law_enthalpy_of_vaporization'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- on present-work column; conclusions round to 20, 25, 18, 13, 14
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-188-nanjo-1976
+  locator:
+    published_page: 960
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
+  read_from: pdf:kems-188-nanjo-1976
+- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=239fc39c052b
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+    species:
+      formula: Se
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Se_and_Se-Te_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [500.0, 800.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- on present-work column; conclusions round to 20, 25, 18, 13, 14
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-188-nanjo-1976
+  locator:
+    published_page: 960
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
+  read_from: pdf:kems-188-nanjo-1976
+- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=572de327d7b1
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+    species:
+      formula: Se
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Se_and_Se-Te_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [500.0, 800.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- on present-work column; conclusions round to 20, 25, 18, 13, 14
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-188-nanjo-1976
+  locator:
+    published_page: 960
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
+  read_from: pdf:kems-188-nanjo-1976
+- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=5ab71457c5f3
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+    species:
+      formula: Se
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Se_and_Se-Te_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [500.0, 800.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- on present-work column; conclusions round to 20, 25, 18, 13, 14
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-188-nanjo-1976
+  locator:
+    published_page: 960
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 Se-species second-law heats; present-work last digits printed as subscripts
+  read_from: pdf:kems-188-nanjo-1976
+- observation_id: kems-188-nanjo-1976::nanjo_1976_table1_second_law_deltaHvap_Se::rows:h=c2a5c5e56110
+  experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+    species:
+      formula: Se
+      phase:
+        tag: unknown
+        reason: phase string 'pure_Se_and_Se-Te_vapor' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [500.0, 800.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

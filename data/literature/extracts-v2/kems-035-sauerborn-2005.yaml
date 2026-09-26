@@ -2220,14 +2220,14 @@ observations:
     figure: '5.1'
     note: Abb. 5.1–5.3 and MS QMS/IR time series
   read_from: pdf:kems-035-sauerborn-2005
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt::rows:row=apollo-12:h=02d32d76f862
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
       reason: unsupported quantity 'bulk_element_wt_pct'
     species:
-      formula: Na
+      formula: Apollo 12
       phase:
         tag: unknown
         reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
@@ -2239,7 +2239,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_element_wt_pct'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2253,7 +2253,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2::rows:row=apollo-14:h=6d26ae4093f1
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -2268,14 +2268,14 @@ observations:
     table: '2.1'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt::rows:row=apollo-14:h=6d26ae4093f1
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
       reason: unsupported quantity 'bulk_element_wt_pct'
     species:
-      formula: Na
+      formula: Apollo 14
       phase:
         tag: unknown
         reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
@@ -2287,7 +2287,151 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_element_wt_pct'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation; no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2::rows:row=apollo-14:h=6d26ae4093f1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 15
+        table: '2.1'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 15
+    table: '2.1'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+  read_from: unknown:kems-035-sauerborn-2005
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt::rows:row=apollo-16:h=8f89a865768e
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_element_wt_pct'
+    species:
+      formula: Apollo 16
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation; no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2::rows:row=apollo-14:h=6d26ae4093f1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 15
+        table: '2.1'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 15
+    table: '2.1'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+  read_from: unknown:kems-035-sauerborn-2005
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt::rows:row=luna:h=7d380fb28fb1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_element_wt_pct'
+    species:
+      formula: Luna
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation; no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2::rows:row=apollo-14:h=6d26ae4093f1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 15
+        table: '2.1'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 15
+    table: '2.1'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+  read_from: unknown:kems-035-sauerborn-2005
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2::rows:row=apollo-12:h=02d32d76f862
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_element_wt_pct'
+    species:
+      formula: Apollo 12
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2307,14 +2451,14 @@ observations:
     page: 15
     table: '2.1'
   read_from: pdf:kems-035-sauerborn-2005
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2::rows:row=apollo-14:h=6d26ae4093f1
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'bulk_mineral_vol_pct'
+      reason: unsupported quantity 'bulk_element_wt_pct'
     species:
-      formula: Na
+      formula: Apollo 14
       phase:
         tag: unknown
         reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
@@ -2326,7 +2470,124 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_mineral_vol_pct'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation; no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 15
+    table: '2.1'
+  read_from: pdf:kems-035-sauerborn-2005
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2::rows:row=apollo-16:h=8f89a865768e
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_element_wt_pct'
+    species:
+      formula: Apollo 16
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation; no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 15
+    table: '2.1'
+  read_from: pdf:kems-035-sauerborn-2005
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt_deep2::rows:row=luna:h=7d380fb28fb1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_element_wt_pct'
+    species:
+      formula: Luna
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation; no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 15
+    table: '2.1'
+  read_from: pdf:kems-035-sauerborn-2005
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol::rows:row=apollo-16:h=37955b93f29e
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_mineral_vol_pct'
+    species:
+      formula: Apollo 16
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2340,7 +2601,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol_deep2
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol_deep2::rows:row=apollo-16:h=37955b93f29e
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -2353,14 +2614,14 @@ observations:
     page: 16
     table: '2.2'
   read_from: pdf:kems-035-sauerborn-2005
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol_deep2
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol::rows:row=apollo-17:h=17970a2a5cc1
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
       reason: unsupported quantity 'bulk_mineral_vol_pct'
     species:
-      formula: Na
+      formula: Apollo 17
       phase:
         tag: unknown
         reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
@@ -2372,7 +2633,92 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_mineral_vol_pct'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation; no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol_deep2::rows:row=apollo-16:h=37955b93f29e
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 16
+        table: '2.2'
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 16
+    table: '2.2'
+  read_from: pdf:kems-035-sauerborn-2005
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol_deep2::rows:row=apollo-16:h=37955b93f29e
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_mineral_vol_pct'
+    species:
+      formula: Apollo 16
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation; no uncertainty printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 16
+    table: '2.2'
+  read_from: pdf:kems-035-sauerborn-2005
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_table22_lunar_mineral_vol_deep2::rows:row=apollo-17:h=17970a2a5cc1
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_mineral_vol_pct'
+    species:
+      formula: Apollo 17
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_compilation_HeVa91' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

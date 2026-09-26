@@ -595,7 +595,7 @@ observations:
     table: IV
     note: Table IV. Comparison of Sensitivity of Temperature Measurement (at 1800K)
   read_from: pdf:kems-198-ichise-ueshima-1989
-- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=0ed3ad1a0012
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
     quantity:
@@ -617,8 +617,412 @@ observations:
       reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_and_present_invariant_temperatures'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-198-ichise-ueshima-1989
+  locator:
+    published_page: 306
+    pdf_page_index: 12
+    table: V
+    note: Table V. Comparison with Previous Studies on Invariant Reactions
+  read_from: pdf:kems-198-ichise-ueshima-1989
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=1ad11e0c90fd
+  experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_and_present_invariant_temperatures'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-198-ichise-ueshima-1989
+  locator:
+    published_page: 306
+    pdf_page_index: 12
+    table: V
+    note: Table V. Comparison with Previous Studies on Invariant Reactions
+  read_from: pdf:kems-198-ichise-ueshima-1989
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=24be52c1713b
+  experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_and_present_invariant_temperatures'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-198-ichise-ueshima-1989
+  locator:
+    published_page: 306
+    pdf_page_index: 12
+    table: V
+    note: Table V. Comparison with Previous Studies on Invariant Reactions
+  read_from: pdf:kems-198-ichise-ueshima-1989
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=5d73be2acafc
+  experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_and_present_invariant_temperatures'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-198-ichise-ueshima-1989
+  locator:
+    published_page: 306
+    pdf_page_index: 12
+    table: V
+    note: Table V. Comparison with Previous Studies on Invariant Reactions
+  read_from: pdf:kems-198-ichise-ueshima-1989
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=a9482aa8dfb1
+  experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_and_present_invariant_temperatures'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-198-ichise-ueshima-1989
+  locator:
+    published_page: 306
+    pdf_page_index: 12
+    table: V
+    note: Table V. Comparison with Previous Studies on Invariant Reactions
+  read_from: pdf:kems-198-ichise-ueshima-1989
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=dc24e52faa26
+  experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_and_present_invariant_temperatures'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-198-ichise-ueshima-1989
+  locator:
+    published_page: 306
+    pdf_page_index: 12
+    table: V
+    note: Table V. Comparison with Previous Studies on Invariant Reactions
+  read_from: pdf:kems-198-ichise-ueshima-1989
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=dcdb4d62d427
+  experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_and_present_invariant_temperatures'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-198-ichise-ueshima-1989
+  locator:
+    published_page: 306
+    pdf_page_index: 12
+    table: V
+    note: Table V. Comparison with Previous Studies on Invariant Reactions
+  read_from: pdf:kems-198-ichise-ueshima-1989
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=e02f8af14504
+  experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_and_present_invariant_temperatures'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-198-ichise-ueshima-1989
+  locator:
+    published_page: 306
+    pdf_page_index: 12
+    table: V
+    note: Table V. Comparison with Previous Studies on Invariant Reactions
+  read_from: pdf:kems-198-ichise-ueshima-1989
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=ee04ff1da56f
+  experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_and_present_invariant_temperatures'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted literature values have no sigma in Table V; present-study reaction D is 1492 K, while the corresponding
+        Table II mean is 1491 K, so the Present study column is not exactly the Table II means
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-198-ichise-ueshima-1989
+  locator:
+    published_page: 306
+    pdf_page_index: 12
+    table: V
+    note: Table V. Comparison with Previous Studies on Invariant Reactions
+  read_from: pdf:kems-198-ichise-ueshima-1989
+- observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=f6992bafdd0d
+  experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_and_present_invariant_temperatures'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: phase string 'Ag-Mn_binary_invariants_literature_comparison' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1260.0, 1492.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

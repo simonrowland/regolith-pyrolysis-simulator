@@ -476,7 +476,7 @@ observations:
     pdf_page_index: 41
     section: '4.1'
   read_from: pdf:kems-027-plante-hastie-1983
-- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1100.0:h=e93daf08d31a
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
@@ -494,13 +494,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1100.0, 1600.0]; no midpoint invented
+      tag: value
+      value: '1100'
   value:
     kind: unavailable
-    unavailable_reason: 'source column census (T_K: 7 numeric cells, invT_times_1e4_K_inv: 7 numeric cells, log10_P_atm: 7
-      numeric cells, p_atm: 7 numeric cells, p_Pa: 7 numeric cells, p_Pa_arithmetic: 0 numeric cells); declared quantity is
-      unknown; no mapped coordinate/value pair selected'
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -533,7 +531,414 @@ observations:
     note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two (average
       of Series I and II).
   read_from: pdf:kems-027-plante-hastie-1983
-- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1200.0:h=ad8dcf297945
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_CsBO2'
+    species:
+      formula: CsBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1200'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.3 on A and ±0.04×10^4 on B; Series I vs II disagreed by ~×4 before averaging
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two (average
+      of Series I and II).
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1250.0:h=ae3b69ee8db3
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_CsBO2'
+    species:
+      formula: CsBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1250'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.3 on A and ±0.04×10^4 on B; Series I vs II disagreed by ~×4 before averaging
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two (average
+      of Series I and II).
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1300.0:h=de101914ca94
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_CsBO2'
+    species:
+      formula: CsBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1300'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.3 on A and ±0.04×10^4 on B; Series I vs II disagreed by ~×4 before averaging
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two (average
+      of Series I and II).
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1400.0:h=7f94aad0bd5e
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_CsBO2'
+    species:
+      formula: CsBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1400'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.3 on A and ±0.04×10^4 on B; Series I vs II disagreed by ~×4 before averaging
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two (average
+      of Series I and II).
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1500.0:h=65a15c4273c0
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_CsBO2'
+    species:
+      formula: CsBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.3 on A and ±0.04×10^4 on B; Series I vs II disagreed by ~×4 before averaging
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two (average
+      of Series I and II).
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1600.0:h=90d7a7af205a
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_CsBO2'
+    species:
+      formula: CsBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1600'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.3 on A and ±0.04×10^4 on B; Series I vs II disagreed by ~×4 before averaging
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two (average
+      of Series I and II).
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
+          (average of Series I and II).
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1000.0:h=c368d21e3159
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
@@ -551,13 +956,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1000.0, 1600.0]; no midpoint invented
+      tag: value
+      value: '1000'
   value:
     kind: unavailable
-    unavailable_reason: 'source column census (T_K: 9 numeric cells, invT_times_1e4_K_inv: 9 numeric cells, log10_P_atm: 9
-      numeric cells, p_atm: 9 numeric cells, p_Pa: 9 numeric cells, p_Pa_arithmetic: 0 numeric cells); declared quantity is
-      unknown; no mapped coordinate/value pair selected'
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -588,7 +991,521 @@ observations:
     figure: '19'
     note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
   read_from: pdf:kems-027-plante-hastie-1983
-- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1100.0:h=79ea37904bcc
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_LiBO2'
+    species:
+      formula: LiBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1100'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.2 on A and ±0.02×10^4 on B; TMS reproducibility ca. 20%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1200.0:h=2db4dec5147b
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_LiBO2'
+    species:
+      formula: LiBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1200'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.2 on A and ±0.02×10^4 on B; TMS reproducibility ca. 20%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1250.0:h=297af26062cf
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_LiBO2'
+    species:
+      formula: LiBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1250'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.2 on A and ±0.02×10^4 on B; TMS reproducibility ca. 20%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1300.0:h=47be77b8b03a
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_LiBO2'
+    species:
+      formula: LiBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1300'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.2 on A and ±0.02×10^4 on B; TMS reproducibility ca. 20%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1400.0:h=91eba2cdbb09
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_LiBO2'
+    species:
+      formula: LiBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1400'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.2 on A and ±0.02×10^4 on B; TMS reproducibility ca. 20%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1423.15:h=cc49cab0fda1
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_LiBO2'
+    species:
+      formula: LiBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.2 on A and ±0.02×10^4 on B; TMS reproducibility ca. 20%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1500.0:h=f4b5fc597850
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_LiBO2'
+    species:
+      formula: LiBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.2 on A and ±0.02×10^4 on B; TMS reproducibility ca. 20%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1600.0:h=302a07b5bab6
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_LiBO2'
+    species:
+      formula: LiBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1600'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ±0.2 on A and ±0.02×10^4 on B; TMS reproducibility ca. 20%
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1000.0:h=ab17e525982e
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
@@ -606,13 +1523,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1000.0, 1600.0]; no midpoint invented
+      tag: value
+      value: '1000'
   value:
     kind: unavailable
-    unavailable_reason: 'source column census (T_K: 9 numeric cells, invT_times_1e4_K_inv: 9 numeric cells, log10_P_atm: 9
-      numeric cells, p_atm: 9 numeric cells, p_Pa: 9 numeric cells, p_Pa_arithmetic: 0 numeric cells); declared quantity is
-      unknown; no mapped coordinate/value pair selected'
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -646,6 +1561,553 @@ observations:
     note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
       equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
   read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1100.0:h=0b0d048df3fd
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_NaBO2'
+    species:
+      formula: NaBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1100'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility ca. 20% (section 3.6). No per-point sigma
+        tabulated. Digitisation of the scatter is not required for the coefficients (they are printed).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1200.0:h=f00c3544c7ab
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_NaBO2'
+    species:
+      formula: NaBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1200'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility ca. 20% (section 3.6). No per-point sigma
+        tabulated. Digitisation of the scatter is not required for the coefficients (they are printed).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1200'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1250.0:h=1c52d5bef45c
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_NaBO2'
+    species:
+      formula: NaBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1250'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility ca. 20% (section 3.6). No per-point sigma
+        tabulated. Digitisation of the scatter is not required for the coefficients (they are printed).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1250'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1300.0:h=bea99e58d80f
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_NaBO2'
+    species:
+      formula: NaBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1300'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility ca. 20% (section 3.6). No per-point sigma
+        tabulated. Digitisation of the scatter is not required for the coefficients (they are printed).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1400.0:h=a06ab10e3887
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_NaBO2'
+    species:
+      formula: NaBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1400'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility ca. 20% (section 3.6). No per-point sigma
+        tabulated. Digitisation of the scatter is not required for the coefficients (they are printed).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1423.15:h=43868802bb86
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_NaBO2'
+    species:
+      formula: NaBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1423.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility ca. 20% (section 3.6). No per-point sigma
+        tabulated. Digitisation of the scatter is not required for the coefficients (they are printed).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1423.15'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1500.0:h=abddf66e4845
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_NaBO2'
+    species:
+      formula: NaBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1500'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility ca. 20% (section 3.6). No per-point sigma
+        tabulated. Digitisation of the scatter is not required for the coefficients (they are printed).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+- observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1600.0:h=966c02c5f618
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_NaBO2'
+    species:
+      formula: NaBO2
+      phase:
+        tag: unknown
+        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1600'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility ca. 20% (section 3.6). No per-point sigma
+        tabulated. Digitisation of the scatter is not required for the coefficients (they are printed).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  notices: []
+  source_id: kems-027-plante-hastie-1983
+  locator:
+    published_page: 45
+    pdf_page_index: 51
+    figure: '19'
+    note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+      equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  read_from: pdf:kems-027-plante-hastie-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1600'
+      locator:
+        published_page: 45
+        pdf_page_index: 51
+        figure: '19'
+        note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+          equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:

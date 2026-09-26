@@ -63,6 +63,7 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.melt_backend.base import (
     EquilibriumResult,
+    MeltCompositionError,
     RealBackendAuthority,
     RealBackendFamily,
 )
@@ -534,6 +535,8 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
+        except MeltCompositionError:
+            raise
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             return LiquidusSolidusResult(
                 status='not_converged',

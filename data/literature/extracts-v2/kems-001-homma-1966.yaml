@@ -43,7 +43,7 @@ observations:
     paragraph: alumina crucible CP-2 ID 38 mm
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   read_from: unknown:kems-001-homma-1966
-- observation_id: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+- observation_id: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=058d7a674444
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:
     quantity:
@@ -62,8 +62,211 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'fitted_first_order_evaporation_constants'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=b7add4fd8b46
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=c64bb546df37
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=d09e85ac793a
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -1850,7 +2053,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    superseded_by: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=c64bb546df37
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -1897,7 +2100,7 @@ observations:
               line_range: 216-218
               source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         output_unit: K
-- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=1a1a493a8f6b
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:
     quantity:
@@ -1916,8 +2119,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'fitted_first_order_evaporation_constants'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -1979,7 +2181,671 @@ observations:
   source_id: kems-001-homma-1966
   locator:
     page: '519'
-    table: 4, 5
+    table: '4'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=57dfdf468b4a
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+      Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+      Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+      Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+      Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+
+      Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=5a814f23f051
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+      Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+      Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+      Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+      Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+
+      Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '4'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=7a44811336bf
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+      Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+      Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+      Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+      Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+
+      Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '4'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=88e086594f53
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+      Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+      Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+      Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+      Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+
+      Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=b4fe777ebaf1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+      Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+      Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+      Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+      Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+
+      Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '4'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=ba9f20114c39
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+      Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+      Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+      Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+      Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+
+      Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '4'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=c1828c2fcb92
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+      Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+      Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+      Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+      Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+
+      Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '4'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=f3d2f35f7219
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Mn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_P^E(sec^-1),K_P^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6411-15,4.4x10^-3,8.1x10^-3,0.09
+
+      Fe-Mn,6411-1,4.2x10^-3,7.8x10^-3,0.09
+
+      Fe-Mn,6409-2,4.6x10^-3,8.5x10^-3,0.10
+
+      Fe-Mn,6411-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-C-Mn,6501-11,5.8x10^-3,1.1x10^-2,0.12
+
+      Fe-C-Mn,6501-12,4.8x10^-3,8.8x10^-3,0.10
+
+
+      Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
   read_from: pdf:kems-001-homma-1966
 - observation_id: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep::point:0
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
@@ -3072,7 +3938,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    superseded_by: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep::rows:h=1a1a493a8f6b
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -3124,7 +3990,7 @@ observations:
               line_range: 5-7
               source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
         output_unit: K
-- observation_id: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+- observation_id: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep::rows:h=11307d7cead6
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:
     quantity:
@@ -3143,8 +4009,143 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'fitted_first_order_evaporation_constants'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep::rows:h=ab99b7ebf656
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Alloy,Melt No. of Mother Alloy,K_N^E(sec^-1),K_N^S(cm sec^-1),C^S/C^m
+
+      Fe-Mn,6502-1,5.4x10^-3,9.9x10^-3,0.11
+
+      Fe-Mn,6502-2,5.0x10^-3,9.2x10^-3,0.11
+
+      Fe-Mn,6412-14,6.5x10^-3,1.2x10^-2,0.14
+
+      Fe-Cu,6503-12,3.0x10^-3,5.6x10^-3,0.47
+
+      Fe-Cu,6503-11,3.1x10^-3,5.8x10^-3,0.49
+
+      Fe-Cu,6503-16,2.2x10^-3,4.1x10^-3,0.31
+
+      Fe-Cu,6503-28,1.8x10^-3,3.4x10^-3,0.25
+
+      Fe-Sn,6503-15,8.4x10^-4,1.6x10^-3,0.96
+
+      Fe-Sn,6503-14,6.5x10^-4,1.2x10^-3,0.74
+
+      Fe-Sn,6504-1,8.0x10^-4,1.5x10^-3,0.91
+
+      '
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep::rows:h=d4a905b025a1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_first_order_evaporation_constants'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -4571,7 +5572,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+    superseded_by: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep::rows:h=ab99b7ebf656
     decided_by:
       worker: extract-supersedes
       date: unspecified

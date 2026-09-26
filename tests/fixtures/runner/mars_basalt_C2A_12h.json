@@ -109,6 +109,41 @@
     "campaigns_elapsed": 0.4,
     "backend_status": "unavailable",
     "backend_authoritative": false,
+    "composition_projected_liquidus_notice": {
+      "kind": "composition_projected",
+      "reason": "composition_projected",
+      "authority": "extrapolated",
+      "notices": [
+        {
+          "kind": "composition_projected",
+          "reason": "composition_projected",
+          "authority": "extrapolated",
+          "certified_band": {
+            "engine": "magemin",
+            "database": "ig",
+            "bulk_components": [
+              "SiO2",
+              "Al2O3",
+              "CaO",
+              "MgO",
+              "FeOt",
+              "K2O",
+              "Na2O",
+              "TiO2",
+              "O",
+              "Cr2O3",
+              "H2O"
+            ]
+          },
+          "dropped_components": [
+            {
+              "component": "P2O5",
+              "mass_fraction": 0.008809612614480485
+            }
+          ]
+        }
+      ]
+    },
     "evidence_class": "internal-analytical",
     "runtime_status": "unavailable",
     "degradation_reason": "unavailable",
@@ -2358,12 +2393,14 @@
     },
     "observed_upstream_state": {
       "O2_vented_peak_kg_hr": 0.0,
+      "O2_vented_peak_status": "complete",
       "note": "observed legacy upstream diagnostics; not thermal-train overflow",
       "transport_saturation_peak_pct": 0.0
     },
     "peaks": {
       "cold_o2_kg_hr": 0.0,
       "cold_o2_mol_hr": 0.0,
+      "cold_o2_status": "complete",
       "hot_species_basis": "per_species_design_maxima_not_concurrent_sum",
       "hot_species_kg_hr": {},
       "hot_total_vapor_basis": "maximum_concurrent_snapshot_total",
@@ -2835,7 +2872,8 @@
     },
     "snapshot_count": 12,
     "status": "closed",
-    "train_closes_for_run": true
+    "train_closes_for_run": true,
+    "unmeasured_hours": []
   },
   "stage_purity_report": {
     "stage_0": {

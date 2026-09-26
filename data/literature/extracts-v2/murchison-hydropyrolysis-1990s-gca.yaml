@@ -87,7 +87,7 @@ observations:
     section: 2.1. H2-Pyrolysis
     note: thermal program, 15 MPa H2, stainless-steel 316 reactor, dry-ice trap
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
-- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent::points:h=6c045e902bbc
   experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
@@ -109,7 +109,7 @@ observations:
       reason: source T_range_K [493.15, 793.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_carbon_wt_percent'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -129,7 +129,91 @@ observations:
     table: '1'
     note: Bulk C (wt%) by IRMS; measured values plain text; calculated italics
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
-- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_isotopes
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent::points:h=c277e81bf35d
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_carbon_wt_percent'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [493.15, 793.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1389
+    pdf_page_index: 5
+    table: '1'
+    note: Bulk C (wt%) by IRMS; measured values plain text; calculated italics
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent::points:h=e63d94d67e30
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_carbon_wt_percent'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [493.15, 793.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1389
+    pdf_page_index: 5
+    table: '1'
+    note: Bulk C (wt%) by IRMS; measured values plain text; calculated italics
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_isotopes::points:h=16f9f25ca32c
   experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
@@ -151,7 +235,7 @@ observations:
       reason: source T_range_K [493.15, 793.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'stable_isotope_delta'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -174,7 +258,97 @@ observations:
     table: '1'
     note: delta13C and delta15N (permil)
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
-- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_isotopes::points:h=d63f4eea97a9
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stable_isotope_delta'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [493.15, 793.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil C for samples > 4 ng; +/- 3 permil N for samples > 5 ng
+      locator_page: 1387
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1389
+    pdf_page_index: 5
+    table: '1'
+    note: delta13C and delta15N (permil)
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_isotopes::points:h=e0bff94b1c6f
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stable_isotope_delta'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [493.15, 793.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil C for samples > 4 ng; +/- 3 permil N for samples > 5 ng
+      locator_page: 1387
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1389
+    pdf_page_index: 5
+    table: '1'
+    note: delta13C and delta15N (permil)
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent::points:h=3a74fb0f58c0
   experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
@@ -196,8 +370,91 @@ observations:
       reason: source T_range_K [493.15, 793.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_nitrogen_wt_percent'; refusing to pick a
-      number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1389
+    pdf_page_index: 5
+    table: '1'
+    note: Bulk N (wt%) and N/C by IRMS
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent::points:h=490c2af2f135
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_nitrogen_wt_percent'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [493.15, 793.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1389
+    pdf_page_index: 5
+    table: '1'
+    note: Bulk N (wt%) and N/C by IRMS
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent::points:h=bf2ffe021492
+  experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_nitrogen_wt_percent'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [493.15, 793.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -261,7 +518,7 @@ observations:
     table: '1'
     note: H2-total pyrolysate (by mass balance); printed in italics = calculated
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
-- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms::points:h=171c260faa6e
   experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
   identity:
     quantity:
@@ -283,7 +540,91 @@ observations:
       reason: source T_range_K [593.15, 593.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_C_N_and_isotopes'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_from_other_workers
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1389
+    pdf_page_index: 5
+    table: '1'
+    note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms::points:h=4e6f0bfc153f
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_C_N_and_isotopes'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_HF_HCl_residue_H2O_pyrolysis' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [593.15, 593.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_from_other_workers
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1389
+    pdf_page_index: 5
+    table: '1'
+    note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms::points:h=68c6ef39f635
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_C_N_and_isotopes'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'Murchison_HF_HCl_residue_H2O_pyrolysis' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [593.15, 593.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -346,7 +687,7 @@ observations:
     table: '2'
     note: Four C/N-bearing components in Murchison HF/HCl residues; Sephton et al. 2003
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
-- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=1073.15:h=95657ecdc38c
   experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
   identity:
     quantity:
@@ -364,12 +705,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [573.15, 1273.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'stepped_combustion_carbon_yield'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -431,7 +771,1504 @@ observations:
               table: '3'
               note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
         output_unit: Pa
-- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=1173.15:h=6d3f3764d475
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1173.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=1273.15:h=1a87051f9c1f
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=573.15:h=3767e62fae64
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '573.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=598.15:h=388ece5285a6
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '598.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '598.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=623.15:h=aff55b708b96
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '623.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '623.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=648.15:h=17fc2d8f02de
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '648.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '648.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=673.15:h=01c4f3954f0e
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '673.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=698.15:h=1f40c77858db
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '698.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '698.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=723.15:h=910cf1a7c072
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '723.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '723.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=748.15:h=8823c69a2520
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '748.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '748.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=773.15:h=31c8672b74d1
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '773.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=798.15:h=06cefd49b15d
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '798.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '798.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=823.15:h=b3da956166c2
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '823.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '823.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=873.15:h=c94f222a0945
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '873.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=923.15:h=57ab0848b05a
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '923.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '923.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon::T=973.15:h=6b05798bd148
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_carbon_yield'
+    species:
+      formula: C
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '973.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000'
+          approximate: false
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=10 mbar
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 1390
+              pdf_page_index: 6
+              table: '3'
+              note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+        output_unit: Pa
+    temperature_K:
+      state:
+        tag: value
+        value: '973.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=1073.15:h=e778f64543d1
   experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
   identity:
     quantity:
@@ -449,12 +2286,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [573.15, 1273.15]; no midpoint invented
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'stepped_combustion_nitrogen_yield'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -476,3 +2312,553 @@ observations:
     table: '3'
     note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=1173.15:h=5e59fcbeddcd
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1173.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=1273.15:h=75ab0096ebe4
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=573.15:h=9f05ab3b9edd
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '573.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=623.15:h=9a87ff3238ee
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '623.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '623.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=673.15:h=7c010b37535a
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '673.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=723.15:h=48a43fd148cf
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '723.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '723.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=773.15:h=1f63cfd8d528
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '773.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=823.15:h=7c9523a9c253
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '823.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '823.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=873.15:h=b8316159e9e1
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '873.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+- observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen::T=973.15:h=1ba548e1f2dc
+  experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepped_combustion_nitrogen_yield'
+    species:
+      formula: N
+      phase:
+        tag: unknown
+        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '973.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: murchison-hydropyrolysis-1990s-gca
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+  read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '973.15'
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue

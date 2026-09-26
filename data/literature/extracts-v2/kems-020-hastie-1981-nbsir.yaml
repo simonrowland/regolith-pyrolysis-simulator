@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/kems-020-hastie-1981-nbsir.yaml
 observations:
-- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1248.8:row=2:h=06e96a26477f
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
@@ -20,11 +20,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1248.8, 1857.4]; no midpoint invented
+      tag: value
+      value: '1248.8'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_gamma_K2O'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -58,6 +58,1223 @@ observations:
     figure: '11'
     note: report figure page after captions; PDF page 71
   read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1248.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1266.5:row=1:h=4dcd95997d8a
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1266.5'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1266.5'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1334.0:row=1:h=e09ca56e72fe
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1334'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1334'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1334.0:row=3:h=4cc46dbe958a
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1334'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1334'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1431.8:row=1:h=5a583bb616d0
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1431.8'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1431.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1445.1:row=2:h=84840b2a9be8
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1445.1'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1445.1'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1458.6:row=3:h=e4e4fe3bdf96
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1458.6'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1458.6'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1479.3:row=1:h=76706652f192
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1479.3'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1479.3'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1530.0:row=1:h=dd8be11ba102
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1530'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1530'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1552.8:row=2:h=f876aef0254a
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1552.8'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1552.8'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1568.4:row=1:h=3bfe6e021f0a
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1568.4'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1568.4'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1576.3:row=2:h=3fd23f609226
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1576.3'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1576.3'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1596.4:row=1:h=7a75efac0bd8
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1596.4'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1596.4'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1625.5:row=2:h=f7e376c622bd
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1625.5'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1625.5'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1651.3:row=3:h=d38548088cab
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1651.3'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1651.3'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1700.7:row=2:h=4dc296ebfe9f
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1700.7'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700.7'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1700.7:row=3:h=c570c787fc5d
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1700.7'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700.7'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1773.0:row=3:h=9cc0f1e22a6b
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1857.4:row=3:h=d750662636ad
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_gamma_K2O'
+    species:
+      formula: K2O
+      phase:
+        tag: unknown
+        reason: phase string 'real_MHD_channel_slag_K1' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1857.4'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1857.4'
+      locator:
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        figure: '11'
+        note: report figure page after captions; PDF page 71
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -414,7 +1631,7 @@ observations:
     figure: '4'
     note: Caption locator; plotted pages recorded in completeness ledger.
   read_from: pdf:kems-020-hastie-1981-nbsir
-- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1821.7:h=73d823b8e48e
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
@@ -432,17 +1649,14 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1745.1, 1961.3]; no midpoint invented
+      tag: value
+      value: '1821.7'
     reference_state:
       tag: unknown
       reason: qualifier over_illite does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: 'source column census (T_K: 6 numeric cells, invT_times_1e4_K_inv: 6 numeric cells, p_atm: 6 numeric
-      cells, log10_p_atm: 6 numeric cells, column[0]: 6 numeric cells, column[1]: 6 numeric cells, residual_dex_vs_pass2:
-      6 numeric cells, symbol: 0 numeric cells, species: 0 numeric cells, note: 0 numeric cells); declared quantity is unknown;
-      no mapped coordinate/value pair selected'
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -475,6 +1689,356 @@ observations:
     pdf_page_index: 64
     figure: '4'
   read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1821.7'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 64
+        figure: '4'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1860.8:h=37b8334fa33d
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_over_illite'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'illite_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1860.8'
+    reference_state:
+      tag: unknown
+      reason: qualifier over_illite does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
+        on Fig. 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 58
+    published_page: 58
+    pdf_page_index: 64
+    figure: '4'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1860.8'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 64
+        figure: '4'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1868.6:h=8ea25bb94003
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_over_illite'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'illite_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1868.6'
+    reference_state:
+      tag: unknown
+      reason: qualifier over_illite does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
+        on Fig. 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 58
+    published_page: 58
+    pdf_page_index: 64
+    figure: '4'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1868.6'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 64
+        figure: '4'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1911.6:h=d9ef607ec5af
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_over_illite'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'illite_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1911.6'
+    reference_state:
+      tag: unknown
+      reason: qualifier over_illite does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
+        on Fig. 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 58
+    published_page: 58
+    pdf_page_index: 64
+    figure: '4'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1911.6'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 64
+        figure: '4'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1914.8:h=96933736e50e
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_over_illite'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'illite_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1914.8'
+    reference_state:
+      tag: unknown
+      reason: qualifier over_illite does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
+        on Fig. 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 58
+    published_page: 58
+    pdf_page_index: 64
+    figure: '4'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1914.8'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 64
+        figure: '4'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1946.8:h=865b11871b18
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_over_illite'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'illite_liquid' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1946.8'
+    reference_state:
+      tag: unknown
+      reason: qualifier over_illite does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
+        on Fig. 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 58
+    published_page: 58
+    pdf_page_index: 64
+    figure: '4'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1946.8'
+      locator:
+        page: 58
+        published_page: 58
+        pdf_page_index: 64
+        figure: '4'
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -629,7 +2193,7 @@ observations:
     figure: '5'
     note: Caption locator; plotted pages recorded in completeness ledger.
   read_from: pdf:kems-020-hastie-1981-nbsir
-- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=0364389ce814
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
@@ -647,14 +2211,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1333.3, 1493.7]; no midpoint invented
+      tag: value
+      value: '1333.3'
   value:
     kind: unavailable
-    unavailable_reason: 'source column census (series: 0 numeric cells, T_K: 6 numeric cells, invT_times_1e4_K_inv: 6 numeric
-      cells, p_atm: 6 numeric cells, log10_p_atm: 6 numeric cells, column[0]: 6 numeric cells, column[1]: 6 numeric cells,
-      residual_dex_vs_pass2: 6 numeric cells, Na2O_wt_pct: 3 numeric cells, note: 0 numeric cells); declared quantity is unknown;
-      no mapped coordinate/value pair selected'
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -687,6 +2248,341 @@ observations:
     pdf_page_index: 65
     figure: '5'
   read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1333.3'
+      locator:
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+        figure: '5'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=2db4bdbaa4a6
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1333.3'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum
+        conceivable error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 59
+    published_page: 59
+    pdf_page_index: 65
+    figure: '5'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1333.3'
+      locator:
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+        figure: '5'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=5121ebf96a04
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1333.3'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum
+        conceivable error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 59
+    published_page: 59
+    pdf_page_index: 65
+    figure: '5'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1333.3'
+      locator:
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+        figure: '5'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1428.6:h=8b93bd735499
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1428.6'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum
+        conceivable error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 59
+    published_page: 59
+    pdf_page_index: 65
+    figure: '5'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1428.6'
+      locator:
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+        figure: '5'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1488.8:h=5f7a8c15c78e
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1488.8'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum
+        conceivable error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 59
+    published_page: 59
+    pdf_page_index: 65
+    figure: '5'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1488.8'
+      locator:
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+        figure: '5'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1493.7:h=31e60450532f
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1493.7'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum
+        conceivable error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 59
+    published_page: 59
+    pdf_page_index: 65
+    figure: '5'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1493.7'
+      locator:
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+        figure: '5'
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -1692,7 +3588,7 @@ observations:
     pdf_page_index: 28
     table: '2'
   read_from: pdf:kems-020-hastie-1981-nbsir
-- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=0ec91612e9c7
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
@@ -1714,8 +3610,7 @@ observations:
       reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_P_K_atm_empirical_fit'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -1730,7 +3625,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -1751,7 +3646,1850 @@ observations:
     note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
   read_from: unknown:kems-020-hastie-1981-nbsir
-- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: '7.4'
+          Al2O3: '26'
+          Fe2O3: '4.4'
+          MgO: '2.1'
+          SiO2: '60.2'
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.05551283854733651199425310813'
+          - - Al2O3
+            - '0.1801920080317673509727131806'
+          - - Fe2O3
+            - '0.01947042566932521293471723952'
+          - - MgO
+            - '0.0368182783239472288087974735'
+          - - SiO2
+            - '0.7080064494276236952895189985'
+          amount_basis: mole_fraction
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '7.4'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '26'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '4.4'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '2.1'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '60.2'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        output_unit: mole_fraction
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=160b0cf31d4b
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=18345d88e443
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=5990a63e7c0b
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: '23.6'
+          Al2O3: '25.5'
+          Fe2O3: '12.5'
+          CaO: '1.8'
+          MgO: '0.6'
+          SiO2: '36'
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.2045119195408229976380291588'
+          - - Al2O3
+            - '0.2041490035607471406601254596'
+          - - Fe2O3
+            - '0.06389659121921674913570573995'
+          - - CaO
+            - '0.02620142865223391464883058042'
+          - - MgO
+            - '0.01215179233269916437383895493'
+          - - SiO2
+            - '0.4890892646942800335434701061'
+          amount_basis: mole_fraction
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '23.6'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '25.5'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.5'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.8'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '0.6'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '36'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        output_unit: mole_fraction
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=65d014284ac8
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: '8.7'
+          Al2O3: '11.1'
+          Fe2O3: '12'
+          CaO: '13.9'
+          MgO: '7.9'
+          SiO2: '47.3'
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.0612675719211682823093057266'
+          - - Al2O3
+            - '0.07221623745433399488531122602'
+          - - Fe2O3
+            - '0.04984868629996740652431006519'
+          - - CaO
+            - '0.1644265944618444787953834333'
+          - - MgO
+            - '0.1300232372232385380289286028'
+          - - SiO2
+            - '0.5222176726394472994567609464'
+          amount_basis: mole_fraction
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.1'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '12'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '13.9'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.9'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.3'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        output_unit: mole_fraction
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=7e1ddafaaee6
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=8f50111721e8
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=a0d035ad29f9
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=af4a50debd88
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=bdd0719b07bd
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=bfd77f1b4c4f
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=c3c57e8f6757
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: '22.7'
+          Al2O3: '24.6'
+          Fe2O3: '5.3'
+          CaO: '9.3'
+          MgO: '3.3'
+          SiO2: '34.8'
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1795243839737074959159960722'
+          - - Al2O3
+            - '0.1797352073765913067717464412'
+          - - Fe2O3
+            - '0.02472489821265685180340413124'
+          - - CaO
+            - '0.1235453435967127725644059259'
+          - - MgO
+            - '0.06099496612967374599257737967'
+          - - SiO2
+            - '0.4314752007106578269518700501'
+          amount_basis: mole_fraction
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '22.7'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '24.6'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '5.3'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '9.3'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '3.3'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '34.8'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        output_unit: mole_fraction
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=c9613b2f065a
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=e3f647c078ee
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+  point_conditions:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          K2O: '19.5'
+          Al2O3: '12.1'
+          Fe2O3: '14.3'
+          CaO: '3.8'
+          MgO: '1'
+          SiO2: '46.8'
+          Na2O: '0.5'
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - K2O
+            - '0.1598819803598172038690991183'
+          - - Al2O3
+            - '0.09165385576989872858295440087'
+          - - Fe2O3
+            - '0.06916111716920942071948801596'
+          - - CaO
+            - '0.05233525556470525650915578215'
+          - - MgO
+            - '0.01916228849103378096819570357'
+          - - SiO2
+            - '0.6015749840393268275727422232'
+          - - Na2O
+            - '0.006230518606008781778364755852'
+          amount_basis: mole_fraction
+      locator:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '19.5'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.1'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '14.3'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '3.8'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.8'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 23
+              published_page: 23
+              pdf_page_index: 29
+              table: '2'
+              note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+        output_unit: mole_fraction
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=ee99cfbe61d3
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=f3eebf386eda
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=f8d465e76d95
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'log10_P_K_atm_empirical_fit'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1100.0, 2150.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        table: '2'
+        note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: unknown:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=032c7e48606c
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
@@ -1770,8 +5508,8 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'published_K_pressure_fit_table'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1800, 2150] is a temperature domain,
+      not the observable
     approximate: false
   uncertainty:
     kind: printed
@@ -1810,10 +5548,1000 @@ observations:
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
-    published_page: 23
-    pdf_page_index: 28
     table: '2'
-    note: Table spans printed pp. 23–25, physical PDF pages 29–31; pdf_page_index is zero-based.
+    note: body row 11
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=043cbfd5a16d
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1400, 1900] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 24
+    table: '2'
+    note: body row 12
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=0fb871092cbb
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1550, 2085] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 24
+    table: '2'
+    note: body row 16
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=208e0732ae07
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1600, 1750] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 24
+    table: '2'
+    note: body row 15
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=32ce441e1b70
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1600, 2000] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 9
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=40b6e31ec6e4
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1600, 1800] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 24
+    table: '2'
+    note: body row 13
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=5b28f8dd1eaf
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1500, 1800] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 3
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=6e179c40ed21
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1300, 1800] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 2
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=940d0e2da80d
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1400, 1650] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 7
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=9b379eb03d06
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1100, 1450] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 4
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=a7f93eca4c80
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1150, 1450] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 5
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=b455e61917c0
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1750, 2150] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 10
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=b7beed458db6
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1600, 1900] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 8
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dc53a4c0a1a1
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1300, 1800] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 1
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=de78e686ab1f
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1500, 1700] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 24
+    table: '2'
+    note: body row 14
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dfcd6d43af5e
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1470, 1820] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 25
+    table: '2'
+    note: body row 17
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=e8d369daa8f3
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'published_K_pressure_fit_table'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'K-bearing_oxide_and_slag_mix' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1200, 1600] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Potassium partial pressure data can be represented, to a good approximation, by the empirical form, log P
+      (atm) = A - B/T + C + D - E
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    table: '2'
+    note: body row 6
   read_from: pdf:kems-020-hastie-1981-nbsir
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
@@ -1864,7 +6592,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=d12bf8167a5d
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -1894,7 +6622,7 @@ observations:
         pdf_page_index: 49
         table: '3'
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
-- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=0f36488eae22
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
@@ -1913,8 +6641,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'SOLGASMIX_alkali_speciation'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -1933,9 +6660,295 @@ observations:
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 43
-    published_page: 43
-    pdf_page_index: 48
     table: '3'
+    note: Na2O Activity[c] row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=22a67a60b1a7
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: NaCl row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=456905b82e81
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: No Halogen row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=52e7f26fbe57
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: Total Na row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=698b1a5d8095
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: Na2SO4 row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=6999fa3771a0
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: Na2Cl2 row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=c191a2cc6ce7
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: NaOH row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=d12bf8167a5d
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: Na row
   read_from: pdf:kems-020-hastie-1981-nbsir
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
@@ -1974,7 +6987,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=d12bf8167a5d
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -2001,7 +7014,7 @@ observations:
         published_page: 43
         pdf_page_index: 49
         table: '3'
-- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=0f36488eae22
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
@@ -2020,8 +7033,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'SOLGASMIX_alkali_speciation'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -2040,7 +7052,293 @@ observations:
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 43
-    published_page: 43
-    pdf_page_index: 48
     table: '3'
+    note: Na2O Activity[c] row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=22a67a60b1a7
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: NaCl row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=456905b82e81
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: No Halogen row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=52e7f26fbe57
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: Total Na row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=698b1a5d8095
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: Na2SO4 row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=6999fa3771a0
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: Na2Cl2 row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=c191a2cc6ce7
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: NaOH row
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=d12bf8167a5d
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'SOLGASMIX_alkali_speciation'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'soda_lime_silica_glass_model' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%). Initial Gas Composition (mole percent): H2O (4), O2
+      (5), CO2 (12), N2 (76), SO2 (2), HCl (1)[d]. Temperature: 1400 K. Total Pressure: one atm.'
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    table: '3'
+    note: Na row
   read_from: pdf:kems-020-hastie-1981-nbsir

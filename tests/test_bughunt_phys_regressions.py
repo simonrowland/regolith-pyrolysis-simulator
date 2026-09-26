@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import copy
 import gc
 import math
+import pickle
+from collections import deque
 from types import MappingProxyType, SimpleNamespace
 
 import pytest
@@ -178,6 +181,197 @@ def test_typed_refusal_rolls_back_entire_hour(refusal: Exception) -> None:
     slotted_schedule = sim.runtime_state["slotted_holder"].schedule
     assert isinstance(slotted_schedule, MappingProxyType)
     assert slotted_schedule["points"] == [{"temperature_C": 75.0}]
+
+
+def test_refusal_snapshot_does_not_patch_global_deepcopy_dispatch() -> None:
+    missing = object()
+    original_dispatch = copy._deepcopy_dispatch.get(MappingProxyType, missing)
+    probe = object()
+
+    class DispatchProbe:
+        def __deepcopy__(self, memo):
+            assert (
+                copy._deepcopy_dispatch.get(MappingProxyType, missing)
+                is original_dispatch
+            )
+            with pytest.raises(TypeError):
+                copy.deepcopy(MappingProxyType({"value": 1}))
+            return probe
+
+    state = {
+        "probe": DispatchProbe(),
+        "proxy": MappingProxyType({"value": 1}),
+    }
+    copied = _deepcopy_refusal_state(state, {})
+
+    assert copied["probe"] is probe
+    assert (
+        copy._deepcopy_dispatch.get(MappingProxyType, missing)
+        is original_dispatch
+    )
+
+
+def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
+    class ImmutableOwner:
+        def __deepcopy__(self, _memo):
+            raise AssertionError("preserved owner must not enter the snapshot")
+
+        def __setattr__(self, _name, _value):
+            raise AssertionError("preserved owner is not hour-mutable")
+
+    class SlottedState:
+        __slots__ = ("payload",)
+
+        def __init__(self, payload):
+            self.payload = payload
+
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    def snapshot_bytes(value):
+        def freeze(candidate):
+            if isinstance(candidate, MappingProxyType):
+                referents = [
+                    item
+                    for item in gc.get_referents(candidate)
+                    if isinstance(item, (dict, MappingProxyType))
+                ]
+                assert len(referents) == 1
+                return ("mappingproxy", freeze(referents[0]))
+            if isinstance(candidate, dict):
+                return (
+                    "dict",
+                    tuple(
+                        (freeze(key), freeze(item))
+                        for key, item in sorted(
+                            candidate.items(), key=lambda pair: repr(pair[0])
+                        )
+                    ),
+                )
+            if isinstance(candidate, list):
+                return ("list", tuple(freeze(item) for item in candidate))
+            if isinstance(candidate, tuple):
+                return ("tuple", tuple(freeze(item) for item in candidate))
+            if isinstance(candidate, (set, frozenset)):
+                return (
+                    type(candidate).__name__,
+                    tuple(sorted((freeze(item) for item in candidate), key=repr)),
+                )
+            if isinstance(candidate, deque):
+                return ("deque", tuple(freeze(item) for item in candidate))
+            if isinstance(candidate, (str, bytes, int, float, bool, type(None))):
+                return (type(candidate).__name__, candidate)
+            attributes = getattr(candidate, "__dict__", None)
+            if isinstance(attributes, dict):
+                return (
+                    type(candidate).__module__,
+                    type(candidate).__qualname__,
+                    freeze(attributes),
+                )
+            slots = {}
+            for cls in type(candidate).__mro__:
+                names = getattr(cls, "__slots__", ())
+                if isinstance(names, str):
+                    names = (names,)
+                for name in names:
+                    if name in ("__dict__", "__weakref__"):
+                        continue
+                    if hasattr(candidate, name):
+                        slots[name] = freeze(getattr(candidate, name))
+            return (
+                type(candidate).__module__,
+                type(candidate).__qualname__,
+                freeze(slots),
+            )
+
+        return pickle.dumps(freeze(value), protocol=5)
+
+    refusal = EvaporationFluxRefusal("terminal", {"reason": "byte-proof"})
+    owner = ImmutableOwner()
+    backing = {"nested": [{"value": 1}]}
+    proxy = MappingProxyType(backing)
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.overhead = SimpleNamespace(pressure_mbar=2.0)
+    sim.record = SimpleNamespace(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        operating_history=[],
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.runtime_state = {
+        "plain": {"value": 1},
+        "proxy": proxy,
+        "slotted": SlottedState({"value": 2}),
+        "deque": deque([1, 2]),
+    }
+    sim.vapour_rail_catalog = owner
+    sim.atom_ledger = FakeLedger()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    sim._build_chemistry_kernel = lambda: object()
+
+    non_graph_roots = {
+        "backend",
+        "_sulfsat_gate",
+        "_base_species_formula_registry",
+        "species_formula_registry",
+        "_chem_registry",
+        "_chem_kernel",
+        "cost_ledger",
+        "vapour_rail_catalog",
+        "atom_ledger",
+    }
+
+    def refuse_after_mutating_every_copied_root() -> None:
+        sim.atom_ledger._transitions.append(object())
+        sim.melt.hour = 5
+        sim.overhead.pressure_mbar = 99.0
+        sim.record.snapshots.append(object())
+        sim._condensation_model.operating_history.append(object())
+        sim.runtime_state["plain"]["value"] = 9
+        backing["nested"][0]["value"] = 9
+        sim.runtime_state["slotted"].payload["value"] = 9
+        sim.runtime_state["deque"].append(3)
+        raise refusal
+
+    sim._step_one_hour = refuse_after_mutating_every_copied_root
+    expected_state, expected_ledger, _cost = (
+        sim._snapshot_terminal_refusal_hour_state()
+    )
+    expected_roots = {
+        name: value
+        for name, value in expected_state.items()
+        if name not in non_graph_roots
+    }
+    expected_fingerprint = snapshot_bytes(expected_roots)
+    original_proxy = proxy
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+
+    assert raised.value is refusal
+    restored_roots = {
+        name: value
+        for name, value in sim.__dict__.items()
+        if name not in non_graph_roots
+    }
+    assert snapshot_bytes(restored_roots) == expected_fingerprint
+    restored_proxy = sim.runtime_state["proxy"]
+    assert restored_proxy is not original_proxy
+    assert restored_proxy["nested"][0]["value"] == 1
+    assert original_proxy["nested"][0]["value"] == 9
+    assert sim.atom_ledger.__dict__ == expected_ledger.__dict__
+    assert sim.vapour_rail_catalog is owner
 
 
 def test_terminal_refusal_rolls_back_chemistry_registry_fallback() -> None:

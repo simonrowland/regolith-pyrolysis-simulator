@@ -44,7 +44,7 @@ observations:
     section: The Secondary Atmosphere
     note: Prose sentence cites Hashimoto et al. (2007); values are not measurements made in this review.
   read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
-- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_co_ch4_equal_ratio_pressure_shift
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_co_ch4_equal_ratio_pressure_shift::rows:h=480b1202919d
   experiment_id: 10.1101/cshperspect.a004895::2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
   identity:
     quantity:
@@ -63,7 +63,49 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'CO_to_CH4_ratio'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Both temperatures are approximate; no uncertainty is printed.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  locator:
+    published_page: 6
+    pdf_page_index: 6
+    section: The Secondary Atmosphere
+    note: Examples reported from the Schaefer and Fegley (2007) model.
+  read_from: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+- observation_id: 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_co_ch4_equal_ratio_pressure_shift::rows:h=ab3695d611af
+  experiment_id: 10.1101/cshperspect.a004895::2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'CO_to_CH4_ratio'
+    species:
+      formula: ordinary_chondrite_gas
+      phase:
+        tag: unknown
+        reason: phase string 'ordinary_chondritic_material_gas' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

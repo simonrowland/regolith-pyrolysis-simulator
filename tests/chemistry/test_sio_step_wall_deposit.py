@@ -216,8 +216,18 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # overstated D_AB by 1.216%. SiO/N2 at 1973.15 K and 1000 Pa moves
     # 0.0496927555 -> 0.0490955656 m^2/s. The 1050 C cold-liner Si+SiO2
     # deposit follows: 8.452523682217e-06 -> 8.191796266986e-06 (−3.085%).
+    # 2026-09-25 b-573 projected-bulk freeze-gate re-grounding: this helper's
+    # lunar 24-hour report now uses the projected 918.75--1370.3125 C bounds
+    # after the 0.308801 wt% MnO+P2O5 predict-and-flag drop, instead of the
+    # green Kress-floor step.  The derivation is C_m_effective = C_m_full * F,
+    # delta_ln(fO2) = net_O2_equivalent_mol / C_m_effective, then the corrected
+    # wall route integrates the resulting Si/SiO2 flux as J * A * M * 3600,
+    # capped by available supply.  Re-grounding that executable chain moves
+    # the 1050 C product deposit, without changing the 1400/1500 C threshold
+    # zeros; this is a physics-derived pin, not a tuning adjustment.
+    # The new 1050 C value is 8.191905995448e-06 kg.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        8.191796266986e-06, rel=1e-9
+        8.191905995448e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9
