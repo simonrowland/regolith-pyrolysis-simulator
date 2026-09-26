@@ -786,7 +786,15 @@
               ]
             },
             "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
+            "alpha_s_authoritative_at_temperature": false,
+            "authority_level": "extrapolated",
+            "reactive_uptake_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "original_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "reactive_uptake_envelope": [
+              0.0,
+              1.0
+            ],
+            "alpha_reactive_ladder": "physical_ceiling"
           },
           "stage_3_to_stage_4": {
             "species": "K",
@@ -965,52 +973,15 @@
             },
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 3
-          },
-          "stage_4": {
-            "species": "K",
-            "alpha_s": 1.0,
-            "source": "REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.",
-            "source_class": "uncertified_na_analogy_default",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 798.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_extrapolation_warning": "K alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.2138/rmg.2018.84.11",
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": [
-              1700,
-              2273
-            ],
-            "envelope": [
-              0.8,
+            "stage_number": 3,
+            "authority_level": "extrapolated",
+            "reactive_uptake_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "original_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "reactive_uptake_envelope": [
+              0.0,
               1.0
             ],
-            "uncertainty_flag": "no_direct_k_sticking_coefficient",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.K.value",
-            "material_source": "data/materials.yaml::stages.4.alpha_s_by_species.K",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 1.0,
-              "temperature_range_K": [
-                1700.0,
-                2273.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 4
+            "alpha_reactive_ladder": "physical_ceiling"
           },
           "capture_budget": {
             "species": "K",
@@ -1055,6 +1026,14 @@
             },
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false,
+            "authority_level": "extrapolated",
+            "reactive_uptake_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "original_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "reactive_uptake_envelope": [
+              0.0,
+              1.0
+            ],
+            "alpha_reactive_ladder": "physical_ceiling",
             "alpha_s_stage_evaluations": {
               "0": {
                 "species": "K",
@@ -2395,7 +2374,15 @@
               ]
             },
             "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
+            "alpha_s_authoritative_at_temperature": false,
+            "authority_level": "extrapolated",
+            "reactive_uptake_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "original_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "reactive_uptake_envelope": [
+              0.0,
+              1.0
+            ],
+            "alpha_reactive_ladder": "physical_ceiling"
           },
           "stage_3_to_stage_4": {
             "species": "Na",
@@ -2574,187 +2561,15 @@
             },
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 3
-          },
-          "stage_4": {
-            "species": "Na",
-            "alpha_s": 1.0,
-            "source": "Unsupported corpus-created Sossi interval withdrawn 2026-08-11; alpha_s=1 retained only as the physical HKL capture ceiling. Sossi's separate author-adopted alpha_e=1 is context, not a wall-sticking measurement.",
-            "source_class": "hkl_ideal_upper_bound",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 798.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 798.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": [
-              1700,
-              2273
-            ],
-            "envelope": [
+            "stage_number": 3,
+            "authority_level": "extrapolated",
+            "reactive_uptake_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "original_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "reactive_uptake_envelope": [
               0.0,
               1.0
             ],
-            "uncertainty_flag": "physical_bound_only_no_direct_Na_wall_sticking_measurement",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Na.value",
-            "material_source": "data/materials.yaml::stages.4.alpha_s_by_species.Na",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 1.0,
-              "temperature_range_K": [
-                1700.0,
-                2273.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 4
-          },
-          "stage_5": {
-            "species": "Na",
-            "alpha_s": 1.0,
-            "source": "Unsupported corpus-created Sossi interval withdrawn 2026-08-11; alpha_s=1 retained only as the physical HKL capture ceiling. Sossi's separate author-adopted alpha_e=1 is context, not a wall-sticking measurement.",
-            "source_class": "hkl_ideal_upper_bound",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 548.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 548.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": [
-              1700,
-              2273
-            ],
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "physical_bound_only_no_direct_Na_wall_sticking_measurement",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Na.value",
-            "material_source": "data/materials.yaml::stages.5.alpha_s_by_species.Na",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 1.0,
-              "temperature_range_K": [
-                1700.0,
-                2273.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 5
-          },
-          "stage_6": {
-            "species": "Na",
-            "alpha_s": 1.0,
-            "source": "Unsupported corpus-created Sossi interval withdrawn 2026-08-11; alpha_s=1 retained only as the physical HKL capture ceiling. Sossi's separate author-adopted alpha_e=1 is context, not a wall-sticking measurement.",
-            "source_class": "hkl_ideal_upper_bound",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 398.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 398.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": [
-              1700,
-              2273
-            ],
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "physical_bound_only_no_direct_Na_wall_sticking_measurement",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Na.value",
-            "material_source": "data/materials.yaml::stages.6.alpha_s_by_species.Na",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 1.0,
-              "temperature_range_K": [
-                1700.0,
-                2273.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 6
-          },
-          "stage_7": {
-            "species": "Na",
-            "alpha_s": 1.0,
-            "source": "Unsupported corpus-created Sossi interval withdrawn 2026-08-11; alpha_s=1 retained only as the physical HKL capture ceiling. Sossi's separate author-adopted alpha_e=1 is context, not a wall-sticking measurement.",
-            "source_class": "hkl_ideal_upper_bound",
-            "status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
-            "alpha_s_temperature_K": 308.15,
-            "alpha_s_extrapolated": true,
-            "alpha_s_valid_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_temperature_range_K": [
-              1700.0,
-              2273.0
-            ],
-            "alpha_s_extrapolation_warning": "Na alpha_s scalar coefficient extrapolated beyond valid_range_K [1700, 2273] at 308.15 K",
-            "alpha_s_temperature_below_valid_range": true,
-            "source_url": "https://doi.org/10.1016/j.gca.2019.06.021",
-            "citation_status": "UNCERTIFIED",
-            "temperature_range_K": [
-              1700,
-              2273
-            ],
-            "envelope": [
-              0.0,
-              1.0
-            ],
-            "uncertainty_flag": "physical_bound_only_no_direct_Na_wall_sticking_measurement",
-            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.Na.value",
-            "material_source": "data/materials.yaml::stages.7.alpha_s_by_species.Na",
-            "alpha_s_coefficient_spec": {
-              "form": "scalar",
-              "value": 1.0,
-              "temperature_range_K": [
-                1700.0,
-                2273.0
-              ]
-            },
-            "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false,
-            "stage_number": 7
+            "alpha_reactive_ladder": "physical_ceiling"
           },
           "capture_budget": {
             "species": "Na",
@@ -2799,6 +2614,14 @@
             },
             "alpha_s_domain_status": "out_of_domain",
             "alpha_s_authoritative_at_temperature": false,
+            "authority_level": "extrapolated",
+            "reactive_uptake_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "original_reason": "physical_bound_only_no_reactive_uptake_measurement",
+            "reactive_uptake_envelope": [
+              0.0,
+              1.0
+            ],
+            "alpha_reactive_ladder": "physical_ceiling",
             "alpha_s_stage_evaluations": {
               "0": {
                 "species": "Na",
@@ -3371,7 +3194,15 @@
               }
             },
             "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
+            "alpha_s_authoritative_at_temperature": false,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "stage_1_to_stage_2": {
             "species": "SiO",
@@ -3432,23 +3263,84 @@
               }
             },
             "alpha_s_domain_status": "out_of_domain",
-            "alpha_s_authoritative_at_temperature": false
+            "alpha_s_authoritative_at_temperature": false,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "stage_2_to_stage_3": {
             "species": "SiO",
-            "alpha_s": 0.0,
-            "source": "data/wall_materials.yaml::materials.fused_silica.stickiness.SiO",
-            "source_class": "fail_closed_no_direct_sticking_coefficient",
+            "alpha_s": 0.07080594980098856,
+            "source": "Wetzel & Gail 2013 A&A 553 A92 use 0.52*exp(-3685/T) as a solid-SiO particle-growth coefficient, not a silicate-melt free-evaporation coefficient. Runtime retains the numeric form only as an explicitly uncertified hot-source proxy. Cold-wall condensation below the valid_range_K floor separately uses the cited Pound high-supersaturation limit.",
+            "source_class": "solid_film_growth_proxy_not_evaporation_evidence",
             "status": "UNCERTIFIED",
             "output_status": "status_bearing",
-            "alpha_s_form": "scalar",
+            "alpha_s_form": "arrhenius",
             "alpha_s_temperature_K": 1848.15,
-            "alpha_s_extrapolated": false,
-            "liner_material": "fused_silica_baffles",
-            "segment": "stage_2_to_stage_3",
-            "basis": "Fused-silica SiO retention has cited chemistry/fouling proxies but no direct differentiated alpha_s; fail closed instead of applying the legacy 0.7.",
+            "alpha_s_A": 0.52,
+            "alpha_s_B": 3685.0,
+            "alpha_s_valid_range_K": [
+              1000.0,
+              1800.0
+            ],
+            "alpha_s_extrapolated": true,
+            "alpha_s_uncertainty_envelope": [
+              0.003,
+              0.067
+            ],
+            "alpha_s_cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+            "alpha_s_status": "UNCERTIFIED",
+            "alpha_s_temperature_above_valid_range": true,
+            "alpha_s_extrapolation_warning": "SiO alpha_s arrhenius coefficient extrapolated beyond valid_range_K [1000, 1800] at 1848.15 K",
+            "source_url": "https://doi.org/10.1051/0004-6361/201220803",
             "citation_status": "UNCERTIFIED",
-            "certification_status_reason": "materials.yaml liner alpha_s override lacks CITED/UNCERTIFIED certification status"
+            "temperature_range_K": [
+              1000,
+              1800
+            ],
+            "envelope": [
+              0.003,
+              0.067
+            ],
+            "uncertainty_flag": "solid_film_growth_proxy_not_silicate_melt_evaporation_measurement",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value",
+            "material_source": "data/materials.yaml::wall_surfaces.interstage_duct.alpha_s_by_species.SiO",
+            "liner_material": "hot_wall_refractory_liner",
+            "segment": "stage_2_to_stage_3",
+            "alpha_s_coefficient_spec": {
+              "form": "arrhenius",
+              "A": 0.52,
+              "B": 3685.0,
+              "valid_range_K": [
+                1000,
+                1800
+              ],
+              "uncertainty_envelope": [
+                0.003,
+                0.067
+              ],
+              "cite": "Wetzel&Gail 2013 DOI 10.1051/0004-6361/201220803",
+              "status": "UNCERTIFIED",
+              "prior_scalar": {
+                "value": 0.04,
+                "source": "REF-018 REF-016 Schaefer & Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa & Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check."
+              }
+            },
+            "alpha_s_domain_status": "out_of_domain",
+            "alpha_s_authoritative_at_temperature": false,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "stage_0": {
             "species": "SiO",
@@ -3506,7 +3398,15 @@
             },
             "alpha_s_domain_status": "in_domain",
             "alpha_s_authoritative_at_temperature": true,
-            "stage_number": 0
+            "stage_number": 0,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "stage_1": {
             "species": "SiO",
@@ -3564,7 +3464,15 @@
             },
             "alpha_s_domain_status": "in_domain",
             "alpha_s_authoritative_at_temperature": true,
-            "stage_number": 1
+            "stage_number": 1,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "stage_3": {
             "species": "SiO",
@@ -3622,7 +3530,15 @@
             },
             "alpha_s_domain_status": "in_domain",
             "alpha_s_authoritative_at_temperature": true,
-            "stage_number": 3
+            "stage_number": 3,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "stage_4": {
             "species": "SiO",
@@ -3697,7 +3613,15 @@
             },
             "alpha_s_domain_status": "in_domain",
             "alpha_s_authoritative_at_temperature": true,
-            "stage_number": 4
+            "stage_number": 4,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "stage_5": {
             "species": "SiO",
@@ -3772,7 +3696,15 @@
             },
             "alpha_s_domain_status": "in_domain",
             "alpha_s_authoritative_at_temperature": true,
-            "stage_number": 5
+            "stage_number": 5,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "stage_6": {
             "species": "SiO",
@@ -3847,7 +3779,15 @@
             },
             "alpha_s_domain_status": "in_domain",
             "alpha_s_authoritative_at_temperature": true,
-            "stage_number": 6
+            "stage_number": 6,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "stage_7": {
             "species": "SiO",
@@ -3922,7 +3862,15 @@
             },
             "alpha_s_domain_status": "in_domain",
             "alpha_s_authoritative_at_temperature": true,
-            "stage_number": 7
+            "stage_number": 7,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ]
           },
           "capture_budget": {
             "species": "SiO",
@@ -3980,6 +3928,14 @@
             },
             "alpha_s_domain_status": "in_domain",
             "alpha_s_authoritative_at_temperature": true,
+            "authority_level": "bridge",
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "alpha_reactive_ladder": "species_bridge",
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ],
             "alpha_s_stage_evaluations": {
               "0": {
                 "species": "SiO",
@@ -8648,6 +8604,182 @@
             "output_status": "status_bearing",
             "continuation": "antoine"
           }
+        },
+        "SiO": {
+          "stage_0_to_stage_1": {
+            "status": "status_bearing",
+            "output_status": "status_bearing",
+            "authority_level": "bridge",
+            "reason": "reactive_equilibrium_undersaturated",
+            "saturation_pressure_policy": "reactive_equilibrium",
+            "temperature_K": 1848.15,
+            "wall_saturation_pressure_pa": 7190.58251604089,
+            "driving_pressure_pa": 0.0,
+            "phase_standard_state_mismatch": false,
+            "liquid_standard_state_min_K": 1696.0,
+            "p_eq_comparison_pa": null,
+            "standard_state_1mbar_crossing_liquid_C": 1253.0953623158694,
+            "standard_state_1mbar_crossing_comparison_C": 1259.2028259182352,
+            "standard_state_crossing_band_C": 6.107463602365897,
+            "antoine_standard_state_extrapolated": false,
+            "primary_phase_basis": "Si(l) + O2 -> SiO2(l); rows 1700-2500 K",
+            "comparison_phase_basis": null,
+            "certified_band_K": [
+              1696.0,
+              2500.0
+            ],
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ],
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake"
+          },
+          "stage_1_to_stage_2": {
+            "status": "status_bearing",
+            "output_status": "status_bearing",
+            "authority_level": "bridge",
+            "reason": "reactive_equilibrium_undersaturated",
+            "saturation_pressure_policy": "reactive_equilibrium",
+            "temperature_K": 1848.15,
+            "wall_saturation_pressure_pa": 7190.58251604089,
+            "driving_pressure_pa": 0.0,
+            "phase_standard_state_mismatch": false,
+            "liquid_standard_state_min_K": 1696.0,
+            "p_eq_comparison_pa": null,
+            "standard_state_1mbar_crossing_liquid_C": 1253.0953623158694,
+            "standard_state_1mbar_crossing_comparison_C": 1259.2028259182352,
+            "standard_state_crossing_band_C": 6.107463602365897,
+            "antoine_standard_state_extrapolated": false,
+            "primary_phase_basis": "Si(l) + O2 -> SiO2(l); rows 1700-2500 K",
+            "comparison_phase_basis": null,
+            "certified_band_K": [
+              1696.0,
+              2500.0
+            ],
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ],
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake"
+          },
+          "stage_2_to_stage_3": {
+            "status": "status_bearing",
+            "output_status": "status_bearing",
+            "authority_level": "bridge",
+            "reason": "reactive_equilibrium_undersaturated",
+            "saturation_pressure_policy": "reactive_equilibrium",
+            "temperature_K": 1848.15,
+            "wall_saturation_pressure_pa": 7190.58251604089,
+            "driving_pressure_pa": 0.0,
+            "phase_standard_state_mismatch": false,
+            "liquid_standard_state_min_K": 1696.0,
+            "p_eq_comparison_pa": null,
+            "standard_state_1mbar_crossing_liquid_C": 1253.0953623158694,
+            "standard_state_1mbar_crossing_comparison_C": 1259.2028259182352,
+            "standard_state_crossing_band_C": 6.107463602365897,
+            "antoine_standard_state_extrapolated": false,
+            "primary_phase_basis": "Si(l) + O2 -> SiO2(l); rows 1700-2500 K",
+            "comparison_phase_basis": null,
+            "certified_band_K": [
+              1696.0,
+              2500.0
+            ],
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ],
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake"
+          },
+          "stage_0_to_stage_1#2": {
+            "status": "status_bearing",
+            "output_status": "status_bearing",
+            "authority_level": "bridge",
+            "reason": "reactive_equilibrium_undersaturated",
+            "saturation_pressure_policy": "reactive_equilibrium",
+            "temperature_K": 1923.15,
+            "wall_saturation_pressure_pa": 15638.944376548867,
+            "driving_pressure_pa": 0.0,
+            "phase_standard_state_mismatch": false,
+            "liquid_standard_state_min_K": 1696.0,
+            "p_eq_comparison_pa": null,
+            "standard_state_1mbar_crossing_liquid_C": 1253.0953623158694,
+            "standard_state_1mbar_crossing_comparison_C": 1259.2028259182352,
+            "standard_state_crossing_band_C": 6.107463602365897,
+            "antoine_standard_state_extrapolated": false,
+            "primary_phase_basis": "Si(l) + O2 -> SiO2(l); rows 1700-2500 K",
+            "comparison_phase_basis": null,
+            "certified_band_K": [
+              1696.0,
+              2500.0
+            ],
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ],
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake"
+          },
+          "stage_1_to_stage_2#2": {
+            "status": "status_bearing",
+            "output_status": "status_bearing",
+            "authority_level": "bridge",
+            "reason": "reactive_equilibrium_undersaturated",
+            "saturation_pressure_policy": "reactive_equilibrium",
+            "temperature_K": 1923.15,
+            "wall_saturation_pressure_pa": 15638.944376548867,
+            "driving_pressure_pa": 0.0,
+            "phase_standard_state_mismatch": false,
+            "liquid_standard_state_min_K": 1696.0,
+            "p_eq_comparison_pa": null,
+            "standard_state_1mbar_crossing_liquid_C": 1253.0953623158694,
+            "standard_state_1mbar_crossing_comparison_C": 1259.2028259182352,
+            "standard_state_crossing_band_C": 6.107463602365897,
+            "antoine_standard_state_extrapolated": false,
+            "primary_phase_basis": "Si(l) + O2 -> SiO2(l); rows 1700-2500 K",
+            "comparison_phase_basis": null,
+            "certified_band_K": [
+              1696.0,
+              2500.0
+            ],
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ],
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake"
+          },
+          "stage_2_to_stage_3#2": {
+            "status": "status_bearing",
+            "output_status": "status_bearing",
+            "authority_level": "bridge",
+            "reason": "reactive_equilibrium_undersaturated",
+            "saturation_pressure_policy": "reactive_equilibrium",
+            "temperature_K": 1923.15,
+            "wall_saturation_pressure_pa": 15638.944376548867,
+            "driving_pressure_pa": 0.0,
+            "phase_standard_state_mismatch": false,
+            "liquid_standard_state_min_K": 1696.0,
+            "p_eq_comparison_pa": null,
+            "standard_state_1mbar_crossing_liquid_C": 1253.0953623158694,
+            "standard_state_1mbar_crossing_comparison_C": 1259.2028259182352,
+            "standard_state_crossing_band_C": 6.107463602365897,
+            "antoine_standard_state_extrapolated": false,
+            "primary_phase_basis": "Si(l) + O2 -> SiO2(l); rows 1700-2500 K",
+            "comparison_phase_basis": null,
+            "certified_band_K": [
+              1696.0,
+              2500.0
+            ],
+            "reactive_uptake_envelope": [
+              0.003,
+              0.067
+            ],
+            "reactive_uptake_reason": "evaporation_alpha_proxy_not_reactive_uptake",
+            "original_reason": "evaporation_alpha_proxy_not_reactive_uptake"
+          }
         }
       },
       "authority_level": "extrapolated",
@@ -8723,7 +8855,6 @@
       "surface_geometry_code": "wall_deposit_surface_geometry_provenance",
       "codes": [
         "wall_deposit_vapour_carrier_non_authoritative",
-        "wall_deposit_saturation_pressure_refused",
         "wall_deposit_sticking_alpha_provenance_missing",
         "wall_deposit_sticking_alpha_out_of_domain",
         "wall_deposit_sticking_alpha_uncertified"
@@ -8765,74 +8896,6 @@
         "Ti": "status_bearing",
         "TiO": "status_bearing",
         "TiO2_gas": "status_bearing"
-      },
-      "status_bearing_refusal_count": 1,
-      "wall_saturation_pressure_refused_species": [
-        "SiO"
-      ],
-      "wall_saturation_pressure_refusals_by_species": {
-        "SiO": {
-          "stage_0_to_stage_1": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1848.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1848.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1848.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_1_to_stage_2": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1848.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1848.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1848.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_0_to_stage_1#2": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1923.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1923.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1923.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_1_to_stage_2#2": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1923.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1923.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1923.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          }
-        }
       }
     },
     "nominal_verdict": "slow-fouling",

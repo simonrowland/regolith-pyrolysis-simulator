@@ -45,9 +45,14 @@ def produce_bytes() -> bytes:
             "kernel_commit_sha": "goal-18-fixture",
         },
     )
+    payload = run.run()
+    # Mirror the test (b-238): the floor-fallback engagement counter depends on
+    # the freeze-gate cross-run cache, so the test drops it before hashing.
+    # Hashing it here made every regenerated pin unreachable by the test.
+    payload.pop("melt_redox_gate_floor_fallback_engagement")
     return (
         json.dumps(
-            run.run(),
+            payload,
             indent=2,
             sort_keys=False,
             allow_nan=False,

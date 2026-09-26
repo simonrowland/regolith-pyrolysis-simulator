@@ -404,9 +404,17 @@ BASELINE_STAGE4_SIO2_KG = {
 # docs-private/research/2026-08-02-train13-adjudication.md
 # Rebaselined 2026-08-28 after f7bcbf79 removed fabricated stage pressure
 # and b42d14ed carried per-carrier authority into the wall-routing model.
+# Rebaselined 2026-09-25 (wall cluster b-324, 751b22ab3): condenser eta now
+# converts the kg/h supply to mol/s (eta = flux*A*3600*M/kg_hr), so SiO's
+# stage-3 weight rises by 3600/tau_stage3 = 900 and the fixed pressure-
+# isolated capture budget is booked on stage 3 instead of split with the
+# non-target stage 4. Stage 3 + stage 4 is conserved: lunar
+# 2.73726786918e-6 + 3.91978550119e-6 = 6.65705337037e-6 (Mars likewise
+# 6.70667353678e-6); evolved SiO is unchanged. Studio-1 executable values;
+# evidence docs-private/reviews/2026-09-25-wall-cluster-fix/golden-verdict.md.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 2.73730312429e-06,
-    "mars_basalt": 2.7578902906e-06,
+    "lunar_mare_low_ti": 6.65705337037e-06,
+    "mars_basalt": 6.70667353678e-06,
 }
 
 
@@ -572,10 +580,15 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     extrapolations = authority["wall_saturation_pressure_extrapolations_by_species"]
     assert extrapolations
     assert "Wall saturation includes EXTRAPOLATED quantities" in report["fouling_rate"]["status_reason"]
-    for by_segment in extrapolations.values():
+    # d-025 (owner, 2026-09-25): SiO deposits as a reactive sink governed by
+    # 2SiO(g) = Si + SiO2 p_eq, with Wetzel-bridged reactive uptake, so its
+    # wall record is authority "bridge"; physisorbing metals keep the Antoine
+    # extrapolation authority "extrapolated". Neither may read as certified.
+    for species, by_segment in extrapolations.items():
         assert by_segment
+        expected_authority = "bridge" if species == "SiO" else "extrapolated"
         for event in by_segment.values():
-            assert event["authority_level"] == "extrapolated"
+            assert event["authority_level"] == expected_authority
             assert event["valid_range_K"]
             assert event["reason"]
 
