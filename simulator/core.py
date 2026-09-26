@@ -951,16 +951,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # SULFUR_SATURATION_GATE intent (PySulfSat). Lazy-probe: when
         # the optional [sulfur] extra is absent, the gate stays
         # un-initialised and ``is_available()`` returns False, which
-        # causes the Stage 0 + post-equilibrium hooks below to record
-        # an 'unavailable' result and fall back to builtin partitioning.
+        # causes the post-equilibrium hook below to record an
+        # 'unavailable' result and fall back to builtin partitioning.
         # The gate itself never emits a LedgerTransition (binding spec
         # §4 — it is a diagnostic gate, not a writer).
         self._sulfsat_gate = SulfSatGate()
         self._sulfsat_gate.initialize({})
-        # Latest SulfurSaturationResult captured by either the Stage 0
-        # hook (``_record_stage0_sulfsat_result``) or the post-equilibrium
+        # Latest SulfurSaturationResult captured by the post-equilibrium
         # hook in ``_get_equilibrium``. Available to the UI / diagnostics
-        # without forcing a recompute. None until the first call.
+        # without forcing a recompute. None until a melt is present and
+        # the first call succeeds.
         self._last_sulfur_saturation_result: SulfurSaturationResult | None = None
         self.setpoints = copy.deepcopy(setpoints)
         self.feedstocks = copy.deepcopy(feedstocks)
@@ -1429,6 +1429,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_out_of_domain_diagnostics = {}
         self._engine_commissioning_steps = []
         self._sulfur_saturation_steps = []
+        self._last_sulfur_saturation_result = None
         self._backend_failed = False
 
         self.melt.temperature_C = 25.0
@@ -8139,12 +8140,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             label,
             [*foulant_specs, *direct_volatile_specs],
         )
-        # SULFUR_SATURATION_GATE — Stage 0 hook. Refines the sulfate /
-        # sulfide partitioning diagnostic when PySulfSat is available;
-        # otherwise records an 'unavailable' result so the builtin Stage
-        # 0 bucketing remains authoritative.
-        self._run_stage0_sulfsat_gate()
-
     def _load_ledger_account(
         self, account: str, species_kg: Mapping[str, float], *, source: str
     ) -> None:
@@ -8598,47 +8593,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if kg > 0.0
         }
 
-    def _run_stage0_sulfsat_gate(self) -> None:
-        """
-        Run the SULFUR_SATURATION_GATE at the end of Stage 0.
-
-        Records the result on ``self._last_sulfur_saturation_result`` so
-        the UI / diagnostics can read the SCSS / SCAS / S6+ partitioning
-        without re-running the gate. The result never mutates the atom
-        ledger; Stage 0 keeps its builtin sulfate / sulfide bucketing
-        authoritative. When the gate reports ``out_of_range`` the
-        warning is preserved on the result; the caller is expected to
-        log it but not redirect inventory.
-        """
-        s_input_ppm = self._stage0_sulfur_input_ppm()
-        if s_input_ppm <= 0.0:
-            self._last_sulfur_saturation_result = None
-            return
-        comp_wt = self._melt_oxide_wt_pct()
-        if not comp_wt:
-            self._last_sulfur_saturation_result = None
-            return
-        # The Stage 0 reload pinpoints the melt at room temperature; the
-        # SCSS / SCAS empirical fits are calibrated above ~1000 K. Using
-        # a representative liquidus temperature (1473 K) for the Stage 0
-        # diagnostic keeps the gate output meaningful before the melt
-        # has been heated, without claiming a temperature it has not
-        # reached. Post-equilibrium calls override this with the actual
-        # melt T.
-        T_K = 1473.0
-        P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
-        fO2_log = self._current_melt_redox_fO2_log()
-        self._sync_oxygen_reservoir_mirror()
-        self._last_sulfur_saturation_result = (
-            self._sulfsat_gate.compute_sulfur_saturation(
-                liquid_comp_wt=comp_wt,
-                T_K=T_K,
-                P_bar=P_bar,
-                fO2_log=fO2_log,
-                S_input_ppm=s_input_ppm,
-            )
-        )
-
     def _attach_post_equilibrium_sulfsat(
         self, result: 'Any'
     ) -> None:
@@ -8646,9 +8600,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Post-equilibrium SULFUR_SATURATION_GATE hook.
 
         Called from ``_get_equilibrium`` after a successful backend
-        equilibration. If Stage 0 sulfide / sulfate inventory is
-        non-zero, calls the gate at the melt's current T / P / fO2 and
-        attaches the result to ``result.sulfur_saturation`` (and
+        equilibration. If the result reports a positive liquid fraction
+        and Stage 0 sulfide / sulfate inventory is non-zero, calls the
+        gate at the melt's current T / P / fO2 and attaches the result to
+        ``result.sulfur_saturation`` (and
         ``self._last_sulfur_saturation_result``). When the gate reports
         ``out_of_range`` or ``unavailable`` the warning is appended to
         ``result.warnings`` so existing diagnostic surfaces (UI,
@@ -8656,6 +8611,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         is never mutated here — the gate has no ledger authority
         (binding spec §4 forbids it).
         """
+        liquid_fraction = getattr(result, 'liquid_fraction', None)
+        try:
+            melt_present = liquid_fraction is not None and float(
+                liquid_fraction
+            ) > 0.0
+        except (TypeError, ValueError):
+            melt_present = False
+        if not melt_present:
+            self._last_sulfur_saturation_result = None
+            try:
+                result.sulfur_saturation = None
+            except AttributeError:
+                pass
+            return
         s_input_ppm = self._stage0_sulfur_input_ppm()
         if s_input_ppm <= 0.0:
             return
@@ -9130,9 +9099,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # (EVAPORATION_FLUX, ...) sit on top of this same kernel.
         self._refresh_vapor_pressures_from_kernel(result)
         # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
-        # Stage 0 left sulfide / sulfate inventory behind; otherwise
-        # short-circuits without touching PySulfSat. Never mutates the
-        # ledger (the gate has no LedgerTransition authority).
+        # the backend reports a positive liquid fraction and Stage 0 left
+        # sulfide / sulfate inventory behind; otherwise short-circuits
+        # without touching PySulfSat. Never mutates the ledger (the gate
+        # has no LedgerTransition authority).
         self._attach_post_equilibrium_sulfsat(result)
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'capture_enabled', False):

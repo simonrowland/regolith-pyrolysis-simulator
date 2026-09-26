@@ -16,11 +16,9 @@ Covers four mocked paths plus one live PySulfSat smoke test:
   feed a high-FeO composition outside the calibration window and assert
   ``calibration_status='out_of_range'`` plus a descriptive warning. No
   silent extrapolation - result still comes back tagged out-of-range.
-* ``test_stage0_fallback_records_warning_when_gate_unavailable`` - Stage 0
-  fallback path: with ``SulfSatGate.is_available()`` patched to False,
-  the Stage 0 sulfate / sulfide bucketing is preserved (builtin
-  authority) and the simulator records an ``unavailable`` result with a
-  warning on ``_last_sulfur_saturation_result``.
+* ``test_stage0_does_not_run_sulfsat_before_melt`` - Stage 0 preserves
+  the builtin sulfate / sulfide bucketing without recording a
+  pre-melt SCAS / SCSS result.
 * ``test_live_pysulfsat_morb_basalt`` - skipif-guarded live test that
   calls real PySulfSat on a single MORB-basalt composition. Asserts
   ``calibration_status == 'in_range'`` and ``SCSS_ppm > 0``.
@@ -245,7 +243,7 @@ def test_gate_unavailable_when_pysulfsat_import_fails(monkeypatch):
 
 
 def test_gate_populates_every_field_with_fake_pysulfsat(monkeypatch):
-    """Fake PySulfSat -> every SulfurSaturationResult field is populated."""
+    """A 1300 K melt populates every SulfurSaturationResult field."""
     scss_ppm = 1500.0
     scas_ppm = 2200.0
     s6_fraction = 0.30
@@ -262,7 +260,7 @@ def test_gate_populates_every_field_with_fake_pysulfsat(monkeypatch):
     S_input_ppm = 1000.0
     result = gate.compute_sulfur_saturation(
         liquid_comp_wt=_MORB_COMP_WT,
-        T_K=1400.0,
+        T_K=1300.0,
         P_bar=1.0,
         fO2_log=-9.0,
         S_input_ppm=S_input_ppm,
@@ -387,7 +385,7 @@ def test_gate_flags_cd2019_temperature_range(monkeypatch):
 
     result = gate.compute_sulfur_saturation(
         liquid_comp_wt=_MORB_COMP_WT,
-        T_K=1873.15,
+        T_K=1700.0,
         P_bar=1.0,
         fO2_log=-9.0,
         S_input_ppm=500.0,
@@ -395,7 +393,7 @@ def test_gate_flags_cd2019_temperature_range(monkeypatch):
 
     assert result.calibration_status == 'out_of_range'
     assert any(
-        'T_K=1873.15 K outside Chowdhury-Dasgupta 2019 SCAS' in w
+        'T_K=1700.00 K outside Chowdhury-Dasgupta 2019 SCAS' in w
         for w in result.warnings
     )
 
@@ -432,7 +430,7 @@ def test_malformed_liquid_composition_returns_unavailable(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# 4. Stage 0 fallback path
+# 4. Stage 0 pre-melt path
 # ---------------------------------------------------------------------------
 
 
@@ -440,8 +438,7 @@ def _sim_with_sulfur_feedstock() -> PyrolysisSimulator:
     """
     Build a simulator with a Mars-style feedstock that leaves SO3 and
     FeS-bearing inventory in ``salt_phase_kg`` / ``sulfide_matte_kg``,
-    so the Stage 0 SulfSat hook actually runs (it short-circuits on
-    zero S_input_ppm).
+    so a pre-melt SulfSat call would have had non-zero S input.
     """
     backend = InternalAnalyticalBackend()
     backend.initialize({})
@@ -480,13 +477,17 @@ def _sim_with_sulfur_feedstock() -> PyrolysisSimulator:
     return sim
 
 
-def test_stage0_fallback_records_warning_when_gate_unavailable(monkeypatch):
+def test_stage0_does_not_run_sulfsat_before_melt(monkeypatch):
     """
-    When ``SulfSatGate.is_available()`` is False at Stage 0, builtin
-    sulfate/sulfide bucketing stays authoritative and the simulator
-    records an ``unavailable`` SulfSat result with a warning.
+    Stage 0 runs at room temperature before a phase assemblage exists.
+    Builtin sulfate/sulfide bucketing stays authoritative and no
+    SulfSat result is recorded.
     """
-    monkeypatch.setattr(SulfSatGate, 'is_available', lambda self: False)
+
+    def fail_sulfsat(*_args, **_kwargs):
+        raise AssertionError('SulfSat must not run before a melt exists')
+
+    monkeypatch.setattr(SulfSatGate, 'compute_sulfur_saturation', fail_sulfsat)
 
     sim = _sim_with_sulfur_feedstock()
     sim.load_batch('mixed', mass_kg=1000.0)
@@ -500,14 +501,7 @@ def test_stage0_fallback_records_warning_when_gate_unavailable(monkeypatch):
         50.458716
     )
 
-    # The Stage 0 hook recorded an ``unavailable`` diagnostic, not None
-    # (we have non-zero S_input_ppm so the hook didn't short-circuit).
-    sulfsat_result = sim._last_sulfur_saturation_result
-    assert sulfsat_result is not None
-    assert sulfsat_result.calibration_status == 'unavailable'
-    assert sulfsat_result.SCSS_ppm == 0.0
-    assert sulfsat_result.SCAS_ppm == 0.0
-    assert len(sulfsat_result.warnings) >= 1
+    assert sim._last_sulfur_saturation_result is None
 
 
 # ---------------------------------------------------------------------------

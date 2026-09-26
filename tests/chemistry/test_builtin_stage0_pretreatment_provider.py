@@ -27,10 +27,8 @@ Covers:
 * Out-of-domain handling: a feedstock with no Stage 0 profile for the
   requested reaction_family yields ``status='out_of_domain'`` with a
   warning, NOT a fabricated proposal.
-* SulfSat post-equilibrium hook still fires after the Stage 0 flip:
-  Mars sulfate-rich feedstock with sulfur-bearing inventory produces a
-  populated ``SulfurSaturationResult`` on
-  ``_last_sulfur_saturation_result`` after the flip.
+* SulfSat post-equilibrium hook still fires after the Stage 0 flip when a
+  melt result is supplied for the Mars sulfate-rich feedstock.
 * Smoke parity: full Stage 0 reload on lunar + Mars + asteroid
   feedstocks closes mass balance to the existing tolerance and the
   kernel-committed Stage 0 transitions land in the declared accounts
@@ -39,6 +37,7 @@ Covers:
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -1107,17 +1106,16 @@ def test_complete_oxidation_matches_legacy_stoich(
 # ---------------------------------------------------------------------------
 
 
-def test_sulfsat_post_stage0_hook_still_fires_after_flip(
+def test_sulfsat_post_equilibrium_hook_still_fires_after_flip(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """Carbonaceous chondrite has Stage 0 sulfide inventory that
     survives Stage 0 cleanup (the legacy salt+sulfide buckets carry
     residual S after the carbon cleanup absorbs sulfate-bound SO3).
     After the Stage 0 flip the cleanup transitions are kernel-routed;
-    the post-Stage-0 SulfSat gate (legacy hook,
-    `_run_stage0_sulfsat_gate`) must still fire and populate
-    `_last_sulfur_saturation_result`.  Verifies the flip didn't
-    disrupt the SulfSat wiring downstream of the cleanup transitions.
+    the post-equilibrium SulfSat gate must still fire for a reported
+    melt and populate `_last_sulfur_saturation_result`. Verifies the
+    flip didn't disrupt the SulfSat wiring downstream of cleanup.
 
     Note: PySulfSat may report ``unavailable`` (when the optional
     extra isn't installed) or ``in_range`` / ``out_of_range`` (when
@@ -1133,10 +1131,13 @@ def test_sulfsat_post_stage0_hook_still_fires_after_flip(
         setpoints_data,
     )
     # Carbonaceous chondrite carries elemental S in sulfide_matte
-    # inventory after Stage 0 -> _stage0_sulfur_input_ppm > 0 -> gate
-    # runs.
+    # inventory after Stage 0 -> _stage0_sulfur_input_ppm > 0.
     assert sim._stage0_sulfur_input_ppm() > 0.0, (
         "test fixture must trigger the SulfSat gate (sulfur_input_ppm > 0)"
+    )
+    sim.melt.temperature_C = 1300.0 - 273.15
+    sim._attach_post_equilibrium_sulfsat(
+        SimpleNamespace(warnings=[], liquid_fraction=1.0)
     )
     result = sim._last_sulfur_saturation_result
     assert result is not None, (

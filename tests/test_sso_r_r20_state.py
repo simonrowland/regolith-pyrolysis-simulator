@@ -2569,7 +2569,9 @@ def test_live_paths_do_not_call_intrinsic_heuristic(monkeypatch) -> None:
 
     assert sim._freeze_gate_curve()["source"] == "test_cached_curve"
     assert sim._internal_analytical_equilibrium().fO2_log == pytest.approx(-6.5)
-    sim._attach_post_equilibrium_sulfsat(SimpleNamespace(warnings=[]))
+    sim._attach_post_equilibrium_sulfsat(
+        SimpleNamespace(warnings=[], liquid_fraction=1.0)
+    )
 
     assert seen_sulfsat_fO2 == pytest.approx([-6.5])
     assert sim.melt.fO2_log == pytest.approx(-6.5)
