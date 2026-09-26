@@ -1011,6 +1011,7 @@ class PyrolysisRun:
     # the live values.
     run_metadata_overrides: dict[str, Any] = field(default_factory=dict)
     reduced_real_cache: Mapping[str, Any] | None = None
+    imcc_activity_shadow: bool = False
     strict_result_contract: bool = field(init=False, default=True)
     _target_inventory_by_hour: list[dict[str, Any]] = field(
         default_factory=list, init=False, repr=False
@@ -1036,6 +1037,8 @@ class PyrolysisRun:
         )
         self.runtime_campaign_overrides = overrides
         self.setpoints_overrides = overrides
+        if not isinstance(self.imcc_activity_shadow, bool):
+            raise TypeError("imcc_activity_shadow must be bool")
 
     def _enforce_preset_comparison_contract(self) -> None:
         preset = self.run_metadata_overrides.get(PRESET_PROVENANCE_METADATA_KEY)
@@ -1259,6 +1262,7 @@ class PyrolysisRun:
                 if self.force_builtin_vapor_pressure
                 else None
             ),
+            imcc_activity_shadow=self.imcc_activity_shadow,
         )
 
     def _load_config_bundle(self) -> ConfigBundle:
@@ -2665,6 +2669,11 @@ def build_per_hour_summary(
     overlay = dict(getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {})
     if overlay:
         summary["vapour_batch_flux_overlay"] = _json_safe(overlay)
+    imcc_activity_shadow = dict(
+        getattr(snapshot, "imcc_activity_shadow", {}) or {}
+    )
+    if imcc_activity_shadow:
+        summary["imcc_activity_shadow"] = _json_safe(imcc_activity_shadow)
     capture_ledger_snapshot(sim, snapshot)
     return _json_safe(summary)
 

@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -106,6 +109,48 @@ def test_missing_openimcc_is_a_typed_refusal(monkeypatch: pytest.MonkeyPatch) ->
     assert "remedy:" in str(refusal)
 
 
+def test_missing_openimcc_blocked_subprocess_is_a_typed_refusal() -> None:
+    script = """
+import importlib.abc
+import sys
+
+
+class _BlockOpenImcc(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == 'openimcc' or fullname.startswith('openimcc.'):
+            raise ImportError('test-only blocked openimcc import')
+        return None
+
+
+sys.meta_path.insert(0, _BlockOpenImcc())
+from simulator.melt_backend.imcc_sf04.openimcc_bridge import evaluate
+
+try:
+    evaluate(composition_mol={'SiO2': 1.0}, temperature_K=2200.0)
+except Exception as exc:
+    print(type(exc).__name__)
+    print(getattr(exc, 'code', ''))
+    print(str(exc))
+else:
+    raise SystemExit('openimcc unexpectedly importable in clean environment')
+"""
+    env = os.environ.copy()
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "OpenImccUnavailableError" in completed.stdout
+    assert "openimcc_not_importable" in completed.stdout
+    assert "remedy:" in completed.stdout
+    assert "PYTHONPATH=/Users/simonrowland/Repos/openimcc/src" in completed.stdout
+
+
 def test_bridge_maps_mol_kg_and_returns_labels() -> None:
     _openimcc_or_skip()
     composition_mol = {"SiO2": 0.7, "FeO": 0.2, "Na2O": 0.1}
@@ -134,21 +179,13 @@ def test_bridge_maps_mol_kg_and_returns_labels() -> None:
 
 @pytest.mark.parametrize("pack_name", tuple(VENDORED_PACKS))
 def test_openimcc_parent_activity_parity(pack_name: str) -> None:
-    openimcc = _openimcc_or_skip()
+    _openimcc_or_skip()
     vendored_pack = vendored_load_datapack(VENDORED_PACKS[pack_name])
-    if pack_name == "v1.0.2":
-        open_pack = openimcc.load_datapack()
-        enable_sp_extension = False
-    else:
-        open_pack = openimcc.load_datapack(
-            Path(openimcc.__file__).resolve().parent
-            / "data/packs/imcc-sf04-ext-v4.json"
-        )
-        enable_sp_extension = True
 
     differences: list[str] = []
     for composition_name, (composition, basis_type) in COMPOSITIONS.items():
         for temperature_K in TEMPERATURES_K:
+            enable_sp_extension = pack_name == "ext-v4"
             vendored = vendored_evaluate(
                 composition,
                 temperature_K,
@@ -156,21 +193,36 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
                 basis_type=basis_type,
                 enable_sp_extension=enable_sp_extension,
             )
-            standalone = openimcc.evaluate(
-                composition,
-                temperature_K,
-                open_pack,
-                basis_type=basis_type,
-                enable_sp_extension=enable_sp_extension,
-            )
-            for oxide, expected, actual in zip(
+            bridge_kwargs = {
+                "temperature_K": temperature_K,
+                "pack": pack_name,
+            }
+            if basis_type == "wt":
+                bridge_kwargs["composition_kg"] = composition
+            else:
+                bridge_kwargs["composition_mol"] = composition
+            standalone = bridge_evaluate(**bridge_kwargs)
+            if tuple(vendored.parent_oxides) != tuple(standalone.parent_oxides):
+                differences.append(
+                    f"{pack_name} {composition_name} {temperature_K:g} K "
+                    f"parent-oxide labels: vendored={tuple(vendored.parent_oxides)!r} "
+                    f"bridge={tuple(standalone.parent_oxides)!r}"
+                )
+                continue
+            if set(standalone.parent_oxide_activities) != set(vendored.parent_oxides):
+                differences.append(
+                    f"{pack_name} {composition_name} {temperature_K:g} K "
+                    "bridge parent-oxide activity labels do not match"
+                )
+                continue
+            for oxide, expected, _ in zip(
                 vendored.parent_oxides,
                 vendored.parent_activity,
-                standalone.parent_activity,
+                standalone.parent_oxides,
                 strict=True,
             ):
                 expected = float(expected)
-                actual = float(actual)
+                actual = float(standalone.parent_oxide_activities[oxide])
                 absolute = abs(expected - actual)
                 relative = absolute / max(abs(expected), abs(actual), 1.0e-300)
                 if relative > 1.0e-10:

@@ -1170,10 +1170,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapour_batch_report: Dict[str, Any] | None = None
         self._last_vapour_batch_flux_overlay: Dict[str, Any] = {}
         self._last_vapour_batch_resolve_error: Dict[str, Any] = {}
+        self._last_imcc_activity_shadow: Dict[str, Any] = {}
         # t-568 diagnostic capture is default-off. A diagnostic harness may
         # opt in and supply reviewed TierAEngineInput objects by component.
         self._melt_activity_shadow_enabled: bool = False
         self._melt_activity_engine_inputs: Dict[str, Any] = {}
+        imcc_activity_shadow = self.setpoints.get("imcc_activity_shadow", False)
+        if not isinstance(imcc_activity_shadow, bool):
+            raise ValueError("imcc_activity_shadow must be bool")
+        self._imcc_activity_shadow_enabled: bool = imcc_activity_shadow
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_target_inventory_diagnostic: Dict[str, Any] = {}
         self._target_inventory_by_hour: list[Dict[str, Any]] = []
@@ -1529,6 +1534,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapour_batch_report = None
         self._last_vapour_batch_flux_overlay = {}
         self._last_vapour_batch_resolve_error = {}
+        self._last_imcc_activity_shadow = {}
         self._last_target_inventory_diagnostic = {}
         self._target_inventory_by_hour = []
         self._target_inventory_depletion_hour = None
@@ -2124,6 +2130,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 source_reaction_composition_wt_pct or {}
             ),
             "melt_activity_shadow_enabled": melt_activity_shadow_enabled,
+            "imcc_activity_shadow_enabled": getattr(
+                self, "_imcc_activity_shadow_enabled", False
+            ),
             "melt_activity_engine_inputs": dict(
                 melt_activity_engine_inputs or {}
             ),
@@ -13332,6 +13341,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # diagnostics and return a detached snapshot without clearing evidence.
         if self.paused_for_decision:
             return self._make_snapshot()
+        self._last_imcc_activity_shadow = {}
         o2_bubbler_refusal = self._o2_bubbler_control_refusal()
         if o2_bubbler_refusal is not None:
             self._last_o2_bubbler_diagnostic = o2_bubbler_refusal
@@ -13775,6 +13785,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.campaign_hour += 1
         self._stamp_redox_source_context_for_current_state(force=True)
         snapshot = self._make_snapshot()
+        if getattr(self, "_imcc_activity_shadow_enabled", False):
+            snapshot.imcc_activity_shadow = self._imcc_activity_shadow_for_hour(
+                snapshot
+            )
         snapshot.evap_flux = evap_flux
         snapshot.melt_headspace_composition_mbar = dict(
             self._melt_headspace_composition_mbar
@@ -13818,6 +13832,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     # ------------------------------------------------------------------
     # Step sub-methods
     # ------------------------------------------------------------------
+
+    def _imcc_activity_shadow_for_hour(
+        self,
+        snapshot: HourSnapshot,
+    ) -> dict[str, Any]:
+        """Return the current-hour IMCC payload, with a no-batch fallback."""
+
+        cached = dict(getattr(self, "_last_imcc_activity_shadow", {}) or {})
+        if cached:
+            return cached
+        try:
+            from simulator.vapour_rail.melt_activity_resolver import (
+                build_imcc_activity_shadow,
+            )
+
+            composition = self.atom_ledger.project_account_mol(
+                "process.cleaned_melt"
+            )
+            payload = build_imcc_activity_shadow(
+                composition_mol=composition,
+                temperature_K=float(snapshot.temperature_C) + 273.15,
+            )
+            self._last_imcc_activity_shadow = dict(payload)
+            return dict(payload)
+        except Exception as exc:  # noqa: BLE001 - shadow must not stop a run
+            payload = {
+                "schema": "imcc_activity_shadow.v1",
+                "behavior_authority": False,
+                "status": "refused",
+                "reason": "IMCC shadow infrastructure refused",
+                "reason_code": "imcc_activity_shadow_internal_refusal",
+                "refusal": {
+                    "code": "imcc_activity_shadow_internal_refusal",
+                    "type": type(exc).__name__,
+                    "detail": str(exc),
+                },
+            }
+            self._last_imcc_activity_shadow = payload
+            return payload
 
     def _update_temperature(self):
         """

@@ -308,10 +308,13 @@ class VapourResolveState:
     melt_activity_engine_inputs: Mapping[str, Any] = field(
         default_factory=lambda: MappingProxyType({})
     )
+    imcc_activity_shadow_enabled: bool = False
 
     def __post_init__(self) -> None:
         if not isinstance(self.melt_activity_shadow_enabled, bool):
             raise TypeError("melt_activity_shadow_enabled must be bool")
+        if not isinstance(self.imcc_activity_shadow_enabled, bool):
+            raise TypeError("imcc_activity_shadow_enabled must be bool")
         object.__setattr__(
             self,
             "source_reaction_activities",
@@ -396,6 +399,7 @@ class VapourResolveState:
                 self.melt_activity_shadow_inventory_digest
             ),
             "melt_activity_shadow_enabled": self.melt_activity_shadow_enabled,
+            "imcc_activity_shadow_enabled": self.imcc_activity_shadow_enabled,
             "melt_activity_engine_inputs": dict(self.melt_activity_engine_inputs),
             **dict(self.extras),
         }
@@ -2534,7 +2538,13 @@ def resolve_vapour_batch(
     # request path stays lazy; opted-in callers compute once per component and
     # carry typed objects beside the still-authoritative scalar maps.
     melt_activity_shadow: Any | None = None
-    if state is not None and state.melt_activity_shadow_enabled:
+    imcc_activity_shadow_enabled = bool(
+        getattr(state, "imcc_activity_shadow_enabled", False)
+    ) if state is not None else False
+    if state is not None and (
+        state.melt_activity_shadow_enabled
+        or imcc_activity_shadow_enabled
+    ):
         try:
             from simulator.vapour_rail.melt_activity_resolver import (
                 build_shadow_for_vapour_batch,
@@ -2545,19 +2555,21 @@ def resolve_vapour_batch(
                 ledger_snapshot=ledger_snapshot,  # type: ignore[arg-type]
                 state=state,
                 engine_inputs_by_component=state.melt_activity_engine_inputs,
+                imcc_activity_shadow_enabled=imcc_activity_shadow_enabled,
             )
-            state = replace(
-                state,
-                source_reaction_activity_results=(
-                    melt_activity_shadow.results_by_component
-                ),
-                melt_activity_shadow_state_fingerprint=(
-                    melt_activity_shadow.state_fingerprint
-                ),
-                melt_activity_shadow_inventory_digest=(
-                    melt_activity_shadow.inventory_digest
-                ),
-            )
+            if state.melt_activity_shadow_enabled:
+                state = replace(
+                    state,
+                    source_reaction_activity_results=(
+                        melt_activity_shadow.results_by_component
+                    ),
+                    melt_activity_shadow_state_fingerprint=(
+                        melt_activity_shadow.state_fingerprint
+                    ),
+                    melt_activity_shadow_inventory_digest=(
+                        melt_activity_shadow.inventory_digest
+                    ),
+                )
         except Exception as exc:  # noqa: BLE001 - diagnostic shadow is fail-isolated
             melt_activity_shadow = MappingProxyType(
                 {

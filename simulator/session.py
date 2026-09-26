@@ -206,6 +206,7 @@ class SimSessionConfig:
     reduced_real_cache: Mapping[str, Any] | None = None
     backend_config: Mapping[str, Any] | None = None
     campaigns_elapsed: float = 1.0
+    imcc_activity_shadow: bool = False
 
     def __post_init__(self) -> None:
         # Fold legacy analytical aliases onto the canonical
@@ -219,6 +220,8 @@ class SimSessionConfig:
         )
         object.__setattr__(self, "runtime_campaign_overrides", overrides)
         object.__setattr__(self, "setpoints_overrides", overrides)
+        if not isinstance(self.imcc_activity_shadow, bool):
+            raise TypeError("imcc_activity_shadow must be bool")
         track = str(self.track)
         if track not in _ALLOWED_SESSION_TRACKS:
             valid = ", ".join(sorted(_ALLOWED_SESSION_TRACKS))
@@ -379,6 +382,8 @@ class SimSession:
                 ),
             )
         )
+        if config.imcc_activity_shadow:
+            sim._imcc_activity_shadow_enabled = True
         if cached_real_config is not None:
             sim.configure_pt0_determinism_store(
                 build_cached_real_store(cached_real_config)
