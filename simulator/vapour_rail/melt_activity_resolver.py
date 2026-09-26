@@ -25,6 +25,7 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_CATIONS_PER_FORMULA,
     melt_oxide_activity,
 )
+from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.vapour_rail.activity import (
     ActivityAttempt,
     ActivityRefusalCode,
@@ -47,7 +48,7 @@ MELT_ACTIVITY_SHADOW_RECORD_LIMIT: Final[int] = 64
 
 IMCC_ACTIVITY_SHADOW_SCHEMA: Final[str] = "imcc_activity_shadow.v1"
 IMCC_ACTIVITY_SHADOW_DOMAIN_K: Final[tuple[float, float]] = (1700.0, 3000.0)
-IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K: Final[float] = 1950.0
+IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K: Final[float] = VAPOROCK_T_MAX_K
 IMCC_ACTIVITY_SHADOW_FLUX_OXIDES: Final[tuple[str, ...]] = (
     "Na2O",
     "K2O",

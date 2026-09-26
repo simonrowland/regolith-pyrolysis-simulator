@@ -465,6 +465,8 @@ from simulator.chemistry.kernel import (
     normalize_chemistry_kernel_config,
     normalize_oxygen_sink_channel_mode,
 )
+from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
+from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 # BuiltinVaporPressureProvider is imported lazily inside
 # _build_chemistry_kernel: simulator/__init__.py -> simulator.core ->
 # engines.builtin.vapor_pressure -> simulator.chemistry.kernel ->
@@ -1179,6 +1181,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not isinstance(imcc_activity_shadow, bool):
             raise ValueError("imcc_activity_shadow must be bool")
         self._imcc_activity_shadow_enabled: bool = imcc_activity_shadow
+        self._high_t_melt_activity = normalize_high_t_melt_activity(
+            self.setpoints.get("high_t_melt_activity", "openimcc")
+        )
+        self._last_high_t_melt_activity_temperature_K: float | None = None
+        self._last_high_t_melt_activity: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_target_inventory_diagnostic: Dict[str, Any] = {}
         self._target_inventory_by_hour: list[Dict[str, Any]] = []
@@ -1535,6 +1542,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_vapour_batch_flux_overlay = {}
         self._last_vapour_batch_resolve_error = {}
         self._last_imcc_activity_shadow = {}
+        self._last_high_t_melt_activity_temperature_K = None
+        self._last_high_t_melt_activity = {}
         self._last_target_inventory_diagnostic = {}
         self._target_inventory_by_hour = []
         self._target_inventory_depletion_hour = None
@@ -9318,6 +9327,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         T_C = float(self.melt.temperature_C)
         if T_C + 273.15 < 400:
+            self._last_high_t_melt_activity = {}
             self._last_vapor_pressures_source = dict(
                 getattr(result, 'vapor_pressures_source', {}) or {}
             )
@@ -9372,6 +9382,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 }
                 self._last_vapor_pressures_source = {}
                 self._last_vapor_pressure_diagnostic = diagnostic
+                self._last_high_t_melt_activity = {}
                 return
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
@@ -9410,6 +9421,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         process_phase = (
             'stage0' if campaign_name in {'C0', 'C0B'} else 'hot_train'
         )
+        high_t_control_inputs: dict[str, Any] = {}
+        if T_C + 273.15 > VAPOROCK_T_MAX_K:
+            high_t_control_inputs = {
+                'high_t_melt_activity': getattr(
+                    self, '_high_t_melt_activity', 'openimcc'
+                ),
+                'high_t_melt_activity_previous_temperature_K': getattr(
+                    self, '_last_high_t_melt_activity_temperature_K', None
+                ),
+                'high_t_melt_activity_crossing': (
+                    getattr(
+                        self,
+                        '_last_high_t_melt_activity_temperature_K',
+                        None,
+                    )
+                    is not None
+                    and getattr(
+                        self,
+                        '_last_high_t_melt_activity_temperature_K',
+                        None,
+                    )
+                    <= VAPOROCK_T_MAX_K
+                ),
+            }
         kernel_result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
             control_inputs={
@@ -9421,10 +9456,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'ambient_pressure_bar': (
                     ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
                 ),
+                **high_t_control_inputs,
             },
             fO2_log=intrinsic_fO2_log,
         )
+        self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
+        self._last_high_t_melt_activity = dict(
+            diagnostic.get("high_t_melt_activity") or {}
+        )
         diagnostic['backend_vapor_pressures_source'] = dict(backend_sources)
         diagnostic['backend_vapor_pressures_Pa'] = dict(backend_vp)
         diagnostic.update(regime_diagnostic)

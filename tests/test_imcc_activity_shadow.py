@@ -30,11 +30,19 @@ COMPOSITION_MOL = {
 }
 
 
-def _lunar_run(*, imcc_activity_shadow: bool | None = None) -> dict:
+def _lunar_run(
+    *,
+    imcc_activity_shadow: bool | None = None,
+    high_t_melt_activity: str = "constant_gamma",
+) -> dict:
     kwargs = {
         "feedstock_id": "lunar_mare_low_ti",
         "campaign": "C2A",
         "hours": 1,
+        # This module guards C2's diagnostic-only shadow contract. Pin the
+        # C3 authority escape hatch so its mutation test still exercises the
+        # legacy activity path rather than C3's new default.
+        "high_t_melt_activity": high_t_melt_activity,
         "allow_fallback_vapor": True,
         "sio_start_temperature_c": 1800.0,
         "sio_hold_temperature_c": 1800.0,
@@ -171,7 +179,10 @@ def test_missing_openimcc_is_typed_refusal_and_not_a_run_failure(monkeypatch) ->
     assert shadow["reason_code"] == "openimcc_not_importable"
     assert shadow["refusal"]["code"] == "openimcc_not_importable"
     assert shadow["above_vaporock_cap"] is True
-    payload = _lunar_run(imcc_activity_shadow=True)
+    payload = _lunar_run(
+        imcc_activity_shadow=True,
+        high_t_melt_activity="openimcc",
+    )
     assert payload["status"] == "ok"
     assert (
         payload["per_hour_summary"][0]["imcc_activity_shadow"]["reason_code"]
