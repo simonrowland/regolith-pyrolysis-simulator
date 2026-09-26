@@ -54,7 +54,7 @@ def test_engine_point_uses_observation_temperature_without_schedule():
     )
     rows = consumer_readiness(experiment, bench, observation)
     engines = [row for row in rows if row.consumer == "engine_point"]
-    assert len(engines) == 8
+    assert len(engines) == 9
     assert all(row.status is ReadinessStatus.READY for row in engines)
     assert all(row.status is not ReadinessStatus.READY for row in rows if row.consumer != "engine_point")
     assert all(row.status is ReadinessStatus.GAP for row in consumer_readiness(experiment, bench) if row.consumer == "engine_point")

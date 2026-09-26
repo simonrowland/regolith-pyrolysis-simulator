@@ -38,6 +38,7 @@ class Engine(StrEnum):
     MAGEMIN = "magemin"
     IMCC_SF04 = "imcc_sf04"
     IMCC_SF04_EXT = "imcc_sf04_ext"
+    OPENIMCC = "openimcc"
 
 
 class Rail(StrEnum):
@@ -133,6 +134,8 @@ class RefusalReason(StrEnum):
     IDENTITY_INCOMPLETE = "identity_incomplete"
     CONDITIONAL_FIELD = "conditional_field"
     BULK_NOT_LIQUID_COMPOSITION = "bulk_not_liquid_composition"
+    OPENIMCC_NOT_IMPORTABLE = "openimcc_not_importable"
+    OUTSIDE_SUPPORTED_SPECIES = "outside_supported_species"
 
 
 class BenchAbsenceReason(StrEnum):

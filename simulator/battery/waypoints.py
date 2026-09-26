@@ -172,6 +172,7 @@ ENGINE_POINT_CONSUMERS = (
     "cached-real",
     "imcc_sf04",
     "imcc_sf04_ext",
+    "openimcc",
 )
 # Engines whose equilibrate result fills activity_coefficients.
 # magemin, vaporock, internal-analytical, and cached-real do not.
@@ -180,6 +181,7 @@ MELT_ACTIVITY_ENGINES = (
     "thermoengine",
     "imcc_sf04",
     "imcc_sf04_ext",
+    "openimcc",
 )
 # Activity and activity coefficient only. Interaction parameters stay on
 # engine_point; they are not this observable.
