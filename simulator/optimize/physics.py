@@ -47,7 +47,9 @@ SourceKind = Literal[
 # cannot be reused.
 # v5: coating and Knudsen transport retain signed continuous margins without
 # Boolean exclusion, so cached v4 feasibility verdicts cannot be reused.
-PHYSICS_GATE_VERSION = "physics-feasibility-v5-continuous-transport"
+# v6: predicted upstream coating, including flagged quantities, is a hard
+# no-coating violation; refused wall quantities are unavailable.
+PHYSICS_GATE_VERSION = "physics-feasibility-v6-predicted-coating"
 DEFAULT_ACTIVE_GATES: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",
@@ -63,6 +65,9 @@ TARGET_SPECIES_YIELD_CONSUMERS: tuple[str, ...] = (
     "product_summary.target_species_yield_report",
 )
 _EPS = 1.0e-12
+# Round-off guard only. This is not a physical coating threshold: any larger
+# predicted upstream deposit violates the no-coating gate.
+COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN = 1.0e-12
 
 
 @dataclass(frozen=True)
@@ -127,6 +132,9 @@ def _normalized_gate_margin_feasibility(
 ) -> bool:
     if gate != "coating":
         return bool(feasible)
+    verdict = status_payload.get("coating_verdict")
+    if verdict in {"violated", "unavailable"}:
+        return False
     if (
         margin == -math.inf
         or status_payload.get("coating_constraint_mode")
@@ -456,11 +464,47 @@ class PhysicsConstraintSet:
             return _fail_closed("delivered_stream_purity", self.stream_purity_min, str(exc))
 
     def coating(self, trace: Any) -> GateMargin:
-        if hasattr(trace, "wall_fouling_report"):
-            return self.coating_from_fouling_report(trace.wall_fouling_report)
+        base_trace = getattr(trace, "trace", None) or trace
+        missing_report = object()
+        report = getattr(trace, "wall_fouling_report", missing_report)
+        if report is missing_report:
+            report = getattr(base_trace, "wall_fouling_report", missing_report)
+        if report is not missing_report:
+            if isinstance(report, Mapping):
+                runtime_diagnostics = _coating_runtime_diagnostics(trace)
+                report_diagnostics = report.get("coating_diagnostics")
+                merged_diagnostics = dict(
+                    report_diagnostics
+                    if isinstance(report_diagnostics, Mapping)
+                    else {}
+                )
+                for key in (
+                    "upstream_hot_wall_findings",
+                    "silica_exposed_to_alkali_findings",
+                ):
+                    merged_diagnostics[key] = [
+                        *(
+                            report_diagnostics.get(key, ())
+                            if isinstance(report_diagnostics, Mapping)
+                            and isinstance(
+                                report_diagnostics.get(key, ()),
+                                (tuple, list),
+                            )
+                            else ()
+                        ),
+                        *runtime_diagnostics[key],
+                    ]
+                report = {
+                    **report,
+                    "coating_diagnostics": merged_diagnostics,
+                }
+            return self.coating_from_fouling_report(report)
         try:
-            snapshots = _required_sequence(trace, "snapshots")
-            deltas = _required_sequence(trace, "wall_deposit_by_segment_species_delta")
+            snapshots = _required_sequence(base_trace, "snapshots")
+            deltas = _required_sequence(
+                base_trace,
+                "wall_deposit_by_segment_species_delta",
+            )
             if len(deltas) != len(snapshots):
                 return _fail_closed(
                     "coating",
@@ -480,12 +524,60 @@ class PhysicsConstraintSet:
                     segment, species = _segment_species_key(key)
                     amount = _non_negative_number(kg, "wall deposit kg")
                     by_campaign[(campaign, segment, species)] += amount
-            has_wall_deposit = any(kg > _EPS for kg in by_campaign.values())
-            authority = _coating_authority_status(trace, by_campaign)
+            has_wall_deposit = any(
+                kg > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+                for kg in by_campaign.values()
+            )
+            authority = _coating_authority_status(base_trace, by_campaign)
             authoritative = _authority_is_authoritative(authority)
+            diagnostics = _coating_runtime_diagnostics(trace)
+            deposit_records = [
+                {
+                    "campaign": campaign,
+                    "segment": segment,
+                    "species": species,
+                    "deposit_kg_per_campaign": float(kg),
+                }
+                for (campaign, segment, species), kg in sorted(by_campaign.items())
+                if kg > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+            ]
+            reasons = _coating_violation_reasons(
+                authority=authority,
+                deposit_records=deposit_records,
+                diagnostics=diagnostics,
+            )
+            unavailable_reason = _coating_wall_quantity_unavailable(authority)
+            common_payload = {
+                **authority,
+                "constraint_mode": "continuous",
+                "coating_positive_deposit_tolerance_kg_per_campaign": (
+                    COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+                ),
+                "coating_violation_reasons": reasons,
+            }
+            if unavailable_reason:
+                return GateMargin(
+                    gate="coating",
+                    feasible=False,
+                    margin=-math.inf,
+                    threshold=self.coating_min_campaigns_to_resinter,
+                    observed=None,
+                    detail=f"coating unavailable: {unavailable_reason}",
+                    status="unavailable",
+                    authoritative=False,
+                    output_status=str(
+                        authority.get("output_status", "unavailable")
+                    ),
+                    status_reason=unavailable_reason,
+                    status_payload={
+                        **common_payload,
+                        "coating_verdict": "unavailable",
+                        "coating_unavailable_reason": unavailable_reason,
+                    },
+                )
             zone_by_segment: Mapping[Any, Any] | None = None
             if has_wall_deposit:
-                zone_by_segment = getattr(trace, "wall_zone_by_segment", None)
+                zone_by_segment = getattr(base_trace, "wall_zone_by_segment", None)
                 if zone_by_segment is None:
                     return _fail_closed(
                         "coating",
@@ -501,9 +593,8 @@ class PhysicsConstraintSet:
             worst_margin = math.inf
             worst_observed = math.inf
             worst_detail = "no wall deposit"
-            worst_campaign_detail = "no wall deposit"
             for (campaign, segment, species), kg in sorted(by_campaign.items()):
-                if kg <= _EPS:
+                if kg <= COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN:
                     continue
                 if zone_by_segment is None:
                     return _fail_closed(
@@ -553,12 +644,6 @@ class PhysicsConstraintSet:
                     )
                 if campaigns_to_resinter < worst_observed:
                     worst_observed = campaigns_to_resinter
-                    worst_campaign_detail = (
-                        f"{campaign}/{zone}/{segment}/{species}: "
-                        f"deposit={kg:.6g} kg, "
-                        f"allowable={limit.value:.6g} kg, "
-                        f"campaigns_to_resinter={campaigns_to_resinter:.6g}"
-                    )
             if math.isinf(worst_margin):
                 worst_margin = math.inf
             detail = (
@@ -566,32 +651,22 @@ class PhysicsConstraintSet:
                 if worst_detail == "no wall deposit"
                 else f"reported-only: {worst_detail}"
             )
-            grounded_campaign_ok = (
-                worst_observed >= self.coating_min_campaigns_to_resinter.value
-            )
-            feasible = True
-            if not authoritative:
+            if reasons:
+                detail = (
+                    "coating constraint violated: "
+                    f"{_coating_reason_summary(reasons)}; {detail}"
+                )
+                if not authoritative:
+                    detail = f"non-authoritative prediction: {detail}"
+            elif not authoritative:
                 detail = (
                     "non-authoritative: grounded coating criterion not enforced; "
                     f"{detail}"
                 )
-            elif not grounded_campaign_ok:
-                detail = (
-                    "continuous constraint exceeded: grounded coating criterion "
-                    f"campaigns_to_resinter={worst_observed:.6g} < "
-                    f"{self.coating_min_campaigns_to_resinter.value:.6g}; "
-                    f"{worst_campaign_detail}; advisory={detail}"
-                )
-            elif worst_detail != "no wall deposit":
-                detail = (
-                    "grounded coating criterion satisfied: "
-                    f"campaigns_to_resinter={worst_observed:.6g} >= "
-                    f"{self.coating_min_campaigns_to_resinter.value:.6g}; "
-                    f"{detail}"
-                )
+            common_payload["coating_verdict"] = "violated" if reasons else "clear"
             return GateMargin(
                 gate="coating",
-                feasible=feasible,
+                feasible=not reasons,
                 margin=float(worst_margin),
                 threshold=self.coating_min_campaigns_to_resinter,
                 observed=float(worst_observed),
@@ -604,20 +679,20 @@ class PhysicsConstraintSet:
                     if authoritative
                     else str(authority.get("message", "non-authoritative coating"))
                 ),
-                status_payload={
-                    **authority,
-                    "constraint_mode": "continuous",
-                },
+                status_payload=common_payload,
             )
         except (KeyError, TypeError, ValueError) as exc:
             return _fail_closed("coating", self.coating_min_campaigns_to_resinter, str(exc))
 
-    def coating_from_fouling_report(self, report: Any) -> GateMargin:
+    def coating_from_fouling_report(
+        self,
+        report: Any,
+    ) -> GateMargin:
         """Classify the runner's worst-segment lifespan verdict.
 
-        A non-authoritative wall-sticking or threshold verdict is deliberately
-        unconstrained by coating: heuristics remain visible, but never become a
-        hard feasibility block.
+        Authority controls the label only. Predicted upstream deposition and
+        upstream chemistry findings remain hard no-coating violations; a
+        refused wall quantity is unavailable rather than a zero.
         """
         if not isinstance(report, Mapping):
             raise CoatingFeasibilityReportError(
@@ -667,15 +742,26 @@ class PhysicsConstraintSet:
                 threshold_is_unqualified = (
                     not math.isfinite(threshold) or threshold <= 0.0
                 )
-        if constraint_mode == "no_unqualified_deposition" or threshold_is_unqualified:
-            sticking_authority = report.get("sticking_alpha_authority")
-            unavailable = not authoritative and (
-                output_status != "non-authoritative-threshold"
-                or (
-                    isinstance(sticking_authority, Mapping)
-                    and sticking_authority.get("authoritative_for_deposit_mass") is False
+        authority_payload = _coating_report_authority(report)
+        diagnostics = _coating_runtime_diagnostics(report)
+        report_diagnostics = report.get("coating_diagnostics")
+        if isinstance(report_diagnostics, Mapping):
+            for key in (
+                "upstream_hot_wall_findings",
+                "silica_exposed_to_alkali_findings",
+            ):
+                diagnostics[key].extend(
+                    _plain_value(report_diagnostics.get(key, ()))
+                    if isinstance(report_diagnostics.get(key, ()), (tuple, list))
+                    else []
                 )
-            )
+        deposit_records = _coating_report_deposit_records(report)
+        unavailable_reason = _coating_wall_quantity_unavailable(
+            report,
+            authority_payload,
+            include_coverage_unknown=True,
+        )
+        if constraint_mode == "no_unqualified_deposition" or threshold_is_unqualified:
             if (
                 constraint_mode == "no_unqualified_deposition"
                 and report.get("coating_constraint_authoritative") is not True
@@ -696,6 +782,13 @@ class PhysicsConstraintSet:
                 raise CoatingFeasibilityReportError(
                     "unqualified deposition rate must be finite and non-negative"
                 )
+            reasons = _coating_violation_reasons(
+                authority=authority_payload,
+                deposit_records=deposit_records,
+                aggregate_deposit_kg=rate,
+                diagnostics=diagnostics,
+                explicit_reasons=report.get("coating_violation_reasons", ()),
+            )
             threshold = ThresholdSpec(
                 id="coating_max_unqualified_deposit_kg_per_campaign",
                 value=0.0,
@@ -705,30 +798,77 @@ class PhysicsConstraintSet:
                     "require_coating_gate with no sourced resinter capacity"
                 ),
             )
+            coating_authoritative = (
+                _authority_is_authoritative(authority_payload)
+                if "sticking_alpha_authority" in report
+                else bool(report.get("authoritative_for_resinter", True))
+            )
+            constraint_authoritative = (
+                report.get("coating_constraint_authoritative") is True
+            )
+            if unavailable_reason:
+                return GateMargin(
+                    gate="coating",
+                    feasible=False,
+                    margin=-math.inf,
+                    threshold=threshold,
+                    observed=None,
+                    detail=f"coating unavailable: {unavailable_reason}",
+                    status="unavailable",
+                    authoritative=False,
+                    output_status=output_status,
+                    status_reason=unavailable_reason,
+                    status_payload={
+                        **report,
+                        "coating_constraint_mode": "no_unqualified_deposition",
+                        "coating_constraint_authoritative": False,
+                        "constraint_mode": "continuous",
+                        "coating_verdict": "unavailable",
+                        "coating_unavailable_reason": unavailable_reason,
+                        "coating_violation_reasons": reasons,
+                        "coating_positive_deposit_tolerance_kg_per_campaign": (
+                            COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+                        ),
+                    },
+                )
+            violated = bool(reasons)
+            detail = (
+                "coating constraint violated: "
+                f"{_coating_reason_summary(reasons)}; "
+                f"deposit_rate={rate:.6g} kg/campaign"
+                if violated
+                else (
+                    "no positive upstream wall deposition or coating finding; "
+                    f"deposit_rate={rate:.6g} kg/campaign"
+                )
+            )
+            if violated and not coating_authoritative:
+                detail = f"non-authoritative prediction: {detail}"
             return GateMargin(
                 gate="coating",
-                feasible=True if unavailable else rate == 0.0,
-                margin=math.inf if unavailable else -rate,
+                feasible=not violated,
+                margin=-rate if math.isfinite(rate) else -math.inf,
                 threshold=threshold,
-                observed=None if unavailable else rate,
-                detail=(
-                    "non-authoritative: coating feasibility unconstrained; "
-                    f"output_status={output_status}; status_reason={status_reason}"
-                ) if unavailable else (
-                    "fail-closed continuous no-unqualified-deposition constraint: "
-                    "no finite material damage capacity qualifies a positive "
-                    "deposition rate; "
-                    f"deposit_rate={rate:.6g} kg/campaign"
-                ),
-                status="unavailable" if unavailable else "available",
-                authoritative=not unavailable,
+                observed=rate,
+                detail=detail,
+                status="available" if coating_authoritative else "warning",
+                authoritative=coating_authoritative,
                 output_status=output_status,
-                status_reason=status_reason,
+                status_reason=(
+                    ""
+                    if coating_authoritative
+                    else status_reason
+                ),
                 status_payload={
                     **report,
                     "coating_constraint_mode": "no_unqualified_deposition",
-                    "coating_constraint_authoritative": not unavailable,
+                    "coating_constraint_authoritative": constraint_authoritative,
                     "constraint_mode": "continuous",
+                    "coating_verdict": "violated" if violated else "clear",
+                    "coating_violation_reasons": reasons,
+                    "coating_positive_deposit_tolerance_kg_per_campaign": (
+                        COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+                    ),
                 },
             )
         observed_field = (
@@ -747,7 +887,57 @@ class PhysicsConstraintSet:
                 f"wall-fouling {observed_field} must be non-negative"
             )
         margin = observed - self.coating_min_campaigns_to_resinter.value
-        feasible = True
+        raw_rate = report.get(
+            "unqualified_deposition_rate_kg_per_campaign",
+            report.get("wall_deposit_kg_per_campaign"),
+        )
+        aggregate_deposit = None
+        if raw_rate is not None:
+            if isinstance(raw_rate, bool) or not isinstance(raw_rate, int | float):
+                raise CoatingFeasibilityReportError(
+                    "wall deposit rate must be numeric"
+                )
+            aggregate_deposit = float(raw_rate)
+            if not math.isfinite(aggregate_deposit) or aggregate_deposit < 0.0:
+                raise CoatingFeasibilityReportError(
+                    "wall deposit rate must be finite and non-negative"
+                )
+        reasons = _coating_violation_reasons(
+            authority=authority_payload,
+            deposit_records=deposit_records,
+            aggregate_deposit_kg=aggregate_deposit,
+            diagnostics=diagnostics,
+            explicit_reasons=report.get("coating_violation_reasons", ()),
+        )
+        coating_authoritative = (
+            _authority_is_authoritative(authority_payload)
+            if "sticking_alpha_authority" in report
+            else authoritative
+        )
+        if unavailable_reason:
+            return GateMargin(
+                gate="coating",
+                feasible=False,
+                margin=-math.inf,
+                threshold=self.coating_min_campaigns_to_resinter,
+                observed=None,
+                detail=f"coating unavailable: {unavailable_reason}",
+                status="unavailable",
+                authoritative=False,
+                output_status=output_status,
+                status_reason=unavailable_reason,
+                status_payload={
+                    **report,
+                    "constraint_mode": "continuous",
+                    "coating_verdict": "unavailable",
+                    "coating_unavailable_reason": unavailable_reason,
+                    "coating_violation_reasons": reasons,
+                    "coating_positive_deposit_tolerance_kg_per_campaign": (
+                        COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+                    ),
+                },
+            )
+        violated = bool(reasons)
         if authoritative:
             detail = (
                 f"continuous runner wall-fouling {observed_field}={observed:.6g}; "
@@ -759,9 +949,16 @@ class PhysicsConstraintSet:
                 f"output_status={output_status}; "
                 f"status_reason={status_reason}"
             )
+        if violated:
+            detail = (
+                "coating constraint violated: "
+                f"{_coating_reason_summary(reasons)}; {detail}"
+            )
+            if not coating_authoritative:
+                detail = f"non-authoritative prediction: {detail}"
         return GateMargin(
             gate="coating",
-            feasible=feasible,
+            feasible=not violated,
             margin=margin,
             threshold=self.coating_min_campaigns_to_resinter,
             observed=observed,
@@ -773,6 +970,11 @@ class PhysicsConstraintSet:
             status_payload={
                 **report,
                 "constraint_mode": "continuous",
+                "coating_verdict": "violated" if violated else "clear",
+                "coating_violation_reasons": reasons,
+                "coating_positive_deposit_tolerance_kg_per_campaign": (
+                    COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+                ),
             },
         )
 
@@ -1567,6 +1769,312 @@ def _coating_authority_status(
         by_segment_species,
         trace_status if isinstance(trace_status, Mapping) else {},
     )
+
+
+def _coating_runtime_diagnostics(value: Any) -> dict[str, Any]:
+    """Collect upstream coating findings without changing PhysicsTrace shape."""
+
+    upstream_hot_wall_findings: list[Mapping[str, Any]] = []
+    silica_exposed_to_alkali_findings: list[Mapping[str, Any]] = []
+    sources: list[Any] = []
+    seen: set[int] = set()
+
+    def add_source(source: Any) -> None:
+        if source is None or id(source) in seen:
+            return
+        seen.add(id(source))
+        sources.append(source)
+
+    add_source(value)
+    for owner in (
+        value,
+        getattr(value, "trace", None),
+        getattr(value, "original_trace", None),
+        getattr(value, "simulator", None),
+    ):
+        if isinstance(owner, Mapping):
+            add_source(owner.get("coating_diagnostics"))
+            add_source(owner.get("stage3_route_diagnostic"))
+        add_source(getattr(owner, "coating_diagnostics", None))
+        for attr in ("condensation_model", "_condensation_model"):
+            model = getattr(owner, attr, None)
+            add_source(getattr(model, "last_cold_spot_diagnostic", None))
+            add_source(getattr(model, "cold_spot_history", None))
+            add_source(getattr(model, "last_stage3_route_diagnostic", None))
+            add_source(getattr(model, "operating_history", None))
+        add_source(getattr(owner, "run_metadata", None))
+
+    def append_findings(target: list[Mapping[str, Any]], raw: Any) -> None:
+        if isinstance(raw, Mapping):
+            target.append(dict(raw))
+        elif isinstance(raw, (tuple, list)):
+            target.extend(
+                dict(item)
+                for item in raw
+                if isinstance(item, Mapping)
+            )
+
+    for source in sources:
+        if isinstance(source, Mapping):
+            append_findings(
+                upstream_hot_wall_findings,
+                source.get("upstream_hot_wall_findings"),
+            )
+            append_findings(
+                silica_exposed_to_alkali_findings,
+                source.get("silica_exposed_to_alkali_findings"),
+            )
+            route = source.get("stage3_route_diagnostic")
+            if isinstance(route, Mapping):
+                append_findings(
+                    silica_exposed_to_alkali_findings,
+                    [
+                        finding
+                        for finding in route.get("findings", ())
+                        if isinstance(finding, Mapping)
+                        and finding.get("key") == "silica_exposed_to_alkali"
+                    ],
+                )
+                if "silica_exposed_to_alkali" in (route.get("finding_keys") or ()):
+                    silica_exposed_to_alkali_findings.append({
+                        "key": "silica_exposed_to_alkali",
+                    })
+            if source.get("key") == "silica_exposed_to_alkali":
+                silica_exposed_to_alkali_findings.append(dict(source))
+            if source.get("finding_keys") and "silica_exposed_to_alkali" in source.get(
+                "finding_keys", ()
+            ):
+                silica_exposed_to_alkali_findings.append({
+                    "key": "silica_exposed_to_alkali",
+                })
+            if source.get("stage3_route") and source.get("findings"):
+                append_findings(
+                    silica_exposed_to_alkali_findings,
+                    [
+                        finding
+                        for finding in source.get("findings", ())
+                        if isinstance(finding, Mapping)
+                        and finding.get("key") == "silica_exposed_to_alkali"
+                    ],
+                )
+        elif isinstance(source, (tuple, list)):
+            for item in source:
+                if isinstance(item, Mapping):
+                    append_findings(
+                        upstream_hot_wall_findings,
+                        item.get("upstream_hot_wall_findings"),
+                    )
+                    if item.get("key") == "silica_exposed_to_alkali":
+                        silica_exposed_to_alkali_findings.append(dict(item))
+                    if item.get("stage3_route_diagnostic"):
+                        add_source(item["stage3_route_diagnostic"])
+
+    def unique(findings: list[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
+        result: list[Mapping[str, Any]] = []
+        keys: set[str] = set()
+        for finding in findings:
+            plain = _plain_value(finding)
+            key = repr(plain)
+            if key in keys:
+                continue
+            keys.add(key)
+            result.append(plain)
+        return result
+
+    return {
+        "upstream_hot_wall_findings": unique(upstream_hot_wall_findings),
+        "silica_exposed_to_alkali_findings": unique(
+            silica_exposed_to_alkali_findings
+        ),
+    }
+
+
+def _coating_authority_flags(authority: Mapping[str, Any]) -> dict[str, Any]:
+    keys = (
+        "code",
+        "output_status",
+        "authoritative_for_deposit_mass",
+        "authoritative_for_coating",
+        "wall_saturation_pressure_extrapolations_by_species",
+        "wall_saturation_pressure_refusals_by_species",
+        "wall_saturation_pressure_refused_species",
+        "out_of_domain_alpha_species",
+        "uncertified_alpha_species",
+        "codes",
+    )
+    return {
+        key: _plain_value(authority[key])
+        for key in keys
+        if key in authority
+    }
+
+
+def _coating_reason_record(
+    reason: str,
+    *,
+    authority: Mapping[str, Any],
+    **payload: Any,
+) -> dict[str, Any]:
+    return {
+        "reason": reason,
+        **payload,
+        "authority": _plain_value(authority),
+        "flags": _coating_authority_flags(authority),
+    }
+
+
+def _coating_violation_reasons(
+    *,
+    authority: Mapping[str, Any],
+    deposit_records: Any = (),
+    aggregate_deposit_kg: float | None = None,
+    diagnostics: Mapping[str, Any] | None = None,
+    explicit_reasons: Any = (),
+) -> list[dict[str, Any]]:
+    reasons: list[dict[str, Any]] = []
+    positive_record_seen = False
+    for record in deposit_records if isinstance(deposit_records, (tuple, list)) else ():
+        if not isinstance(record, Mapping):
+            continue
+        if record.get("scope") in {"designated_condenser", "condenser"}:
+            continue
+        raw_amount = record.get(
+            "deposit_kg_per_campaign",
+            record.get("wall_deposit_kg_per_campaign", record.get("kg", 0.0)),
+        )
+        try:
+            amount = float(raw_amount)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(amount) or amount <= COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN:
+            continue
+        positive_record_seen = True
+        payload = {
+            key: _plain_value(record[key])
+            for key in ("campaign", "segment", "species", "zone")
+            if key in record
+        }
+        payload["deposit_kg_per_campaign"] = amount
+        reasons.append(
+            _coating_reason_record(
+                "positive_upstream_wall_deposit",
+                authority=authority,
+                **payload,
+            )
+        )
+    if (
+        not positive_record_seen
+        and aggregate_deposit_kg is not None
+        and math.isfinite(aggregate_deposit_kg)
+        and aggregate_deposit_kg > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+    ):
+        reasons.append(
+            _coating_reason_record(
+                "positive_upstream_wall_deposit",
+                authority=authority,
+                deposit_kg_per_campaign=float(aggregate_deposit_kg),
+            )
+        )
+    diagnostics = diagnostics or {}
+    for finding in diagnostics.get("upstream_hot_wall_findings", ()):
+        reasons.append(
+            _coating_reason_record(
+                "upstream_hot_wall_supersaturation",
+                authority=authority,
+                finding=_plain_value(finding),
+            )
+        )
+    for finding in diagnostics.get("silica_exposed_to_alkali_findings", ()):
+        reasons.append(
+            _coating_reason_record(
+                "silica_exposed_to_alkali",
+                authority=authority,
+                finding=_plain_value(finding),
+            )
+        )
+    for explicit in explicit_reasons if isinstance(explicit_reasons, (tuple, list)) else ():
+        if isinstance(explicit, Mapping):
+            record = dict(_plain_value(explicit))
+            record.setdefault("authority", _plain_value(authority))
+            record.setdefault("flags", _coating_authority_flags(authority))
+            reasons.append(record)
+    unique: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for reason in reasons:
+        key = repr(_plain_value(reason))
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(reason)
+    return unique
+
+
+def _coating_reason_summary(reasons: list[Mapping[str, Any]]) -> str:
+    labels: list[str] = []
+    for reason in reasons:
+        label = str(reason.get("reason", "coating violation"))
+        segment = reason.get("segment")
+        species = reason.get("species")
+        if segment or species:
+            label += f" ({segment or '?'}/{species or '?'})"
+        labels.append(label)
+    return "; ".join(labels)
+
+
+def _coating_wall_quantity_unavailable(
+    *sources: Mapping[str, Any] | None,
+    include_coverage_unknown: bool = False,
+) -> str:
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        if source.get("wall_quantity_unavailable") is True:
+            return str(source.get("status_reason") or source.get("message") or "wall quantity unavailable")
+        refusal_species = source.get("wall_saturation_pressure_refused_species")
+        refusal_map = source.get("wall_saturation_pressure_refusals_by_species")
+        if refusal_species or refusal_map:
+            return str(
+                source.get("status_reason")
+                or source.get("message")
+                or "wall saturation pressure was refused"
+            )
+        code = str(source.get("code", ""))
+        if "wall_saturation_pressure_refused" in code:
+            return str(
+                source.get("status_reason")
+                or source.get("message")
+                or "wall saturation pressure was refused"
+            )
+        if include_coverage_unknown and code == "wall_deposit_coverage_unknown":
+            return str(source.get("message") or "wall deposit quantity is unavailable")
+        status = str(source.get("status", ""))
+        if status == "unavailable" or source.get("output_status") == "unavailable":
+            return str(source.get("status_reason") or source.get("message") or "wall quantity unavailable")
+        status_reason = str(source.get("status_reason", ""))
+        lowered_reason = status_reason.lower()
+        if (
+            "wall saturation unavailable" in lowered_reason
+            or (
+                "wall saturation" in lowered_reason
+                and "refus" in lowered_reason
+            )
+        ):
+            return status_reason
+    return ""
+
+
+def _coating_report_authority(report: Mapping[str, Any]) -> Mapping[str, Any]:
+    nested = report.get("sticking_alpha_authority")
+    if isinstance(nested, Mapping):
+        return nested
+    return report
+
+
+def _coating_report_deposit_records(report: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    raw = report.get("upstream_wall_deposit_records", ())
+    if not isinstance(raw, (tuple, list)):
+        return []
+    return [dict(item) for item in raw if isinstance(item, Mapping)]
 
 
 def _authority_is_authoritative(payload: Mapping[str, Any]) -> bool:

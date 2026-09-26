@@ -89,12 +89,14 @@ from simulator.optimize.objective import (
     product_summary,
 )
 from simulator.optimize.physics import (
+    COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN,
     CoatingFeasibilityReportError,
     GATE_ORDER,
     FeasibilityResult,
     GateMargin,
     PhysicsConstraintSet,
     ThresholdSpec,
+    _coating_runtime_diagnostics,
     physics_constraints_digest,
 )
 from simulator.optimize.profiles import (
@@ -1694,6 +1696,17 @@ def _trace_with_optimizer_coating_report(
         authoritative_for_resinter=authoritative,
         output_status=output_status,
         status_reason=status_reason,
+        upstream_wall_deposit_records=[
+            {
+                "scope": "upstream",
+                "segment": segment,
+                "species": species,
+                "deposit_kg_per_campaign": float(kg),
+            }
+            for (segment, species), kg in sorted(normalized_deposit.items())
+            if float(kg) > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+        ],
+        coating_diagnostics=_coating_runtime_diagnostics(run_execution),
     )
     if threshold_parametric:
         report.update(

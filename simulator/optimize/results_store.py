@@ -1527,7 +1527,12 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
         threshold_tolerance = float(threshold.get("tolerance", 0.0))
         feasible_value = bool(item["feasible"])
         if gate_name == "coating":
-            grounded_authority = _coating_margin_grounded_authority(status_payload)
+            explicit_verdict = status_payload.get("coating_verdict")
+            grounded_authority = (
+                None
+                if explicit_verdict in {"clear", "violated", "unavailable"}
+                else _coating_margin_grounded_authority(status_payload)
+            )
             if grounded_authority is not None:
                 authoritative_value = bool(
                     grounded_authority.get("authoritative_for_coating", False)

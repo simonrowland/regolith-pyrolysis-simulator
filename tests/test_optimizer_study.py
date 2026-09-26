@@ -4565,9 +4565,10 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
     )
     new_digest, new_recipe_id, new_cache_key = build_for_version(current_version)
 
-    # v4 2026-07-12: bumped when t-005 wired the body-aware sub-ambient pumping
-    # hard gate; pre-wiring cached feasibility verdicts must not be served.
-    assert current_version == "physics-feasibility-v5-continuous-transport"
+    # v6: flagged upstream wall deposition is a hard no-coating violation and
+    # refused wall quantities are unavailable; old feasibility caches cannot be
+    # served under the same physics_constraints_digest.
+    assert current_version == "physics-feasibility-v6-predicted-coating"
     assert old_digest != new_digest
     assert old_cache_key != new_cache_key
     assert old_recipe_id == new_recipe_id

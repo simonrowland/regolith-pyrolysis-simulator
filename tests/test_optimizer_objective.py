@@ -1942,6 +1942,34 @@ def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:
     assert "Stage 3 Fe contamination" in SSO2_CHUNK3B_READER_HANDOFF
 
 
+def test_sso2_reader_fails_on_runtime_silica_exposure_finding() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 10.0},
+        ledger=_FakeSso2Ledger({
+            "terminal.drain_tap_material": {"Fe": 7.0},
+            "process.metal_phase": {"Fe": 3.0},
+        }),
+    )
+    execution.trace.coating_diagnostics = {
+        "silica_exposed_to_alkali_findings": [{
+            "key": "silica_exposed_to_alkali",
+            "stage_number": 3,
+            "species": "Na",
+        }],
+    }
+
+    evidence = sso2_owner_recipe_evidence(execution)
+    score, reader = sso2_owner_recipe_objective_reader(execution)
+
+    assert evidence["wall_coating"]["feasible"] is False
+    assert evidence["wall_coating"]["coating_verdict"] == "violated"
+    assert evidence["wall_coating"]["coating_violation_reasons"][0]["reason"] == (
+        "silica_exposed_to_alkali"
+    )
+    assert score == pytest.approx(0.0)
+    assert reader["status"] == "wall_coating_failed"
+
+
 def test_sso2_evidence_empty_fe_tap_account_fails_closed_without_zero_alias() -> None:
     execution = _sso2_execution(
         condensed_delta={(3, "SiO2"): 1.0},

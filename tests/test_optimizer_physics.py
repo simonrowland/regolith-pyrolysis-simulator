@@ -236,7 +236,8 @@ def test_all_default_gates_are_computed_from_physics_trace() -> None:
 
     result = constraints.evaluate(trace)
 
-    assert result.feasible
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
     assert set(result.margins) == set(constraints.active_gates)
     assert result.margins["coating"].observed == pytest.approx(20.0)
 
@@ -351,7 +352,7 @@ def test_clean_zero_wall_deposit_coating_margin_is_feasible_infinity() -> None:
     assert coating.observed == math.inf
 
 
-def test_non_authoritative_coating_readout_reports_negative_margin_without_gate() -> None:
+def test_non_authoritative_coating_readout_reports_negative_margin_and_fails_gate() -> None:
     constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
         ("hot_wall", "SiO"): ThresholdSpec(
             id="allowable_wall_deposit_kg.hot_wall.SiO",
@@ -369,15 +370,16 @@ def test_non_authoritative_coating_readout_reports_negative_margin_without_gate(
     result = constraints.evaluate(trace)
     coating = result.margins["coating"]
 
-    # D1: missing sticking authority makes this advisory margin non-authoritative.
-    assert result.feasible
-    assert result.failing_gates == ()
-    assert coating.feasible
+    # A predicted deposit remains a hard no-coating violation when flagged.
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    assert not coating.feasible
     assert coating.authoritative is False
     assert coating.status == "warning"
     assert coating.margin < 0.0
     assert coating.observed == pytest.approx(0.2)
-    assert "grounded coating criterion not enforced" in coating.detail
+    assert "coating constraint violated" in coating.detail
+    assert "non-authoritative prediction" in coating.detail
     assert "reported-only" in coating.detail
     assert "Hottest/hot_wall/SiO" in coating.detail
 
@@ -404,17 +406,17 @@ def test_authoritative_bad_coating_fails_grounded_campaign_gate() -> None:
     result = constraints.evaluate(trace)
     coating = result.margins["coating"]
 
-    assert result.feasible
-    assert result.failing_gates == ()
-    assert coating.feasible
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    assert not coating.feasible
     assert coating.authoritative is True
     assert coating.status == "available"
     assert coating.observed == pytest.approx(0.2)
     assert coating.threshold.value == pytest.approx(10.0)
-    assert (
-        "continuous constraint exceeded: grounded coating criterion "
-        "campaigns_to_resinter=0.2 < 10"
-    ) in coating.detail
+    assert "coating constraint violated" in coating.detail
+    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+        "positive_upstream_wall_deposit"
+    )
 
 
 def test_runner_fouling_report_binds_authoritative_coating_gate() -> None:
@@ -478,7 +480,14 @@ def test_null_threshold_unavailable_wall_channel_is_not_an_authoritative_pass(
         "authoritative_for_resinter": False,
         "output_status": output_status,
         "status_reason": "wall saturation unavailable: above_source_certified_range",
-        "sticking_alpha_authority": {"authoritative_for_deposit_mass": False},
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["Na"],
+            "wall_saturation_pressure_refusals_by_species": {
+                "Na": "above_source_certified_range",
+            },
+        },
     }
     constraints = PhysicsConstraintSet(active_gates=("coating",))
     result = constraints.evaluate(_valid_trace_object(wall_fouling_report=report))
@@ -488,11 +497,14 @@ def test_null_threshold_unavailable_wall_channel_is_not_an_authoritative_pass(
         {**report, "resinter_threshold_kg": 1.0}
     )
 
-    assert coating.feasible is finite_threshold.feasible  # Unconstrained, not a clean-wall claim.
+    assert not coating.feasible
+    assert not finite_threshold.feasible
+    assert coating.margin == -math.inf
     assert coating.status == "unavailable"
     assert coating.authoritative is False
     assert coating.observed is None
     assert coating.status_payload["coating_constraint_authoritative"] is False
+    assert coating.status_payload["coating_verdict"] == "unavailable"
     assert coating.status_reason == report["status_reason"]
     assert _margin_view(coating)[9] is None
     exported = _gate_margin_payload(coating)
@@ -510,6 +522,12 @@ def test_null_threshold_unavailable_wall_channel_is_not_an_authoritative_pass(
     assert restored.observed is None
     assert restored.authoritative is False
     assert restored.status_payload["coating_constraint_authoritative"] is False
+    tampered = {
+        **stored,
+        "coating": {**stored["coating"], "feasible": True},
+    }
+    tampered_restored = _deserialize_grounding_margins(tampered)["coating"]
+    assert tampered_restored.feasible is False
     persisted_readouts = _result_row_constraint_margins({"feasibility_margins": stored})
     assert len(persisted_readouts) == 1
     persisted = persisted_readouts[0]
@@ -536,11 +554,197 @@ def test_direct_null_threshold_report_binds_no_unqualified_deposition() -> None:
 
     assert not result.feasible
     assert not coating.feasible
-    assert coating.authoritative is True
+    assert coating.authoritative is False
+    assert coating.status == "warning"
     assert coating.margin == pytest.approx(-0.5)
     assert coating.status_payload["coating_constraint_mode"] == (
         "no_unqualified_deposition"
     )
+
+
+@pytest.mark.parametrize(
+    ("species", "wall_temperature_C", "pressure_pa", "deposit_kg"),
+    (
+        ("Na", 400.0, 100.0, 0.3164430882678186),
+        ("Na", 20.0, 100.0, 0.3164430882678186),
+        ("K", 400.0, 100.0, 0.2821829005105212),
+        ("Mg", 400.0, 100.0, 0.1290796280282575),
+        ("Fe", 1400.0, 100.0, 0.078721439669855),
+        ("SiO", 20.0, 100.0, 0.5888592104624205),
+    ),
+)
+def test_review_table_flagged_upstream_deposits_fail_no_coating_gate(
+    species: str,
+    wall_temperature_C: float,
+    pressure_pa: float,
+    deposit_kg: float,
+) -> None:
+    report = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": deposit_kg,
+        "unqualified_deposition_rate_kg_per_campaign": deposit_kg,
+        "authoritative_for_resinter": False,
+        "output_status": "non-authoritative-threshold",
+        "status_reason": "wall saturation pressure extrapolated",
+        "coating_constraint_mode": "no_unqualified_deposition",
+        "coating_constraint_authoritative": True,
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_extrapolated",
+            "wall_saturation_pressure_extrapolations_by_species": {
+                species: {"wall_temperature_C": wall_temperature_C},
+            },
+        },
+        "upstream_wall_deposit_records": [{
+            "scope": "upstream",
+            "segment": "hot_wall",
+            "species": species,
+            "wall_temperature_C": wall_temperature_C,
+            "pressure_pa": pressure_pa,
+            "deposit_kg_per_campaign": deposit_kg,
+        }],
+    }
+
+    result = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    )
+    coating = result.margins["coating"]
+
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    assert not coating.feasible
+    assert coating.status == "warning"
+    assert coating.authoritative is False
+    reason = coating.status_payload["coating_violation_reasons"][0]
+    assert reason["reason"] == "positive_upstream_wall_deposit"
+    assert reason["species"] == species
+    assert reason["deposit_kg_per_campaign"] == pytest.approx(deposit_kg)
+    assert reason["flags"]["code"] == "wall_saturation_pressure_extrapolated"
+
+
+def test_review_table_clean_na_500_c_is_feasible() -> None:
+    report = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": 0.0,
+        "unqualified_deposition_rate_kg_per_campaign": 0.0,
+        "authoritative_for_resinter": False,
+        "output_status": "non-authoritative-threshold",
+        "status_reason": "resinter threshold is not grounded",
+        "coating_constraint_mode": "no_unqualified_deposition",
+        "coating_constraint_authoritative": True,
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": True,
+            "code": "wall_deposit_sticking_alpha_provenance",
+        },
+    }
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert coating.feasible
+    assert coating.status == "available"
+    assert coating.status_payload["coating_violation_reasons"] == []
+
+
+def test_review_table_fe_1400_c_100_pa_fails_from_dew_point_finding() -> None:
+    report = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": 0.0,
+        "authoritative_for_resinter": True,
+        "output_status": "authoritative",
+        "status_reason": "",
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": True,
+        },
+        "coating_diagnostics": {
+            "upstream_hot_wall_findings": [{
+                "segment": "stage_0_to_stage_1",
+                "species": "Fe",
+                "wall_temperature_C": 1400.0,
+                "pressure_pa": 100.0,
+                "finding": "p_i > P_sat,i(T_wall)",
+            }],
+        },
+    }
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+        "upstream_hot_wall_supersaturation"
+    )
+
+
+def test_refused_wall_quantity_is_unavailable_not_zero() -> None:
+    report = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": 0.0,
+        "authoritative_for_resinter": False,
+        "output_status": "status_bearing",
+        "status_reason": "wall saturation pressure refused",
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": False,
+            "code": "wall_saturation_pressure_refused",
+            "wall_saturation_pressure_refused_species": ["Na"],
+        },
+    }
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert not coating.feasible
+    assert coating.status == "unavailable"
+    assert coating.observed is None
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+    assert coating.status_reason == "wall saturation pressure refused"
+
+
+def test_silica_exposed_to_alkali_finding_fails_coating_gate() -> None:
+    report = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": 0.0,
+        "authoritative_for_resinter": True,
+        "output_status": "authoritative",
+        "status_reason": "",
+        "sticking_alpha_authority": {
+            "authoritative_for_deposit_mass": True,
+        },
+        "coating_diagnostics": {
+            "silica_exposed_to_alkali_findings": [{
+                "key": "silica_exposed_to_alkali",
+                "stage_number": 3,
+                "species": "Na",
+            }],
+        },
+    }
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_violation_reasons"][0]["reason"] == (
+        "silica_exposed_to_alkali"
+    )
+
+
+def test_designated_condenser_capture_only_is_not_coating() -> None:
+    result = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _trace(condensed=({(3, "Na"): 0.316},))
+    )
+
+    assert result.feasible
+    assert result.margins["coating"].feasible
+    assert result.margins["coating"].status_payload["coating_verdict"] == "clear"
 
 
 @pytest.mark.parametrize(
@@ -583,7 +787,7 @@ def test_malformed_runner_fouling_status_fields_fail_loud(
         )
 
 
-def test_non_authoritative_bad_coating_stays_feasible_with_warning() -> None:
+def test_non_authoritative_bad_coating_fails_with_warning() -> None:
     constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
         ("hot_wall", "K"): ThresholdSpec(
             id="allowable_wall_deposit_kg.hot_wall.K",
@@ -605,17 +809,17 @@ def test_non_authoritative_bad_coating_stays_feasible_with_warning() -> None:
     result = constraints.evaluate(trace)
     coating = result.margins["coating"]
 
-    assert result.feasible
-    assert result.failing_gates == ()
-    assert coating.feasible
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    assert not coating.feasible
     assert coating.authoritative is False
     assert coating.status == "warning"
     assert coating.observed == pytest.approx(0.2)
-    assert "grounded coating criterion not enforced" in coating.detail
+    assert "coating constraint violated" in coating.detail
     assert "non-authoritative" in coating.detail
 
 
-def test_authoritative_good_coating_satisfies_grounded_campaign_gate() -> None:
+def test_authoritative_positive_coating_fails_no_coating_gate() -> None:
     constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
         ("hot_wall", "SiO"): ThresholdSpec(
             id="allowable_wall_deposit_kg.hot_wall.SiO",
@@ -637,15 +841,15 @@ def test_authoritative_good_coating_satisfies_grounded_campaign_gate() -> None:
     result = constraints.evaluate(trace)
     coating = result.margins["coating"]
 
-    assert result.feasible
-    assert result.failing_gates == ()
-    assert coating.feasible
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    assert not coating.feasible
     assert coating.authoritative is True
     assert coating.observed == pytest.approx(20.0)
-    assert "grounded coating criterion satisfied" in coating.detail
+    assert "coating constraint violated" in coating.detail
 
 
-def test_unconfigured_kg_limit_does_not_fail_authoritative_coating_gate() -> None:
+def test_unconfigured_kg_limit_still_fails_authoritative_coating_gate() -> None:
     trace = _trace(
         condensed=({(3, "SiO"): 20.0},),
         wall=({("hot_wall", "SiO"): 0.05},),
@@ -657,11 +861,12 @@ def test_unconfigured_kg_limit_does_not_fail_authoritative_coating_gate() -> Non
 
     coating = PhysicsConstraintSet().coating(trace)
 
-    assert coating.feasible
+    assert not coating.feasible
     assert coating.authoritative is True
     assert coating.margin == pytest.approx(0.0)
     assert coating.observed == math.inf
     assert "absolute kg limit unconfigured" in coating.detail
+    assert coating.status_payload["coating_verdict"] == "violated"
 
 
 def test_coating_and_segment_allowable_readout_reports_small_wall_deposit_margin() -> None:
@@ -683,9 +888,9 @@ def test_coating_and_segment_allowable_readout_reports_small_wall_deposit_margin
     result = constraints.evaluate(trace)
     coating = result.margins["coating"]
 
-    assert result.feasible
-    assert result.failing_gates == ()
-    assert coating.feasible
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    assert not coating.feasible
     assert coating.observed == pytest.approx(20.0)
     assert coating.margin > 0.0
     assert "Hottest/hot_wall/SiO" in coating.detail
@@ -754,12 +959,12 @@ def test_non_authoritative_coating_readout_uses_declared_wall_zone_buckets(
 
     coating = constraints.coating(trace)
 
-    # D1: no authority payload, so the negative coating margin remains advisory.
-    assert coating.feasible
+    # The flag changes the label, not the no-coating verdict.
+    assert not coating.feasible
     assert coating.authoritative is False
     assert coating.status == "warning"
     assert coating.margin < 0.0
-    assert "grounded coating criterion not enforced" in coating.detail
+    assert "coating constraint violated" in coating.detail
     assert "reported-only" in coating.detail
     assert f"{zone}/{segment}/SiO" in coating.detail
     assert "unbucketed" not in coating.detail

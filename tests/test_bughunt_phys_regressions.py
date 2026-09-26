@@ -1298,7 +1298,8 @@ def test_null_resinter_threshold_emits_finite_deposition_constraint() -> None:
     )
     margin = PhysicsConstraintSet().coating(overlay)
     assert not margin.feasible
-    assert margin.authoritative
+    assert margin.authoritative is False
+    assert margin.status == "warning"
     assert margin.margin == pytest.approx(-0.5)
     assert margin.status_payload["coating_constraint_mode"] == (
         "no_unqualified_deposition"

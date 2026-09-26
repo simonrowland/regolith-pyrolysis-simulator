@@ -380,7 +380,8 @@ def test_uncertified_deposited_alpha_status_reaches_all_coating_surfaces() -> No
     readout = surfaces["readout"]
     leaderboard_row = surfaces["leaderboard_row"]
 
-    assert coating.feasible
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
     assert coating.status == "warning"
     assert coating.authoritative is False
     assert coating.output_status == "status_bearing"
@@ -1398,7 +1399,8 @@ def test_missing_or_wrong_species_alpha_status_reaches_all_coating_surfaces(
     readout = surfaces["readout"]
     leaderboard_row = surfaces["leaderboard_row"]
 
-    assert coating.feasible
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
     assert coating.status == "warning"
     assert coating.authoritative is False
     assert coating.output_status == "status_bearing"
