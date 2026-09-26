@@ -1268,29 +1268,19 @@ def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
     assert "pure_component_antoine" in markdown or "sidecar P_sat" in markdown
 
 
-def test_psat_al_si_are_compilation_disagreement_not_cheap_hypotheses() -> None:
-    """b-493: Al/Si rail P_sat is 1–2 dex above JANAF; cheap hypotheses die.
-
-    H1: adapter uses Al-005/Si-005 gas and Al-003/Si-003 liquid, not cr
-    past melting (Al 933.5 K, Si 1687 K) and not Al2/Si2/Si3.
-    H2: Al 1700/2200 K and Si 2200 K sit inside the Stull sidecar fit
-    (Al 1557–2329 K, Si 1997–2560 K), so the residual is not Antoine
-    extrapolation. H3: Alcock 1984 liquid Al agrees with JANAF; Si is
-    not in Alcock. Finding class is compilation_disagreement.
-    """
+def test_psat_al_si_match_janaf_fit_and_kill_old_stull_disagreement() -> None:
+    """d-021: active Al/Si sidecars match JANAF within their declared fit residual."""
 
     assert AL_MELTING_K == 933.5
     assert SI_MELTING_K == 1687.0
     al_fit = _sidecar_valid_range_K("Al")
     si_fit = _sidecar_valid_range_K("Si")
-    assert al_fit == (1557.0, 2329.0)
-    assert si_fit == (1997.0, 2560.0)
+    assert al_fit == (933.45, 2792.15)
+    assert si_fit == (1685.0, 3538.15)
     assert al_fit[0] <= 1700.0 <= al_fit[1]
     assert al_fit[0] <= 2200.0 <= al_fit[1]
     assert si_fit[0] <= 2200.0 <= si_fit[1]
-    assert not (al_fit[0] <= 1200.0 <= al_fit[1])
-    assert not (si_fit[0] <= 1800.0 <= si_fit[1])
-    assert not (si_fit[0] <= 2600.0 <= si_fit[1])
+    assert si_fit[0] <= 3500.0 <= si_fit[1]
 
     al_cr_1200 = KeyedTablePoint(
         compilation_id="janaf",
@@ -1337,15 +1327,10 @@ def test_psat_al_si_are_compilation_disagreement_not_cheap_hypotheses() -> None:
     assert 1200.0 > AL_MELTING_K
 
     # Premise: Al(l) ⇌ Al(g), a=1, JANAF P0=0.1 MPa.
-    # Algebra: log10(P_sat/P0)=−ΔvapG/(R T ln 10).
-    # ΔvapG = dfG(Al-005 g)−dfG(Al-003 l)=117.631−0=117.631 kJ/mol at 1700 K.
-    # R=8.314462618e-3 kJ/(mol·K); R T ln 10=0.008314462618×1700×2.302585
-    # =32.546 kJ/mol. log10(P/P0)_JANAF=−117.631/32.546=−3.6143.
-    # Sidecar log10(P/Pa)=10.73623−13204.109/(1700−24.306); P=718.53 Pa.
-    # log10(P/P0)_rail=log10(718.53/1e5)=−2.1436.
-    # residual=−2.1436−(−3.6143)=+1.4707 dex.
-    # Unit: dimensionless dex. Sanity: Alcock 1984 liquid Al four-term at
-    # 1700 K is 23.6 Pa, 0.01 dex from JANAF 24.3 Pa.
+    # Algebra: log10(P_sat/P0)=−ΔvapG/(R T ln 10). At 1700 K,
+    # ΔvapG = dfG(Al-005 g)−dfG(Al-003 l)=117.631 kJ/mol.
+    # The active fit is a JANAF-derived Antoine approximation; its residual
+    # is expected and is recorded in data/vapor_pressures.yaml.
     al_l_1700 = KeyedTablePoint(
         compilation_id="janaf",
         record_id="Al-003",
@@ -1376,32 +1361,27 @@ def test_psat_al_si_are_compilation_disagreement_not_cheap_hypotheses() -> None:
     assert isinstance(al_P, float)
     al_score = score_psat_pair(al_g_1700, al_l_1700, al_P, "Al")
     assert al_score.engine_channel == CHANNEL_VAPOUR_RAIL_PSAT
-    assert al_score.status == "mismatch"
-    assert al_score.finding_class == "compilation_disagreement"
+    assert al_score.status == "match"
+    assert al_score.finding_class == "compilation_agreement"
     assert al_score.finding_class != FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT
     assert al_score.finding_class != FINDING_CONDENSED_ROW_PAST_TRANSITION
-    assert al_score.residual_log10K == pytest.approx(1.4707, abs=5e-4)
+    assert al_score.residual_log10K == pytest.approx(-0.0011178, abs=5e-5)
     assert "Al-003" in (al_score.note or "")
-    assert "Stull 1947" in (al_score.note or "")
+    assert "Stull 1947" not in (al_score.note or "")
     assert psat_finding_class(
-        status="mismatch",
+        status="match",
         formula="Al",
         species_id="Al",
         T_K=1200.0,
         condensed=al_l_1200,
         provenance_class="independent_tabulation",
-    ) == "compilation_disagreement"
+    ) == "compilation_agreement"
 
     # Premise: Si(l) ⇌ Si(g), a=1, JANAF P0=0.1 MPa.
-    # Algebra: same as Al. ΔvapG=dfG(Si-005 g)−dfG(Si-003 l)=144.382 kJ/mol
-    # at 2200 K. R T ln 10=0.008314462618×2200×2.302585=42.118 kJ/mol.
-    # log10(P/P0)_JANAF=−144.382/42.118=−3.4280.
-    # Sidecar log10(P/Pa)=14.56436−23308.848/(2200−123.133); P=2194.21 Pa.
-    # log10(P/P0)_rail=log10(2194.21/1e5)=−1.6587.
-    # residual=−1.6587−(−3.4280)=+1.7693 dex.
-    # Unit: dimensionless dex. Sanity: Si is absent from Alcock 1984
-    # metallic-element tables; Clausius–Clapeyron from Tb≈3500 K and
-    # ΔHvap≈383 kJ/mol gives ~42 Pa at 2200 K, with JANAF not Stull.
+    # Algebra: same as Al. At 2200 K,
+    # ΔvapG=dfG(Si-005 g)−dfG(Si-003 l)=144.382 kJ/mol and the independent
+    # JANAF value is 37.3252 Pa. Alcock's numeric Si equation is unavailable
+    # offline, so this check intentionally uses JANAF only.
     si_cr_2200 = KeyedTablePoint(
         compilation_id="janaf",
         record_id="Si-002",
@@ -1447,11 +1427,11 @@ def test_psat_al_si_are_compilation_disagreement_not_cheap_hypotheses() -> None:
     si_P = _evaluate_rail_pressure_Pa("Si", 2200.0)
     assert isinstance(si_P, float)
     si_score = score_psat_pair(si_g_2200, si_l_2200, si_P, "Si")
-    assert si_score.status == "mismatch"
-    assert si_score.finding_class == "compilation_disagreement"
+    assert si_score.status == "match"
+    assert si_score.finding_class == "compilation_agreement"
     assert si_score.finding_class != FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT
     assert si_score.finding_class != FINDING_CONDENSED_ROW_PAST_TRANSITION
-    assert si_score.residual_log10K == pytest.approx(1.7693, abs=5e-4)
+    assert si_score.residual_log10K == pytest.approx(0.0213359, abs=5e-5)
     assert "Si-003" in (si_score.note or "")
 
     rail = derive_species_rail()
@@ -1466,7 +1446,7 @@ def test_psat_al_si_are_compilation_disagreement_not_cheap_hypotheses() -> None:
         and p.score.status != "typed-refusal"
         and p.score.species in {"Al", "Si"}
     }
-    assert by_key[("Al", 1200.0)].finding_class == "compilation_disagreement"
+    assert by_key[("Al", 1200.0)].finding_class == "compilation_agreement"
     assert "condensed_record=Al-003" in (by_key[("Al", 1200.0)].note or "")
-    assert by_key[("Si", 2200.0)].finding_class == "compilation_disagreement"
+    assert by_key[("Si", 2200.0)].finding_class == "compilation_agreement"
     assert "condensed_record=Si-003" in (by_key[("Si", 2200.0)].note or "")

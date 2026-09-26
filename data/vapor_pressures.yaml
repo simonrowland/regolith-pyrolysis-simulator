@@ -1842,17 +1842,53 @@ families:
           electrons_per_atom: 3
           parent_oxide: Al2O3
           authority_class: uncertified
-          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); pure_component_antoine
-            is retained as a legacy compatibility sidecar; the schema-v2 catalog uses the activity-corrected
-            liquid-AlO1.5 reaction
+          source: REF-020 NIST-JANAF 4th ed. (Chase 1998), Al-003 liquid and Al-005 gas; the
+            pure_component_antoine sidecar is a JANAF liquid-to-gas evaluation fit. Alcock, Itkin & Horrigan
+            1984 is not numerically available in the offline corpus, so JANAF is the source for this row;
+            the schema-v2 catalog still uses the activity-corrected liquid-AlO1.5 reaction.
           pure_component_antoine:
-            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306),
-              converted to Pa by A+5
-            source_certification: source_equation_fit
-            A: 10.73623
-            B: 13204.109
-            C: -24.306
+            source: REF-020 NIST-JANAF 4th ed. (Chase 1998), tables Al-003 (Al(l)) and Al-005 (Al(g));
+              source cache SHA-256 Al-003=a36de1edb6002908206ace92276184aeefb0afc70ef40c95c5288f7fcde4abc1,
+              Al-005=666ec06681fe525b68eab0c2f297bd1be28144bd3bb7ab27cc48fc67dc76e5e7. Alcock, Itkin & Horrigan
+              1984 is unavailable offline; no Alcock coefficient is substituted.
+            source_certification: derived_from_evaluation
+            provenance_class: derived_from_evaluation
+            derivation: >-
+              Premise: Al(l) -> Al(g), unit liquid activity and ideal-gas fugacity, with JANAF p° = 0.1 MPa
+              = 100000 Pa. Algebra: delta_r G° = G°[Al(g)] - G°[Al(l)], log10 K = -delta_r G°/(R T ln 10),
+              K = P_sat/p°, so log10(P_sat/Pa) = 5 - delta_r G°/(R T ln 10), with R = 8.314462618e-3
+              kJ/(mol K). The Antoine form log10(P/Pa) = A - B/(T+C) is a bounded-minimax fit to the
+              tabulated liquid/gas points from 1000-2700 K plus the catalog normal-boiling check at
+              2792.15 K, P=101325 Pa. Unit check: kJ/mol divided by kJ/(mol K)*K is dimensionless;
+              adding log10(100000 Pa) returns log10(P/Pa). Sanity: at 2200 K, Al-003 delta-fG=0 and
+              Al-005 delta-fG=62.979 kJ/mol gives P_tab=3196.8161 Pa; the fit gives 3167.4746 Pa
+              (-0.004005 dex). At T_b=2792.15 K the fit gives 102219.23 Pa (+0.003817 dex from
+              101325 Pa). Fit residual over 17 JANAF points plus the boiling-point check is max 0.004385
+              dex, RMS 0.003274 dex. Valid range covers the liquid phase and the normal-boiling check.
+            source_certified_range_K:
+            - 1000
+            - 2700
+            fit_residual_dex:
+              max_abs: 0.004385281
+              rms: 0.003273764
+              n_tabulated_points: 17
+              method: bounded minimax absolute log10 residual; JANAF points plus normal-boiling check
+            A: 10.4937063712
+            B: 15051.1182906
+            C: -47.6858467007
             valid_range_K:
+            - 933.45
+            - 2792.15
+          retired_stull_1947:
+            status: inactive_provenance_only
+            reason: d-021 owner ruling; Stull 1947 sidecar was 1.2-2.1 dex high against JANAF/Alcock
+            source: REF-002 NIST Chemistry WebBook SRD 69 / Stull 1947 aluminum (C7429905)
+            equation_log10_P_bar: log10(P/bar)=5.73623-13204.109/(T-24.306)
+            converted_coefficients_Pa:
+              A: 10.73623
+              B: 13204.109
+              C: -24.306
+            source_valid_range_K:
             - 1557
             - 2329
           boiling_point_C: 2519
@@ -1997,16 +2033,57 @@ families:
           prefer_compiled_reference_pressure_model: true
           retain_analytical_pressure_channel: true
           flux_dormant: false
-          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); pure_component_antoine
-            remains a legacy pure-element sidecar and is not a melt-source catalog answer
+          source: REF-020 NIST-JANAF 4th ed. (Chase 1998), Si-003 liquid and Si-005 gas; the
+            pure_component_antoine sidecar is a JANAF liquid-to-gas evaluation fit and is not a melt-source
+            catalog answer. Alcock, Itkin & Horrigan 1984 is not numerically available in the offline corpus,
+            so JANAF is the source for this row.
           pure_component_antoine:
-            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133),
-              converted to Pa by A+5
-            source_certification: source_equation_fit
-            A: 14.56436
-            B: 23308.848
-            C: -123.133
+            source: REF-020 NIST-JANAF 4th ed. (Chase 1998), tables Si-003 (Si(l)) and Si-005 (Si(g));
+              source cache SHA-256 Si-003=014834423b0521e30b16c55256aa6c65785836d8bed0d82cbb0cba9dd438408c,
+              Si-005=269ee0967ede0a7277d9bfd946a1e9fa99f5fa02a8dd605f3ba036f63c3850a8. Alcock, Itkin & Horrigan
+              1984 is unavailable offline; no Alcock coefficient is substituted.
+            source_certification: derived_from_evaluation
+            provenance_class: derived_from_evaluation
+            derivation: >-
+              Premise: Si(l) -> Si(g), unit liquid activity and ideal-gas fugacity, with JANAF p° = 0.1 MPa
+              = 100000 Pa. Algebra: delta_r G° = G°[Si(g)] - G°[Si(l)], log10 K = -delta_r G°/(R T ln 10),
+              K = P_sat/p°, so log10(P_sat/Pa) = 5 - delta_r G°/(R T ln 10), with R = 8.314462618e-3
+              kJ/(mol K). The Antoine form log10(P/Pa) = A - B/(T+C) is a bounded-minimax fit to the
+              tabulated liquid/gas points from 1700-3500 K plus the catalog normal-boiling check at
+              3538.15 K, P=101325 Pa. Unit check: kJ/mol divided by kJ/(mol K)*K is dimensionless;
+              adding log10(100000 Pa) returns log10(P/Pa). Sanity: at 2200 K, Si-003 delta-fG=0 and
+              Si-005 delta-fG=144.382 kJ/mol gives P_tab=37.3252 Pa; the fit gives 39.2047 Pa
+              (+0.021336 dex). At T_b=3538.15 K the fit gives 106912.93 Pa (+0.023314 dex from
+              101325 Pa). Fit residual over 18 JANAF points plus the boiling-point check is max 0.023314
+              dex, RMS 0.016850 dex. The Si residual is accepted as smooth Antoine curvature,
+              not unstructured table noise: it changes sign across the JANAF grid (negative at
+              1800 K, positive at 2200-2400 K, and negative again by 3100-3500 K) while remaining
+              within the declared 0.023314 dex bound. Valid range covers the liquid phase and the
+              normal-boiling check.
+            source_certified_range_K:
+            - 1700
+            - 3500
+            fit_residual_dex:
+              max_abs: 0.023313638
+              rms: 0.016849955
+              n_tabulated_points: 18
+              method: bounded minimax absolute log10 residual; JANAF points plus normal-boiling check
+            A: 10.285771463
+            B: 17797.0716171
+            C: -152.57880732
             valid_range_K:
+            - 1685
+            - 3538.15
+          retired_stull_1947:
+            status: inactive_provenance_only
+            reason: d-021 owner ruling; Stull 1947 sidecar was 1.2-2.1 dex high against JANAF/Alcock
+            source: REF-002 NIST Chemistry WebBook SRD 69 / Stull 1947 silicon (C7440213)
+            equation_log10_P_bar: log10(P/bar)=9.56436-23308.848/(T-123.133)
+            converted_coefficients_Pa:
+              A: 14.56436
+              B: 23308.848
+              C: -123.133
+            source_valid_range_K:
             - 1997
             - 2560
           boiling_point_C: 3265

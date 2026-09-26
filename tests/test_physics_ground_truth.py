@@ -31,9 +31,11 @@ from simulator.environment import (
 )
 from simulator.mre_ladder import mre_decomposition_voltage_reference
 from simulator.state import GAS_CONSTANT, MOLAR_MASS
+from simulator import condensation
 
 
 PA_PER_ATM = 101_325.0
+JANAF_GAS_CONSTANT_KJ_MOL_K = 8.314462618e-3
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 
@@ -240,6 +242,94 @@ def _alcock_source_pa(species: str, phase: str, temperature_K: float) -> float:
     return 10.0 ** log10_pa
 
 
+@lru_cache(maxsize=None)
+def _janaf_formation_gibbs_kj_mol(table_id: str, temperature_K: float) -> float:
+    """Read one independent JANAF delta-f G point, not simulator output."""
+
+    table_path = (
+        DATA_DIR
+        / "literature"
+        / "compilations"
+        / "janaf"
+        / "tables"
+        / f"{table_id}.yaml"
+    )
+    payload = yaml.safe_load(table_path.read_text())
+    for point in payload["table"]["values"]:
+        if point["temperature"]["value"] == temperature_K:
+            value = point["formation_gibbs_energy"]["value"]
+            assert value is not None
+            return float(value)
+    raise AssertionError(f"JANAF {table_id} has no exact {temperature_K:g} K point")
+
+
+def _janaf_liquid_vapour_pa(species: str, temperature_K: float) -> float:
+    table_ids = {
+        "Al": ("Al-003", "Al-005"),
+        "Si": ("Si-003", "Si-005"),
+    }
+    liquid_table, gas_table = table_ids[species]
+    delta_g_kj_mol = _janaf_formation_gibbs_kj_mol(
+        gas_table, temperature_K
+    ) - _janaf_formation_gibbs_kj_mol(liquid_table, temperature_K)
+    # JANAF p° = 0.1 MPa. K = P_sat/p° for M(l) -> M(g), so this is an
+    # external-table computation independent of the runtime Antoine row.
+    return 100_000.0 * 10.0 ** (
+        -delta_g_kj_mol
+        / (JANAF_GAS_CONSTANT_KJ_MOL_K * temperature_K * math.log(10.0))
+    )
+
+
+@lru_cache(maxsize=None)
+def _janaf_liquid_vapour_grid(species: str) -> tuple[tuple[float, float], ...]:
+    """Return every exact liquid/gas JANAF intersection plus the NBP anchor."""
+
+    table_ids = {
+        "Al": ("Al-003", "Al-005"),
+        "Si": ("Si-003", "Si-005"),
+    }
+    liquid_table, gas_table = table_ids[species]
+    points_by_table = []
+    for table_id in (liquid_table, gas_table):
+        table_path = (
+            DATA_DIR
+            / "literature"
+            / "compilations"
+            / "janaf"
+            / "tables"
+            / f"{table_id}.yaml"
+        )
+        payload = yaml.safe_load(table_path.read_text())
+        points_by_table.append(
+            {
+                float(point["temperature"]["value"])
+                for point in payload["table"]["values"]
+                if point["formation_gibbs_energy"]["value"] is not None
+            }
+        )
+
+    row = _vapor_pressure_data()["metals"][species]["pure_component_antoine"]
+    low_K, high_K = map(float, row["valid_range_K"])
+    grid_temperatures = sorted(
+        temperature_K
+        for temperature_K in points_by_table[0] & points_by_table[1]
+        if low_K <= temperature_K <= high_K
+    )
+    cases = [
+        (temperature_K, _janaf_liquid_vapour_pa(species, temperature_K))
+        for temperature_K in grid_temperatures
+    ]
+    cases.append((high_K, PA_PER_ATM))
+    return tuple(cases)
+
+
+_JANAF_LIQUID_VAPOUR_GRID_CASES = tuple(
+    (species, temperature_K, expected_pa)
+    for species in ("Al", "Si")
+    for temperature_K, expected_pa in _janaf_liquid_vapour_grid(species)
+)
+
+
 def _shomate_h_increment_kj_mol(coeff: dict, temperature_K: float) -> float:
     t = temperature_K / 1000.0
     return (
@@ -399,10 +489,6 @@ def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
         ("K", 1033.0, 104_572.576518, 1e-6),
         # NIST Chemistry WebBook SRD 69, calcium Antoine row, Hartmann and Schneider 1929.
         ("Ca", 1500.0, 21_740.153809, 1e-6),
-        # NIST Chemistry WebBook SRD 69, aluminum Antoine row, Stull 1947.
-        ("Al", 2200.0, 46_484.884967, 1e-6),
-        # NIST Chemistry WebBook SRD 69, silicon Antoine row, Stull 1947.
-        ("Si", 2200.0, 2_194.210607, 1e-6),
         # NIST Chemistry WebBook SRD 69, chromium Antoine row, Stull 1947.
         ("Cr", 2200.0, 2_704.347348, 1e-6),
         # CRC.b/Stull source-tabulated Mg pressure levels.
@@ -427,6 +513,139 @@ def test_pure_component_antoine_matches_published_vapor_pressure_points(
         expected_pa,
         rel=rel_tol,
     )
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "expected_pa"),
+    _JANAF_LIQUID_VAPOUR_GRID_CASES,
+    ids=[
+        f"{species}-JANAF-{temperature_K:g}K"
+        for species, temperature_K, _ in _JANAF_LIQUID_VAPOUR_GRID_CASES
+    ],
+)
+def test_pure_component_janaf_fit_matches_independent_liquid_vapour_point(
+    species: str,
+    temperature_K: float,
+    expected_pa: float,
+) -> None:
+    """d-021: every in-range JANAF point and NBP anchor ground the fit."""
+
+    actual_pa = _pure_component_antoine_pa(
+        _vapor_pressure_data()["metals"][species], temperature_K
+    )
+    declared_max_dex = float(
+        _vapor_pressure_data()["metals"][species]["pure_component_antoine"][
+            "fit_residual_dex"
+        ]["max_abs"]
+    )
+    expected_max_dex = {"Al": 0.004385281, "Si": 0.023313638}[species]
+
+    assert declared_max_dex == pytest.approx(expected_max_dex, abs=1e-12)
+    assert abs(math.log10(actual_pa / expected_pa)) <= declared_max_dex + 1e-8
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "expected_label"),
+    [
+        pytest.param(
+            "Al",
+            950.0,
+            "builtin_authoritative:pure_component_extrapolated:"
+            "extrapolated_beyond_source_certified_range_K",
+            id="Al-below-JANAF-fit",
+        ),
+        pytest.param(
+            "Si",
+            1690.0,
+            "builtin_authoritative:pure_component_extrapolated:"
+            "extrapolated_beyond_source_certified_range_K",
+            id="Si-below-JANAF-fit",
+        ),
+        pytest.param(
+            "Al",
+            2200.0,
+            "builtin_authoritative:pure_component_derived_from_evaluation",
+            id="Al-inside-JANAF-fit",
+        ),
+        pytest.param(
+            "Si",
+            2200.0,
+            "builtin_authoritative:pure_component_derived_from_evaluation",
+            id="Si-inside-JANAF-fit",
+        ),
+        pytest.param(
+            "Al",
+            2792.15,
+            "builtin_authoritative:pure_component_extrapolated:"
+            "extrapolated_beyond_source_certified_range_K",
+            id="Al-NBP-above-JANAF-fit",
+        ),
+        pytest.param(
+            "Si",
+            3538.15,
+            "builtin_authoritative:pure_component_extrapolated:"
+            "extrapolated_beyond_source_certified_range_K",
+            id="Si-NBP-above-JANAF-fit",
+        ),
+    ],
+)
+def test_janaf_source_range_label_marks_fit_continuations(
+    species: str,
+    temperature_K: float,
+    expected_label: str,
+) -> None:
+    data = _vapor_pressure_data()
+    row = data["metals"][species]
+    _, block = vapor_pressure_antoine_coefficients(
+        row,
+        temperature_K=temperature_K,
+    )
+
+    assert vapor_pressure_source_label(
+        "builtin_authoritative",
+        row,
+        coefficient_block=block,
+        temperature_K=temperature_K,
+    ) == expected_label
+
+
+@pytest.mark.parametrize(
+    ("species", "temperature_K", "expected_range_K", "extrapolated"),
+    [
+        pytest.param("Al", 950.0, [1000.0, 2700.0], True, id="Al-below-fit"),
+        pytest.param("Si", 1690.0, [1700.0, 3500.0], True, id="Si-below-fit"),
+        pytest.param("Al", 2200.0, [1000.0, 2700.0], False, id="Al-inside-fit"),
+        pytest.param("Si", 2200.0, [1700.0, 3500.0], False, id="Si-inside-fit"),
+    ],
+)
+def test_janaf_wall_telemetry_marks_fit_continuations(
+    species: str,
+    temperature_K: float,
+    expected_range_K: list[float],
+    extrapolated: bool,
+) -> None:
+    records: dict[str, dict] = {}
+    diagnostic: dict[str, object] = {}
+    driving_pressure_pa = condensation._wall_deposition_driving_pressure_pa(
+        species,
+        1000.0,
+        temperature_K,
+        vapor_pressure_data=_vapor_pressure_data(),
+        reactive_product_backstop=False,
+        antoine_extrapolations=records,
+        diagnostic_out=diagnostic,
+    )
+
+    assert driving_pressure_pa >= 0.0
+    if extrapolated:
+        notice = diagnostic["wall_saturation_pressure_notice"]
+        assert notice["valid_range_K"] == expected_range_K
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["status"] == "extrapolated"
+        assert notice["output_status"] == "status_bearing"
+    else:
+        assert records == {}
+        assert "wall_saturation_pressure_notice" not in diagnostic
 
 
 def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_liquid_oxide_standard() -> None:
@@ -681,10 +900,6 @@ def test_mn_source_spread_and_join_resolution_are_documented_in_place() -> None:
         # the recovered-P runtime path — same class as Al/Cr oxide-coupled rails.
         # Ca condensed rail (below boil 1757 K) still uses pure-component * Ellingham.
         ("Ca", 1500.0, 21_740.153809, 1e-6),
-        # Al/Cr oxide-coupled runtime uses liquid_oxide_standard_reaction (pairing
-        # fix); pure-component sidecars remain NBP/NIST ground-truth only and are
-        # covered by pure_component_antoine point tests, not this recovered-P path.
-        ("Si", 2200.0, 2_194.210607, 1e-6),
     ],
 )
 def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pressure(
@@ -746,8 +961,8 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
     label_cases = [
         ("Fe", 3135.15, "pure_component_derived_from_evaluation"),
         ("Ca", 1700.0, "pure_component_source_equation_fit"),
-        ("Al", 2300.0, "pure_component_source_equation_fit"),
-        ("Si", 2500.0, "pure_component_source_equation_fit"),
+        ("Al", 2300.0, "pure_component_derived_from_evaluation"),
+        ("Si", 2500.0, "pure_component_derived_from_evaluation"),
         ("Cr", 2700.0, "pure_component_source_equation_fit"),
         ("Mn", 1519.0, "pure_component_derived_from_evaluation"),
         ("Mn", 1700.0, "pure_component_derived_from_evaluation"),

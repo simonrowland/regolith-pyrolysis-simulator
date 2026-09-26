@@ -81,10 +81,13 @@ to pascals. For example, the sodium fit
 (*J. Am. Chem. Soc.* 52(7):2654–2665, [doi:10.1021/ja01370a011](https://doi.org/10.1021/ja01370a011))
 via the WebBook Antoine table; potassium traces to Fiock & Rodebush 1926
 ([doi:10.1021/ja01421a006](https://doi.org/10.1021/ja01421a006)), calcium to Hartmann & Schneider 1929
-([doi:10.1002/zaac.19291800129](https://doi.org/10.1002/zaac.19291800129)), and aluminium to the Stull
-1947 compilation ([doi:10.1021/ie50448a022](https://doi.org/10.1021/ie50448a022)). These are the
-`pure_component_psat` species (Ca, Al, Ti, Cr, Mn, and the alkalis' pure references) and their fits are
-CITED — traceable to a primary measurement on the basis the reference used.
+([doi:10.1002/zaac.19291800129](https://doi.org/10.1002/zaac.19291800129)). Aluminium and silicon now use
+JANAF 4th-edition liquid/gas evaluation pairs (Al-003/Al-005 and Si-003/Si-005, respectively), converted
+from `delta_r G°` with `log10(P/Pa) = 5 − delta_r G°/(R T ln 10)` and fitted to the same Antoine form;
+the Alcock, Itkin & Horrigan 1984 numeric rows are not present in the offline corpus. These are the
+`pure_component_psat` species (Ca, Al, Si, Ti, Cr, Mn, and the alkalis' pure references) and their fits are
+CITED or evaluation-derived as recorded in `data/vapor_pressures.yaml` and
+`docs/chemistry-provenance.yaml`.
 <!-- impl: §2.1 -> engines/builtin/vapor_pressure.py vapor_pressure_antoine_coefficients:619 — Antoine row selection -->
 <!-- impl: §2.1 -> data/vapor_pressures.yaml families.metals_na_family.physical_properties.species.Na.pure_component_antoine:796 — pure Antoine data -->
 
