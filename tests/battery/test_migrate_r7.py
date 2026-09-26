@@ -30,6 +30,7 @@ from simulator.battery.migrate import (
     select_declared_source,
 )
 from simulator.battery.records import State
+from simulator.battery.validity import underdetermined_apparatus
 from tests.battery.test_migrate import (
     _copy_compilation_record,
     _copy_extract,
@@ -404,6 +405,46 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         else:
             assert obs.admission.status.value == "admitted"
             assert obs.identity.fO2_Pa.is_value
+
+
+def test_g2_plante_pressure_rows_lift_page_271_calibration(tmp_path):
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-042-plante-1979.yaml")
+    result = migrate(root, write=False)
+
+    experiment = next(
+        item
+        for item in result.experiments.values()
+        if item.experiment_id.endswith("::experiment::k2o-sio2-effusion-series")
+    )
+    assert experiment.apparatus is not None
+    calibration = experiment.apparatus.calibration
+    assert calibration is not None
+    assert {
+        "k_1104_microvolts_atm_inverse_K_inverse",
+        "k_1110_1115_microvolts_atm_inverse_K_inverse",
+        "k_1122_1129_microvolts_atm_inverse_K_inverse",
+        "k_1214_microvolts_atm_inverse_K_inverse",
+        "method",
+    } <= set(calibration)
+    assert all(item.locator is not None for item in calibration.values())
+    assert all(item.inference is None for item in calibration.values())
+
+    measured = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-042-plante-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.admission.status.value != "superseded"
+    ]
+    assert len(measured) == 221
+    assert {observation.experiment_id for observation in measured} == {
+        experiment.experiment_id
+    }
+    assert all(
+        underdetermined_apparatus(experiment, Quantity.P_PARTIAL).passed
+        for _ in measured
+    )
 
 
 def test_g1_jacobson_keeps_category_and_quantity_reason(tmp_path):

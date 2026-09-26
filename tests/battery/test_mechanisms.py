@@ -593,8 +593,8 @@ def test_m06_clamp_emits_floor_inversion_with_original_and_band() -> None:
     assert validate_corpus([w], [exp], [clean]).ok
 
 
-def test_m07_apparatus_rejects_unknown_calibration_and_invalid_geometry() -> None:
-    """Grounded, physically valid determinants; TGA kinetic area is required."""
+def test_m07_apparatus_rejects_unknown_calibration_and_requires_flux_area() -> None:
+    """Calibrated KEMS pressure is geometry-free; flux still needs orifice area."""
 
     from dataclasses import replace
 
@@ -613,10 +613,9 @@ def test_m07_apparatus_rejects_unknown_calibration_and_invalid_geometry() -> Non
     bad_gate = underdetermined_apparatus(bad, Quantity.P_SAT)
     assert bad_gate.passed is False
     assert bad_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    missing = next(c.detail["missing"] for c in bad_gate.checks if c.name == "geometry_determinants")
-    assert "orifice_area_m2" in missing
-    assert "clausing_factor" in missing
-    assert "calibration" in missing
+    assert bad_gate.primary_check == "kems_calibration"
+    check = next(c for c in bad_gate.checks if c.name == "kems_calibration")
+    assert check.detail["missing"] == ["calibration"]
     tga = F.tabulation_experiment(method=MethodToken.TGA)
     tga_gate = underdetermined_apparatus(tga, Quantity.MASS_LOSS_RATE)
     assert tga_gate.passed is False
@@ -2724,7 +2723,7 @@ def test_sc_f04_omitted_wall_or_reservoir_refuses() -> None:
     assert identity_equal(complete, olivine).kind is IdentityEqualKind.IDENTITY_MISMATCH
     exp = F.kems_experiment(orifice_area=None, clausing=None)
     gate = underdetermined_apparatus(exp, Quantity.P_SAT)
-    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert gate.passed
 
 
 def test_sc_f05_pi_p1_4_hematite_annotations_do_not_compare() -> None:
@@ -3060,7 +3059,7 @@ def test_mf_f01_f02_f03_f05_f06_default_free_validator() -> None:
 
 def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
     exp = F.kems_experiment(orifice_area=None, clausing=Decimal("0.9"))
-    assert underdetermined_apparatus(exp, Quantity.P_SAT).reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert underdetermined_apparatus(exp, Quantity.P_SAT).passed
     complete = F.kems_experiment()
     assert underdetermined_apparatus(complete, Quantity.P_SAT).passed
     assert effusion_regime_unverified(complete, Quantity.P_SAT).passed

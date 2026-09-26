@@ -140,6 +140,28 @@ experiments:
       orifice_channel_length_m:
         state: {tag: unknown, reason: not_published}
         locator: {page: 271, section: '3. Procedure'}
+    calibration:
+      k_1104_microvolts_atm_inverse_K_inverse:
+        state: {tag: value, value: 1.96e-11}
+        locator: {published_page: 271, table: '1', note: 'Printed mass spectrometer constant k for series 1104'}
+      k_1110_1115_microvolts_atm_inverse_K_inverse:
+        state: {tag: value, value: 1.47e-11}
+        locator: {published_page: 271, table: '1', note: 'Printed mass spectrometer constant k for series 1110-1115'}
+      k_1122_1129_microvolts_atm_inverse_K_inverse:
+        state: {tag: value, value: 1.83e-11}
+        locator: {published_page: 271, table: '1', note: 'Printed mass spectrometer constant k for series 1122-1129'}
+      k_1214_microvolts_atm_inverse_K_inverse:
+        state: {tag: value, value: 1.75e-11}
+        locator: {published_page: 271, table: '1', note: 'Printed mass spectrometer constant k for series 1214; footnote a says average of previous three values'}
+      method:
+        state:
+          tag: value
+          value: >-
+            Gravimetric weight-loss calibration: each Knudsen-cell removal was
+            weighed, and weight loss with the summed ion-current times square-root
+            temperature data was used to calculate the mass-spectrometer sensitivity
+            constant.
+        locator: {published_page: 271, section: '3. Procedure', table: '1', note: 'Printed calibration procedure preceding Table 1'}
   pressure_environment:
     total_pressure_Pa:
       state: {tag: value, value: {kind: interval, interval_low: '0.000001333223684210526315789474', interval_high: '0.00001333223684210526315789474'}}
