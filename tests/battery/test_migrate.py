@@ -1327,7 +1327,10 @@ def test_calculated_series_conversion_is_not_author_derivation(tmp_path: Path) -
 
     assert len(points) == 1
     assert points[0].derivation is not None
-    assert points[0].derivation.relation == "atm_to_Pa"
+    assert points[0].derivation.relation == (
+        "atm_to_Pa; species.phase=gas derived from quantity=p_sat "
+        "(p_sat identity names the gas species)"
+    )
     assert points[0].evidence.class_.is_unknown
 
 
@@ -1627,7 +1630,14 @@ def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
         if "behrens_p_atm" in o.observation_id
     ]
     assert len(atm_points) == 2
-    assert all(p.derivation is not None and p.derivation.relation == "atm_to_Pa" for p in atm_points)
+    assert all(
+        p.derivation is not None
+        and p.derivation.relation == (
+            "atm_to_Pa; species.phase=gas derived from quantity=p_sat "
+            "(p_sat identity names the gas species)"
+        )
+        for p in atm_points
+    )
     unlift = [
         o
         for o in result.observations.values()
@@ -1918,7 +1928,14 @@ def test_h01_explicit_T_K_pressure_atm_still_converts(tmp_path: Path) -> None:
         {float(p.identity.temperature_K.value) for p in points} == {1200.0, 1300.0}
     )
     assert all(p.value.kind is ValueKind.POINT for p in points)
-    assert all(p.derivation is not None and p.derivation.relation == "atm_to_Pa" for p in points)
+    assert all(
+        p.derivation is not None
+        and p.derivation.relation == (
+            "atm_to_Pa; species.phase=gas derived from quantity=p_sat "
+            "(p_sat identity names the gas species)"
+        )
+        for p in points
+    )
 
 
 def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Path) -> None:

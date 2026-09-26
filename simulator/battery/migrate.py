@@ -10076,8 +10076,11 @@ class Migrator:
             # when the source phase names its condensed system; measured rows
             # keep an explicit, missing, or unmapped source phase.
             method_class = str(values.get("method_class") or "").strip().casefold()
+            source_declares_gas_phase = _source_standard_state_phase(
+                source_standard_state, "g"
+            ) is not None
             inferred_pressure_phase = (
-                _source_standard_state_phase(source_standard_state, "g") is not None
+                source_declares_gas_phase
                 or method_class
                 in {
                     "model_derived",
@@ -10086,7 +10089,9 @@ class Migrator:
                     "directly_reduced_measurement",
                 }
             )
-            if phase_provenance is not None and phase.is_unknown and inferred_pressure_phase:
+            if phase_provenance is not None and inferred_pressure_phase and (
+                phase.is_unknown or source_declares_gas_phase
+            ):
                 phase = State.of(Phase.G)
                 unmapped_phase = None
         if phase_raw is None or phase_raw == "":
