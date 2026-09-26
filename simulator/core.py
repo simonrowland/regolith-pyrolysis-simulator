@@ -3416,6 +3416,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             transport_kwargs['effective_transport_capacity'] = (
                 effective_transport_capacity
             )
+        campaign_manager = getattr(self, 'campaign_mgr', None)
+        campaign_phase = getattr(self.melt, 'campaign', None)
+        route_resolver = getattr(campaign_manager, 'stage3_route_for', None)
+        if campaign_phase is None or not callable(route_resolver):
+            stage3_route = 'through'
+            route_basis = 'no_campaign_phase'
+        else:
+            stage3_route = route_resolver(self.melt)
+            route_basis = 'campaign_phase'
         transport = self.overhead_model.estimate_transport_state(
             evap_flux,
             self.melt,
@@ -3491,9 +3500,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             ),
             carrier_gas=self._resolve_condensation_carrier_gas(),
-            campaign_name=getattr(self.melt.campaign, 'name', ''),
-            campaign_hour=float(self.melt.campaign_hour),
-            stage3_route=self.campaign_mgr.stage3_route_for(self.melt),
+            campaign_name=getattr(
+                getattr(self.melt, 'campaign', None),
+                'name',
+                '',
+            ),
+            campaign_hour=float(getattr(self.melt, 'campaign_hour', 0.0) or 0.0),
+            stage3_route=stage3_route,
+            route_basis=route_basis,
         )
 
     def _apply_c2a_knudsen_pressure_adjustment(self) -> None:

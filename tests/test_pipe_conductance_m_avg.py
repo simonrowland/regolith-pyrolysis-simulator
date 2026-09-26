@@ -90,6 +90,8 @@ def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distin
         "duct_a": 850.0,
         "duct_b": 875.0,
     }
+    assert configured["stage3_route"] == "through"
+    assert configured["route_basis"] == "no_campaign_phase"
 
 
 # ---------------------------------------------------------------------------

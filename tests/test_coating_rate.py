@@ -790,6 +790,14 @@ def test_shadow_rate_shares_species_supply_across_segments() -> None:
         sio_liner_temperature_c=1050.0,
         sio_pO2_mbar=0.0,
         include_wall_deposit_rate_diagnostics=True,
+        setpoints_patch={
+            "campaigns": {
+                "C2A_continuous": {
+                    "stage3_route": "through",
+                    "stage3_route_schedule": [],
+                },
+            },
+        },
     ).run()
 
     shadow = payload["per_hour_summary"][0][

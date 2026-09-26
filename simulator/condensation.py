@@ -2906,6 +2906,7 @@ class CondensationModel:
         campaign_name: str | None = None,
         campaign_hour: float | None = None,
         stage3_route: str | None = None,
+        route_basis: str | None = None,
     ) -> None:
         """Update tick-local wall and Knudsen conditions for cached models.
 
@@ -3236,6 +3237,8 @@ class CondensationModel:
                 "knudsen_regime_diagnostic": copy.deepcopy(
                     self.last_knudsen_regime_diagnostic),
             }
+            if route_basis is not None:
+                snapshot["route_basis"] = str(route_basis)
             # Record the as-requested stir_factor only when it was passed
             # this call; otherwise the field is intentionally omitted so
             # downstream auditors can distinguish "no override this tick"

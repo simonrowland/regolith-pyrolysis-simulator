@@ -2632,17 +2632,30 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
 
 
 def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> None:
-    sim = _make_sim()
-    sim.campaign_mgr.overrides["C2A_staged"] = {"hold_temp_C": 1700.0}
-    sim.start_campaign(CampaignPhase.C2A_STAGED)
-    sim.melt.temperature_C = 1650.0
-    sim.melt.campaign_hour = 7
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim.melt.oxygen_reservoir.reference_T_K = sim.melt.temperature_C + 273.15
-    sim._sync_oxygen_reservoir_mirror()
+    def run_case(*, through: bool):
+        sim = _make_sim()
+        if through:
+            stages = sim.campaign_mgr.campaigns["C2A_staged"]["stages"]
+            fe_stage = next(
+                stage for stage in stages if stage.get("name") == "fe_hot_hold"
+            )
+            fe_stage["stage3_route"] = "through"
+        sim.campaign_mgr.overrides["C2A_staged"] = {"hold_temp_C": 1700.0}
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        sim.melt.temperature_C = 1650.0
+        sim.melt.campaign_hour = 7
+        sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+        sim.melt.oxygen_reservoir.reference_T_K = sim.melt.temperature_C + 273.15
+        sim._sync_oxygen_reservoir_mirror()
+        snapshot = sim.step()
+        summary = build_per_hour_summary(
+            sim, snapshot, include_fe_redox_split=True
+        )
+        return sim, snapshot, summary
 
-    snapshot = sim.step()
-    summary = build_per_hour_summary(sim, snapshot, include_fe_redox_split=True)
+    # Keep the existing report test on the through route; the default-diverted
+    # sibling below asserts the new zero-capture report contract.
+    sim, snapshot, summary = run_case(through=True)
     partition = snapshot.fe_redox_split["native_fe_partition"]
     tap_mol = sim.atom_ledger.mol_by_account("terminal.drain_tap_material")
 
@@ -2673,6 +2686,11 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
         100.0 * stage_3_capture["Fe_kg"] / stage_3_capture["total_kg"]
     )
     assert abs(snapshot.mass_balance_error_pct) <= 5e-12
+
+    _diverted_sim, _diverted_snapshot, diverted_summary = run_case(through=False)
+    assert "stage_3_capture" in diverted_summary
+    assert diverted_summary["stage_3_capture"]["Fe_kg"] == pytest.approx(0.0)
+    assert diverted_summary["stage_3_capture"]["Fe_wt_pct"] == pytest.approx(0.0)
 
 
 def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -> None:

@@ -182,10 +182,14 @@ def test_stage3_extrapolation_flag_reaches_product_ledger(
     assert lots
     for lot in lots:
         flag = lot["meta"]["condensation_authority"]
-        assert flag["authority_level"] == "extrapolated"
-        assert flag["reason"] == "antoine_psat_unavailable_at_T"
+        assert flag["authority_level"] == "bridge"
+        assert flag["reason"] == "reactive_uptake"
         assert flag["valid_range_K"]
-        assert any(item.get("original_reason") for item in flag["stage_outcomes"])
+        assert any(
+            item.get("reason") == "antoine_psat_unavailable_at_T"
+            and item.get("authority_level") == "extrapolated"
+            for item in flag["stage_outcomes"]
+        )
 
 
 def test_admission_refusal_does_not_debit_parent_oxide(

@@ -53,6 +53,7 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation import (
     C4B_WALL_ROUTE_ORDER,
     CondensationRouteResult,
+    STAGE3_BYPASS_SEGMENT_NAME,
     _wall_route_species_order,
 )
 from simulator.diagnostics import wall_deposit_sticking_authority_status
@@ -540,6 +541,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         "process.wall_deposit",
         "terminal.chromium_condensed_oxide_stored",
         *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+        f"process.wall_deposit_segment_{STAGE3_BYPASS_SEGMENT_NAME}",
     })
     for accounts in seen_accounts:
         assert accounts == expected, (

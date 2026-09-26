@@ -73,6 +73,14 @@ def test_run_executor_completes_all_hot_sio_stage_with_flag():
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",
         hours=1,
+        setpoints_patch={
+            "campaigns": {
+                "C2A_continuous": {
+                    "stage3_route": "through",
+                    "stage3_route_schedule": [],
+                },
+            },
+        },
     )
     session = run._start_session()
     simulator = session.simulator
@@ -174,6 +182,14 @@ def test_run_executor_classifies_injected_hot_sio_refusal(monkeypatch):
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",
         hours=1,
+        setpoints_patch={
+            "campaigns": {
+                "C2A_continuous": {
+                    "stage3_route": "through",
+                    "stage3_route_schedule": [],
+                },
+            },
+        },
     )
     session = run._start_session()
     simulator = session.simulator
