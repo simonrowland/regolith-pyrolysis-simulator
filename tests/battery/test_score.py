@@ -252,7 +252,7 @@ def _two_phase_notice():
     )
 
 
-@pytest.mark.parametrize("engine", tuple(SINGLE_LIQUID_ENGINES))
+@pytest.mark.parametrize("engine", sorted(SINGLE_LIQUID_ENGINES))
 def test_two_phase_bulk_rows_are_refused_before_single_liquid_prediction(engine):
     exp = F.kems_experiment()
     ident = _partial_identity(
@@ -331,7 +331,7 @@ def test_two_phase_bulk_marker_refusal_preserves_homogeneous_row_count():
         hostname="test",
     )
 
-    for engine in tuple(SINGLE_LIQUID_ENGINES):
+    for engine in sorted(SINGLE_LIQUID_ENGINES):
         residuals, _ = score_store(
             ctx,
             engines=(engine,),

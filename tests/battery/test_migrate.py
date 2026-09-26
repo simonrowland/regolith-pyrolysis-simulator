@@ -2583,7 +2583,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     #   ta-shirai-2000-lpsc evaporation_coefficient_alpha +6
     #   kems-005-fedkin-2006 evaporation_coefficient_alpha +12
     # p_partial 69->75, evaporation_coefficient_alpha 12->30, n_numeric 274->298.
-    assert census.get("p_partial") == 75
+    # The lunar DeMaria 1973 merge adds its 61 Table I p_partial cells as
+    # run-labelled series: p_partial 75->136 and n_numeric 356->417.
+    assert census.get("p_partial") == 136
     assert census.get("p_sat") == 21
     assert census.get("evaporation_coefficient_alpha") == 30
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
@@ -2602,7 +2604,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("ueshima-1982-fe-mo-thermal") == {
         "transition_temperature": 58
     }
-    assert n_numeric == 356, (n_numeric, census, n_unavailable)
+    assert n_numeric == 417, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
@@ -6015,6 +6017,8 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
         "behrens-rosenblatt-1972::NIST_BR72_arsenolite_As4O6"
     ]
     assert quantity_token(br72_obs.identity) is Quantity.P_SAT
+    assert br72_obs.identity.species.phase.value is Phase.G
+    assert br72_obs.identity.species.polymorph.is_not_applicable
     assert br72_obs.value.kind is ValueKind.UNAVAILABLE
     assert "log10(P_bar) = A" in (br72_obs.value.unavailable_reason or "")
 

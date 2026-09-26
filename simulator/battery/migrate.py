@@ -5156,13 +5156,14 @@ def make_species(
 ) -> Species:
     phase_state = phase if isinstance(phase, State) else State.of(phase)
     token = phase_state.value if phase_state.is_value else None
-    if polymorph is None:
-        if token is Phase.CR:
+    if token is Phase.CR:
+        if polymorph is None:
             polymorph = State.unknown("source does not state polymorph")
-        elif token is None:
+    elif token is None:
+        if polymorph is None:
             polymorph = State.unknown("phase unknown; polymorph unresolved")
-        else:
-            polymorph = State.not_applicable("not crystal")
+    else:
+        polymorph = State.not_applicable("not crystal")
     return Species(
         formula=formula,
         phase=phase_state,
