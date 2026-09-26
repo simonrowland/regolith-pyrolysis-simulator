@@ -63,6 +63,10 @@ def _with_empty_vapour_batch(sim):
     sim._resolve_evaporation_vapour_batch = (
         lambda equilibrium, temperature_K, effective_pressure_source: empty_batch
     )
+    sim._resolve_evaporation_batch_flux_state = types.MethodType(
+        PyrolysisSimulator._resolve_evaporation_batch_flux_state,
+        sim,
+    )
     return sim
 
 
@@ -153,6 +157,10 @@ def test_active_liquid_empty_vapor_pressures_fail_loud(temperature_C):
     refused_batch = _resolved_liquid_gate_batch(parent_inventory_mol=1.0)
     sim._resolve_evaporation_vapour_batch = (
         lambda equilibrium, temperature_K, effective_pressure_source: refused_batch
+    )
+    sim._resolve_evaporation_batch_flux_state = types.MethodType(
+        PyrolysisSimulator._resolve_evaporation_batch_flux_state,
+        sim,
     )
     result = EquilibriumResult(
         temperature_C=temperature_C,
@@ -266,6 +274,10 @@ def test_pre_rg_subthreshold_effective_source_zero_requires_answered_batch():
     )
     sim._resolve_evaporation_vapour_batch = (
         lambda equilibrium, temperature_K, effective_pressure_source: answered_batch
+    )
+    sim._resolve_evaporation_batch_flux_state = types.MethodType(
+        PyrolysisSimulator._resolve_evaporation_batch_flux_state,
+        sim,
     )
     result = EquilibriumResult(
         temperature_C=500.0,
