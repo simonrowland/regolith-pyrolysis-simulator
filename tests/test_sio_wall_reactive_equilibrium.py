@@ -158,6 +158,17 @@ def test_sio_equilibrium_controls_flux_on_any_liner(
         if expected_comparison_p_eq is not None
         else None
     )
+    source_row, _ = _sio_source_rows()
+    expected_valid_range_K = source_row["pressure_models"][0]["valid_domain"][
+        "temperature_K"
+    ]
+    assert notice["valid_range_K"] == expected_valid_range_K
+    assert notice["antoine_standard_state_extrapolated"] is (
+        wall_temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        < expected_valid_range_K[0]
+        or wall_temperature_C + CELSIUS_TO_KELVIN_OFFSET
+        > expected_valid_range_K[1]
+    )
 
     flux_notice: dict[str, object] = {}
     flux = _series_resistance_deposition_flux_mol_m2_s(

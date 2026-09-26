@@ -1286,6 +1286,9 @@ def _sio_disproportionation_equilibrium(
         'standard_state_1mbar_crossing_comparison_C': cache['comparison_C'],
         'standard_state_crossing_band_C': cache['band_C'],
         'antoine_standard_state_extrapolated': antoine_extrapolated,
+        'valid_range_K': (
+            None if antoine_bounds is None else list(antoine_bounds)
+        ),
         'primary_phase_basis': str(primary.phase_basis),
         'comparison_phase_basis': (
             None if comparison is None else str(comparison.phase_basis)
@@ -1479,6 +1482,11 @@ def _apply_sio_disproportionation_driving_pressure(
             'antoine_standard_state_extrapolated': equilibrium[
                 'antoine_standard_state_extrapolated'
             ],
+            'valid_range_K': (
+                None
+                if equilibrium['valid_range_K'] is None
+                else list(equilibrium['valid_range_K'])
+            ),
             'primary_phase_basis': equilibrium['primary_phase_basis'],
             'comparison_phase_basis': equilibrium['comparison_phase_basis'],
             'certified_band_K': [
@@ -4360,6 +4368,8 @@ class CondensationModel:
                     ),
                 }
                 for key in (
+                    'valid_range_K',
+                    'antoine_standard_state_extrapolated',
                     'standard_state_crossing_band_C',
                     'activity_band_notice',
                     'activity_band_ends_disagree',
@@ -4394,6 +4404,8 @@ class CondensationModel:
                         'saturation_pressure_policy': 'reactive_equilibrium',
                     })
                     for key in (
+                        'valid_range_K',
+                        'antoine_standard_state_extrapolated',
                         'reactive_uptake_envelope',
                         'reactive_uptake_reason',
                         'original_reason',
@@ -5616,6 +5628,8 @@ class CondensationModel:
                     'standard_state_1mbar_crossing_comparison_C',
                     'standard_state_crossing_band_C',
                     'liquid_standard_state_min_K',
+                    'valid_range_K',
+                    'antoine_standard_state_extrapolated',
                     'silicate_activity_band_log10_a',
                     'activity_band_ends_disagree',
                     'activity_band_notice',
