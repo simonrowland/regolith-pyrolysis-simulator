@@ -449,7 +449,7 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
         stage = float(authority["stage_condensed_mass_kg_hr"])
         remaining = float(route.remaining_by_species["SiO"])
         assert authority["status"] == "missing"
-        assert authority["authority_level"] == "extrapolated"
+        assert authority["authority_level"] == "bridge"
         assert stage > 0.0
         assert wall + stage + remaining == pytest.approx(1.0, rel=0.0, abs=1e-12)
         assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)

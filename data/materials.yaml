@@ -47,7 +47,7 @@ fused_silica_liner_alpha_s_by_species: &fused_silica_liner_alpha_s_by_species
     source_class: fail_closed_no_direct_sticking_coefficient
     source: data/wall_materials.yaml::materials.fused_silica.stickiness.SiO
     output_status: status_bearing
-    basis: "Fused-silica SiO retention has cited chemistry/fouling proxies but no direct differentiated alpha_s; fail closed instead of applying the legacy 0.7."
+    basis: "Fused-silica SiO retention has cited chemistry/fouling proxies but no direct differentiated alpha_s; fail closed instead of applying the legacy 0.7. This zero is not alpha_reactive. The disproportionation branch ignores it and uses the species sticking bridge."
 
 stages:
   0:
@@ -115,6 +115,9 @@ liner_materials:
     alpha_s_by_species: *default_liner_alpha_s_by_species
   fused_silica_baffles:
     max_service_T_C: 1200
+    # Explicit class label. The sticking-table allowlist is what admits it;
+    # a liner outside that allowlist cannot become silica by this key.
+    wall_material_class: silica
     alpha_s_by_species: *fused_silica_liner_alpha_s_by_species
   alkali_mg_cyclone_liner:
     max_service_T_C: 700

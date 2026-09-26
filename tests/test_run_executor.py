@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from copy import deepcopy
 from dataclasses import replace
 from types import SimpleNamespace
@@ -89,44 +90,81 @@ def test_run_executor_completes_all_hot_sio_stage_with_flag():
         execution.simulator.condensation_model
         .last_condensation_refusals_by_species["SiO"]
     )
+    assert "pending_decision" not in species_record
     assert species_record["status"] == "status_bearing"
-    assert species_record["reason"] == (
-        "wall_saturation_pressure_refused_band_sample"
-    )
+    assert species_record["reason"] == "reactive_uptake"
     assert species_record["output_status"] == "status_bearing"
-    assert species_record["authority_level"] == "unavailable"
-    assert species_record["pending_decision"] == "d-025"
-    assert species_record["refused_fraction"] == pytest.approx(1.0)
-    assert species_record["eta_basis"] == (
-        "lower_bound_refused_samples_uncaptured"
+    assert species_record["authority_level"] == "bridge"
+    assert species_record["saturation_pressure_policy"] == "reactive_equilibrium"
+    assert species_record["reactive_uptake_envelope"] == pytest.approx(
+        [0.003, 0.067]
     )
-    assert species_record["original_reason"]
+    assert species_record["original_reason"] == (
+        "evaporation_alpha_proxy_not_reactive_uptake"
+    )
     outcomes = species_record["stage_outcomes"]
-    lower_bound = next(
+    reactive = next(
         outcome
         for outcome in outcomes
-        if outcome.get("eta_basis") == "lower_bound_refused_samples_uncaptured"
+        if outcome.get("reason") == "reactive_uptake"
+        and outcome.get("saturation_pressure_policy") == "reactive_equilibrium"
     )
-    assert lower_bound["status"] == "status_bearing"
-    assert lower_bound["authority_level"] == "unavailable"
-    assert lower_bound["pending_decision"] == "d-025"
-    assert lower_bound["refused_fraction"] == pytest.approx(1.0)
-    assert lower_bound["eta"] == pytest.approx(0.0)
+    assert reactive["status"] == "status_bearing"
+    assert reactive["reason"] == "reactive_uptake"
+    assert reactive["authority_level"] == "bridge"
+    assert reactive["reactive_uptake_envelope"] == pytest.approx(
+        [0.003, 0.067]
+    )
+    assert reactive["original_reason"] == (
+        "evaporation_alpha_proxy_not_reactive_uptake"
+    )
+    assert "pending_decision" not in reactive
+    assert "eta_basis" not in reactive
+    assert math.isfinite(float(reactive["eta"]))
     assert any(outcome.get("status") == "extrapolated" for outcome in outcomes)
+
+    route_authority = execution.simulator.condensation_model.last_condensation_authority_by_species[
+        "SiO"
+    ]
+    assert route_authority["authority_level"] == "bridge"
+    assert route_authority["reactive_uptake_envelope"] == pytest.approx(
+        [0.003, 0.067]
+    )
+    assert route_authority["original_reason"] == (
+        "evaporation_alpha_proxy_not_reactive_uptake"
+    )
+
+    wall_notice = execution.simulator.condensation_model.last_sticking_alpha_provenance_notice
+    wall_records = wall_notice["alpha_s_provenance_by_species"]["SiO"]
+    reactive_alpha_records = [
+        record
+        for record in wall_records.values()
+        if record.get("reactive_uptake_reason")
+    ]
+    assert reactive_alpha_records
+    for record in reactive_alpha_records:
+        assert record["authority_level"] == "bridge"
+        assert record["reactive_uptake_envelope"] == pytest.approx(
+            [0.003, 0.067]
+        )
+        assert record["original_reason"] == (
+            "evaporation_alpha_proxy_not_reactive_uptake"
+        )
 
     published = run._build_output(execution)["condensation_refusals_by_species"][
         "by_species"
     ]["SiO"]
-    for field in (
-        "status",
-        "reason",
-        "authority_level",
-        "pending_decision",
-        "refused_fraction",
-        "eta_basis",
-        "original_reason",
-    ):
-        assert published[field] == species_record[field]
+    assert published["status"] == species_record["status"]
+    assert published["reason"] == "reactive_uptake"
+    assert published["authority_level"] == "bridge"
+    assert published["saturation_pressure_policy"] == "reactive_equilibrium"
+    assert published["output_status"] == "status_bearing"
+    assert published["reactive_uptake_envelope"] == pytest.approx(
+        [0.003, 0.067]
+    )
+    assert published["original_reason"] == (
+        "evaporation_alpha_proxy_not_reactive_uptake"
+    )
 
 
 @pytest.mark.parametrize(

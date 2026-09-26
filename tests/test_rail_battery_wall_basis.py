@@ -8,7 +8,8 @@ source-equation P_sat values rather than a uniform temperature floor.
 Successful-value controls named by the verifiers: adequately hot or
 diluted Fe stays clear; a wall below the SiO engineering landing T
 still sets has_cold_spot; the 1300 C Fe dew-point warning remains;
-SiO reactive P_sat ~= 0 deposition policy is untouched (M30 / D04).
+SiO at 1 mbar and 1400 C is undersaturated on the disproportionation
+equilibrium (p_eq is above 1 mbar), so the diagnostic stays clear.
 """
 
 from __future__ import annotations
@@ -183,8 +184,8 @@ def test_wall_below_sio_landing_temperature_still_has_cold_spot():
     )
 
 
-def test_sio_reactive_wall_saturation_backstop_unchanged():
-    """D04 / M30: diagnostic must not retune SiO reactive deposition P_sat."""
+def test_sio_reactive_equilibrium_at_1400_c_stays_undersaturated():
+    """1 mbar SiO at 1400 C is below p_eq, so the duct stays clear."""
 
     sio_psat, refused = _try_antoine_psat_pa("SiO", WALL_1400_K)
     assert refused is True
@@ -197,9 +198,10 @@ def test_sio_reactive_wall_saturation_backstop_unchanged():
         WALL_1400_K,
         diagnostic_out=notice,
     )
-    assert driving == pytest.approx(MILLIBAR_BAKEOFF_PA)
-    assert notice["wall_saturation_pressure_pa"] == 0.0
-    assert notice["wall_saturation_pressure_status"] == "reactive_product_backstop"
+    assert driving == 0.0
+    assert notice["wall_saturation_pressure_pa"] > MILLIBAR_BAKEOFF_PA
+    assert notice["wall_saturation_pressure_status"] == "reactive_equilibrium"
+    assert notice["reason"] == "reactive_equilibrium_undersaturated"
 
     sio_only = cold_spot_diagnostic(
         [_upstream_segment("stage_3", 1400.0)],
