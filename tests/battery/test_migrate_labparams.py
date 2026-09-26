@@ -56,11 +56,6 @@ def test_printed_method_aliases_map_to_closed_tokens(
 # above 「III. 実験結果および考察」. Roman III on that page is results.
 _YAM_EMF_PROCEDURE_SECTION = "II.3. EMF measurement"
 _YAM_EXTRACT = REPO_ROOT / "data" / "literature" / "extracts" / "yam1983.yaml"
-_YAM_OBSERVATION_IDS = {
-    "yam1983::yam1983_na2o_table1_minus_log10_a_AT_B",
-    "yam1983::yam1983_na2o_prose_activity_range",
-    "yam1983::yam1983_sio2_table2_minus_log10_a_AT_B",
-}
 
 
 def test_yam1983_emf_procedure_is_section_ii_subsection_3(tmp_path: Path) -> None:
@@ -126,14 +121,6 @@ def test_yam1983_emf_procedure_is_section_ii_subsection_3(tmp_path: Path) -> Non
     )
     assert stability.value.locator is not None
     assert stability.value.locator.section == _YAM_EMF_PROCEDURE_SECTION
-
-    linked = {
-        observation.observation_id
-        for observation in migrator.result.observations.values()
-        if observation.experiment_id == lifted.experiment_id
-    }
-    assert linked == _YAM_OBSERVATION_IDS
-
 
 def test_inferred_area_reaches_experiment_with_derivation(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))

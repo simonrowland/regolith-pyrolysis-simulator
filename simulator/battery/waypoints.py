@@ -741,6 +741,11 @@ def normalized_composition(
                         "normalized_composition", GapReason.UNSUPPORTED_PRINT_FORM, (path,)))
             if printed_species is not None:
                 printed_path = path
+            if printed_species is None:
+                pairs = _printed_component_pairs(raw)
+                if pairs is not None:
+                    printed_species = {name for name, _value in pairs}
+                    printed_path = path
             basis = _amount_basis_token(raw)
             if isinstance(raw, Mapping) and basis == AmountBasis.MOLE_FRACTION.value:
                 # Mole amounts are already moles. The wt% threshold and the
@@ -777,9 +782,6 @@ def normalized_composition(
                             printed_path = path
                     else:
                         raw = _printed_composition_map(raw)
-        if field == "printed_composition" and isinstance(raw, Mapping) and printed_species is None:
-            printed_species = {str(species) for species in raw}
-            printed_path = path
         try:
             if field == "printed_composition":
                 if not isinstance(raw, Mapping):
