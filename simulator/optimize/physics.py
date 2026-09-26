@@ -1933,10 +1933,12 @@ def _coating_violation_reasons(
 ) -> list[dict[str, Any]]:
     reasons: list[dict[str, Any]] = []
     positive_record_seen = False
+    scoped_record_seen = False
     for record in deposit_records if isinstance(deposit_records, (tuple, list)) else ():
         if not isinstance(record, Mapping):
             continue
         if record.get("scope") in {"designated_condenser", "condenser"}:
+            scoped_record_seen = True
             continue
         raw_amount = record.get(
             "deposit_kg_per_campaign",
@@ -1964,6 +1966,7 @@ def _coating_violation_reasons(
         )
     if (
         not positive_record_seen
+        and not scoped_record_seen
         and aggregate_deposit_kg is not None
         and math.isfinite(aggregate_deposit_kg)
         and aggregate_deposit_kg > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN

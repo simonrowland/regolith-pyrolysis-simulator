@@ -25,6 +25,7 @@ from simulator.optimize.canonical import canonical_json_dumps, normalize_canonic
 from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
+    _coating_wall_quantity_unavailable,
     extraction_completeness_report,
     target_species_yield_report,
 )
@@ -3615,6 +3616,30 @@ def product_summary(
     if rump:
         summary["rump_expectation_notice"] = rump
     summary.update(_coating_product_summary(run_execution))
+    coating_unavailable_reason = str(summary.get("coating_unavailable_reason", ""))
+    margin_payload = getattr(coating_margin, "status_payload", {}) or {}
+    margin_unavailable_reason = _coating_wall_quantity_unavailable(
+        margin_payload if isinstance(margin_payload, Mapping) else {},
+        include_coverage_unknown=False,
+    )
+    if (
+        str(getattr(coating_margin, "status", "")) == "unavailable"
+        or (
+            isinstance(margin_payload, Mapping)
+            and margin_payload.get("coating_verdict") == "unavailable"
+        )
+        or margin_unavailable_reason
+    ):
+        coating_unavailable_reason = (
+            str(getattr(coating_margin, "status_reason", ""))
+            or margin_unavailable_reason
+            or coating_unavailable_reason
+            or "coating wall evidence unavailable"
+        )
+        summary["coating_status"] = "unavailable"
+        summary["coating_status_reason"] = coating_unavailable_reason
+        summary["coating_unavailable_reason"] = coating_unavailable_reason
+    coating_status = str(summary.get("coating_status", ""))
     lifetime, has_positive_fouling = _selection_coating_lifetime(
         coating_margin,
         fallback_campaigns=summary.get("campaigns_to_resinter", math.inf),
@@ -3629,6 +3654,8 @@ def product_summary(
                 lifetime,
                 has_positive_fouling=has_positive_fouling,
                 cost_parameters=cost_parameters,
+                coating_status=coating_status,
+                coating_status_reason=str(summary.get("coating_status_reason", "")),
             )
         )
     return MappingProxyType(summary)
@@ -3681,6 +3708,14 @@ def _selection_coating_lifetime(
     fallback_positive: bool,
 ) -> tuple[Any, bool]:
     payload = getattr(coating_margin, "status_payload", {}) or {}
+    if (
+        str(getattr(coating_margin, "status", "")) == "unavailable"
+        or (
+            isinstance(payload, Mapping)
+            and payload.get("coating_verdict") == "unavailable"
+        )
+    ):
+        return fallback_campaigns, False
     if not isinstance(payload, Mapping):
         return fallback_campaigns, fallback_positive
     if payload.get("coating_constraint_mode") == "no_unqualified_deposition":
@@ -3707,7 +3742,18 @@ def _furnace_amortization_summary(
     *,
     has_positive_fouling: bool,
     cost_parameters: Mapping[str, Any] | CostParameters | None,
+    coating_status: str | None = None,
+    coating_status_reason: str = "",
 ) -> Mapping[str, Any]:
+    if coating_status == "unavailable":
+        return MappingProxyType({
+            "furnace_amortization_status": "unavailable",
+            "furnace_amortization_status_reason": (
+                coating_status_reason or "coating wall evidence unavailable"
+            ),
+            "furnace_amortization_cost_per_run_usd": None,
+            "furnace_amortization_batch_cost_equivalents": None,
+        })
     parameters = (
         cost_parameters
         if isinstance(cost_parameters, CostParameters)
@@ -3894,20 +3940,37 @@ def _has_positive_wall_deposit(
 
 
 def _coating_authority_summary(authority: Mapping[str, Any]) -> dict[str, Any]:
-    authoritative = _coating_authority_is_authoritative(authority)
-    return {
+    unavailable_reason = _coating_wall_quantity_unavailable(
+        authority,
+        include_coverage_unknown=False,
+    )
+    authoritative = (
+        False if unavailable_reason else _coating_authority_is_authoritative(authority)
+    )
+    summary = {
         "coating_authoritative": authoritative,
         "coating_output_status": str(
             authority.get("output_status", "authoritative")
         ),
-        "coating_status": "available" if authoritative else "warning",
+        "coating_status": (
+            "unavailable"
+            if unavailable_reason
+            else ("available" if authoritative else "warning")
+        ),
         "coating_status_reason": (
-            ""
-            if authoritative
-            else str(authority.get("message", "non-authoritative coating"))
+            unavailable_reason
+            if unavailable_reason
+            else (
+                ""
+                if authoritative
+                else str(authority.get("message", "non-authoritative coating"))
+            )
         ),
         "wall_deposit_sticking_authority": _plain_payload(authority),
     }
+    if unavailable_reason:
+        summary["coating_unavailable_reason"] = unavailable_reason
+    return summary
 
 
 def _coating_authority_is_authoritative(authority: Mapping[str, Any]) -> bool:

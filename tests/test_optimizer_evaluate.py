@@ -3069,6 +3069,37 @@ def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic(
     assert "coating unavailable" in coating.detail
 
 
+def test_diverted_stage3_bypass_wall_deposit_is_scored_as_upstream() -> None:
+    trace = _trace()
+    trace.stage3_route_diagnostic = {"stage3_route": "divert"}
+    trace.wall_deposit_by_segment_species_kg = {
+        ("stage_3_bypass_to_stage_4", "Na"): 0.25,
+    }
+    trace.wall_zone_by_segment = {"stage_3_bypass_to_stage_4": "Hot"}
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_composition_eval_profile(
+            "residual_rump_at_stop",
+            target_id="diverted-stage3-wall-deposit",
+        ),
+        executor=FakeExecutor(_execution(trace=trace)),
+    )
+
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    coating = result.feasibility_margins["coating"]
+    reason = coating.status_payload["coating_violation_reasons"][0]
+    record = coating.status_payload["upstream_wall_deposit_records"][0]
+    assert reason["reason"] == "positive_upstream_wall_deposit"
+    assert reason["segment"] == "stage_3_bypass_to_stage_4"
+    assert reason["deposit_kg_per_campaign"] == pytest.approx(0.25)
+    assert record["scope"] == "upstream"
+    assert record["segment"] == "stage_3_bypass_to_stage_4"
+
+
 def test_optimizer_coating_overlay_preserves_proven_zero_authority() -> None:
     trace = _trace()
     trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO"): 0.0}

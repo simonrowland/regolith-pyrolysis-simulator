@@ -1023,6 +1023,58 @@ def test_furnace_amortization_cost_trades_continuously_against_yield() -> None:
     )[0]
 
 
+def test_refused_wall_evidence_is_unavailable_not_zero_cost() -> None:
+    authority_summary = objective_module._coating_authority_summary({
+        "output_status": "status_bearing",
+        "status_reason": "carrier wall partial refused",
+        "code": "wall_saturation_pressure_refused",
+        "wall_saturation_pressure_refused_species": ["Na"],
+    })
+    params = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        furnace_lifetime_cost_multiplier=10.0,
+        min_fouling_penalty=1.0,
+    )
+    cost_summary = objective_module._furnace_amortization_summary(
+        SimpleNamespace(
+            record=SimpleNamespace(
+                cost_rollup={
+                    "run_input_cost": {
+                        "owner_ratify_money_projection": 20.0,
+                    }
+                }
+            )
+        ),
+        math.inf,
+        has_positive_fouling=False,
+        cost_parameters=params,
+        coating_status=authority_summary["coating_status"],
+        coating_status_reason=authority_summary["coating_status_reason"],
+    )
+    summary = {**authority_summary, **cost_summary}
+
+    assert summary["coating_status"] == "unavailable"
+    assert summary["coating_authoritative"] is False
+    assert summary["furnace_amortization_status"] == "unavailable"
+    assert summary["furnace_amortization_cost_per_run_usd"] is None
+    assert summary["furnace_amortization_batch_cost_equivalents"] is None
+    with pytest.raises(ObjectiveComputationError, match="furnace amortization unavailable"):
+        cost_adjusted_objective_scores(
+            {"oxygen_kg": 1.0, "energy_kWh": 1.0},
+            DEFINITIONS,
+            product_summary=summary,
+        )
+
+
 def test_furnace_amortization_clean_recipe_skips_missing_lifetime() -> None:
     assert furnace_amortization_cost_per_run(
         20.0, None, 0.0, 1.0, has_positive_fouling=False

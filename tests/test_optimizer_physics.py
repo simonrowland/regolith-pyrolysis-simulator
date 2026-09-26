@@ -747,6 +747,34 @@ def test_designated_condenser_capture_only_is_not_coating() -> None:
     assert result.margins["coating"].status_payload["coating_verdict"] == "clear"
 
 
+def test_designated_condenser_record_blocks_aggregate_upstream_fallback() -> None:
+    report = {
+        "campaigns_to_resinter_total": math.inf,
+        "resinter_threshold_kg": None,
+        "wall_deposit_kg_per_campaign": 0.5,
+        "unqualified_deposition_rate_kg_per_campaign": 0.5,
+        "authoritative_for_resinter": True,
+        "output_status": "authoritative",
+        "status_reason": "",
+        "coating_constraint_mode": "no_unqualified_deposition",
+        "coating_constraint_authoritative": True,
+        "upstream_wall_deposit_records": [{
+            "scope": "designated_condenser",
+            "segment": "stage_3_to_condenser",
+            "species": "Na",
+            "deposit_kg_per_campaign": 0.5,
+        }],
+    }
+
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        _valid_trace_object(wall_fouling_report=report)
+    ).margins["coating"]
+
+    assert coating.feasible
+    assert coating.status_payload["coating_verdict"] == "clear"
+    assert coating.status_payload["coating_violation_reasons"] == []
+
+
 @pytest.mark.parametrize(
     "report",
     (

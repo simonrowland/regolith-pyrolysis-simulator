@@ -776,6 +776,56 @@ def test_deserialize_coating_margin_rederives_feasible_from_grounded_authority()
     assert margins["coating"].feasible is True
 
 
+def test_legacy_unavailable_coating_margin_is_not_selected(tmp_path) -> None:
+    spec = _base_spec(recipe_id="legacy-unavailable-coating")
+    db_path = tmp_path / "results.sqlite"
+    store = ResultStore(
+        db_path,
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+    store.store(
+        spec,
+        _scored(
+            spec,
+            margins={
+                "delivered_stream_purity": _margin(),
+                "coating": _coating_margin(feasible=True),
+            },
+        ),
+        created_at="2026-06-18T00:00:00Z",
+    )
+
+    with sqlite3.connect(db_path) as conn:
+        row = conn.execute(
+            "SELECT feasibility_margins FROM results WHERE cache_key = ?",
+            (cache_key(spec),),
+        ).fetchone()
+        assert row is not None
+        margins = json.loads(row[0])
+        legacy = margins["coating"]
+        legacy["status"] = "unavailable"
+        legacy["output_status"] = "status_bearing"
+        legacy.pop("observed", None)
+        legacy.pop("status_payload", None)
+        conn.execute(
+            "UPDATE results SET feasibility_margins = ?, feasible = 1, failing_gates = ? "
+            "WHERE cache_key = ?",
+            (json.dumps(margins), json.dumps([]), cache_key(spec)),
+        )
+
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    coating = loaded.feasibility_margins["coating"]
+    assert coating.status == "unavailable"
+    assert coating.feasible is False
+    assert coating.authoritative is False
+    assert coating.status_payload["coating_verdict"] == "unavailable"
+    assert loaded.feasible is False
+    assert store.best(spec.feedstock_id, objective_metric="oxygen_kg") is None
+
+
 def test_lookup_rederives_stale_false_feasible_from_margins(tmp_path) -> None:
     spec = _base_spec()
     db_path = tmp_path / "results.sqlite"

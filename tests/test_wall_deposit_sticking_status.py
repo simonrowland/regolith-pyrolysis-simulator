@@ -1356,7 +1356,7 @@ def test_zero_deposit_refusal_reaches_product_web_and_leaderboard_surfaces() -> 
     trace_authority = surfaces["trace"].wall_deposit_sticking_authority
     assert trace_authority["authoritative_for_coating"] is False
     assert surfaces["product_summary"]["coating_authoritative"] is False
-    assert surfaces["product_summary"]["coating_status"] == "warning"
+    assert surfaces["product_summary"]["coating_status"] == "unavailable"
     assert surfaces["readout"]["authoritative"] is False
     assert surfaces["readout"]["output_status"] == "status_bearing"
     assert surfaces["leaderboard_row"]["coating_authoritative"] is False
