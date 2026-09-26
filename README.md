@@ -236,7 +236,7 @@ The simulated condenser train currently captures only part of this. For example,
 
 ### What this run does NOT yet show
 
-Ca 97.8%, Al 95.3%, and Ti 99.0% are predicted to evaporate. That erases the
+Ca, Al and Ti are predicted to leave the melt essentially completely (100.0% each under the ideal-condenser basis). That erases the
 refractory rump the project expects to keep, and the prediction rests on 20 of 21
 extrapolated vapour-pressure summaries. It is under investigation: treat it as a
 flagged prediction, not a demonstrated result. 38.0% of the feedstock O sits in the
