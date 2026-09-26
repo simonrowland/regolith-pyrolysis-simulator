@@ -89,25 +89,29 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
+    # Recomputed 2026-09-26 (t-1004): the continuous C2A Stage-3 window
+    # defaults are now explicit setpoint values, so the resolved digest moves.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
+        "49b6846d09ca70ecefe5ff307f37c85a49212bd1361abaaa85c70f04f426c7ad"
     )
     # bounds_digest moved with the knob bounds themselves: the furnace envelope
-    # top (2000 -> catalog max) and the hot-wall ceiling (1750 -> inherited).
+    # top (2000 -> catalog max), hot-wall ceiling (1750 -> inherited), and the
+    # two Stage-3 temperature-window knob bounds.
     # This digest IS the cache-invalidation lever for a bounds change -- it fires
     # automatically, which is why no allowlist_version bump is warranted here:
     # the set of tunable PATHS did not change, only two paths' bounds.
     assert schema.bounds_digest == (
-        "9d87f2394cc45bc6a4d99a3dfa287ed304aa1a5473182c4b1eda2d04df66cccd"
+        "e8c157bdae8e20dc0d2cef4e739683b08b5e5ae3ea816882ddf6121722085789"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
-    # tracks the schema. Recomputed 2026-08-29 (b-329).
+    # tracks the schema. Recomputed 2026-08-29 (b-329), then 2026-09-26
+    # (t-1004) after adding the two searchable window knobs.
     assert empty.recipe_id(schema) == (
-        "d71962c0eb855b0260adc13d4036800e331b948c48d3f2a8e7fb617dee494b78"
+        "23a97e896e727718da5d186abd5e53734226c6b0c6861db2e5ef67fffdb9b03e"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -119,9 +123,10 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
     # Fourth and last digest in this test to move with the b-329 bounds change,
-    # for the same reason as the three above. Recomputed 2026-08-29.
+    # for the same reason as the three above. Recomputed 2026-08-29, then
+    # 2026-09-26 (t-1004) after adding the two searchable window knobs.
     assert identity_digest == (
-        "f25190100b5ee2a9cbb7b8d877dfa6a65a1926501c0c6b8ad7a43a16c6fa8669"
+        "727dcbbc4924b03fb4ffcb1f7015ea938d866a02834c25aa4629d913bb62db8e"
     )
     assert identity_digest != (
         "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
@@ -539,10 +544,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
 
     assert unpinned is schema
-    assert len(paths) == 67
+    assert len(paths) == 73
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "1bc920bf1a0c96b9d4dd0f9679cf9d5495478f79fa6d56294d53a9cd6e7d5c78"
+        == "02ec33ff6adb2658f11820de5090a99f3bf1e7c8c2068dbcca8cd035233b84c9"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -1674,7 +1679,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # stale every time either moves. It is now evaluated, not pinned.
     assert (
         first.recipe_id()
-                == "c9d30fc5ce7426f78c331b7d3a441f293d9fe0512bb255fae315e1cfd214904b"
+        == "1c22df778cc9950781f6ffba898d15c4194349bd22715ac71cec6c037e26cd9e"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

@@ -3101,6 +3101,25 @@ class EvaporationMixin:
                 evap_flux,
                 self.melt,
             )
+            route_resolution_resolver = getattr(
+                self.campaign_mgr, 'stage3_route_resolution_for', None
+            )
+            route_resolver = getattr(self.campaign_mgr, 'stage3_route_for', None)
+            route_resolution: dict[str, Any] = {}
+            if callable(route_resolution_resolver):
+                route_resolution = dict(route_resolution_resolver(self.melt))
+                stage3_route = str(
+                    route_resolution.get('stage3_route', 'through')
+                )
+                route_basis = str(
+                    route_resolution.get('route_basis', 'campaign_phase')
+                )
+            elif callable(route_resolver):
+                stage3_route = route_resolver(self.melt)
+                route_basis = 'campaign_phase'
+            else:
+                stage3_route = 'through'
+                route_basis = 'no_campaign_phase'
             self.condensation_model.configure_operating_conditions(
                 overhead_pressure_mbar=transport['pressure_mbar'],
                 species_partial_pressures_mbar=(
@@ -3120,7 +3139,13 @@ class EvaporationMixin:
                 carrier_gas=self._resolve_condensation_carrier_gas(),
                 campaign_name=str(getattr(self.melt.campaign, 'name', '')),
                 campaign_hour=float(getattr(self.melt, 'campaign_hour', 0.0) or 0.0),
-                stage3_route=self.campaign_mgr.stage3_route_for(self.melt),
+                stage3_route=stage3_route,
+                route_basis=route_basis,
+                stage3_route_basis=(
+                    route_resolution
+                    if route_resolution.get('route_basis') == 'temperature_window'
+                    else None
+                ),
             )
         route_result = self.condensation_model.route(
             evap_flux, self.melt)

@@ -272,6 +272,38 @@ C2A_STAGED_STAGE_METADATA_FIELDS: frozenset[str] = frozenset(
 )
 C2A_STAGED_GAS_COVER_MODES: tuple[str, ...] = ("pn2_sweep", "po2_hold")
 STAGE3_ROUTE_CHOICES: tuple[str, ...] = ("through", "divert")
+# Stage-3 temperature-window knobs are owned by the continuous C2A setpoint
+# branch. The current peak_SiO_window is 1400-1600 C; the optimizer envelope
+# starts at the C0 alkali-onset/divert boundary (900 C), permits opening through
+# the C2A alkali co-evolution band to 1700 C, and requires a 50 C release
+# window. Close is bounded by the furnace-material envelope rather than a
+# duplicated material rating. These are recipe bounds; CampaignManager applies
+# the selected furnace material's lower runtime ceiling and refuses violations.
+STAGE3_OPEN_T_C_PATH: KeyPath = (
+    "campaigns", "C2A_continuous", "stage3_open_T_C"
+)
+STAGE3_CLOSE_T_C_PATH: KeyPath = (
+    "campaigns", "C2A_continuous", "stage3_close_T_C"
+)
+STAGE3_OPEN_T_C_DEFAULT = 1400.0
+STAGE3_CLOSE_T_C_DEFAULT = 1600.0
+STAGE3_OPEN_T_C_LOW = 900.0
+STAGE3_OPEN_T_C_HIGH = 1700.0
+STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C = 50.0
+STAGE3_CLOSE_T_C_LOW = (
+    STAGE3_OPEN_T_C_LOW + STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C
+)
+STAGE3_CLOSE_T_C_HIGH = float(FURNACE_MAX_T_BOUNDS_C[1])
+STAGE3_TEMPERATURE_WINDOW_BOUNDS_SOURCE = (
+    "engineering_envelope: setpoints.yaml::campaigns.C2A_continuous."
+    "dT_dt_C_per_hr.peak_SiO_window_1400_1600C supplies the defaults; "
+    "open spans the setpoints.yaml::campaigns.C0.stage3_route_schedule "
+    "900 C alkali-onset boundary through the "
+    "data/furnace_materials.yaml dense_alumina_continuous 1700 C "
+    "continuous-service envelope; close requires a 50 C release window "
+    "and ends at the furnace-material envelope "
+    "FURNACE_MAX_T_BOUNDS_C[1] from the enabled furnace catalog"
+)
 C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyType(
     {
         "alkali_early_fe": (
@@ -723,6 +755,20 @@ class RecipeSchema:
             units="C",
             bounds_source="setpoints:campaigns.C2A_continuous.temp_range_C",
             search_enabled=False,
+        ),
+        _knob(
+            "campaigns.C2A_continuous.stage3_open_T_C",
+            low=STAGE3_OPEN_T_C_LOW,
+            high=STAGE3_OPEN_T_C_HIGH,
+            units="C",
+            bounds_source=STAGE3_TEMPERATURE_WINDOW_BOUNDS_SOURCE,
+        ),
+        _knob(
+            "campaigns.C2A_continuous.stage3_close_T_C",
+            low=STAGE3_CLOSE_T_C_LOW,
+            high=STAGE3_CLOSE_T_C_HIGH,
+            units="C",
+            bounds_source=STAGE3_TEMPERATURE_WINDOW_BOUNDS_SOURCE,
         ),
         _knob(
             "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
@@ -1816,6 +1862,8 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C0b_p_cleanup.p_total_mbar_default",
         "campaigns.C0b_p_cleanup.duration_hr",
         "campaigns.C2A_continuous.temp_range_C",
+        "campaigns.C2A_continuous.stage3_open_T_C",
+        "campaigns.C2A_continuous.stage3_close_T_C",
         "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
         "campaigns.C2A_continuous.p_total_mbar",
         "campaigns.C2A_continuous.p_total_mbar_default",
@@ -2368,6 +2416,7 @@ class RecipePatch:
             spec = active_schema.spec_for(path)
             _validate_value(spec, value, active_schema)
         _validate_pressure_default_pairs(active_schema, self.values)
+        _validate_stage3_temperature_window(self.values)
         _validate_c2a_staged_depletion_knob_conflict(self.values)
         _validate_temperature_dual_control(self.values)
         return RecipePatch(dict(self.values))
@@ -2805,6 +2854,47 @@ def _default_setpoint_value(path: KeyPath) -> Any:
             )
         node = node[segment]
     return node
+
+
+def _validate_stage3_temperature_window(values: Mapping[KeyPath, Any]) -> None:
+    if not any(
+        path in values
+        for path in (STAGE3_OPEN_T_C_PATH, STAGE3_CLOSE_T_C_PATH)
+    ):
+        return
+
+    resolved: dict[KeyPath, tuple[float, str]] = {}
+    for path in (STAGE3_OPEN_T_C_PATH, STAGE3_CLOSE_T_C_PATH):
+        raw = values[path] if path in values else _default_setpoint_value(path)
+        source = "patched" if path in values else "YAML default"
+        try:
+            value = float(raw)
+        except (TypeError, ValueError) as exc:
+            raise RecipeValidationError(
+                "recipe_stage3_temperature_window_invalid: "
+                f"{_format_path(path)} must be finite"
+            ) from exc
+        if not math.isfinite(value):
+            raise RecipeValidationError(
+                "recipe_stage3_temperature_window_invalid: "
+                f"{_format_path(path)} must be finite"
+            )
+        resolved[path] = (value, source)
+
+    open_T_C, open_source = resolved[STAGE3_OPEN_T_C_PATH]
+    close_T_C, close_source = resolved[STAGE3_CLOSE_T_C_PATH]
+    if open_T_C >= close_T_C:
+        raise RecipeValidationError(
+            "recipe_stage3_temperature_window_invalid: "
+            f"stage3_open_T_C={open_T_C:g} ({open_source}) must be below "
+            f"stage3_close_T_C={close_T_C:g} ({close_source})"
+        )
+    if close_T_C - open_T_C < STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C:
+        raise RecipeValidationError(
+            "recipe_stage3_temperature_window_invalid: "
+            f"temperature window must be at least "
+            f"{STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C:g} C wide"
+        )
 
 
 def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:

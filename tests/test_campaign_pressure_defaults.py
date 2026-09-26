@@ -8,7 +8,11 @@ import pytest
 import yaml
 
 import simulator.campaigns as campaigns_module
-from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignManager,
+    CampaignPressureSetpointRefusal,
+    Stage3TemperatureWindowRefusal,
+)
 from simulator.core import Atmosphere, CampaignPhase, MeltState
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
@@ -425,6 +429,50 @@ def test_default_stage3_route_follows_alkali_and_sio_windows():
     assert manager.stage3_route_for(continuous) == "through"
     continuous.temperature_C = 1650.0
     assert manager.stage3_route_for(continuous) == "divert"
+    default_resolution = manager.stage3_route_resolution_for(continuous)
+    assert default_resolution["stage3_route"] == "divert"
+    assert default_resolution["route_basis"] == "temperature_window"
+    assert default_resolution["stage3_open_T_C"] == pytest.approx(1400.0)
+    assert default_resolution["stage3_close_T_C"] == pytest.approx(1600.0)
+
+
+def test_c2a_stage3_open_knob_changes_route_and_records_temperature_basis():
+    setpoints = deepcopy(_setpoints())
+    setpoints["campaigns"]["C2A_continuous"]["stage3_open_T_C"] = 1300
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A, temperature_C=1350.0)
+
+    resolution = manager.stage3_route_resolution_for(melt)
+
+    assert resolution["stage3_route"] == "through"
+    assert resolution["route_basis"] == "temperature_window"
+    assert resolution["stage3_open_T_C"] == pytest.approx(1300.0)
+    assert resolution["stage3_close_T_C"] == pytest.approx(1600.0)
+    assert manager.stage3_route_for(melt) == "through"
+
+
+def test_c2a_stage3_temperature_window_refuses_invalid_order_and_ceiling():
+    invalid_order = deepcopy(_setpoints())
+    invalid_order["campaigns"]["C2A_continuous"].update({
+        "stage3_open_T_C": 1600,
+        "stage3_close_T_C": 1600,
+    })
+    manager = CampaignManager(invalid_order)
+    with pytest.raises(Stage3TemperatureWindowRefusal) as order_exc:
+        manager.stage3_route_for(
+            MeltState(campaign=CampaignPhase.C2A, temperature_C=1600.0)
+        )
+    assert order_exc.value.reason == "stage3_temperature_window_invalid"
+    assert order_exc.value.terminal_refusal is True
+
+    above_ceiling = deepcopy(_setpoints())
+    above_ceiling["furnace_max_T_C"] = 1500
+    above_ceiling["campaigns"]["C2A_continuous"]["stage3_close_T_C"] = 1600
+    manager = CampaignManager(above_ceiling)
+    with pytest.raises(Stage3TemperatureWindowRefusal):
+        manager.stage3_route_for(
+            MeltState(campaign=CampaignPhase.C2A, temperature_C=1400.0)
+        )
 
 
 def test_c2a_staged_pn2_sweep_trace_po2_is_not_silent_or_phantom_o2():

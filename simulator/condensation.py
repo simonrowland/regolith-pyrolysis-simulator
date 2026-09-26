@@ -2782,6 +2782,7 @@ class CondensationModel:
         ] = {}
         self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
         self.stage3_route = STAGE3_ROUTE_THROUGH
+        self._stage3_route_basis: dict[str, Any] = {}
         self.stage_area_m2_by_stage: dict[str, float] = {}
         self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
         self.gas_temperature_C = float(wall_temperature_C)
@@ -2907,6 +2908,7 @@ class CondensationModel:
         campaign_hour: float | None = None,
         stage3_route: str | None = None,
         route_basis: str | None = None,
+        stage3_route_basis: Mapping[str, Any] | None = None,
     ) -> None:
         """Update tick-local wall and Knudsen conditions for cached models.
 
@@ -2989,6 +2991,13 @@ class CondensationModel:
                     'stage3_route must be one of '
                     f'{sorted(STAGE3_ROUTE_CHOICES)}, got {stage3_route!r}'
                 )
+        if stage3_route_basis is not None and not isinstance(
+            stage3_route_basis, Mapping
+        ):
+            raise ValueError('stage3_route_basis must be a mapping')
+        normalized_stage3_route_basis = (
+            dict(stage3_route_basis) if stage3_route_basis is not None else {}
+        )
         if campaign_hour is not None:
             if isinstance(campaign_hour, bool):
                 raise ValueError('campaign_hour must be finite and non-negative')
@@ -3054,6 +3063,7 @@ class CondensationModel:
             self.carrier_gas = _canonical_carrier_gas_key(carrier_gas)
         if stage3_route is not None:
             self.stage3_route = normalized_stage3_route
+        self._stage3_route_basis = copy.deepcopy(normalized_stage3_route_basis)
         # Track requested vs applied stir for the operating-history audit.
         # Codex + gstack reviewers (Phase B P3): the canonical clamp at
         # ``clamp_stir_factor`` is silent — a downstream auditor reading
@@ -3185,6 +3195,7 @@ class CondensationModel:
                 pipe_segment_temperatures_C,
                 carrier_gas,
                 stage3_route,
+                stage3_route_basis,
             )
         )
         if _snapshot_inputs_changed:
@@ -3239,6 +3250,10 @@ class CondensationModel:
             }
             if route_basis is not None:
                 snapshot["route_basis"] = str(route_basis)
+            if normalized_stage3_route_basis:
+                snapshot["stage3_route_basis"] = copy.deepcopy(
+                    normalized_stage3_route_basis
+                )
             # Record the as-requested stir_factor only when it was passed
             # this call; otherwise the field is intentionally omitted so
             # downstream auditors can distinguish "no override this tick"
@@ -3720,7 +3735,7 @@ class CondensationModel:
                             getattr(melt, 'campaign_hour', 0.0) or 0.0
                         ),
                     })
-        return {
+        diagnostic = {
             'stage3_route': self.stage3_route,
             'stage3_segment': 'stage_3_to_stage_4',
             'bypass_segment': (
@@ -3740,6 +3755,10 @@ class CondensationModel:
             'findings': findings,
             'optimizer_feasibility_owner': 'b-585',
         }
+        if self._stage3_route_basis:
+            diagnostic.update(copy.deepcopy(self._stage3_route_basis))
+            diagnostic['stage3_route'] = self.stage3_route
+        return diagnostic
 
     def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """

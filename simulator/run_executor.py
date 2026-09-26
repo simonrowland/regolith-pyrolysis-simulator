@@ -15,6 +15,7 @@ from simulator.backends import requires_stage0_subprocess
 from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    Stage3TemperatureWindowRefusal,
 )
 from simulator.condensation import (
     DepositionInputRefusal,
@@ -59,6 +60,7 @@ _ALL_TYPED_PHYSICS_REFUSALS = (
     KnudsenRegimeRefusal,
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    Stage3TemperatureWindowRefusal,
     EvaporationFluxRefusal,
     MREElectrolysisRefusal,
     *_TYPED_PHYSICS_REFUSALS,
@@ -409,6 +411,7 @@ class RunExecutor:
             KnudsenRegimeRefusal,
             CampaignHoldTargetRefusal,
             CampaignPressureSetpointRefusal,
+            Stage3TemperatureWindowRefusal,
             EvaporationFluxRefusal,
             MREElectrolysisRefusal,
         ) as exc:

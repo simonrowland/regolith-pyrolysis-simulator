@@ -25,6 +25,9 @@ from simulator.optimize.recipe import (
     KeyPath,
     RecipePatch,
     RecipeSchema,
+    STAGE3_CLOSE_T_C_PATH,
+    STAGE3_OPEN_T_C_PATH,
+    STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C,
     c5_sampler_context,
     _default_setpoint_value,
 )
@@ -911,7 +914,128 @@ def _map_unit_row(
         anchor=anchor,
         delta_fraction=delta_fraction,
     )
+    _condition_stage3_temperature_window_values(
+        schema,
+        specs,
+        values,
+        unit_by_path,
+        anchor=anchor,
+        delta_fraction=delta_fraction,
+    )
     return values
+
+
+def _condition_stage3_temperature_window_values(
+    schema: RecipeSchema,
+    specs: tuple[Any, ...],
+    values: dict[KeyPath, Any],
+    unit_by_path: Mapping[KeyPath, float] | None = None,
+    *,
+    anchor: RecipePatch | None = None,
+    delta_fraction: float = DEFAULT_ANCHOR_DELTA_FRACTION,
+) -> None:
+    """Keep sampled Stage-3 windows valid without changing other dimensions.
+
+    The two temperature knobs are independently continuous in the vocabulary,
+    but their physical relation is ordered. Use the sampled open coordinate to
+    raise the close lower bound to ``open + 50 C`` before RecipePatch validation;
+    this is the same sampler-side conditioning used for coupled pressure pairs.
+    """
+
+    open_sampled = STAGE3_OPEN_T_C_PATH in values
+    close_sampled = STAGE3_CLOSE_T_C_PATH in values
+    if not open_sampled and not close_sampled:
+        return
+
+    open_spec = (
+        schema.spec_for(STAGE3_OPEN_T_C_PATH) if open_sampled else None
+    )
+    close_spec = (
+        schema.spec_for(STAGE3_CLOSE_T_C_PATH) if close_sampled else None
+    )
+    units = unit_by_path or {}
+
+    if open_sampled:
+        open_T_C = float(values[STAGE3_OPEN_T_C_PATH])
+    else:
+        open_T_C = float(_default_setpoint_value(STAGE3_OPEN_T_C_PATH))
+    if close_sampled:
+        close_T_C = float(values[STAGE3_CLOSE_T_C_PATH])
+    else:
+        close_T_C = float(_default_setpoint_value(STAGE3_CLOSE_T_C_PATH))
+
+    if open_sampled and close_sampled:
+        close_low, close_high = _sample_interval(
+            close_spec,
+            anchor=anchor,
+            delta_fraction=delta_fraction,
+        )
+        close_low = max(close_low, open_T_C + STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C)
+        _raise_if_infeasible(
+            STAGE3_CLOSE_T_C_PATH,
+            close_low,
+            close_high,
+            STAGE3_OPEN_T_C_PATH,
+            "stage3_temperature_window_infeasible_bounds",
+        )
+        close_unit = units.get(STAGE3_CLOSE_T_C_PATH, 0.0)
+        values[STAGE3_CLOSE_T_C_PATH] = _map_numeric_unit_value(
+            close_spec,
+            close_unit,
+            close_low,
+            close_high,
+        )
+        return
+
+    if open_sampled:
+        open_low, open_high = _sample_interval(
+            open_spec,
+            anchor=anchor,
+            delta_fraction=delta_fraction,
+        )
+        open_high = min(
+            open_high,
+            close_T_C - STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C,
+        )
+        _raise_if_infeasible(
+            STAGE3_OPEN_T_C_PATH,
+            open_low,
+            open_high,
+            STAGE3_CLOSE_T_C_PATH,
+            "stage3_temperature_window_infeasible_bounds",
+        )
+        open_unit = units.get(STAGE3_OPEN_T_C_PATH, 0.0)
+        values[STAGE3_OPEN_T_C_PATH] = _map_numeric_unit_value(
+            open_spec,
+            open_unit,
+            open_low,
+            open_high,
+        )
+        return
+
+    close_low, close_high = _sample_interval(
+        close_spec,
+        anchor=anchor,
+        delta_fraction=delta_fraction,
+    )
+    close_low = max(
+        close_low,
+        open_T_C + STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C,
+    )
+    _raise_if_infeasible(
+        STAGE3_CLOSE_T_C_PATH,
+        close_low,
+        close_high,
+        STAGE3_OPEN_T_C_PATH,
+        "stage3_temperature_window_infeasible_bounds",
+    )
+    close_unit = units.get(STAGE3_CLOSE_T_C_PATH, 0.0)
+    values[STAGE3_CLOSE_T_C_PATH] = _map_numeric_unit_value(
+        close_spec,
+        close_unit,
+        close_low,
+        close_high,
+    )
 
 
 def _condition_pressure_pair_values(

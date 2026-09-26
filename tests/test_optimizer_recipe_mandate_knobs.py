@@ -103,6 +103,38 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
     assert optional_ca_harvest_po2 not in searchable_paths
 
 
+def test_c2a_stage3_temperature_window_knobs_are_continuous_and_bounded():
+    schema = RecipeSchema()
+    open_path = _path("campaigns.C2A_continuous.stage3_open_T_C")
+    close_path = _path("campaigns.C2A_continuous.stage3_close_T_C")
+    open_spec = schema.spec_for(open_path)
+    close_spec = schema.spec_for(close_path)
+
+    assert open_spec.kind == "float"
+    assert open_spec.low == pytest.approx(900.0)
+    assert open_spec.high == pytest.approx(1700.0)
+    assert open_spec.search_enabled is True
+    assert close_spec.kind == "float"
+    assert close_spec.low == pytest.approx(950.0)
+    assert close_spec.high == pytest.approx(FURNACE_MAX_T_BOUNDS_C[1])
+    assert close_spec.search_enabled is True
+    assert "peak_SiO_window_1400_1600C" in open_spec.bounds_source
+    assert "furnace-material envelope" in close_spec.bounds_source
+
+    rendered = schema.to_setpoints_patch(RecipePatch({
+        open_path: 1300.0,
+        close_path: 1650.0,
+    }))
+    assert rendered["campaigns"]["C2A_continuous"]["stage3_open_T_C"] == 1300.0
+    assert rendered["campaigns"]["C2A_continuous"]["stage3_close_T_C"] == 1650.0
+
+    with pytest.raises(
+        RecipeValidationError,
+        match="recipe_stage3_temperature_window_invalid",
+    ):
+        RecipePatch({open_path: 1600.0, close_path: 1600.0}).validated(schema)
+
+
 def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     schema = RecipeSchema()

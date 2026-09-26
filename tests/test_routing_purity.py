@@ -1,7 +1,11 @@
 import math
+from copy import deepcopy
+from pathlib import Path
 
 import pytest
+import yaml
 
+from simulator.campaigns import CampaignManager
 from simulator.condensation import (
     CondensationModel,
     STAGE3_BYPASS_SEGMENT_NAME,
@@ -17,7 +21,7 @@ from simulator.condensation_routing import (
     product_stage_number,
     target_species_for_stage_number,
 )
-from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+from simulator.state import CampaignPhase, CondensationTrain, EvaporationFlux, MeltState
 
 
 STAGE3_BYPASS_CONFIG = {
@@ -26,6 +30,7 @@ STAGE3_BYPASS_CONFIG = {
     "declared_area_m2": 0.28,
     "liner_material": "hot_duct_refractory_liner",
 }
+SETPOINTS_PATH = Path(__file__).resolve().parents[1] / "data" / "setpoints.yaml"
 
 
 def _alkali_route_model(route: str):
@@ -195,4 +200,58 @@ def test_stage3_through_exposes_alkali_and_surfaces_d025_finding():
     report = stage_purity_report(train, route.stage3_route_diagnostic)
     assert report[STAGE_KEY_BY_NUMBER[3]]["finding_keys"] == [
         "silica_exposed_to_alkali"
+    ]
+
+
+def test_stage3_open_knob_uses_existing_alkali_hard_finding():
+    setpoints = deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
+    setpoints["campaigns"]["C2A_continuous"]["stage3_open_T_C"] = 1300
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A, temperature_C=1400.0)
+    resolution = manager.stage3_route_resolution_for(melt)
+    assert resolution["stage3_route"] == "through"
+
+    train, model, routed_melt, flux = _alkali_route_model("through")
+    routed_melt.campaign = CampaignPhase.C2A
+    routed_melt.temperature_C = 1400.0
+    model.configure_operating_conditions(stage3_route_basis=resolution)
+    route = model.route(flux, routed_melt)
+
+    assert route.stage3_route_diagnostic["route_basis"] == "temperature_window"
+    assert route.stage3_route_diagnostic["stage3_open_T_C"] == pytest.approx(1300.0)
+    assert "silica_exposed_to_alkali" in route.stage3_route_diagnostic[
+        "finding_keys"
+    ]
+
+
+def test_stage3_open_knob_with_no_alkali_is_through_without_hard_finding():
+    setpoints = deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
+    setpoints["campaigns"]["C2A_continuous"].update({
+        "stage3_open_T_C": 1500,
+        "stage3_close_T_C": 1600,
+    })
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A, temperature_C=1550.0)
+    resolution = manager.stage3_route_resolution_for(melt)
+    assert resolution["stage3_route"] == "through"
+
+    train = CondensationTrain.create_default()
+    model = CondensationModel(train, bypass_segment_config=STAGE3_BYPASS_CONFIG)
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"SiO": 1.0},
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in train.stages
+        },
+        stage3_route=resolution["stage3_route"],
+        stage3_route_basis=resolution,
+    )
+    flux = EvaporationFlux({"SiO": 1.0})
+    flux.update_totals()
+    route = model.route(flux, melt)
+
+    assert route.stage3_route_diagnostic["route_basis"] == "temperature_window"
+    assert route.stage3_route_diagnostic["stage3_open_T_C"] == pytest.approx(1500.0)
+    assert "silica_exposed_to_alkali" not in route.stage3_route_diagnostic[
+        "finding_keys"
     ]

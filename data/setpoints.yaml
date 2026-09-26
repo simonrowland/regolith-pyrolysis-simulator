@@ -155,18 +155,12 @@ campaigns:
     pO2_bar: "<1e-8"
     flow_regime: "viscous"               # Kn << 0.01 at 1-10 mbar
     target_species: ["Na", "K", "Fe", "CrO2", "SiO"]
-    # Existing thermal windows define the route: isolate silica below 1400 C
-    # while Na/K evolve, open only across the 1400-1600 C SiO release window,
-    # then isolate again. The optimizer may order/retune the window subject to
-    # the no-coating and tap-purity constraints.
-    stage3_route_schedule:
-      - max_temperature_C: 1400
-        stage3_route: divert
-      - min_temperature_C: 1400
-        max_temperature_C: 1600
-        stage3_route: through
-      - min_temperature_C: 1600
-        stage3_route: divert
+    # The existing peak_SiO_window supplies the default route window. The
+    # optimizer may retune these two thresholds subject to the existing
+    # no-coating and tap-purity constraints; Stage 3 is through iff
+    # stage3_open_T_C <= T < stage3_close_T_C.
+    stage3_open_T_C: 1400
+    stage3_close_T_C: 1600
     adaptive_control:
       law: >
         Meter dT/dt to keep instantaneous outgassing flux (IR-monitored)

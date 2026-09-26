@@ -3419,9 +3419,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         campaign_manager = getattr(self, 'campaign_mgr', None)
         campaign_phase = getattr(self.melt, 'campaign', None)
         route_resolver = getattr(campaign_manager, 'stage3_route_for', None)
+        route_resolution_resolver = getattr(
+            campaign_manager, 'stage3_route_resolution_for', None
+        )
+        route_resolution: dict[str, object] = {}
         if campaign_phase is None or not callable(route_resolver):
             stage3_route = 'through'
             route_basis = 'no_campaign_phase'
+        elif callable(route_resolution_resolver):
+            route_resolution = dict(route_resolution_resolver(self.melt))
+            stage3_route = str(route_resolution.get('stage3_route', 'through'))
+            route_basis = str(route_resolution.get('route_basis', 'campaign_phase'))
         else:
             stage3_route = route_resolver(self.melt)
             route_basis = 'campaign_phase'
@@ -3508,6 +3516,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             campaign_hour=float(getattr(self.melt, 'campaign_hour', 0.0) or 0.0),
             stage3_route=stage3_route,
             route_basis=route_basis,
+            stage3_route_basis=(
+                route_resolution
+                if route_resolution.get('route_basis') == 'temperature_window'
+                else None
+            ),
         )
 
     def _apply_c2a_knudsen_pressure_adjustment(self) -> None:
