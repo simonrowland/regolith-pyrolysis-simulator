@@ -271,6 +271,7 @@ C2A_STAGED_STAGE_METADATA_FIELDS: frozenset[str] = frozenset(
     ("target_species", "endpoint", "verification")
 )
 C2A_STAGED_GAS_COVER_MODES: tuple[str, ...] = ("pn2_sweep", "po2_hold")
+STAGE3_ROUTE_CHOICES: tuple[str, ...] = ("through", "divert")
 C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyType(
     {
         "alkali_early_fe": (
@@ -278,23 +279,23 @@ C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyTyp
             "target_C",
             "ramp_rate_C_per_hr",
             C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
-        ) + C2A_STAGED_STAGE_GAS_FIELDS,
+        ) + C2A_STAGED_STAGE_GAS_FIELDS + ("stage3_route",),
         "sio_window": (
             "duration_hr",
             "target_C",
             "ramp_rate_C_per_hr",
             C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
-        ) + C2A_STAGED_STAGE_GAS_FIELDS,
+        ) + C2A_STAGED_STAGE_GAS_FIELDS + ("stage3_route",),
         "fe_hot_hold": (
             "duration_hr",
             "ramp_rate_C_per_hr",
             C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
-        ) + C2A_STAGED_STAGE_GAS_FIELDS,
+        ) + C2A_STAGED_STAGE_GAS_FIELDS + ("stage3_route",),
         "cool_for_na_shuttle": (
             "duration_hr",
             "target_C",
             "ramp_rate_C_per_hr",
-        ) + C2A_STAGED_STAGE_GAS_FIELDS,
+        ) + C2A_STAGED_STAGE_GAS_FIELDS + ("stage3_route",),
     }
 )
 O2_BUBBLER_CAMPAIGN_RATE_PATHS: tuple[KeyPath, ...] = tuple(
@@ -491,6 +492,16 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
                 "engineering_envelope: pn2_sweep maps to "
                 "Atmosphere.PN2_SWEEP; po2_hold maps to "
                 "Atmosphere.CONTROLLED_O2"
+            ),
+        ),
+        _knob(
+            f"{prefix}.stage3_route",
+            "categorical",
+            choices=STAGE3_ROUTE_CHOICES,
+            units="route",
+            bounds_source=(
+                "owner-confirmed Stage-3 diverter: divert during alkali "
+                "emission and through during the SiO release window"
             ),
         ),
     )
@@ -1821,6 +1832,7 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C2A_staged.stages.alkali_early_fe.pO2_mbar",
         "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar",
         "campaigns.C2A_staged.stages.alkali_early_fe.gas_cover_mode",
+        "campaigns.C2A_staged.stages.alkali_early_fe.stage3_route",
         "campaigns.C2A_staged.stages.sio_window.duration_hr",
         "campaigns.C2A_staged.stages.sio_window.target_C",
         "campaigns.C2A_staged.stages.sio_window.ramp_rate_C_per_hr",
@@ -1828,18 +1840,21 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C2A_staged.stages.sio_window.pO2_mbar",
         "campaigns.C2A_staged.stages.sio_window.p_total_mbar",
         "campaigns.C2A_staged.stages.sio_window.gas_cover_mode",
+        "campaigns.C2A_staged.stages.sio_window.stage3_route",
         "campaigns.C2A_staged.stages.fe_hot_hold.duration_hr",
         "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.stages.fe_hot_hold.depletion_log_slope_epsilon_per_hr",
         "campaigns.C2A_staged.stages.fe_hot_hold.pO2_mbar",
         "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar",
         "campaigns.C2A_staged.stages.fe_hot_hold.gas_cover_mode",
+        "campaigns.C2A_staged.stages.fe_hot_hold.stage3_route",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_hr",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.target_C",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.pO2_mbar",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.p_total_mbar",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.gas_cover_mode",
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.stage3_route",
         "campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.na_shuttle_stage.duration_hr",
         "campaigns.C2B.temp_range_C",

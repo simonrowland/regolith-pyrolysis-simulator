@@ -81,6 +81,7 @@ from simulator.condensation import (
     KNUDSEN_REFUSAL_REASON,
     gram_lab_exposed_melt_area_bridge,
     stage_purity_report,
+    stage3_route_diagnostic_is_material,
 )
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.diagnostics import (
@@ -1419,6 +1420,18 @@ class PyrolysisRun:
         _attach_diagnostic_gate_authority_notice(run_metadata, sim)
         _attach_sulfur_saturation_notice(run_metadata, sim)
         _attach_rump_expectation_notice(run_metadata, sim)
+        stage3_route_diagnostic = dict(
+            getattr(
+                getattr(sim, '_condensation_model', None),
+                'last_stage3_route_diagnostic',
+                {},
+            )
+            or {}
+        )
+        if stage3_route_diagnostic_is_material(stage3_route_diagnostic):
+            run_metadata['stage3_route_diagnostic'] = _json_safe(
+                stage3_route_diagnostic
+            )
         run_metadata.update(
             canonicalize_fidelity_emission(
                 backend_name=self.backend_name,
@@ -1648,7 +1661,10 @@ class PyrolysisRun:
                     {},
                 ),
             ),
-            "stage_purity_report": stage_purity_report(sim.train),
+            "stage_purity_report": stage_purity_report(
+                sim.train,
+                stage3_route_diagnostic,
+            ),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
             "vapour_rail_instrumentation": _json_safe(
                 _vapour_rail_instrumentation_report(sim)
@@ -5070,6 +5086,19 @@ def _runner_failure_result(
     _attach_diagnostic_gate_authority_notice(run_metadata, sim)
     _attach_sulfur_saturation_notice(run_metadata, sim)
     _attach_rump_expectation_notice(run_metadata, sim)
+    if sim is not None:
+        stage3_route_diagnostic = dict(
+            getattr(
+                getattr(sim, '_condensation_model', None),
+                'last_stage3_route_diagnostic',
+                {},
+            )
+            or {}
+        )
+        if stage3_route_diagnostic_is_material(stage3_route_diagnostic):
+            run_metadata['stage3_route_diagnostic'] = _json_safe(
+                stage3_route_diagnostic
+            )
     final_state = (
         _safe_failure_value(lambda: _final_state_from_ledger(sim), {})
         if sim is not None
@@ -5086,7 +5115,17 @@ def _runner_failure_result(
             final,
         )
     stage_report = (
-        _safe_failure_value(lambda: stage_purity_report(sim.train), {})
+        _safe_failure_value(
+            lambda: stage_purity_report(
+                sim.train,
+                getattr(
+                    getattr(sim, '_condensation_model', None),
+                    'last_stage3_route_diagnostic',
+                    {},
+                ),
+            ),
+            {},
+        )
         if sim is not None
         else {}
     )

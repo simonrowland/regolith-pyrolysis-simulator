@@ -1284,6 +1284,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 wall_temperature_C=self.overhead_model.pipe_temperature_C,
                 materials=self.materials,
                 species_formula_registry=self.species_formula_registry,
+                bypass_segment_config=(
+                    self._overhead_condenser_geometry_config.get(
+                        'stage_3_bypass'
+                    )
+                ),
             )
             self._condensation_model.apply_setpoints_overrides(
                 self.setpoints
@@ -1923,6 +1928,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _condensation_route_wall_deposit_accounts(self) -> tuple[str, ...]:
         if self.lab_geometry is None:
+            bypass = self._overhead_condenser_geometry_config.get(
+                'stage_3_bypass'
+            )
+            if isinstance(bypass, Mapping):
+                from simulator.condensation import STAGE3_BYPASS_SEGMENT_NAME
+                return (
+                    f'process.wall_deposit_segment_{STAGE3_BYPASS_SEGMENT_NAME}',
+                )
             return ()
         return self.lab_geometry.wall_deposit_accounts
 
@@ -3480,6 +3493,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             carrier_gas=self._resolve_condensation_carrier_gas(),
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),
+            stage3_route=self.campaign_mgr.stage3_route_for(self.melt),
         )
 
     def _apply_c2a_knudsen_pressure_adjustment(self) -> None:

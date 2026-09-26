@@ -257,6 +257,35 @@ def validate_condenser_geometry_config(config: Mapping | None) -> dict[str, Any]
         ratios[stage] = ratio
     resolved['stage_area_ratios'] = ratios
 
+    raw_bypass = resolved.get('stage_3_bypass')
+    if raw_bypass is not None:
+        if not isinstance(raw_bypass, Mapping):
+            raise OverheadConfigurationError(
+                'condenser_geometry.stage_3_bypass must be a mapping'
+            )
+        bypass = dict(raw_bypass)
+        bypass['length_m'] = _required_positive_finite_float(
+            bypass.get('length_m'),
+            'condenser_geometry.stage_3_bypass.length_m',
+        )
+        bypass['inner_diameter_m'] = _required_positive_finite_float(
+            bypass.get('inner_diameter_m'),
+            'condenser_geometry.stage_3_bypass.inner_diameter_m',
+        )
+        liner_material = bypass.get('liner_material')
+        if not isinstance(liner_material, str) or not liner_material.strip():
+            raise OverheadConfigurationError(
+                'condenser_geometry.stage_3_bypass.liner_material must be '
+                'a non-empty string'
+            )
+        bypass['liner_material'] = liner_material.strip()
+        if 'declared_area_m2' in bypass:
+            bypass['declared_area_m2'] = _required_positive_finite_float(
+                bypass['declared_area_m2'],
+                'condenser_geometry.stage_3_bypass.declared_area_m2',
+            )
+        resolved['stage_3_bypass'] = bypass
+
     raw_sources = resolved.get('stage_area_ratio_sources')
     if raw_sources is not None:
         if not isinstance(raw_sources, Mapping):

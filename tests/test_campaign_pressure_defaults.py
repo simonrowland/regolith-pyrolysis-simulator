@@ -405,6 +405,28 @@ def test_c2a_staged_gas_cover_switch_is_stage_atomic():
     assert melt.background_gas_mole_fraction == pytest.approx(1.0)
 
 
+def test_default_stage3_route_follows_alkali_and_sio_windows():
+    manager = CampaignManager(_setpoints())
+    c0 = MeltState(campaign=CampaignPhase.C0, temperature_C=899.0)
+    assert manager.stage3_route_for(c0) == "through"
+    c0.temperature_C = 900.0
+    assert manager.stage3_route_for(c0) == "divert"
+
+    staged = MeltState(campaign=CampaignPhase.C2A_STAGED)
+    assert manager.stage3_route_for(staged) == "divert"
+    staged.campaign_hour = 4
+    assert manager.stage3_route_for(staged) == "through"
+    staged.campaign_hour = 7
+    assert manager.stage3_route_for(staged) == "divert"
+
+    continuous = MeltState(campaign=CampaignPhase.C2A, temperature_C=1250.0)
+    assert manager.stage3_route_for(continuous) == "divert"
+    continuous.temperature_C = 1500.0
+    assert manager.stage3_route_for(continuous) == "through"
+    continuous.temperature_C = 1650.0
+    assert manager.stage3_route_for(continuous) == "divert"
+
+
 def test_c2a_staged_pn2_sweep_trace_po2_is_not_silent_or_phantom_o2():
     setpoints = deepcopy(_setpoints())
     _stage(setpoints, "alkali_early_fe").update({

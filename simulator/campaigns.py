@@ -46,6 +46,7 @@ from simulator.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
     c2a_staged_stage_order,
     validate_c2a_staged_stage_order,
+    STAGE3_ROUTE_CHOICES,
 )
 from simulator.condensation import _canonical_carrier_gas_key
 from simulator.state import (
@@ -1274,6 +1275,54 @@ class CampaignManager:
             diagnostic['max_hold_adjustment'] = dict(adjustment)
         return atmosphere, diagnostic
 
+    def stage3_route_for(self, melt: MeltState) -> str:
+        """Resolve the configured condenser route for the current phase."""
+
+        campaign = getattr(melt, 'campaign', CampaignPhase.IDLE)
+        if not isinstance(campaign, CampaignPhase):
+            try:
+                campaign = CampaignPhase[str(campaign)]
+            except (KeyError, TypeError):
+                return 'through'
+        cfg = self._campaign_config(campaign)
+        raw_route: object | None = cfg.get('stage3_route')
+        if campaign == CampaignPhase.C2A_STAGED:
+            stages = cfg.get('stages')
+            if isinstance(stages, list) and stages:
+                stage = self._c2a_staged_active_stage(
+                    int(getattr(melt, 'campaign_hour', 0) or 0)
+                )
+                if isinstance(stage, Mapping):
+                    raw_route = stage.get('stage3_route', raw_route)
+        else:
+            schedule = cfg.get('stage3_route_schedule')
+            if isinstance(schedule, list):
+                temperature_C = float(getattr(melt, 'temperature_C', 0.0) or 0.0)
+                for row in schedule:
+                    if not isinstance(row, Mapping):
+                        continue
+                    lower = row.get('min_temperature_C')
+                    upper = row.get('max_temperature_C')
+                    if lower is not None and temperature_C < self._float(lower, 0.0):
+                        continue
+                    if upper is not None and temperature_C >= self._float(upper, 0.0):
+                        continue
+                    raw_route = row.get('stage3_route', raw_route)
+                    break
+        if raw_route is None:
+            target_species = cfg.get('target_species', ())
+            if isinstance(target_species, (list, tuple, set)):
+                target_species = {str(species) for species in target_species}
+                if {'Na', 'K'} & target_species and 'SiO' not in target_species:
+                    raw_route = 'divert'
+        route = str(raw_route or 'through').strip().lower()
+        if route not in STAGE3_ROUTE_CHOICES:
+            raise ValueError(
+                f'{self._campaign_config_key(campaign)}.stage3_route must be '
+                f'one of {STAGE3_ROUTE_CHOICES}, got {raw_route!r}'
+            )
+        return route
+
     def apply_c2a_staged_gas_controls(
             self,
             melt: MeltState,
@@ -1315,6 +1364,7 @@ class CampaignManager:
             melt.background_gas_species = ''
             melt.background_gas_mole_fraction = 0.0
         melt.validate_melt_pressures()
+        diagnostic['stage3_route'] = self.stage3_route_for(melt)
         self.last_c2a_staged_gas_control = diagnostic
 
     def _c2a_staged_flux_decay_species(self, stage: Mapping) -> tuple[str, ...]:

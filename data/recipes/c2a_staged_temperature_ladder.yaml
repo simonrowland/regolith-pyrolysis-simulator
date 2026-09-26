@@ -5,6 +5,7 @@ campaigns:
       target_C: 1250
       ramp_rate_C_per_hr: 600
       duration_h: 4
+      stage3_route: divert
       target_species:
       - Na
       - K
@@ -27,6 +28,7 @@ campaigns:
       target_C: 1600
       ramp_rate_C_per_hr: 175
       duration_h: 3
+      stage3_route: through
       target_species:
       - SiO
       - minor_Fe
@@ -47,6 +49,7 @@ campaigns:
     - name: fe_hot_hold
       ramp_rate_C_per_hr: 150
       duration_h: 1
+      stage3_route: divert
       target_species:
       - Fe
       endpoint:
@@ -68,6 +71,7 @@ campaigns:
       target_C: 1150
       ramp_rate_C_per_hr: 600
       duration_h: 1
+      stage3_route: divert
       target_species:
       - residual_FeO
       endpoint:
