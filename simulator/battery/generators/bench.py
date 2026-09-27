@@ -137,8 +137,9 @@ class EngineReportedActivity:
     alphaMELTS and ThermoEngine report pure-liquid-endmember activity. That
     equals a parent-oxide activity only for the MELTS oxide endmembers.
     IMCC ``parent_activity`` is x* of a parent oxide, relative to the pure
-    liquid oxide. The basis token is not the formula. Nothing here converts
-    one convention into the other.
+    liquid oxide. A basis equal to the endmember formula names the oxide basis
+    for structural recognition; nothing here converts one convention into the
+    other.
     """
 
     reported: str
@@ -285,15 +286,19 @@ def _reference_matches(
 ) -> tuple[bool, str]:
     """Convention, phase, basis token, and the endmember formula.
 
-    The basis token is not the formula. ``NaO0.5`` with token ``oxide`` is
-    still the single-cation formula. ``Na2SiO3`` with that token is not an
-    IMCC parent oxide.
+    A basis equal to the endmember formula names the oxide basis for structural
+    recognition. The basis token is otherwise not the formula: ``NaO0.5``
+    with token ``oxide`` is still the single-cation formula, and
+    ``Na2SiO3`` with that token is not an IMCC parent oxide.
     """
 
     structural = (
         state.convention is reported.convention
         and phase_token(state.endmember) is reported.phase
-        and state.component_basis in reported.component_bases
+        and (
+            state.component_basis in reported.component_bases
+            or state.component_basis == state.endmember.formula
+        )
     )
     if not structural:
         return False, reported.reported
