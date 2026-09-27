@@ -4622,13 +4622,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -4683,13 +4683,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -4720,6 +4720,16 @@ species:
         note: Table 1 heat 9; X_Ta=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.048'], [Fe, '0.952']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -4731,6 +4741,7 @@ species:
         heat: 9
         phase_block: L
         a_Fe: 0.969
+        activity:  0.969
         T_rxn_K: null
         T_range_K_as_printed:
         - 1746
@@ -4743,13 +4754,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -4780,6 +4791,16 @@ species:
         note: Table 1 heat 34; X_Ta=0.054; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.054'], [Fe, '0.946']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -4791,6 +4812,7 @@ species:
         heat: 34
         phase_block: L
         a_Fe: 0.949
+        activity:  0.949
         T_rxn_K: 1713
         T_range_K_as_printed:
         - 1625
@@ -4803,13 +4825,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -4840,6 +4862,16 @@ species:
         note: Table 1 heat 12; X_Ta=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.094'], [Fe, '0.906']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -4851,6 +4883,7 @@ species:
         heat: 12
         phase_block: L
         a_Fe: 0.916
+        activity:  0.916
         T_rxn_K: null
         T_range_K_as_printed:
         - 1751
@@ -4863,13 +4896,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -4900,6 +4933,16 @@ species:
         note: Table 1 heat 32; X_Ta=0.152; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.152'], [Fe, '0.848']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -4911,6 +4954,7 @@ species:
         heat: 32
         phase_block: L
         a_Fe: 0.846
+        activity:  0.846
         T_rxn_K: 1713
         T_range_K_as_printed:
         - 1610
@@ -4923,13 +4967,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -4960,6 +5004,16 @@ species:
         note: Table 1 heat 21; X_Ta=0.153; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.153'], [Fe, '0.847']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -4971,6 +5025,7 @@ species:
         heat: 21
         phase_block: L
         a_Fe: 0.811
+        activity:  0.811
         T_rxn_K: 1715
         T_range_K_as_printed:
         - 1630
@@ -4983,13 +5038,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5020,6 +5075,16 @@ species:
         note: Table 1 heat 31; X_Ta=0.156; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.156'], [Fe, '0.844']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5031,6 +5096,7 @@ species:
         heat: 31
         phase_block: L
         a_Fe: 0.886
+        activity:  0.886
         T_rxn_K: 1717
         T_range_K_as_printed:
         - 1650
@@ -5043,13 +5109,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5080,6 +5146,16 @@ species:
         note: Table 1 heat 25; X_Ta=0.239; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.239'], [Fe, '0.761']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5091,6 +5167,7 @@ species:
         heat: 25
         phase_block: L+ε
         a_Fe: 0.822
+        activity:  0.822
         T_rxn_K: 1716
         T_range_K_as_printed:
         - 1640
@@ -5103,13 +5180,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5140,6 +5217,16 @@ species:
         note: Table 1 heat 22; X_Ta=0.244; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.244'], [Fe, '0.756']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5151,6 +5238,7 @@ species:
         heat: 22
         phase_block: L+ε
         a_Fe: 0.852
+        activity:  0.852
         T_rxn_K: 1713
         T_range_K_as_printed:
         - 1658
@@ -5163,13 +5251,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5200,6 +5288,16 @@ species:
         note: Table 1 heat 27; X_Ta=0.255; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.255'], [Fe, '0.745']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5211,6 +5309,7 @@ species:
         heat: 27
         phase_block: L+ε
         a_Fe: 0.797
+        activity:  0.797
         T_rxn_K: 1713
         T_range_K_as_printed:
         - 1639
@@ -5223,13 +5322,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5260,6 +5359,16 @@ species:
         note: Table 1 heat 33; X_Ta=0.297; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.297'], [Fe, '0.703']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5271,6 +5380,7 @@ species:
         heat: 33
         phase_block: L+ε
         a_Fe: 0.862
+        activity:  0.862
         T_rxn_K: null
         T_range_K_as_printed:
         - 1626
@@ -5283,13 +5393,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5320,6 +5430,16 @@ species:
         note: Table 1 heat 17; X_Ta=0.319; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.319'], [Fe, '0.681']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5331,6 +5451,7 @@ species:
         heat: 17
         phase_block: ε
         a_Fe: 0.76
+        activity:  0.76
         T_rxn_K: null
         T_range_K_as_printed:
         - 1629
@@ -5343,13 +5464,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5380,6 +5501,16 @@ species:
         note: Table 1 heat 50; X_Ta=0.404; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.404'], [Fe, '0.596']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5391,6 +5522,7 @@ species:
         heat: 50
         phase_block: ε+μ
         a_Fe: 0.412
+        activity:  0.412
         T_rxn_K: null
         T_range_K_as_printed:
         - 1752
@@ -5403,13 +5535,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5440,6 +5572,16 @@ species:
         note: Table 1 heat 49; X_Ta=0.406; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.406'], [Fe, '0.594']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5451,6 +5593,7 @@ species:
         heat: 49
         phase_block: ε+μ
         a_Fe: 0.421
+        activity:  0.421
         T_rxn_K: null
         T_range_K_as_printed:
         - 1736
@@ -5463,13 +5606,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5500,6 +5643,16 @@ species:
         note: Table 1 heat 47; X_Ta=0.436; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.436'], [Fe, '0.564']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5511,6 +5664,7 @@ species:
         heat: 47
         phase_block: ε+μ
         a_Fe: 0.42
+        activity:  0.42
         T_rxn_K: null
         T_range_K_as_printed:
         - 1751
@@ -5523,13 +5677,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5560,6 +5714,16 @@ species:
         note: Table 1 heat 51; X_Ta=0.444; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.444'], [Fe, '0.556']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5571,6 +5735,7 @@ species:
         heat: 51
         phase_block: ε+μ
         a_Fe: 0.459
+        activity:  0.459
         T_rxn_K: null
         T_range_K_as_printed:
         - 1769
@@ -5583,13 +5748,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5620,6 +5785,16 @@ species:
         note: Table 1 heat 48; X_Ta=0.606; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.606'], [Fe, '0.394']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5631,6 +5806,7 @@ species:
         heat: 48
         phase_block: μ+(Ta)
         a_Fe: 0.179
+        activity:  0.179
         T_rxn_K: null
         T_range_K_as_printed:
         - 1774
@@ -5643,13 +5819,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5680,6 +5856,16 @@ species:
         note: Table 1 heat 53; X_Ta=0.727; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.727'], [Fe, '0.273']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5691,6 +5877,7 @@ species:
         heat: 53
         phase_block: μ+(Ta)
         a_Fe: 0.194
+        activity:  0.194
         T_rxn_K: null
         T_range_K_as_printed:
         - 1746
@@ -5703,13 +5890,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5740,6 +5927,16 @@ species:
         note: Table 1 heat 55; X_Ta=0.775; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.775'], [Fe, '0.225']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5751,6 +5948,7 @@ species:
         heat: 55
         phase_block: μ+(Ta)
         a_Fe: 0.248
+        activity:  0.248
         T_rxn_K: null
         T_range_K_as_printed:
         - 1706
@@ -5763,13 +5961,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5800,6 +5998,16 @@ species:
         note: Table 1 heat 54; X_Ta=0.810; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.81'], [Fe, '0.19']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5811,6 +6019,7 @@ species:
         heat: 54
         phase_block: μ+(Ta)
         a_Fe: 0.109
+        activity:  0.109
         T_rxn_K: null
         T_range_K_as_printed:
         - 1762
@@ -5823,13 +6032,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -5860,6 +6069,16 @@ species:
         note: Table 1 heat 56; X_Ta=0.828; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Ta mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Ta, '0.828'], [Fe, '0.172']]}}
+          locator: {published_page: 846, pdf_page_index: 4, table: '1', note: 'Printed X_Ta composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -5871,6 +6090,7 @@ species:
         heat: 56
         phase_block: μ+(Ta)
         a_Fe: 0.189
+        activity:  0.189
         T_rxn_K: null
         T_range_K_as_printed:
         - 1701
@@ -5889,7 +6109,7 @@ species:
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6017,13 +6237,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6054,6 +6274,16 @@ species:
         note: Table 5 heat 8; X_Nb=0.048; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.048'], [Fe, '0.952']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6064,6 +6294,7 @@ species:
         heat: 8
         phase_block: null
         a_Fe: 0.962
+        activity:  0.962
         composition_mol:
           Nb: 0.048
           Fe: 0.952
@@ -6072,13 +6303,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6109,6 +6340,16 @@ species:
         note: Table 5 heat 4; X_Nb=0.091; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.091'], [Fe, '0.909']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6119,6 +6360,7 @@ species:
         heat: 4
         phase_block: null
         a_Fe: 0.869
+        activity:  0.869
         composition_mol:
           Nb: 0.091
           Fe: 0.909
@@ -6127,13 +6369,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6164,6 +6406,16 @@ species:
         note: Table 5 heat 31; X_Nb=0.094; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.094'], [Fe, '0.906']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6174,6 +6426,7 @@ species:
         heat: 31
         phase_block: null
         a_Fe: 0.902
+        activity:  0.902
         composition_mol:
           Nb: 0.094
           Fe: 0.906
@@ -6182,13 +6435,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6219,6 +6472,16 @@ species:
         note: Table 5 heat 59; X_Nb=0.139; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.139'], [Fe, '0.861']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6229,6 +6492,7 @@ species:
         heat: 59
         phase_block: null
         a_Fe: 0.826
+        activity:  0.826
         composition_mol:
           Nb: 0.139
           Fe: 0.861
@@ -6237,13 +6501,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6274,6 +6538,16 @@ species:
         note: Table 5 heat 58; X_Nb=0.144; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.144'], [Fe, '0.856']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6284,6 +6558,7 @@ species:
         heat: 58
         phase_block: null
         a_Fe: 0.846
+        activity:  0.846
         composition_mol:
           Nb: 0.144
           Fe: 0.856
@@ -6292,13 +6567,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6329,6 +6604,16 @@ species:
         note: Table 5 heat 11; X_Nb=0.192; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.192'], [Fe, '0.808']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6339,6 +6624,7 @@ species:
         heat: 11
         phase_block: null
         a_Fe: 0.791
+        activity:  0.791
         composition_mol:
           Nb: 0.192
           Fe: 0.808
@@ -6347,13 +6633,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6384,6 +6670,16 @@ species:
         note: Table 5 heat 14; X_Nb=0.234; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.234'], [Fe, '0.766']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6394,6 +6690,7 @@ species:
         heat: 14
         phase_block: null
         a_Fe: 0.731
+        activity:  0.731
         composition_mol:
           Nb: 0.234
           Fe: 0.766
@@ -6402,13 +6699,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6439,6 +6736,16 @@ species:
         note: Table 5 heat 12; X_Nb=0.242; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.242'], [Fe, '0.758']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6449,6 +6756,7 @@ species:
         heat: 12
         phase_block: null
         a_Fe: 0.782
+        activity:  0.782
         composition_mol:
           Nb: 0.242
           Fe: 0.758
@@ -6457,13 +6765,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6494,6 +6802,16 @@ species:
         note: Table 5 heat 32; X_Nb=0.298; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.298'], [Fe, '0.702']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6504,6 +6822,7 @@ species:
         heat: 32
         phase_block: null
         a_Fe: 0.704
+        activity:  0.704
         composition_mol:
           Nb: 0.298
           Fe: 0.702
@@ -6512,13 +6831,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6549,6 +6868,16 @@ species:
         note: Table 5 heat 15; X_Nb=0.320; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.32'], [Fe, '0.68']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6559,6 +6888,7 @@ species:
         heat: 15
         phase_block: null
         a_Fe: 0.545
+        activity:  0.545
         composition_mol:
           Nb: 0.32
           Fe: 0.68
@@ -6567,13 +6897,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6604,6 +6934,16 @@ species:
         note: Table 5 heat 30; X_Nb=0.370; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.37'], [Fe, '0.63']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6614,6 +6954,7 @@ species:
         heat: 30
         phase_block: null
         a_Fe: 0.387
+        activity:  0.387
         composition_mol:
           Nb: 0.37
           Fe: 0.63
@@ -6622,13 +6963,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6659,6 +7000,16 @@ species:
         note: Table 5 heat 29; X_Nb=0.384; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.384'], [Fe, '0.616']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6669,6 +7020,7 @@ species:
         heat: 29
         phase_block: null
         a_Fe: 0.367
+        activity:  0.367
         composition_mol:
           Nb: 0.384
           Fe: 0.616
@@ -6677,13 +7029,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6714,6 +7066,16 @@ species:
         note: Table 5 heat 20; X_Nb=0.388; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.388'], [Fe, '0.612']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6724,6 +7086,7 @@ species:
         heat: 20
         phase_block: null
         a_Fe: 0.359
+        activity:  0.359
         composition_mol:
           Nb: 0.388
           Fe: 0.612
@@ -6732,13 +7095,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6769,6 +7132,16 @@ species:
         note: Table 5 heat 19; X_Nb=0.394; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.394'], [Fe, '0.606']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6779,6 +7152,7 @@ species:
         heat: 19
         phase_block: null
         a_Fe: 0.36
+        activity:  0.36
         composition_mol:
           Nb: 0.394
           Fe: 0.606
@@ -6787,13 +7161,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6824,6 +7198,16 @@ species:
         note: Table 5 heat 16; X_Nb=0.502; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.502'], [Fe, '0.498']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6834,6 +7218,7 @@ species:
         heat: 16
         phase_block: null
         a_Fe: 0.34
+        activity:  0.34
         composition_mol:
           Nb: 0.502
           Fe: 0.498
@@ -6842,13 +7227,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6879,6 +7264,16 @@ species:
         note: Table 5 heat 26; X_Nb=0.548; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.548'], [Fe, '0.452']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6889,6 +7284,7 @@ species:
         heat: 26
         phase_block: null
         a_Fe: 0.276
+        activity:  0.276
         composition_mol:
           Nb: 0.548
           Fe: 0.452
@@ -6897,13 +7293,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6934,6 +7330,16 @@ species:
         note: Table 5 heat 23; X_Nb=0.596; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.596'], [Fe, '0.404']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6944,6 +7350,7 @@ species:
         heat: 23
         phase_block: null
         a_Fe: 0.258
+        activity:  0.258
         composition_mol:
           Nb: 0.596
           Fe: 0.404
@@ -6952,13 +7359,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -6989,6 +7396,16 @@ species:
         note: Table 5 heat 24; X_Nb=0.671; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.671'], [Fe, '0.329']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -6999,6 +7416,7 @@ species:
         heat: 24
         phase_block: null
         a_Fe: 0.203
+        activity:  0.203
         composition_mol:
           Nb: 0.671
           Fe: 0.329
@@ -7007,13 +7425,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -7044,6 +7462,16 @@ species:
         note: Table 5 heat 25; X_Nb=0.760; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.76'], [Fe, '0.24']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -7054,6 +7482,7 @@ species:
         heat: 25
         phase_block: null
         a_Fe: 0.197
+        activity:  0.197
         composition_mol:
           Nb: 0.76
           Fe: 0.24
@@ -7062,13 +7491,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -7099,6 +7528,16 @@ species:
         note: Table 5 heat 27; X_Nb=0.856; a_Fe at 1873 K from I(alloy)/I(foil)
       standard_state: Raoultian a_Fe; pure liquid Fe
       units: dimensionless a_Fe; X_Nb mole fraction
+      point_conditions:
+        composition:
+          state: {tag: value, value: {basis: printed_metals, amount_basis: mole_fraction, components: [[Nb, '0.856'], [Fe, '0.144']]}}
+          locator: {published_page: 848, pdf_page_index: 6, table: '5', note: 'Printed X_Nb composition axis; observation remains tied to its heat.'}
+        total_pressure_Pa:
+          state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'Printed cell-chamber pressure about 1 x 10^-4 Pa.'}
+        fO2_Pa:
+          state: {tag: unknown, reason: not_published}
+          locator: {published_page: 844, pdf_page_index: 2, section: '2.1 Apparatus', note: 'No fO2 or pO2 is printed.'}
       values:
         quantity: activity
         method_class: measured
@@ -7109,6 +7548,7 @@ species:
         heat: 27
         phase_block: null
         a_Fe: 0.222
+        activity:  0.222
         composition_mol:
           Nb: 0.856
           Fe: 0.144
@@ -7123,7 +7563,7 @@ species:
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -7280,13 +7720,13 @@ species:
     - T_range_K:
       - 1673.0
       - 1973.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -7331,13 +7771,13 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
         basis: explicit_author
         note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
-      regime: kems_effusion
+      regime: knudsen_effusion
       equipment:
         cell_material:
           value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
@@ -7384,7 +7824,7 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
@@ -7479,7 +7919,7 @@ species:
     - T_range_K:
       - 1873.0
       - 1873.0
-      phase: Fe-Ta_or_Fe-Nb_alloy
+      phase: condensed_liquid
       condensed_form:
         state: liquid_or_solid_alloy
         metastable: false
