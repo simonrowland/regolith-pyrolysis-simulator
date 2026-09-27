@@ -86,6 +86,7 @@ from simulator.battery.records import (
     phase_token,
     union_notices,
 )
+from simulator.battery.source_lineage import coefficient_lineage_sources
 from simulator.accounting.formulas import parse_formula
 from simulator.battery.validity import run_validity_gates
 from simulator.reference_data.janaf import formula_composition
@@ -1557,7 +1558,7 @@ def validate_residual(
                             reference.observation_id, observations, table_ids
                         )
                         cand_ids = _resolve_coefficient_sources(
-                            engine.coefficient_sources,
+                            coefficient_lineage_sources(engine.coefficient_sources),
                             observations,
                             works,
                             experiments,

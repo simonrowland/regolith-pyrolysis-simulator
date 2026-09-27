@@ -49,6 +49,7 @@ from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
     Derivation,
+    EngineTrace,
     Execution,
     Located,
     Notice,
@@ -68,10 +69,12 @@ from simulator.battery.score import (
     SINGLE_LIQUID_ENGINES,
     compile_residual,
     compute_metric,
+    derive_kems_partial_pressure_band,
     dumps_residual_line,
     engines_from_names,
     load_score_context,
     parse_species_formula,
+    pooled_log_pressure_sd,
     resolve_source_relation,
     score_eligible_from_conjuncts,
     score_store,
@@ -212,6 +215,67 @@ def _partial_prediction(engine, observation, **_kwargs):
         lineage_complete=True,
         identity=observation.identity,
     )
+
+
+def test_pooled_log_pressure_sd_known_replicates() -> None:
+    assert pooled_log_pressure_sd(((-1, 0, 1), (9, 10, 11))) == Decimal("1")
+
+
+def test_kems_band_derives_known_replicate_scatter() -> None:
+    experiment = F.kems_experiment()
+    identity = _partial_identity()
+    first = F.observation(
+        "kems-replicate-1",
+        experiment.experiment_id,
+        identity,
+        Decimal("10"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    second = F.observation(
+        "kems-replicate-2",
+        experiment.experiment_id,
+        identity,
+        Decimal("100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    band = derive_kems_partial_pressure_band(
+        {first.observation_id: first, second.observation_id: second},
+        {experiment.experiment_id: experiment},
+    )
+    assert band is not None
+    assert band.unit == "dimensionless"
+    assert band.value == Decimal("0.5").sqrt()
+    assert "pooled replicate" in band.rule
+
+
+def test_kems_band_uses_source_printed_pressure_uncertainty() -> None:
+    experiment = F.kems_experiment()
+    reference = replace(
+        F.observation(
+            "kems-printed-pressure",
+            experiment.experiment_id,
+            _partial_identity(),
+            Decimal("10"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="kems-042-plante-1979",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "temperature_quote": (
+                    "At 1500 K, the estimated 20 K error yields an error "
+                    "in K pressure of about 40 percent."
+                )
+            },
+        ),
+    )
+    band = derive_kems_partial_pressure_band(
+        {reference.observation_id: reference},
+        {experiment.experiment_id: experiment},
+    )
+    assert band is not None
+    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
+    assert band.rule.startswith("KEMS p_partial measured uncertainty")
 
 
 def test_derived_oxygen_condition_notice_reaches_residual() -> None:
@@ -1284,6 +1348,7 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
         key="headline-no-band::p_sat::vapour::internal-analytical",
         reference=measured_obs.observation_id,
         status=ResidualStatus.NO_BAND,
+        score_eligible=False,
         numeric=ResidualNumeric(
             operation=MetricOperation.DEX,
             unit="dimensionless",
@@ -1317,6 +1382,9 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
         and row["engine"] == Engine.INTERNAL_ANALYTICAL.value
     }
     assert by_tier["measured"]["n"] == 2
+    assert by_tier["measured"]["n_score_eligible"] == 1
+    assert by_tier["measured"]["n_inside_band"] == 1
+    assert by_tier["measured"]["band_width_dex"] == "0.1"
     assert by_tier["measured"]["n_no_band"] == 1
     assert by_tier["measured"]["match_rate"] == 1.0
     assert by_tier["compilation"]["n"] == 1
@@ -1650,6 +1718,106 @@ def test_mapped_coefficient_sources_decide_circularity() -> None:
     assert independent is SourceRelation.INDEPENDENT
 
 
+def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
+    from simulator.battery.score import (
+        ENGINE_COEFFICIENT_SOURCES,
+        expand_coefficient_sources,
+        lineage_complete_for,
+    )
+
+    candidate_sources = (
+        *ENGINE_COEFFICIENT_SOURCES[Engine.OPENIMCC],
+        "openimcc-pack-version:1.0.2",
+        "openimcc-pack-digest:sha256:test",
+    )
+    expanded = expand_coefficient_sources(candidate_sources)
+    assert "openimcc-v1.0.2" in candidate_sources
+    assert "sf04-magma-companion-workbook" in expanded
+    assert lineage_complete_for(candidate_sources) is True
+
+
+def test_openimcc_lineage_metadata_passes_residual_validation() -> None:
+    reference_work = F.work("reference-work")
+    reference_experiment = F.tabulation_experiment(
+        experiment_id="reference-exp", work_id=reference_work.work_id
+    )
+    identity = F.o2_identity()
+    reference = F.observation(
+        "lineage-reference",
+        reference_experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=reference_work.work_id,
+    )
+    source_work = replace(
+        F.work("sf04-work"),
+        source_ids=("sf04-work", "sf04-magma-companion-workbook"),
+    )
+    source_experiment = F.tabulation_experiment(
+        experiment_id="sf04-exp", work_id=source_work.work_id
+    )
+    source_observation = F.observation(
+        "sf04-input",
+        source_experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        source_id=source_work.work_id,
+    )
+    candidate = F.observation(
+        "engine:openimcc:lineage-reference",
+        reference_experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.ENGINE_PREDICTION,
+        source_id=reference.source_id or "reference-work",
+        engine=EngineTrace(
+            name=Engine.OPENIMCC,
+            channel="openimcc",
+            run_id="openimcc:test",
+            coefficient_sources=(
+                "sf04-magma-companion-workbook",
+                "openimcc-pack-version:1.0.2",
+                "openimcc-pack-digest:sha256:test",
+                "openimcc-gas-table:test.csv",
+            ),
+            lineage_complete=True,
+        ),
+        authority=Authority.CERTIFIED,
+    )
+    numeric = ResidualNumeric(
+        operation=MetricOperation.ABSOLUTE,
+        unit="kJ_per_declared_mol_basis",
+        value=Decimal("0"),
+        decision_band=DecisionBand(Decimal("1"), "kJ_per_declared_mol_basis", "test"),
+    )
+    residual = F.residual(
+        "lineage-validation",
+        reference.observation_id,
+        candidate=candidate.observation_id,
+        status=ResidualStatus.MATCH,
+        rail=Rail.THERMOCHEMISTRY,
+        score_eligible=True,
+        numeric=numeric,
+        source_relation=SourceRelation.INDEPENDENT,
+        experiment_id=reference_experiment.experiment_id,
+        quantity=Quantity.DELTA_FG,
+    )
+    assert validate_residual(
+        residual,
+        {
+            reference.observation_id: reference,
+            candidate.observation_id: candidate,
+            source_observation.observation_id: source_observation,
+        },
+        {
+            reference_experiment.experiment_id: reference_experiment,
+            source_experiment.experiment_id: source_experiment,
+        },
+        {reference_work.work_id: reference_work, source_work.work_id: source_work},
+    ) == []
+
+
 def test_missing_live_result_is_coverage_failure() -> None:
     record = PinBandRecord(
         key="missing",
@@ -1832,6 +2000,8 @@ def test_score_report_names_the_measured_store() -> None:
     assert f"{stamp['hard_issues']} hard issues" in report
     assert "RMS dex" in report
     assert "median abs dex" in report
+    assert "n score eligible" in report
+    assert "n inside band" in report
     assert "n no band" in report
     assert "Warning:" not in report
 
