@@ -1753,10 +1753,13 @@ def test_step_overhead_composition_uses_real_condensation_residual():
     )
 
 
-def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
+def test_same_tick_p_bulk_uses_duct_pressure_after_near_total_capture(
     monkeypatch,
 ):
     sim = _gas_train_sim()
+    sim._overhead_headspace_config["enabled"] = True
+    sim._overhead_headspace_config["volume_m3"] = 1.0
+    sim.overhead_model._finite_headspace_enabled = True
     evolved_kg = 1.0
     residual_kg = 1.0e-8
     flux = EvaporationFlux(
@@ -1775,62 +1778,24 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     sim.melt.temperature_C = 1500.0
     sim._apply_native_fe_saturation_split = lambda **_kwargs: None
     sim._update_temperature = lambda: None
+    sim._apply_oxygen_reservoir_exchange = lambda: None
     sim._get_equilibrium = lambda: object()
     sim._calculate_evaporation = lambda _equilibrium: flux
     _bypass_analytic_depletion(sim)
-    partial_pressure_registries = []
-    real_species_partial_pressures = sim.overhead_model.species_partial_pressures
-
-    def _capture_species_partial_pressures(
-        projected_flux,
-        vapor_pressure_mbar,
-        species_formula_registry=None,
-    ):
-        partial_pressure_registries.append(species_formula_registry)
-        return real_species_partial_pressures(
-            projected_flux,
-            vapor_pressure_mbar,
-            species_formula_registry,
-        )
-
-    monkeypatch.setattr(
-        sim.overhead_model,
-        "species_partial_pressures",
-        _capture_species_partial_pressures,
-    )
+    sim._melt_headspace_composition_mbar = {"Fe": 999.0}
 
     sim.step()
 
-    assert partial_pressure_registries
-    assert all(
-        registry is sim.species_formula_registry
-        for registry in partial_pressure_registries
-    )
-
-    upstream_transport = sim.overhead_model.estimate_transport_state(
-        flux, sim.melt
-    )
-    residual_flux = EvaporationFlux(
-        total_kg_hr=residual_kg,
-        species_kg_hr={"Fe": residual_kg},
-    )
-    residual_transport = sim.overhead_model.estimate_transport_state(
-        residual_flux, sim.melt
-    )
+    same_tick_partials = sim._same_tick_evaporation_headspace_partials_Pa(flux)
     assert sim._melt_headspace_composition_mbar["Fe"] == pytest.approx(
-        upstream_transport["vapor_pressure_mbar"]
+        same_tick_partials["Fe"] / 100.0
     )
-    assert sim.overhead.composition["Fe"] == pytest.approx(
-        residual_transport["vapor_pressure_mbar"]
-    )
-    assert sim._melt_headspace_composition_mbar["Fe"] > (
-        sim.overhead.composition["Fe"] * 1.0e3
-    )
+    assert sim._melt_headspace_composition_mbar["Fe"] != pytest.approx(999.0)
     assert sim.record.snapshots[-1].melt_headspace_composition_mbar == pytest.approx(
         sim._melt_headspace_composition_mbar
     )
     assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
-        upstream_transport["vapor_pressure_mbar"] * 100.0
+        same_tick_partials["Fe"]
     )
 
     seen = {}
@@ -1854,10 +1819,137 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     evaporation_module.EvaporationMixin._calculate_evaporation(sim, equilibrium)
 
     assert seen["overhead_partials_Pa"]["Fe"] == pytest.approx(
-        upstream_transport["vapor_pressure_mbar"] * 100.0
+        same_tick_partials["Fe"]
     )
     assert seen["overhead_partials_Pa"]["Fe"] > 0.0
     assert seen["vapour_batch_flux_pressures_Pa"] == {"Fe": 100.0}
+
+
+def _same_tick_solver_fixture(campaign=CampaignPhase.C4):
+    sim = _gas_train_sim()
+    sim.melt.campaign = campaign
+    sim.melt.temperature_C = 1300.0
+    sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})
+    sim.overhead_model._finite_headspace_enabled = True
+    sim._apply_analytic_evaporation_depletion = lambda flux: flux
+    return sim
+
+
+def test_c4_two_tick_species_parity_uses_current_duct_pressure_only():
+    sim = _same_tick_solver_fixture()
+    equilibrium = types.SimpleNamespace(vapor_pressures_Pa={"Fe": 100.0})
+    base_rate = 1.0
+    calls = []
+
+    def calculate(_equilibrium, *, overhead_partials_override_Pa=None):
+        partials = dict(overhead_partials_override_Pa or {})
+        pressure = float(partials.get("Fe", 0.0))
+        rate = base_rate * max(0.0, 1.0 - pressure / 100.0)
+        calls.append(partials)
+        return EvaporationFlux(
+            species_kg_hr={"Fe": rate} if rate > 0.0 else {},
+            total_kg_hr=rate,
+        )
+
+    sim._calculate_evaporation = calculate
+    first_flux, first_partials = (
+        sim._calculate_evaporation_with_same_tick_headspace(equilibrium)
+    )
+    sim._melt_headspace_composition_mbar = {"Fe": 999.0}
+    calls.clear()
+    second_flux, second_partials = (
+        sim._calculate_evaporation_with_same_tick_headspace(equilibrium)
+    )
+
+    assert first_flux.species_kg_hr["Fe"] > 0.0
+    assert first_flux.species_kg_hr["Fe"] < base_rate
+    assert second_flux.species_kg_hr["Fe"] == pytest.approx(
+        first_flux.species_kg_hr["Fe"], rel=1.0e-6
+    )
+    assert second_partials["Fe"] == pytest.approx(
+        first_partials["Fe"], rel=1.0e-6
+    )
+    assert calls[0].get("Fe", 0.0) == pytest.approx(0.0)
+
+
+def test_same_tick_high_flux_throttles_smoothly_near_equilibrium_pressure():
+    sim = _same_tick_solver_fixture()
+    equilibrium = types.SimpleNamespace(vapor_pressures_Pa={"Fe": 100.0})
+    base_rate = 100.0
+
+    def calculate(_equilibrium, *, overhead_partials_override_Pa=None):
+        pressure = float(
+            dict(overhead_partials_override_Pa or {}).get("Fe", 0.0)
+        )
+        rate = base_rate * max(0.0, 1.0 - pressure / 100.0)
+        return EvaporationFlux(
+            species_kg_hr={"Fe": rate} if rate > 0.0 else {},
+            total_kg_hr=rate,
+        )
+
+    sim._calculate_evaporation = calculate
+    flux, partials = sim._calculate_evaporation_with_same_tick_headspace(
+        equilibrium
+    )
+    first_rate = flux.species_kg_hr["Fe"]
+    first_pressure = partials["Fe"]
+
+    base_rate = 101.0
+    flux_101, partials_101 = sim._calculate_evaporation_with_same_tick_headspace(
+        equilibrium
+    )
+
+    assert 0.0 < first_rate < 100.0
+    assert 80.0 < first_pressure < 100.0
+    assert 0.0 < flux_101.species_kg_hr["Fe"] < 101.0
+    assert partials_101["Fe"] > first_pressure
+    assert flux_101.species_kg_hr["Fe"] > first_rate
+
+
+def test_fixed_1300_c_six_tick_control_stays_smooth():
+    sim = _same_tick_solver_fixture()
+    equilibrium = types.SimpleNamespace(vapor_pressures_Pa={"Fe": 100.0})
+
+    def calculate(_equilibrium, *, overhead_partials_override_Pa=None):
+        pressure = float(
+            dict(overhead_partials_override_Pa or {}).get("Fe", 0.0)
+        )
+        rate = 0.25 * max(0.0, 1.0 - pressure / 100.0)
+        return EvaporationFlux(
+            species_kg_hr={"Fe": rate} if rate > 0.0 else {},
+            total_kg_hr=rate,
+        )
+
+    sim._calculate_evaporation = calculate
+    rates = []
+    for _tick in range(6):
+        flux, partials = sim._calculate_evaporation_with_same_tick_headspace(
+            equilibrium
+        )
+        rates.append(flux.species_kg_hr["Fe"])
+        sim._melt_headspace_composition_mbar = {
+            "Fe": partials["Fe"] / 100.0
+        }
+
+    assert all(rate > 0.0 for rate in rates)
+    assert max(rates) - min(rates) <= 1.0e-6
+
+
+def test_h99_k_same_tick_pressure_is_small_against_equilibrium():
+    sim = _same_tick_solver_fixture()
+    sim.melt.temperature_C = 1613.0 - 273.15
+    rate_kg_hr = 1.39e-5
+    flux = EvaporationFlux(
+        species_kg_hr={"K": rate_kg_hr},
+        total_kg_hr=rate_kg_hr,
+    )
+
+    partials = sim._same_tick_evaporation_headspace_partials_Pa(flux)
+    molar_rate_mol_s = rate_kg_hr / 3600.0 / (MOLAR_MASS["K"] / 1000.0)
+
+    assert molar_rate_mol_s == pytest.approx(1.0e-7, rel=0.2)
+    assert 1.0e-3 <= partials["K"] <= 1.0e-2
+    assert partials["K"] < 0.0196
 
 
 def test_uncommitted_evaporation_transition_is_removed_from_tick_flux(

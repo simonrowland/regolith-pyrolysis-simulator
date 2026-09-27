@@ -1278,30 +1278,27 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     assert not sim._last_evaporation_flux_diagnostic.get(
         "continuum_extrapolation_notice"
     )
-    # Recorded on parent 5672e61d9 by the non-binding fallback probe:
-    # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
+    # Same-tick duct transport rebaseline: the finite-capacity partials are
+    # reused by condensation, so channels suppressed by their physical
+    # backpressure are absent from the committed vapor map.
     expected_rates = {
-        "Al": 1.776974630811854e-10,
-        "AlO": 2.622990526227972e-10,
-        "Ca": 6.00143229355403e-09,
-        "CaO_gas": 2.067737447801073e-11,
-        "Cr": 4.355218555260955e-05,
-        "CrO": 9.136286575214732e-06,
-        "CrO2": 3.1730720722299763e-06,
-        "CrO3": 9.294384109563237e-10,
-        "K": 1.800514280546788e-04,
-        "K2": 3.548691772158388e-04,
-        "K2O_gas": 1.7790168157799174e-06,
-        "Mg": 7.232662096170072e-05,
-        "MgO_gas": 1.0307259466430575e-07,
-        "Mn": 2.2585292315558916e-05,
-        "Na": 4.821729121050779e-03,
-        "Na2": 3.507806687556492e-03,
-        "Na2O_gas": 3.4956534691172018e-06,
-        "SiO": 7.769179203709372e-09,
-        "SiO2_gas": 4.598894711291365e-06,
-        "TiO": 2.8635316467141483e-09,
-        "TiO2_gas": 4.788176871001818e-08,
+        "AlO2": 2.143585875533841e-11,
+        "CaO_gas": 2.2577755434146795e-11,
+        "CrO": 5.132850977988064e-09,
+        "CrO2": 5.170334723468988e-04,
+        "CrO3": 4.4565392212870376e-02,
+        "K": 3.74276683431972e-07,
+        "K2": 1.3598634000432232e-09,
+        "K2O_gas": 2.006067083688738e-06,
+        "Mg": 2.683943219427042e-10,
+        "MgO_gas": 1.1255291572060186e-07,
+        "Mn": 8.386507309776792e-11,
+        "Na": 1.133473071483502e-05,
+        "Na2": 1.52010943077418e-08,
+        "Na2O_gas": 4.457650024160285e-06,
+        "SiO": 6.811100915552663e-09,
+        "SiO2_gas": 5.021561852435548e-06,
+        "TiO2_gas": 5.228240451642386e-08,
     }
     actual_rates = {
         str(species): float(rate)
