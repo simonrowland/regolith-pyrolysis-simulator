@@ -1484,22 +1484,31 @@ class _ImccBatteryBackend:
         del pressure_bar
         if self._pack is None:
             raise RuntimeError("IMCC datapack failed to load")
-        composition_wt = {
-            str(name): float(mass_kg) * 100.0
-            for name, mass_kg in dict(composition_kg or {}).items()
-            if float(mass_kg) > 0.0
-        }
-        total = sum(composition_wt.values())
+        if composition_mol:
+            composition = {
+                str(name): float(amount)
+                for name, amount in composition_mol.items()
+                if float(amount) > 0.0
+            }
+            basis_type = "mol"
+        else:
+            composition = {
+                str(name): float(mass_kg) * 100.0
+                for name, mass_kg in dict(composition_kg or {}).items()
+                if float(mass_kg) > 0.0
+            }
+            basis_type = "wt"
+        total = sum(composition.values())
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         enable_sp = self.engine_name == "imcc_sf04_ext"
         from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
 
         result = evaluate_imcc(
-            composition_wt,
+            composition,
             temperature_K,
             self._pack,
             basis=total if total > 0.0 else None,
-            basis_type="wt",
+            basis_type=basis_type,
             enable_sp_extension=enable_sp,
             allow_extrapolation=True,
             allow_out_of_envelope=True,
@@ -1685,10 +1694,9 @@ class _OpenImccBatteryBackend:
             "allow_extrapolation": True,
             "allow_out_of_envelope": True,
         }
-        if composition_kg is not None:
-            # The battery's accepted hand ledger is wt%-based.  Keep this
-            # path aligned with the legacy adapter and the standalone hand
-            # calculation; the bridge normalizes absolute mass internally.
+        if composition_mol:
+            bridge_kwargs["composition_mol"] = composition_mol
+        elif composition_kg is not None:
             bridge_kwargs["composition_kg"] = composition_kg
         else:
             bridge_kwargs["composition_mol"] = composition_mol

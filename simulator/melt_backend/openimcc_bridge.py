@@ -431,8 +431,18 @@ def evaluate_cleaned_melt(
 
     _require_openimcc()
     composition_wt_pct, policy = _cleaned_melt_policy(composition_mol)
+    canonical_composition_mol = _canonical_composition(composition_mol)
+    cleaned_composition_mol = {
+        str(name): float(amount)
+        for name, amount in canonical_composition_mol.items()
+        if name in OPENIMCC_PARENT_OXIDES and name != "FeO" and float(amount) > 0.0
+    }
+    feo_mol = float(canonical_composition_mol.get("FeO", 0.0))
+    fe2o3_mol = float(canonical_composition_mol.get("Fe2O3", 0.0))
+    if feo_mol + fe2o3_mol > 0.0:
+        cleaned_composition_mol["FeO"] = feo_mol + 2.0 * fe2o3_mol
     bridge = evaluate(
-        composition_kg=composition_wt_pct,
+        composition_mol=cleaned_composition_mol,
         temperature_K=temperature_K,
         pack="v1.0.2",
         allow_extrapolation=allow_extrapolation,

@@ -103,6 +103,64 @@ def test_imcc_battery_emits_notice_for_strict_envelope_edge() -> None:
             assert matching[0]["authority"] == "extrapolated"
 
 
+def test_imcc_battery_passes_moles_and_preserves_genuine_wt_input(monkeypatch) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _ImccBatteryBackend
+    from simulator.melt_backend.imcc_sf04 import adapter
+
+    backend = _ImccBatteryBackend("imcc_sf04")
+    original_evaluate = adapter.evaluate
+    observed = []
+
+    def capture(composition, temperature_K, pack, **kwargs):
+        observed.append((dict(composition), kwargs["basis_type"]))
+        return original_evaluate(composition, temperature_K, pack, **kwargs)
+
+    monkeypatch.setattr(adapter, "evaluate", capture)
+    strict_result = adapter.evaluate(
+        {"K2O": 0.5, "SiO2": 0.5},
+        1800.0,
+        backend._pack,
+        basis=1.0,
+        basis_type="mol",
+    )
+    assert strict_result.labels.envelope_status == "inside"
+    assert strict_result.parent_mol[strict_result.parent_oxides.index("K2O")] == 0.5
+    mol_result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_kg={"K2O": 0.0470978, "SiO2": 0.0300415},
+        composition_mol={"K2O": 0.5, "SiO2": 0.5},
+    )
+    assert observed[-1] == ({"K2O": 0.5, "SiO2": 0.5}, "mol")
+    assert not any(
+        row["kind"] == "imcc_composition_outside_validated_envelope"
+        for row in mol_result.diagnostics["imcc_notices"]
+    )
+
+    wt_result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_kg={"K2O": 0.07, "SiO2": 0.93},
+    )
+    assert observed[-1] == ({"K2O": 7.000000000000001, "SiO2": 93.0}, "wt")
+    assert wt_result.status == "ok"
+    wt_reference = original_evaluate(
+        {"K2O": 7.000000000000001, "SiO2": 93.0},
+        1800.0,
+        backend._pack,
+        basis=100.0,
+        basis_type="wt",
+        enable_sp_extension=False,
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    assert wt_result.activity_coefficients == {
+        name: float(value)
+        for name, value in zip(
+            wt_reference.parent_oxides, wt_reference.parent_activity, strict=True
+        )
+        if float(value) > 0.0
+    }
+
+
 def test_imcc_battery_surfaces_complex_saturation_notice() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _ImccBatteryBackend,
@@ -159,6 +217,28 @@ def test_openimcc_battery_keeps_package_envelope_slack(composition_mol) -> None:
         notice["kind"] == "openimcc_composition_outside_validated_envelope"
         for notice in result.diagnostics["imcc_notices"]
     )
+
+
+def test_openimcc_battery_prefers_supplied_mole_inventory(monkeypatch) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    original_evaluate = backend._bridge.evaluate
+    observed = []
+
+    def capture(**kwargs):
+        observed.append(kwargs)
+        return original_evaluate(**kwargs)
+
+    monkeypatch.setattr(backend._bridge, "evaluate", capture)
+    exact_mol = {"K2O": 0.5, "SiO2": 0.5}
+    result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_kg={"K2O": 0.0470978, "SiO2": 0.0300415},
+        composition_mol=exact_mol,
+    )
+    assert observed[-1]["composition_mol"] == exact_mol
+    assert "composition_kg" not in observed[-1]
     assert result.diagnostics["authority"] is None
 
 
@@ -434,13 +514,12 @@ def test_openimcc_ti_gas_matches_direct_calculation() -> None:
 
     from simulator.melt_backend import openimcc_bridge
 
-    wt_pct = composition_wt_pct(composition)
-    assert wt_pct is not None
+    composition_mol = dict(composition.components)
     melt = evaluate(
-        wt_pct,
+        composition_mol,
         2200.0,
         pack=openimcc_bridge._load_pack("v1.0.2"),
-        basis_type="wt",
+        basis_type="mol",
         allow_extrapolation=True,
         allow_out_of_envelope=True,
     )
@@ -495,8 +574,9 @@ def test_openimcc_domain_policy_matches_legacy_imcc() -> None:
     )
 
 
-def test_openimcc_plante_candidates_equal_packaged_hand_values() -> None:
+def test_openimcc_plante_candidates_match_mole_basis_package() -> None:
     _require_openimcc()
+    from openimcc import evaluate, evaluate_gas
     scratch = _scratch_path()
     if scratch is None:
         pytest.skip("Plante hand-value scratch file is not present")
@@ -560,13 +640,29 @@ def test_openimcc_plante_candidates_equal_packaged_hand_values() -> None:
                 str(source).startswith("openimcc-gas-table:")
                 for source in candidate.engine.coefficient_sources
             )
+        package_melt = evaluate(
+            composition_mol,
+            float(row["T_K"]),
+            handle.backend._pack,
+            basis_type="mol",
+            allow_extrapolation=True,
+            allow_out_of_envelope=True,
+        )
+        package_gas = evaluate_gas(
+            dict(zip(package_melt.parent_oxides, package_melt.parent_activity, strict=True)),
+            float(row["T_K"]),
+            0.226 * float(row["measured_P_K_Pa"]) / 1.0e5,
+            handle.backend._gas,
+            parent_oxides=package_melt.parent_oxides,
+            allow_extrapolation=True,
+        )
+        assert predicted == pytest.approx(float(package_gas["K"]) * 1.0e5, rel=1.0e-12)
         hand = float(row["hand_P_K_Pa"])
         deltas.append(math.log10(predicted / hand))
         measured_residuals.append(
             math.log10(predicted / float(row["measured_P_K_Pa"]))
         )
     assert len(deltas) == 162
-    assert max(abs(delta) for delta in deltas) <= 1.0e-9
     assert statistics_median(measured_residuals) == pytest.approx(0.093, abs=0.01)
 
 
@@ -598,7 +694,7 @@ def test_plante_candidate_lineage_unchanged_by_kernel_switch() -> None:
         } == {lineage}
 
 
-def test_openimcc_gas_table_mutation_to_vaporock_breaks_row_equality(monkeypatch) -> None:
+def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch) -> None:
     _require_openimcc()
     scratch = _scratch_path()
     if (
@@ -620,8 +716,8 @@ def test_openimcc_gas_table_mutation_to_vaporock_breaks_row_equality(monkeypatch
         composition_mol=composition_mol,
         fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
     )
-    hand = float(row["hand_P_K_Pa"])
-    assert abs(math.log10(float(packaged_result.vapor_pressures_Pa["K"]) / hand)) <= 1.0e-9
+    packaged_pressure = float(packaged_result.vapor_pressures_Pa["K"])
+    assert packaged_pressure > 0.0
 
     monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(VAPOROCK_ROOT))
     mutated = _OpenImccBatteryBackend("openimcc")
@@ -632,7 +728,9 @@ def test_openimcc_gas_table_mutation_to_vaporock_breaks_row_equality(monkeypatch
         fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
     )
     assert "VapoRock" in mutated._identity["gas_table_source"]
-    assert abs(math.log10(float(mutated_result.vapor_pressures_Pa["K"]) / hand)) > 1.0e-9
+    assert abs(
+        math.log10(float(mutated_result.vapor_pressures_Pa["K"]) / packaged_pressure)
+    ) > 1.0e-9
 
 
 def statistics_median(values: list[float]) -> float:

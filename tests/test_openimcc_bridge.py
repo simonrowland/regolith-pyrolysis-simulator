@@ -121,11 +121,61 @@ def test_cleaned_melt_treats_zero_inventory_as_absent() -> None:
     assert "MgO" not in folded_wt_pct
 
 
+def test_cleaned_melt_passes_exact_parent_moles_to_openimcc(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.melt_backend.openimcc_bridge as bridge
+
+    original_evaluate = bridge.evaluate
+    observed = []
+
+    def capture(**kwargs):
+        observed.append(kwargs)
+        return original_evaluate(**kwargs)
+
+    monkeypatch.setattr(bridge, "evaluate", capture)
+    result = evaluate_cleaned_melt({"Na2O": 0.5, "SiO2": 0.5}, 1800.0)
+
+    assert observed[-1]["composition_mol"] == {"Na2O": 0.5, "SiO2": 0.5}
+    assert "composition_kg" not in observed[-1]
+    assert result.bridge.envelope_status == "inside"
+
+
 def test_cleaned_melt_omits_absent_parent_activity() -> None:
     result = evaluate_cleaned_melt({"SiO2": 1.0}, 2200.0)
 
     assert "SiO2" in result.single_cation_activities
     assert "Na2O" not in result.single_cation_activities
+
+
+@pytest.mark.parametrize(
+    ("composition_mol", "expected"),
+    (
+        ({"SiO2": 0.8, "FeO_total": 0.2}, {"SiO2": 0.8, "FeO": 0.2}),
+        (
+            {"SiO2": 0.8, "FeO": 0.1, "Fe2O3": 0.05},
+            {"SiO2": 0.8, "FeO": 0.2},
+        ),
+    ),
+)
+def test_cleaned_melt_preserves_feo_equivalent_moles(
+    monkeypatch: pytest.MonkeyPatch,
+    composition_mol: dict[str, float],
+    expected: dict[str, float],
+) -> None:
+    import simulator.melt_backend.openimcc_bridge as bridge
+
+    original_evaluate = bridge.evaluate
+    observed = []
+
+    def capture(**kwargs):
+        observed.append(kwargs)
+        return original_evaluate(**kwargs)
+
+    monkeypatch.setattr(bridge, "evaluate", capture)
+    evaluate_cleaned_melt(composition_mol, 2200.0)
+
+    assert observed[-1]["composition_mol"] == expected
 
 
 def test_cleaned_melt_refuses_missing_present_parent_activity(
