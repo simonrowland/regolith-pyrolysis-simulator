@@ -31,6 +31,8 @@ from simulator.battery.enums import (
     MethodToken,
     MetricOperation,
     NoticeKind,
+    PerBasis,
+    Phase,
     Quantity,
     Rail,
     RefusalReason,
@@ -45,6 +47,7 @@ from simulator.battery.pins import (
     pin_failures,
     tombstone_for_changed_identity,
 )
+from simulator.battery.identity import Exposure, SweepIdentity
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -332,6 +335,86 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
     assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
     assert "source-printed" in band.rule
     assert "pooled replicate" not in band.rule
+
+
+def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
+    exp = F.kems_experiment()
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        species=Species("Na", Phase.L),
+        subtype=State.of("langmuir_alpha"),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.not_applicable("alpha row does not carry activity standard state"),
+        reservoir=State.of(Species("Na", Phase.G)),
+        sweep_gas=State.of(
+            SweepIdentity(
+                species="N2",
+                flow_sccm=State.of(Decimal("1")),
+                partial_pressure_Pa=State.of(Decimal("1")),
+            )
+        ),
+        exposure=State.of(
+            Exposure(area_m2=State.of(Decimal("1")), duration_s=State.of(Decimal("1")))
+        ),
+    )
+    reference = F.observation(
+        "zhang-bound",
+        exp.experiment_id,
+        identity,
+        Decimal("1e-6"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="work-1",
+    )
+    reference = replace(
+        reference,
+        provenance={
+            "scoring": {
+                "kind": "implied_alpha_from_alpha_times_Gamma",
+                "oxide_formula": "Na2O",
+            }
+        },
+    )
+    ctx = _context(F.work(), exp, reference)
+
+    def predict(engine, observation, **_kwargs):
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:gamma"),
+            value=Decimal("1e-5"),
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("nasa-cea-thermo",),
+            lineage_complete=True,
+            identity=observation.identity,
+        )
+
+    residual, candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        predict=predict,
+    )
+    assert candidate is not None
+    assert residual.numeric is not None
+    assert residual.numeric.verdict == "consistent"
+    assert residual.numeric.value == Decimal("-1")
+    assert residual.status is ResidualStatus.MATCH
+
+    def impossible_predict(engine, observation, **_kwargs):
+        return replace(predict(engine, observation), value=Decimal("1e-7"))
+
+    impossible_residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        predict=impossible_predict,
+    )
+    assert impossible_residual.numeric is not None
+    assert impossible_residual.numeric.verdict == "physically_impossible"
+    assert impossible_residual.numeric.value == Decimal("1")
+    assert impossible_residual.status is ResidualStatus.MISMATCH
 
 
 def test_derived_oxygen_condition_notice_reaches_residual() -> None:

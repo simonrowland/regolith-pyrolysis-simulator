@@ -338,6 +338,8 @@ PHASE_MAP: dict[str, Phase] = {
     "glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
     "solid_arsenolite": Phase.CR,
+    "basaltic_silicate_melt": Phase.L,
+    "silicate_melt_ferrobasalt_FCMAS": Phase.L,
     # Published parenthetical spellings (Kelley / Pankratz tables).
     "(g)": Phase.G,
     "(c)": Phase.CR,
@@ -349,6 +351,7 @@ TYPE_QUANTITY = {
     "gibbs_table": Quantity.DELTA_FG,
     "activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
     "alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+    "log10_K_star": Quantity.LOG10_K_STAR,
     "rate_series": Quantity.MASS_LOSS_RATE,
     "transition_point": Quantity.TRANSITION_TEMPERATURE,
 }
@@ -388,6 +391,7 @@ QUANTITY_ALIASES = {
     "delta_f_H": Quantity.DELTA_FH,
     "log10_Kf": Quantity.LOG10_KF,
     "log10_kf": Quantity.LOG10_KF,
+    "log10_K_star_equilibrium_fit": Quantity.LOG10_K_STAR,
     "activity": Quantity.ACTIVITY,
     "raoultian_activity": Quantity.ACTIVITY,
     "activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
@@ -398,6 +402,7 @@ QUANTITY_ALIASES = {
     "literature_vaporization_coefficient": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "evaporation_coefficient_alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+    "evaporation_coefficient_gamma_equals_alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "evaporation_coefficient_gamma_Si": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "o2_yield": Quantity.O2_YIELD,
     "mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
@@ -471,6 +476,7 @@ REGIME_TO_METHOD = {
     "knudsen_effusion": MethodToken.KNUDSEN_EFFUSION,
     "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
     "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
+    "open_furnace_apparent": MethodToken.LANGMUIR_FREE_EVAPORATION,
     "transpiration": MethodToken.TRANSPIRATION,
     "tga": MethodToken.TGA,
     "dta_dsc": MethodToken.DTA_DSC,
@@ -6088,7 +6094,7 @@ _PARTIAL_PRESSURE_FIELDS = ("partial_pressure_pa", "p_Ga_Pa", "p_In_Pa", "p_O2_c
 QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
     Quantity.ACTIVITY: ("activity",),
     Quantity.ACTIVITY_COEFFICIENT: ("gamma", "activity_coefficient"),
-    Quantity.EVAPORATION_COEFFICIENT_ALPHA: ("alpha",),
+    Quantity.EVAPORATION_COEFFICIENT_ALPHA: ("alpha", "alpha_times_Gamma"),
     Quantity.CP: (
         "cp",
         "heat_capacity",
@@ -6142,6 +6148,10 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "log10_kf",
         "log_k",
         "log10_formation_equilibrium_constant",
+        "value",
+    ),
+    Quantity.LOG10_K_STAR: (
+        "log10_K_star",
         "value",
     ),
     Quantity.P_SAT: tuple(k for k, _u in _PRESSURE_SERIES_KEYS) + ("P", "p"),
