@@ -5465,6 +5465,18 @@ species:
         note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
+        inference:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
+        derivation:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
         gas_species: Na(g)
         melt_component: NaO0.5
         reaction: NaO0.5(l) = Na(g) + 1/4 O2
@@ -5621,6 +5633,13 @@ species:
       values:
         gamma: 0.001
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        inference:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
         oxide_formula_as_published: NaO0.5
         gas_species: Na(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -5629,6 +5648,10 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -5758,11 +5781,25 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
       values:
         quantity: log10_K_star_equilibrium_fit
+        admission_status: admitted
+        derived_from:
+        - tables:kems-012-sossi-2019
+        inference:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
+        derivation:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
         evidence_class: model
         method_class: model_derived
         reaction: NaO0.5(l) = Na(g) + ¼O2
         n_electrons: 1
         t0_min: 0.0
+        log10_K_star: -4.25
         log10_K_star_by_T_K:
           1673.15:
             log10_K_star: -4.25
@@ -5873,8 +5910,22 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
       values:
         quantity: activity_coefficient_this_work
+        admission_status: admitted
+        derived_from:
+        - tables:kems-012-sossi-2019
+        inference:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
         evidence_class: model
         method_class: model_derived
+        gamma: 0.001
         per_temperature_by_channel:
           NaO0.5:
           - T_K: 1673.15
@@ -6012,6 +6063,13 @@ species:
         note: Table 3 SD; authors also note K* accuracy harder to quantify than precision (~±5–30%)
       values:
         quantity: log10_K_star_equilibrium_fit
+        derived_from:
+        - tables:kems-012-sossi-2019
+        inference:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
         gas_species: K(g)
         reaction: KO0.5(l) = K(g) + 1/4 O2
         n_electrons: 1
@@ -6023,6 +6081,10 @@ species:
         material: ferrobasalt_FCMAS_open_furnace
         derived: true
         derivation:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
           premise: authors nonlinear-least-squares fit of residue X_i^t/X_i^0 vs t and fO2 to eq. 8
           algebra: K* is the fitted mass-action constant; not inverted to alpha here
           unit_check: log10 K* as published, bar-based
@@ -6093,6 +6155,13 @@ species:
       values:
         gamma: 0.00022
         quantity: activity_coefficient_this_work
+        derived_from:
+        - tables:kems-012-sossi-2019
+        inference:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
         oxide_formula_as_published: KO0.5
         gas_species: K(g)
         material: ferrobasalt_FCMAS_open_furnace
@@ -6101,6 +6170,10 @@ species:
         derived: true
         not_a_measured_alpha: true
         derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
           premise: OCR §4.6 line 306 — evaporation coefficients close to unity within ×2–3; α_e set to 1
           algebra: γ_i^∞ = K*_i / (α_e · K_i) with α_e = 1 (eq. 6)
           unit_check: K* and K share the bar-based mass-action standard; γ dimensionless
@@ -6277,11 +6350,25 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml
       values:
         quantity: log10_K_star_equilibrium_fit
+        admission_status: admitted
+        derived_from:
+        - tables:kems-012-sossi-2019
+        inference:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
+        derivation:
+          relation: nonlinear_least_squares_K_star_fit
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: log10_dimensionless
         evidence_class: model
         method_class: model_derived
         reaction: KO0.5(l) = K(g) + ¼O2
         n_electrons: 1
         t0_min: 0.0
+        log10_K_star: -3.95
         log10_K_star_by_T_K:
           1673.15:
             log10_K_star: -3.95
@@ -6324,8 +6411,22 @@ species:
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
       values:
         quantity: activity_coefficient_this_work
+        admission_status: admitted
+        derived_from:
+        - tables:kems-012-sossi-2019
+        inference:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
         evidence_class: model
         method_class: model_derived
+        gamma: 0.00022
         per_temperature_by_channel:
           KO0.5:
           - T_K: 1673.15

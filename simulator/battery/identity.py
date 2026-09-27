@@ -82,6 +82,7 @@ from typing import Any
 
 from simulator.battery.enums import (
     CONDENSED_PHASES,
+    EQUILIBRIUM_FIT_QUANTITIES,
     EXTENSIVE_YIELD_QUANTITIES,
     FORMATION_QUANTITIES,
     KINETIC_YIELD_QUANTITIES,
@@ -428,6 +429,24 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "reservoir",
             "reference_state",
             "total_pressure_Pa",
+            "subtype",
+        )
+    elif q in EQUILIBRIUM_FIT_QUANTITIES:
+        req("temperature_K")
+        na(
+            "per",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+            "reservoir",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
             "subtype",
         )
     elif q in PURE_STANDARD_THERMO:

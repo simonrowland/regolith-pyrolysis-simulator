@@ -24,6 +24,7 @@ from fractions import Fraction
 from typing import Callable, Mapping, Sequence
 
 from simulator.battery.enums import (
+    EQUILIBRIUM_FIT_QUANTITIES,
     FORMATION_QUANTITIES,
     PURE_STANDARD_THERMO,
     QUANTITY_UNITS,
@@ -87,7 +88,7 @@ _TE_FORMULA: dict[str, str] = {
     "Sil": "Al2SiO5",
 }
 
-_THERMO_QUANTITIES = FORMATION_QUANTITIES | PURE_STANDARD_THERMO
+_THERMO_QUANTITIES = FORMATION_QUANTITIES | EQUILIBRIUM_FIT_QUANTITIES | PURE_STANDARD_THERMO
 _H298_K = 298.15
 _PA_PER_BAR = Decimal("100000")
 

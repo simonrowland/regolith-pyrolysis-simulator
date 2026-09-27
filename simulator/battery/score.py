@@ -26,6 +26,7 @@ from simulator.battery.enums import (
     AdmissionStatus,
     Authority,
     CONDENSED_PHASES,
+    EQUILIBRIUM_FIT_QUANTITIES,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -36,9 +37,11 @@ from simulator.battery.enums import (
     MetricOperation,
     MethodToken,
     NoticeKind,
+    PerBasis,
     Phase,
     PURE_STANDARD_THERMO,
     Quantity,
+    ReferenceStateConvention,
     Rail,
     RefusalReason,
     ResidualStatus,
@@ -81,6 +84,8 @@ from simulator.battery.records import (
     Work,
     as_decimal,
     phase_token,
+    Species,
+    StandardState,
     union_notices,
 )
 from simulator.battery.source_lineage import coefficient_lineage_sources
@@ -192,6 +197,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.CP: MetricOperation.ABSOLUTE,
     Quantity.S: MetricOperation.ABSOLUTE,
     Quantity.LOG10_KF: MetricOperation.ABSOLUTE,
+    Quantity.LOG10_K_STAR: MetricOperation.ABSOLUTE,
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: MetricOperation.ABSOLUTE,
     Quantity.MASS_LOSS_FRACTION: MetricOperation.RELATIVE,
     Quantity.MASS_LOSS_FRACTION_VS_T: MetricOperation.RELATIVE,
@@ -342,6 +348,7 @@ class EnginePrediction:
     execution: Execution
     value: Decimal | None = None
     unit: str | None = None
+    coefficient_basis: str | None = None
     authority: Authority | None = None
     notices: tuple[Notice, ...] = ()
     coefficient_sources: tuple[str, ...] = ()
@@ -502,7 +509,12 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         return Rail.VAPOUR
     if quantity in MELT_ACTIVITY_QUANTITIES:
         return Rail.MELT_ACTIVITY
-    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO or quantity in VAPORIZATION_ENTHALPIES:
+    if (
+        quantity in FORMATION_QUANTITIES
+        or quantity in EQUILIBRIUM_FIT_QUANTITIES
+        or quantity in PURE_STANDARD_THERMO
+        or quantity in VAPORIZATION_ENTHALPIES
+    ):
         return Rail.THERMOCHEMISTRY
     if quantity is Quantity.WALL_DEPOSIT_MASS:
         return Rail.WALL_DEPOSITION
@@ -1640,6 +1652,134 @@ def total_pressure_bar_for_score(
     return float(_DEFAULT_PRESSURE_BAR), notice, None
 
 
+_IMPLIED_ALPHA_SCORING_KIND = "implied_alpha_from_alpha_times_Gamma"
+_IMPLIED_ALPHA_LOW = Decimal("0.07")
+_IMPLIED_ALPHA_HIGH = Decimal("0.3")
+SINGLE_CATION_COEFFICIENT_BASIS = "single_cation"
+_IMPLIED_ALPHA_SINGLE_CATION_FORMULAS = {
+    "Na2O": "NaO0.5",
+    "K2O": "KO0.5",
+}
+
+
+def _implied_alpha_metadata(observation: Observation) -> Mapping[str, object] | None:
+    provenance = observation.provenance
+    scoring = provenance.get("scoring") if isinstance(provenance, Mapping) else None
+    if not isinstance(scoring, Mapping):
+        return None
+    if scoring.get("kind") != _IMPLIED_ALPHA_SCORING_KIND:
+        return None
+    oxide = scoring.get("oxide_formula")
+    if not isinstance(oxide, str) or not oxide:
+        return None
+    return scoring
+
+
+def _implied_alpha_activity_observation(observation: Observation) -> Observation | None:
+    """Build the engine-facing activity identity for a Zhang bound row.
+
+    The source identity stays an evaporation-alpha row.  Only the derived
+    engine request uses the reported single-cation activity coefficient; the
+    measured endpoint remains the printed alpha·Gamma product.
+    """
+
+    metadata = _implied_alpha_metadata(observation)
+    if metadata is None or not isinstance(observation.identity, Identity):
+        return None
+    oxide = str(metadata["oxide_formula"])
+    coefficient_formula = _IMPLIED_ALPHA_SINGLE_CATION_FORMULAS.get(oxide, oxide)
+    identity = observation.identity
+    activity_identity = replace(
+        identity,
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        species=replace(identity.species, formula=coefficient_formula),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.of(
+            StandardState(
+                convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+                endmember=Species(coefficient_formula, Phase.L),
+                component_basis=coefficient_formula,
+            )
+        ),
+        standard_pressure_Pa=State.not_applicable("melt activity coefficient uses its reference state"),
+        reaction=State.not_applicable("melt activity coefficient has no reaction axis"),
+        formation_elements=State.not_applicable("melt activity coefficient has no formation-elements axis"),
+        reservoir=State.not_applicable("melt activity coefficient has no gas reservoir axis"),
+        sweep_gas=State.not_applicable("melt activity coefficient has no sweep-gas axis"),
+        exposure=State.not_applicable("melt activity coefficient has no exposure axis"),
+        sample_mass_kg=State.not_applicable("melt activity coefficient has no sample-mass axis"),
+        wall=State.not_applicable("melt activity coefficient has no wall axis"),
+        subtype=State.not_applicable("melt activity coefficient has no subtype axis"),
+    )
+    return replace(observation, identity=activity_identity, provenance=None)
+
+
+def _implied_alpha_coefficient_basis_matches(
+    expected: Observation,
+    prediction: EnginePrediction,
+) -> bool:
+    if prediction.coefficient_basis != SINGLE_CATION_COEFFICIENT_BASIS:
+        return False
+    expected_identity = expected.identity
+    actual_identity = prediction.identity
+    if not isinstance(expected_identity, Identity) or not isinstance(
+        actual_identity, Identity
+    ):
+        return False
+    if actual_identity.species.formula != expected_identity.species.formula:
+        return False
+    expected_state = expected_identity.reference_state
+    actual_state = actual_identity.reference_state
+    if (
+        expected_state is None
+        or not expected_state.is_value
+        or not isinstance(expected_state.value, StandardState)
+        or actual_state is None
+        or not actual_state.is_value
+        or not isinstance(actual_state.value, StandardState)
+    ):
+        return False
+    expected_standard = expected_state.value
+    actual_standard = actual_state.value
+    return (
+        actual_standard.convention is expected_standard.convention
+        and actual_standard.endmember.formula == expected_standard.endmember.formula
+        and phase_token(actual_standard.endmember)
+        is phase_token(expected_standard.endmember)
+        and actual_standard.component_basis == expected_standard.component_basis
+    )
+
+
+def _implied_alpha_verdict(value: Decimal) -> str:
+    if value > Decimal("1"):
+        return "physically_impossible"
+    if value < _IMPLIED_ALPHA_LOW or value > _IMPLIED_ALPHA_HIGH:
+        return "outside_literature_band"
+    return "consistent"
+
+
+def _implied_alpha_numeric(
+    value: Decimal,
+) -> tuple[ResidualNumeric | None, RefusalReason | None, dict[str, object]]:
+    if not value.is_finite() or value <= 0:
+        return None, RefusalReason.METRIC_DOMAIN, {
+            "reason": "implied_alpha_nonpositive_or_nonfinite",
+            "implied_alpha": str(value),
+        }
+    dex = Decimal(str(math.log10(float(value))))
+    return (
+        ResidualNumeric(
+            operation=MetricOperation.DEX,
+            unit="dimensionless",
+            value=dex,
+            decision_band=None,
+            verdict=_implied_alpha_verdict(value),
+        ),
+        None,
+        {},
+    )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -1703,6 +1843,21 @@ def predict_with_engine(
             refusal_detail={
                 "reason": "imcc_built_on_sf04_workbook",
                 "source_id": observation.source_id,
+            },
+            identity=identity,
+        )
+
+    if quantity in EQUILIBRIUM_FIT_QUANTITIES:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "unsupported_observable:logKstar_not_activity_coefficient",
+                "quantity": quantity.value,
             },
             identity=identity,
         )
@@ -2338,10 +2493,12 @@ def compile_residual(
     origin = context.origins.get(reference.observation_id)
     review_status = context.extract_review.get(reference.source_id or "")
     experiment = context.experiments.get(reference.experiment_id)
+    implied_alpha_reference = _implied_alpha_activity_observation(reference)
+    gate_reference = implied_alpha_reference or reference
     if experiment is not None:
         gates = run_validity_gates(
             experiment,
-            reference,
+            gate_reference,
             tables=_gate_tables(reference, context.observations, table_index),
         )
     else:
@@ -2450,7 +2607,12 @@ def compile_residual(
 
     if prediction is None:
         predictor = predict or predict_with_engine
-        prediction = predictor(engine, reference, handles=handles, experiment=experiment)
+        prediction = predictor(
+            engine,
+            implied_alpha_reference or reference,
+            handles=handles,
+            experiment=experiment,
+        )
 
     notices = union_notices(notices, prediction.notices)
     expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)
@@ -2533,6 +2695,53 @@ def compile_residual(
             source_relation=source_relation,
         )
 
+    implied_alpha = implied_alpha_reference is not None
+    if implied_alpha:
+        if not _implied_alpha_coefficient_basis_matches(
+            implied_alpha_reference, prediction
+        ):
+            return _refused(
+                RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+                {
+                    "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                    "expected_basis": SINGLE_CATION_COEFFICIENT_BASIS,
+                    "reported_basis": prediction.coefficient_basis,
+                    "expected_formula": (
+                        implied_alpha_reference.identity.species.formula
+                    ),
+                    "reported_formula": (
+                        prediction.identity.species.formula
+                        if isinstance(prediction.identity, Identity)
+                        else None
+                    ),
+                },
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+                source_relation=source_relation,
+                exclusions=("coefficient_basis_match",),
+            )
+        measured_product = point_magnitude(reference.value)
+        assert measured_product is not None
+        if prediction.value <= 0 or not prediction.value.is_finite():
+            return _refused(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "predicted_activity_coefficient_nonpositive_or_nonfinite",
+                    "predicted_gamma": str(prediction.value),
+                },
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+                source_relation=source_relation,
+                exclusions=("valid_metric_domain",),
+            )
+        implied_value = measured_product / prediction.value
+        prediction = replace(
+            prediction,
+            value=implied_value,
+            unit="dimensionless",
+            identity=reference.identity,
+        )
+
     candidate = candidate_observation(reference, prediction)
     equal = identity_equal(reference.identity, candidate.identity)
     if equal.kind is not IdentityEqualKind.EQUAL:
@@ -2555,26 +2764,29 @@ def compile_residual(
 
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
-    numeric, metric_reason, metric_detail = populate_numeric(
-        quantity=quantity,
-        candidate=prediction.value,
-        reference=ref_point,
-        source_relation=source_relation,
-        metric_uncertainty=(
-            reference.uncertainty
-            if reference.uncertainty.kind is UncertaintyKind.PRINTED
-            else None
-        ),
-        rail=rail,
-        method=(
-            experiment.method.value
-            if experiment is not None and experiment.method.is_value
-            else None
-        ),
-        observations=context.observations,
-        experiments=context.experiments,
-        derived_band=derived_band,
-    )
+    if implied_alpha:
+        numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
+    else:
+        numeric, metric_reason, metric_detail = populate_numeric(
+            quantity=quantity,
+            candidate=prediction.value,
+            reference=ref_point,
+            source_relation=source_relation,
+            metric_uncertainty=(
+                reference.uncertainty
+                if reference.uncertainty.kind is UncertaintyKind.PRINTED
+                else None
+            ),
+            rail=rail,
+            method=(
+                experiment.method.value
+                if experiment is not None and experiment.method.is_value
+                else None
+            ),
+            observations=context.observations,
+            experiments=context.experiments,
+            derived_band=derived_band,
+        )
     if numeric is None:
         return _refused(
             metric_reason or RefusalReason.METRIC_DOMAIN,
@@ -2585,7 +2797,14 @@ def compile_residual(
             source_relation=source_relation,
             exclusions=("valid_metric_domain",),
         )
-    status = match_status(numeric)
+    if implied_alpha:
+        status = {
+            "physically_impossible": ResidualStatus.MISMATCH,
+            "outside_literature_band": ResidualStatus.NO_BAND,
+            "consistent": ResidualStatus.MATCH,
+        }[numeric.verdict or "consistent"]
+    else:
+        status = match_status(numeric)
     conjuncts = build_conjuncts(
         status=status,
         reference=reference,
