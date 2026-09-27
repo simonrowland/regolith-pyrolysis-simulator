@@ -1192,6 +1192,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity_temperature_K: float | None = None
         self._last_high_t_melt_activity: Dict[str, Any] = {}
+        self._high_t_melt_activity_latched_fallback: Dict[str, Any] | None = None
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_target_inventory_diagnostic: Dict[str, Any] = {}
         self._target_inventory_by_hour: list[Dict[str, Any]] = []
@@ -1580,6 +1581,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_imcc_activity_shadow = {}
         self._last_high_t_melt_activity_temperature_K = None
         self._last_high_t_melt_activity = {}
+        self._high_t_melt_activity_latched_fallback = None
         self._last_target_inventory_diagnostic = {}
         self._target_inventory_by_hour = []
         self._target_inventory_depletion_hour = None
@@ -11031,6 +11033,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     <= VAPOROCK_T_MAX_K
                 ),
             }
+            latched_fallback = getattr(
+                self, '_high_t_melt_activity_latched_fallback', None
+            )
+            if isinstance(latched_fallback, Mapping):
+                high_t_control_inputs[
+                    'high_t_melt_activity_latched_fallback'
+                ] = dict(latched_fallback)
         kernel_result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
             control_inputs={
@@ -11049,9 +11058,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
-        self._last_high_t_melt_activity = dict(
-            diagnostic.get("high_t_melt_activity") or {}
-        )
+        high_t_activity = dict(diagnostic.get("high_t_melt_activity") or {})
+        if (
+            self._high_t_melt_activity == 'openimcc'
+            and high_t_activity.get('provider') == 'constant_gamma'
+            and high_t_activity.get('fallback') is True
+        ):
+            latched_fallback = getattr(
+                self, '_high_t_melt_activity_latched_fallback', None
+            )
+            if not isinstance(latched_fallback, Mapping):
+                latched_fallback = {
+                    'fallback_reason': dict(
+                        high_t_activity.get('fallback_reason') or {}
+                    ),
+                    'composition_projection_classification': dict(
+                        high_t_activity.get(
+                            'composition_projection_classification'
+                        )
+                        or {}
+                    ),
+                    'first_failure_temperature_K': T_C + 273.15,
+                }
+                self._high_t_melt_activity_latched_fallback = (
+                    latched_fallback
+                )
+            continuity = dict(high_t_activity.get('continuity') or {})
+            continuity.update(
+                {
+                    'latched': True,
+                    'first_failure_temperature_K': float(
+                        latched_fallback.get(
+                            'first_failure_temperature_K', T_C + 273.15
+                        )
+                    ),
+                }
+            )
+            high_t_activity['continuity'] = continuity
+            notices = [
+                dict(notice)
+                for notice in high_t_activity.get('notices', ())
+                if isinstance(notice, Mapping)
+            ]
+            for notice in notices:
+                notice['latched'] = True
+            high_t_activity['notices'] = notices
+            diagnostic['high_t_melt_activity'] = high_t_activity
+        self._last_high_t_melt_activity = high_t_activity
         diagnostic['backend_vapor_pressures_source'] = dict(backend_sources)
         diagnostic['backend_vapor_pressures_Pa'] = dict(backend_vp)
         diagnostic.update(regime_diagnostic)

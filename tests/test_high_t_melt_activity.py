@@ -29,7 +29,7 @@ from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
 )
 import simulator.melt_backend.imcc_sf04.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
-from simulator.runner import PyrolysisRun
+from simulator.runner import PyrolysisRun, build_per_hour_summary
 
 
 pytest.importorskip("openimcc")
@@ -56,6 +56,34 @@ def _provider() -> BuiltinVaporPressureProvider:
         return BuiltinVaporPressureProvider(yaml.safe_load(handle) or {})
 
 
+def _simulator_refresh_case() -> tuple[PyrolysisSimulator, SimpleNamespace]:
+    with (DATA_DIR / "feedstocks.yaml").open() as handle:
+        feedstocks = yaml.safe_load(handle) or {}
+    with (DATA_DIR / "setpoints.yaml").open() as handle:
+        setpoints = yaml.safe_load(handle) or {}
+    with (DATA_DIR / "vapor_pressures.yaml").open() as handle:
+        vapor_pressures = yaml.safe_load(handle) or {}
+    kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
+    kernel_config.update(
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    setpoints["chemistry_kernel"] = kernel_config
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.melt.temperature_C = 1800.0
+    result = SimpleNamespace(
+        vapor_pressures_Pa={},
+        vapor_pressures_source={},
+        liquid_fraction=1.0,
+        fO2_log=sim.melt.fO2_log,
+        activity_coefficients={},
+    )
+    return sim, result
+
+
 def _request(
     composition_mol: dict[str, float],
     temperature_K: float,
@@ -66,6 +94,7 @@ def _request(
 ) -> IntentRequest:
     controls: dict[str, object] = {
         "pO2_bar": 1.0e-9,
+        "interface_pO2_bar": 1.0e-9,
         "intrinsic_fO2_log": -10.0,
     }
     if high_t_melt_activity is not None:
@@ -379,36 +408,57 @@ def test_recipe_default_and_constant_gamma_escape_are_threaded() -> None:
 
 
 def test_simulator_default_passes_openimcc_authority_into_flux_dispatch() -> None:
-    with (DATA_DIR / "feedstocks.yaml").open() as handle:
-        feedstocks = yaml.safe_load(handle) or {}
-    with (DATA_DIR / "setpoints.yaml").open() as handle:
-        setpoints = yaml.safe_load(handle) or {}
-    with (DATA_DIR / "vapor_pressures.yaml").open() as handle:
-        vapor_pressures = yaml.safe_load(handle) or {}
-    kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
-    kernel_config.update(
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-    )
-    setpoints["chemistry_kernel"] = kernel_config
-    backend = InternalAnalyticalBackend()
-    backend.initialize({})
-    sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
-    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
-    sim.melt.temperature_C = 1800.0
-    result = SimpleNamespace(
-        vapor_pressures_Pa={},
-        vapor_pressures_source={},
-        liquid_fraction=1.0,
-        fO2_log=sim.melt.fO2_log,
-        activity_coefficients={},
-    )
+    sim, result = _simulator_refresh_case()
 
     sim._refresh_vapor_pressures_from_kernel(result)
 
     assert sim._high_t_melt_activity == "openimcc"
     assert sim._last_high_t_melt_activity["provider"] == "openimcc"
     assert sim._last_vapor_pressures_source
+
+
+def test_openimcc_failure_latches_fallback_and_notice_across_hours(monkeypatch):
+    sim, result = _simulator_refresh_case()
+    bridge_calls: list[float] = []
+
+    def refuse_openimcc(*args, **kwargs):
+        bridge_calls.append(float(kwargs["temperature_K"]))
+        raise OpenImccCompositionPolicyRefusal(
+            "imcc_nonconvergence",
+            "residual_inf=2.5e-12 after continuation",
+        )
+
+    monkeypatch.setattr(
+        openimcc_bridge_module,
+        "evaluate_cleaned_melt",
+        refuse_openimcc,
+    )
+
+    sim._refresh_vapor_pressures_from_kernel(result)
+    first = sim._last_high_t_melt_activity
+    assert first["provider"] == "constant_gamma"
+    assert first["fallback"] is True
+    assert first["fallback_reason"]["code"] == "imcc_nonconvergence"
+    assert first["continuity"]["latched"] is True
+    assert first["notices"][0]["status"] == "out_of_domain"
+    assert first["notices"][0]["authority_level"] == "fallback"
+    assert (
+        sim._last_vapor_pressure_diagnostic["high_t_melt_activity"]["notices"]
+    )
+
+    sim.melt.temperature_C = 1807.5
+    sim._refresh_vapor_pressures_from_kernel(result)
+    second = sim._last_high_t_melt_activity
+    assert second["provider"] == "constant_gamma"
+    assert second["fallback"] is True
+    assert second["continuity"]["latched"] is True
+    assert second["notices"][0]["status"] == "out_of_domain"
+    assert "latched" in second["notices"][0]["message"]
+    assert len(bridge_calls) == 1
+    report_hour = build_per_hour_summary(sim, sim._make_snapshot())
+    assert report_hour["high_t_melt_activity"]["notices"][0]["status"] == (
+        "out_of_domain"
+    )
 
 
 def test_constant_gamma_reproduces_pre_c3_physics_above_cap() -> None:
@@ -644,7 +694,11 @@ request = IntentRequest(
     ),
     temperature_C=1800.0,
     pressure_bar=1e-6,
-    control_inputs={"pO2_bar": 1e-9, "high_t_melt_activity": "openimcc"},
+    control_inputs={
+        "pO2_bar": 1e-9,
+        "interface_pO2_bar": 1e-9,
+        "high_t_melt_activity": "openimcc",
+    },
 )
 result = provider.dispatch(request)
 high_t = result.diagnostic["high_t_melt_activity"]
