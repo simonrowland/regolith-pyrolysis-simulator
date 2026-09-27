@@ -12,7 +12,9 @@ import pytest
 from simulator.melt_backend.imcc_sf04 import evaluate as vendored_evaluate
 from simulator.melt_backend.imcc_sf04 import load_datapack as vendored_load_datapack
 from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
+    OpenImccCompositionPolicyRefusal,
     OpenImccUnavailableError,
+    _cleaned_melt_wt_pct,
     evaluate as bridge_evaluate,
 )
 
@@ -90,6 +92,29 @@ def _openimcc_or_skip():
             "checkout's src/ directory on PYTHONPATH before running the parity check"
         ),
     )
+
+
+@pytest.mark.parametrize(
+    "invalid_inventory",
+    (-1.0, float("nan"), float("inf"), True, "1.0"),
+)
+def test_cleaned_melt_rejects_invalid_inventory(invalid_inventory) -> None:
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        _cleaned_melt_wt_pct({"SiO2": 1.0, "MgO": invalid_inventory})
+
+    refusal = exc_info.value
+    assert refusal.code == "openimcc_composition_invalid_input"
+    assert "MgO" in str(refusal)
+    assert repr(invalid_inventory) in str(refusal)
+
+
+def test_cleaned_melt_treats_zero_inventory_as_absent() -> None:
+    source_wt_pct, folded_wt_pct, _ = _cleaned_melt_wt_pct(
+        {"SiO2": 1.0, "MgO": 0.0}
+    )
+
+    assert "MgO" not in source_wt_pct
+    assert "MgO" not in folded_wt_pct
 
 
 def test_missing_openimcc_is_a_typed_refusal(monkeypatch: pytest.MonkeyPatch) -> None:

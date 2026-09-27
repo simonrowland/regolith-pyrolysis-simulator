@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from importlib import resources
 import math
+import numbers
 from types import MappingProxyType
 from typing import Any
 
@@ -188,12 +189,43 @@ def _cleaned_melt_wt_pct(
     source_mass_kg: dict[str, float] = {}
     for raw_name, raw_mol in canonical.items():
         name = str(raw_name)
+        if not isinstance(raw_mol, numbers.Real) or isinstance(raw_mol, bool):
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_invalid_input",
+                (
+                    f"invalid mole inventory for {name!r}: "
+                    f"value={raw_mol!r}; expected a real numeric value"
+                ),
+            )
+        if raw_mol < 0.0:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_invalid_input",
+                (
+                    f"invalid mole inventory for {name!r}: "
+                    f"value={raw_mol!r}; inventory must be non-negative"
+                ),
+            )
         try:
             mol = float(raw_mol)
-            if not math.isfinite(mol) or mol < 0.0:
-                if not math.isfinite(mol):
-                    raise ValueError("mole inventory must be finite")
-                continue
+        except (OverflowError, TypeError, ValueError) as exc:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_invalid_input",
+                (
+                    f"invalid mole inventory for {name!r}: "
+                    f"value={raw_mol!r}; cannot convert to float"
+                ),
+            ) from exc
+        if not math.isfinite(mol):
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_invalid_input",
+                (
+                    f"invalid mole inventory for {name!r}: "
+                    f"value={raw_mol!r}; inventory must be finite"
+                ),
+            )
+        if mol == 0.0:
+            continue
+        try:
             mass_kg = mol * resolve_species_formula(name).molar_mass_kg_per_mol()
         except Exception as exc:  # noqa: BLE001 - policy turns this into a typed refusal
             raise OpenImccCompositionPolicyRefusal(
