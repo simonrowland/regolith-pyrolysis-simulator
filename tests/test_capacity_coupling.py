@@ -1187,12 +1187,15 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # 2026-09-26 b603 same-tick duct pressure: the finite-headspace
         # fixed point suppresses the high-flux P channels at their physical
         # duct backpressure instead of reusing a prior-hour projection.
+        # 2026-09-27 Studio regeneration: the b-603 same-tick backpressure
+        # update moves the total, transport, and melt-mass pins below; the
+        # non-P flux pin above is unchanged.
         (
             1,
             1550.0,
-            3.991390002927084,
-            420988.5318854956,
-            826.2536424865747,
+            3.991224711311173,
+            420964.78778095124,
+            826.2538064965702,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

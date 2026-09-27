@@ -1576,7 +1576,10 @@ def test_runner_golden_fixture_matches(scenario):
     # (floor_fallback engaged, no_melt_redox_capacity). Mechanism signature
     # after repair: melt_redox_gate_floor_fallback_engagement = {engaged:
     # false, total_count: 0}. ci_carbonaceous_chondrite_C2B_12h.json was
-    # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
+    # unchanged in that earlier regen. 2026-09-27 Studio regeneration moves
+    # all three scenarios: t-992 ideal-train output, b-588 interface/headspace
+    # pressures, and b-599 parent-basis carrier pressures.
+    # docs-private/research/2026-08-02-train13-adjudication.md
     fixture_path = FIXTURES_DIR / scenario["fixture"]
     expected = json.loads(fixture_path.read_text())
     actual = _run_scenario(scenario)

@@ -296,9 +296,12 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # by the b-324 stage rebooking. Values and stale-snapshot deltas are:
 # lunar 1.04099243606e-05 -> 1.04097913286e-05 kg (-1.33032e-10 kg),
 # mars 1.05357832376e-05 -> 1.04873763032e-05 kg (-4.84069344e-08 kg).
+# 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves the
+# executable C2A yield fixtures. Lunar 1.04097913286e-05 -> 1.80287974292e-05
+# kg; Mars 1.04873763032e-05 -> 2.09022274351e-05 kg.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.04097913286e-05,
-    "mars_basalt": 1.04873763032e-05,
+    "lunar_mare_low_ti": 1.80287974292e-05,
+    "mars_basalt": 2.09022274351e-05,
 }
 
 
@@ -412,9 +415,12 @@ BASELINE_STAGE4_SIO2_KG = {
 # 2.73726786918e-6 + 3.91978550119e-6 = 6.65705337037e-6 (Mars likewise
 # 6.70667353678e-6); evolved SiO is unchanged. Studio-1 executable values;
 # evidence docs-private/reviews/2026-09-25-wall-cluster-fix/golden-verdict.md.
+# 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves the
+# executable Stage-3 silica pins to lunar 1.14607282073e-05 kg and Mars
+# 1.32908402021e-05 kg.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 6.65705337037e-06,
-    "mars_basalt": 6.70667353678e-06,
+    "lunar_mare_low_ti": 1.14607282073e-05,
+    "mars_basalt": 1.32908402021e-05,
 }
 
 

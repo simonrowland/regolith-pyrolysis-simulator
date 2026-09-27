@@ -112,7 +112,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # capture agrees with the regenerated C2A fixture at 1.04097913286e-05 kg.
 # The prior 1.04099243606e-05 kg pin was stale versus that capture; the wall
 # cluster rebooks stage destinations but does not change evolved SiO.
-PHASE3BIS_SIO_EVOLVED_KG = 1.04097913286e-05
+# 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves the
+# lunar C2A fixture and its matching invariant pin to 1.80287974292e-05 kg.
+PHASE3BIS_SIO_EVOLVED_KG = 1.80287974292e-05
 
 
 @lru_cache(maxsize=None)
@@ -164,7 +166,7 @@ def test_sio_evolved_is_invariant_to_wall_temperature_at_fixed_po2_mode():
     # CLAIM 1, the property this test exists for: SiO evolution is independent
     # of wall temperature at fixed pO2 mode. Measured on the current tree it is
     # not merely close, it is BIT-IDENTICAL across all four liner setpoints:
-    #     1050 C / 1300 C / 1400 C / 1500 C -> 1.04099243606e-05 each,
+    #     1050 C / 1300 C / 1400 C / 1500 C -> 1.80287974292e-05 each,
     #     spread exactly 0.0, mass-balance error 1.14e-14 %.
     # This is the cheap, durable claim. It must never be relaxed to buy a green.
     spread = max(evolved) - min(evolved)
