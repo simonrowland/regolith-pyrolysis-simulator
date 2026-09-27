@@ -500,7 +500,7 @@ class ResultStore:
                 raise ValueError(f"objective {metric!r} has conflicting senses")
             sense = normalize_objective_sense(str(objective[0]["sense"]))
             value_order = "ASC" if sense == "minimize" else "DESC"
-            row = conn.execute(
+            rows = conn.execute(
                 f"""
                 SELECT r.*
                 FROM results r
@@ -508,11 +508,14 @@ class ResultStore:
                 WHERE {where} AND r.feasible = 1 AND r.corpus_version = ?
                     AND ov.metric IN ({metric_placeholders}) AND ov.value IS NOT NULL
                 ORDER BY ov.value {value_order}, r.cache_key ASC
-                LIMIT 1
                 """,
                 (*params, current_corpus_version(), *metric_aliases),
-            ).fetchone()
-        return _row_to_scored_result(row) if row is not None else None
+            ).fetchall()
+        for row in rows:
+            scored = _row_to_scored_result(row)
+            if scored.feasible:
+                return scored
+        return None
 
     def _default_objective_metric(
         self,
@@ -1519,30 +1522,53 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
             if isinstance(item.get("status_payload", {}), Mapping)
             else {}
         )
+        observed_raw = item.get("observed")
         observed_value = (
-            None if status_value == "unavailable" and item["observed"] is None
-            else _decode_json_number(item["observed"], f"{gate}.observed")
+            None
+            if status_value == "unavailable" and observed_raw is None
+            else _decode_json_number(observed_raw, f"{gate}.observed")
         )
         threshold_value = float(threshold["value"])
         threshold_tolerance = float(threshold.get("tolerance", 0.0))
         feasible_value = bool(item["feasible"])
         if gate_name == "coating":
-            grounded_authority = _coating_margin_grounded_authority(status_payload)
-            if grounded_authority is not None:
-                authoritative_value = bool(
-                    grounded_authority.get("authoritative_for_coating", False)
+            explicit_verdict = status_payload.get("coating_verdict")
+            unavailable = (
+                status_value == "unavailable"
+                or output_status == "unavailable"
+                or explicit_verdict == "unavailable"
+            )
+            if unavailable:
+                feasible_value = False
+                authoritative_value = False
+                status_value = "unavailable"
+                status_reason = status_reason or "coating wall evidence unavailable"
+                status_payload = {
+                    **status_payload,
+                    "coating_verdict": "unavailable",
+                    "coating_unavailable_reason": status_reason,
+                }
+            else:
+                grounded_authority = (
+                    None
+                    if explicit_verdict in {"clear", "violated"}
+                    else _coating_margin_grounded_authority(status_payload)
                 )
-                status_value = "available" if authoritative_value else "warning"
-                output_status = str(
-                    grounded_authority.get("output_status")
-                    or ("authoritative" if authoritative_value else "status_bearing")
-                )
-                status_reason = (
-                    ""
-                    if authoritative_value
-                    else str(grounded_authority.get("message", "non-authoritative coating"))
-                )
-                status_payload = _jsonable(grounded_authority)
+                if grounded_authority is not None:
+                    authoritative_value = bool(
+                        grounded_authority.get("authoritative_for_coating", False)
+                    )
+                    status_value = "available" if authoritative_value else "warning"
+                    output_status = str(
+                        grounded_authority.get("output_status")
+                        or ("authoritative" if authoritative_value else "status_bearing")
+                    )
+                    status_reason = (
+                        ""
+                        if authoritative_value
+                        else str(grounded_authority.get("message", "non-authoritative coating"))
+                    )
+                    status_payload = _jsonable(grounded_authority)
         margins[str(gate)] = GateMargin(
             gate=gate_name,
             feasible=feasible_value,
