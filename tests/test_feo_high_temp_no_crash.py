@@ -50,6 +50,7 @@ def test_high_temp_fallback_routes_fe_as_metallic_fe_without_accountingerror():
     }
     setpoints = {
         "campaigns": {},
+        "sso_r": _load_yaml("setpoints.yaml")["sso_r"],
         "chemistry_kernel": {"allow_fallback_vapor": True},
     }
     backend = InternalAnalyticalBackend()
@@ -101,6 +102,7 @@ def test_internal_analytical_equilibrium_feo_activity_ignores_neutral_total_pres
     }
     setpoints = {
         "campaigns": {},
+        "sso_r": _load_yaml("setpoints.yaml")["sso_r"],
         "chemistry_kernel": {"allow_fallback_vapor": True},
     }
     backend = InternalAnalyticalBackend()
