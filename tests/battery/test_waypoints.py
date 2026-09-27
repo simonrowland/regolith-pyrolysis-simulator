@@ -1420,6 +1420,71 @@ def test_oxygen_condition_graphite_c_co_is_derived_never_printed() -> None:
     assert float(result.selected.value.point) == pytest.approx(-10.475256412619215, abs=1e-9)
 
 
+def test_ts1985_table2_co_atmosphere_survives_migration(tmp_path) -> None:
+    from simulator.battery.migrate import (
+        REPO_ROOT,
+        Migrator,
+        load_migrated_benches,
+        load_migrated_store,
+        write_outputs,
+    )
+
+    extracts = tmp_path / "data/literature/extracts"
+    extracts.mkdir(parents=True)
+    source = REPO_ROOT / "data/literature/extracts/ts1985.yaml"
+    (extracts / source.name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    migrator = Migrator(tmp_path, index={}, aliases={})
+    migrator.migrate_extracts()
+    write_outputs(migrator.result, tmp_path)
+    _, experiments, observations = load_migrated_store(tmp_path)
+    benches = load_migrated_benches(tmp_path)
+
+    rows = [
+        observation
+        for observation in observations.values()
+        if "ts1985_na2o_table2_X" in observation.observation_id
+    ]
+    assert len(rows) == 12
+    for observation in rows:
+        experiment = experiments[observation.experiment_id]
+        gas = experiment.pressure_environment.sweep_gas.state.value
+        # Table 2 equilibrations used CO at 1 atm; CO/Ar belongs to calibration.
+        assert gas.species == "CO", observation.observation_id
+        assert gas.partial_pressure_Pa.value == Decimal("101325")
+        assert not gas.alternatives
+        result = oxygen_condition(experiment, benches[experiment.bench_id], observation)
+        assert result.absence is None, observation.observation_id
+        assert result.selected is not None
+        assert result.selected.route == "graphite_c_co_buffer"
+        assert result.selected.authority is WaypointAuthority.DERIVED
+
+    anchor = observations["ts1985::ts1985_sio2_gibbs_duhem_1200C_X0500"]
+    table2 = observations["ts1985::ts1985_na2o_table2_X0p50_T1200C"]
+    assert anchor.experiment_id != table2.experiment_id
+    experiment = experiments[anchor.experiment_id]
+    composition = normalized_composition(experiment, benches[experiment.bench_id], anchor)
+    assert composition.selected is not None
+    assert composition.selected.value == {"Na2O": Decimal("0.5"), "SiO2": Decimal("0.5")}
+    gas = experiment.pressure_environment.sweep_gas.state.value
+    co = next(component for component in gas.components if component.species == "CO")
+    assert co.partial_pressure_Pa.value == Decimal("10132.5")
+    assert not gas.alternatives
+    result = oxygen_condition(experiment, benches[experiment.bench_id], anchor)
+    assert result.absence is None
+    assert result.selected is not None
+    assert result.selected.route == "graphite_c_co_buffer"
+    assert result.selected.authority is WaypointAuthority.DERIVED
+    table2_experiment = experiments[table2.experiment_id]
+    table2_result = oxygen_condition(
+        table2_experiment, benches[table2_experiment.bench_id], table2
+    )
+    # Table 1's integration anchor used P_CO=0.1 atm at the same 1200 C;
+    # C-CO fO2 is proportional to P_CO squared, hence two log units lower.
+    assert float(result.selected.value.point - table2_result.selected.value.point) == (
+        pytest.approx(-2)
+    )
+
+
 def test_oxygen_condition_c_co_prose_buffer_without_token_stays_refusal() -> None:
     """Free-text CO/Ar prose is not a C–CO token and must not invent fO2."""
     experiment = replace(
