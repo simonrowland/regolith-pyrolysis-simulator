@@ -766,14 +766,14 @@ completion_contracts:
   species_sets:
     Na: &completion_species_Na ["Na", "Na2O"]
     K: &completion_species_K ["K", "K2O"]
-    Fe: &completion_species_Fe ["Fe", "FeO"]
+    Fe: &completion_species_Fe ["Fe", "FeO", "Fe2O3"]
     Si: &completion_species_Si ["SiO", "SiO2"]
     Mg: &completion_species_Mg ["Mg", "MgO"]
     Cr: &completion_species_Cr ["Cr", "CrO2", "Cr2O3"]
   residual_species:
     Na: &completion_residual_Na ["Na2O", "Na"]
     K: &completion_residual_K ["K2O", "K"]
-    Fe: &completion_residual_Fe ["FeO", "Fe"]
+    Fe: &completion_residual_Fe ["FeO", "Fe2O3", "Fe"]
     Si: &completion_residual_Si ["SiO2", "SiO"]
     Mg: &completion_residual_Mg ["MgO", "Mg"]
     Cr: &completion_residual_Cr ["Cr2O3", "CrO2", "Cr"]
