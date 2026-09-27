@@ -332,10 +332,7 @@ fidelity_samples:
       page: 1278
       table: '2'
       note: Table 2 f(FeO) at x(FeO)=0.1 as printed
-  - species: Fe
-    observable: rate_series
-    observation_id: plante_1992_table1_xfeo_0p15
-    field: I_Fe_over_I_Mg
+  - path: species.Fe.observations[plante_1992_table1_xfeo_0p15].values.rows[0].ion_intensity_ratio
     value: 7.04
     locator:
       page: 1278
