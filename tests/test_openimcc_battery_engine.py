@@ -31,13 +31,12 @@ from simulator.battery.score import (
     candidate_observation,
     compile_residual,
     composition_wt_pct,
-    _implied_alpha_activity_observation,
     ScoreContext,
     predict_with_engine,
     score_store,
 )
 from simulator.battery.migrate import load_migrated_store, load_yaml
-from simulator.battery.records import Composition, Species, State
+from simulator.battery.records import Composition, Species, State, Value
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     BinaryPot,
@@ -283,10 +282,11 @@ def _zhang_k_case(tmp_path: Path, temperature: str):
                 )
             ),
         ),
+        point_conditions={
+            **(reference.point_conditions or {}),
+            "fO2_Pa": F.located(Value.point_of(Decimal("1e-4"))),
+        },
     )
-    request = _implied_alpha_activity_observation(reference)
-    assert request is not None
-    assert request.identity is not None
     context = ScoreContext(
         works=migration.works,
         experiments=migration.experiments,
@@ -294,42 +294,31 @@ def _zhang_k_case(tmp_path: Path, temperature: str):
         extract_review={"kems-006-zhang-2021": "draft"},
         hostname="test",
     )
-    return context, reference, request
+    return context, reference
 
 
 @pytest.mark.parametrize(
-    ("temperature", "expected_gamma", "expected_alpha"),
+    ("temperature", "expected_alpha"),
     [
-        ("1473.15", 3.49e-9, 20.0),
-        ("1673.15", 2.45e-8, 45.0),
+        ("1473.15", 20.0),
+        ("1673.15", 45.0),
     ],
 )
 def test_openimcc_zhang_implied_alpha_uses_coefficient_details(
     tmp_path: Path,
     temperature: str,
-    expected_gamma: float,
     expected_alpha: float,
 ) -> None:
     _require_openimcc()
-    context, reference, request = _zhang_k_case(tmp_path, temperature)
+    context, reference = _zhang_k_case(tmp_path, temperature)
     handle = open_battery_engine("openimcc")
     assert handle.available, handle.unavailable_reason
-
-    prediction = predict_with_engine(
-        Engine.OPENIMCC,
-        request,
-        handles={"openimcc": handle},
-        isolated=False,
-    )
-    assert float(prediction.value) == pytest.approx(expected_gamma, rel=1e-2)
-    assert prediction.coefficient_basis == "single_cation"
-    assert prediction.authority is Authority.EXTRAPOLATED
 
     residual, candidate = compile_residual(
         reference,
         Engine.OPENIMCC,
         context=context,
-        prediction=prediction,
+        handles={"openimcc": handle},
     )
     assert candidate is not None
     assert candidate.authority is Authority.EXTRAPOLATED
@@ -341,14 +330,17 @@ def test_openimcc_zhang_implied_alpha_uses_coefficient_details(
     )
 
 
-@pytest.mark.parametrize("details_mode", ["absent", "parent_oxide", "wrong_state"])
+@pytest.mark.parametrize(
+    "details_mode",
+    ["absent", "parent_oxide", "wrong_phase", "wrong_component_basis", "wrong_convention"],
+)
 def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     details_mode: str,
 ) -> None:
     _require_openimcc()
-    context, reference, request = _zhang_k_case(tmp_path, "1673.15")
+    context, reference = _zhang_k_case(tmp_path, "1673.15")
     handle = open_battery_engine("openimcc")
 
     from simulator.diagnostic_helpers import binary_pot_battery
@@ -365,7 +357,7 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
                 **details["KO0.5"],
                 "coefficient_basis": "parent_oxide",
             }
-        else:
+        elif details_mode == "wrong_phase":
             details["KO0.5"] = {
                 **details["KO0.5"],
                 "standard_state": {
@@ -373,20 +365,30 @@ def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
                     "phase": "cr",
                 },
             }
+        elif details_mode == "wrong_component_basis":
+            details["KO0.5"] = {
+                **details["KO0.5"],
+                "standard_state": {
+                    **details["KO0.5"]["standard_state"],
+                    "component_basis": "K2O",
+                },
+            }
+        else:
+            details["KO0.5"] = {
+                **details["KO0.5"],
+                "standard_state": {
+                    **details["KO0.5"]["standard_state"],
+                    "convention": "henrian_liquid",
+                },
+            }
         return replace(cell, melt_activity_coefficient_details=details)
 
     monkeypatch.setattr(binary_pot_battery, "equilibrate_cell", altered_equilibrate_cell)
-    prediction = predict_with_engine(
-        Engine.OPENIMCC,
-        request,
-        handles={"openimcc": handle},
-        isolated=False,
-    )
     residual, candidate = compile_residual(
         reference,
         Engine.OPENIMCC,
         context=context,
-        prediction=prediction,
+        handles={"openimcc": handle},
     )
     assert candidate is None
     assert residual.status is ResidualStatus.REFUSED

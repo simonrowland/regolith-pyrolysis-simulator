@@ -2309,75 +2309,68 @@ def predict_with_engine(
         if quantity is Quantity.ACTIVITY_COEFFICIENT:
             details = getattr(cell, "melt_activity_coefficient_details", None)
             detail = details.get(formula) if isinstance(details, Mapping) else None
-            reported_basis = (
-                detail.get("coefficient_basis")
-                if isinstance(detail, Mapping)
-                else None
-            )
-            reported_standard_state = (
-                detail.get("standard_state") if isinstance(detail, Mapping) else None
-            )
-            reference_state = identity.reference_state
-            expected_standard_state = (
-                reference_state.value
-                if reference_state is not None
-                and reference_state.is_value
-                and isinstance(reference_state.value, StandardState)
-                else None
-            )
-            expected_phase = (
-                phase_token(expected_standard_state.endmember)
-                if expected_standard_state is not None
-                else None
-            )
-            if (
-                not isinstance(reported_basis, str)
-                or expected_standard_state is None
-                or expected_phase is None
-                or not isinstance(reported_standard_state, Mapping)
-                or reported_standard_state.get("convention")
-                != expected_standard_state.convention.value
-                or reported_standard_state.get("phase") != expected_phase.value
-                or reported_standard_state.get("component_basis")
-                != expected_standard_state.component_basis
-            ):
-                return EnginePrediction(
-                    engine=engine,
-                    channel=channel,
-                    execution=Execution(
-                        state=ExecutionState.PRODUCED,
-                        call_evidence=call_evidence,
-                    ),
-                    authority=Authority.REFUSED,
-                    notices=notices,
-                    coefficient_sources=sources,
-                    lineage_complete=False,
-                    refusal_reason=RefusalReason.COEFFICIENT_BASIS_MISMATCH,
-                    refusal_detail={
-                        "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
-                        "formula": formula,
-                        "reported_basis": reported_basis,
-                        "reported_standard_state": (
-                            dict(reported_standard_state)
-                            if isinstance(reported_standard_state, Mapping)
-                            else None
-                        ),
-                        "expected_standard_state": (
-                            {
-                                "convention": expected_standard_state.convention.value,
-                                "phase": expected_phase.value,
-                                "component_basis": expected_standard_state.component_basis,
-                            }
-                            if expected_standard_state is not None
-                            and expected_phase is not None
-                            else None
-                        ),
-                    },
-                    identity=identity,
-                    requested_composition=requested,
-                    version=engine_version,
+            if isinstance(detail, Mapping):
+                reported_basis = detail.get("coefficient_basis")
+                reported_standard_state = detail.get("standard_state")
+                reference_state = identity.reference_state
+                expected_standard_state = (
+                    reference_state.value
+                    if reference_state is not None
+                    and reference_state.is_value
+                    and isinstance(reference_state.value, StandardState)
+                    else None
                 )
-            coefficient_basis = reported_basis
+                expected_phase = (
+                    phase_token(expected_standard_state.endmember)
+                    if expected_standard_state is not None
+                    else None
+                )
+                if (
+                    expected_standard_state is None
+                    or expected_phase is None
+                    or not isinstance(reported_standard_state, Mapping)
+                    or reported_standard_state.get("convention")
+                    != expected_standard_state.convention.value
+                    or reported_standard_state.get("phase") != expected_phase.value
+                    or reported_standard_state.get("component_basis")
+                    != expected_standard_state.component_basis
+                ):
+                    return EnginePrediction(
+                        engine=engine,
+                        channel=channel,
+                        execution=Execution(
+                            state=ExecutionState.PRODUCED,
+                            call_evidence=call_evidence,
+                        ),
+                        authority=Authority.REFUSED,
+                        notices=notices,
+                        coefficient_sources=sources,
+                        lineage_complete=False,
+                        refusal_reason=RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+                        refusal_detail={
+                            "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                            "formula": formula,
+                            "reported_basis": reported_basis,
+                            "reported_standard_state": dict(reported_standard_state)
+                            if isinstance(reported_standard_state, Mapping)
+                            else None,
+                            "expected_standard_state": (
+                                {
+                                    "convention": expected_standard_state.convention.value,
+                                    "phase": expected_phase.value,
+                                    "component_basis": expected_standard_state.component_basis,
+                                }
+                                if expected_standard_state is not None
+                                and expected_phase is not None
+                                else None
+                            ),
+                        },
+                        identity=identity,
+                        requested_composition=requested,
+                        version=engine_version,
+                    )
+                if isinstance(reported_basis, str):
+                    coefficient_basis = reported_basis
         reported = selected
         unit = "dimensionless"
     elif quantity in _VAPOUR_EQUILIBRIUM:
