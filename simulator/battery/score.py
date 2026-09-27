@@ -768,6 +768,8 @@ def lineage_complete_for(
     """
 
     lineage_sources = coefficient_lineage_sources(sources)
+    if not lineage_sources:
+        return False
     for src in lineage_sources:
         if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
             return False
@@ -1049,29 +1051,49 @@ def derive_kems_partial_pressure_band(
     if not candidates:
         return None
 
-    printed = [
-        width
+    printed_observations = [
+        (observation, width)
         for observation in candidates
         if (width := _printed_pressure_uncertainty_dex(observation)) is not None
     ]
+    printed = [width for _, width in printed_observations]
+    if printed:
+        width = _rms(printed)
+        if width is None or not width.is_finite() or width <= 0:
+            return None
+        if any(
+            observation.source_id == "kems-042-plante-1979"
+            for observation, _ in printed_observations
+        ):
+            rule = (
+                "KEMS p_partial measured uncertainty: source-printed pressure "
+                "envelope (RMS of admitted printed log10 pressure envelopes only); "
+                "Plante width log10(1.40) from the printed page-280 1500 K "
+                "sentence, using the upper multiplicative edge and accepting "
+                "pressure ratios [1/1.40, 1.40] (-28.6%..+40%), not a symmetric "
+                "+/-40% relative band; NOTICE: the single 1500 K figure is "
+                "applied across the tabulated T range"
+            )
+        else:
+            rule = (
+                "KEMS p_partial measured uncertainty: source-printed pressure "
+                "envelope (RMS of admitted printed log10 pressure envelopes only)"
+            )
+        return DecisionBand(width, "dimensionless", rule)
+
     replicate_scatter = pooled_log_pressure_sd(
         _kems_replicate_groups(observations, experiments)
     )
-    components = [*printed]
-    if replicate_scatter is not None:
-        components.append(replicate_scatter)
-    if not components:
+    if replicate_scatter is None:
         return None
-    width = _rms(components)
+    width = replicate_scatter
     if width is None or not width.is_finite() or width <= 0:
         return None
-    if printed:
-        rule = (
-            "KEMS p_partial measured uncertainty: RMS of admitted source-printed "
-            "log10 pressure envelopes"
-        )
-    else:
-        rule = "KEMS p_partial measured uncertainty: pooled replicate log10 pressure SD"
+    rule = (
+        "KEMS p_partial measured uncertainty: replicate scatter (pooled replicate "
+        "log10 pressure SD; used because no admitted printed pressure envelope "
+        "exists)"
+    )
     return DecisionBand(width, "dimensionless", rule)
 
 

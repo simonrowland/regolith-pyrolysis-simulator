@@ -1304,6 +1304,8 @@ def _resolve_coefficient_sources(
     expands to every observation/table registered under that work.
     """
 
+    if not sources:
+        return None
     table_ids = _table_ids(works)
     resolved: set[str] = set()
     for src in sources:

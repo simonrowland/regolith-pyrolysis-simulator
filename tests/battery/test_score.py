@@ -245,6 +245,7 @@ def test_kems_band_derives_known_replicate_scatter() -> None:
     assert band is not None
     assert band.unit == "dimensionless"
     assert band.value == Decimal("0.5").sqrt()
+    assert "replicate scatter" in band.rule
     assert "pooled replicate" in band.rule
 
 
@@ -275,7 +276,62 @@ def test_kems_band_uses_source_printed_pressure_uncertainty() -> None:
     )
     assert band is not None
     assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
-    assert band.rule.startswith("KEMS p_partial measured uncertainty")
+    assert "source-printed" in band.rule
+    assert "log10(1.40)" in band.rule
+    assert "page-280 1500 K sentence" in band.rule
+    assert "upper multiplicative edge" in band.rule
+    assert "[1/1.40, 1.40] (-28.6%..+40%)" in band.rule
+    assert "+/-40% relative band" in band.rule
+    assert "single 1500 K figure is applied across the tabulated T range" in band.rule
+
+
+def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
+    experiment = F.kems_experiment()
+    identity = _partial_identity()
+    printed = replace(
+        F.observation(
+            "kems-printed-with-replicates",
+            experiment.experiment_id,
+            identity,
+            Decimal("10"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="kems-042-plante-1979",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "temperature_quote": (
+                    "At 1500 K, the estimated 20 K error yields an error "
+                    "in K pressure of about 40 percent."
+                )
+            },
+        ),
+    )
+    replicate_low = F.observation(
+        "kems-replicate-low",
+        experiment.experiment_id,
+        identity,
+        Decimal("10"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    replicate_high = F.observation(
+        "kems-replicate-high",
+        experiment.experiment_id,
+        identity,
+        Decimal("100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    band = derive_kems_partial_pressure_band(
+        {
+            item.observation_id: item
+            for item in (printed, replicate_low, replicate_high)
+        },
+        {experiment.experiment_id: experiment},
+    )
+    assert band is not None
+    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
+    assert "source-printed" in band.rule
+    assert "pooled replicate" not in band.rule
 
 
 def test_derived_oxygen_condition_notice_reaches_residual() -> None:
@@ -1736,7 +1792,60 @@ def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
     assert lineage_complete_for(candidate_sources) is True
 
 
-def test_openimcc_lineage_metadata_passes_residual_validation() -> None:
+@pytest.mark.parametrize(
+    "candidate_sources",
+    [
+        pytest.param(
+            ("openimcc-pack-version:1.0.2",),
+            id="metadata-only",
+        ),
+        pytest.param(
+            ("openimcc-gas-table:sf04-magma-companion-workbook",),
+            id="prefix-concealed",
+        ),
+        pytest.param(
+            (
+                "openimcc-pack-version:1.0.2",
+                "openimcc-pack-digest:sha256:test",
+                "openimcc-gas-table:gas.csv",
+            ),
+            id="empty-after-strip",
+        ),
+    ],
+)
+def test_openimcc_metadata_lineage_fails_closed(
+    candidate_sources: tuple[str, ...],
+) -> None:
+    from simulator.battery.score import lineage_complete_for
+
+    reference = F.observation(
+        "metadata-lineage-reference",
+        "metadata-lineage-exp",
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    observations = {reference.observation_id: reference}
+    experiments = {
+        reference.experiment_id: F.tabulation_experiment(
+            experiment_id=reference.experiment_id,
+        )
+    }
+    assert lineage_complete_for(candidate_sources) is False
+    assert (
+        resolve_source_relation(
+            reference,
+            candidate_sources,
+            True,
+            works={},
+            observations=observations,
+            experiments=experiments,
+        )
+        is SourceRelation.UNKNOWN
+    )
+
+
+def _openimcc_lineage_validation_case(coefficient_sources: tuple[str, ...]):
     reference_work = F.work("reference-work")
     reference_experiment = F.tabulation_experiment(
         experiment_id="reference-exp", work_id=reference_work.work_id
@@ -1775,12 +1884,7 @@ def test_openimcc_lineage_metadata_passes_residual_validation() -> None:
             name=Engine.OPENIMCC,
             channel="openimcc",
             run_id="openimcc:test",
-            coefficient_sources=(
-                "sf04-magma-companion-workbook",
-                "openimcc-pack-version:1.0.2",
-                "openimcc-pack-digest:sha256:test",
-                "openimcc-gas-table:test.csv",
-            ),
+            coefficient_sources=coefficient_sources,
             lineage_complete=True,
         ),
         authority=Authority.CERTIFIED,
@@ -1803,7 +1907,7 @@ def test_openimcc_lineage_metadata_passes_residual_validation() -> None:
         experiment_id=reference_experiment.experiment_id,
         quantity=Quantity.DELTA_FG,
     )
-    assert validate_residual(
+    return (
         residual,
         {
             reference.observation_id: reference,
@@ -1815,7 +1919,40 @@ def test_openimcc_lineage_metadata_passes_residual_validation() -> None:
             source_experiment.experiment_id: source_experiment,
         },
         {reference_work.work_id: reference_work, source_work.work_id: source_work},
+    )
+
+
+def test_openimcc_lineage_metadata_passes_residual_validation() -> None:
+    residual, observations, experiments, works = _openimcc_lineage_validation_case(
+        (
+            "sf04-magma-companion-workbook",
+            "openimcc-pack-version:1.0.2",
+            "openimcc-pack-digest:sha256:test",
+            "openimcc-gas-table:test.csv",
+        )
+    )
+    assert validate_residual(
+        residual,
+        observations,
+        experiments,
+        works,
     ) == []
+
+
+def test_openimcc_metadata_only_lineage_fails_residual_validation() -> None:
+    residual, observations, experiments, works = _openimcc_lineage_validation_case(
+        (
+            "openimcc-pack-version:1.0.2",
+            "openimcc-pack-digest:sha256:test",
+            "openimcc-gas-table:test.csv",
+        )
+    )
+    issues = validate_residual(residual, observations, experiments, works)
+    assert any(
+        issue.path == "residual.source_relation"
+        and issue.reason is RefusalReason.LINEAGE_UNKNOWN
+        for issue in issues
+    )
 
 
 def test_missing_live_result_is_coverage_failure() -> None:
