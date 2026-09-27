@@ -312,8 +312,6 @@ def test_sossi_printed_one_atmosphere_still_inherits(tmp_path) -> None:
     [
         "sossi_2019_na_alpha_e_authors_adopted_unity",
         "sossi_2019_na_alpha_e_authors_adopted_unity_quoted_20260906",
-        "sossi_2019_na_logKstar_table3",
-        "sossi_2019_na_logKstar_table3_quoted_20260906",
         "sossi_2019_na_pure_system_LH_table5",
         "sossi_2019_na_pure_system_LH_table5_quoted_20260906",
         "sossi_2019_k_open_furnace_alpha_e_context",
@@ -327,6 +325,25 @@ def test_model_carrier_keeps_printed_sossi_furnace_condition(
         f"kems-012-sossi-2019::{observation_id}"
     ]
     assert observation.identity.total_pressure_Pa == State.of(Decimal("100000"))
+
+
+@pytest.mark.parametrize(
+    "observation_id",
+    [
+        "sossi_2019_na_logKstar_table3",
+        "sossi_2019_na_logKstar_table3_quoted_20260906",
+    ],
+)
+def test_sossi_log_k_star_does_not_use_furnace_pressure(
+    tmp_path, observation_id: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
+    observation = result.observations[
+        f"kems-012-sossi-2019::{observation_id}"
+    ]
+    assert observation.identity.total_pressure_Pa == State.not_applicable(
+        "profile log10_K_star does not use total_pressure_Pa"
+    )
 
 
 def test_model_carrier_keeps_printed_fedkin_chamber_condition(tmp_path) -> None:
