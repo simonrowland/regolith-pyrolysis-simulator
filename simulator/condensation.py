@@ -2774,6 +2774,7 @@ class CondensationModel:
         )
         self.wall_temperature_C = float(wall_temperature_C)
         self.overhead_pressure_mbar = 0.0
+        self._live_transport_pressure_mbar: float | None = None
         self.species_partial_pressures_mbar: dict[str, float] = {}
         self._species_partial_pressures_configured = False
         self.wall_species_partial_pressures_pa: dict[str, float] = {}
@@ -2895,6 +2896,7 @@ class CondensationModel:
         *,
         wall_temperature_C: float | None = None,
         overhead_pressure_mbar: float | None = None,
+        live_transport_pressure_mbar: float | None = None,
         species_partial_pressures_mbar: Mapping[str, float] | None = None,
         pipe_diameter_m: float | None = None,
         gas_temperature_C: float | None = None,
@@ -2970,6 +2972,17 @@ class CondensationModel:
                     'overhead_pressure_mbar must be finite and non-negative'
                 )
             _campaign_requires_viscous_flow(campaign_name)
+        if live_transport_pressure_mbar is not None:
+            if not is_declared_real_scalar(
+                live_transport_pressure_mbar,
+                allow_numeric_str=True,
+            ):
+                raise ValueError('live_transport_pressure_mbar must be numeric')
+            live_pressure = float(live_transport_pressure_mbar)
+            if not math.isfinite(live_pressure) or live_pressure < 0.0:
+                raise ValueError(
+                    'live_transport_pressure_mbar must be finite and non-negative'
+                )
         candidate_total_pressure_mbar = (
             float(overhead_pressure_mbar)
             if overhead_pressure_mbar is not None
@@ -3144,6 +3157,14 @@ class CondensationModel:
             self._knudsen_policy_configured = True
             self._viscous_flow_required = _campaign_requires_viscous_flow(
                 campaign_name)
+        if live_transport_pressure_mbar is not None:
+            self._live_transport_pressure_mbar = float(
+                live_transport_pressure_mbar
+            )
+        elif overhead_pressure_mbar is not None:
+            self._live_transport_pressure_mbar = float(
+                self.overhead_pressure_mbar
+            )
         if species_partial_pressures_mbar is not None:
             self.species_partial_pressures_mbar = {
                 str(species): float(partial_pressure)
@@ -3193,6 +3214,7 @@ class CondensationModel:
                 stage_area_m2_by_stage,
                 stage_area_geometry_provenance_notice,
                 pipe_segment_temperatures_C,
+                live_transport_pressure_mbar,
                 carrier_gas,
                 stage3_route,
                 stage3_route_basis,
@@ -4992,12 +5014,16 @@ class CondensationModel:
         return diagnostic
 
     def _current_knudsen_diagnostic(self) -> dict[str, Any]:
+        live_transport_pressure_mbar = (
+            self._live_transport_pressure_mbar
+            if self._live_transport_pressure_mbar is not None
+            else self.overhead_pressure_mbar
+        )
         diagnostic = knudsen_regime_diagnostic(
-            overhead_pressure_mbar=self.overhead_pressure_mbar,
+            overhead_pressure_mbar=live_transport_pressure_mbar,
             gas_temperature_C=self.gas_temperature_C,
             pipe_diameter_m=self.pipe_diameter_m,
             pipe_segments=self._route_pipe_segments(),
-            regime_factor=self.regime_factor,
             carrier_gas=self.carrier_gas,
         )
         diagnostic['stage_area_m2_by_stage'] = dict(self.stage_area_m2_by_stage)

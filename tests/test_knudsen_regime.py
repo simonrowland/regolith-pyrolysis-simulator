@@ -514,6 +514,12 @@ def test_c2a_recipe_free_molecular_transport_is_continuous(monkeypatch):
 
     assert document["status"] in {"ok", "partial"}
     assert diagnostic["status"] == "warning"
+    assert diagnostic["overhead_pressure_mbar"] == pytest.approx(1.0e-6)
+    assert diagnostic["regime_factor"] == pytest.approx(
+        condensation_module._knudsen_regime_factor(
+            diagnostic["knudsen_number"]
+        )
+    )
     assert diagnostic["reason"] == "knudsen_outside_viscous_flow"
     assert any(
         segment["regime"] == KnudsenRegime.FREE_MOLECULAR.value
