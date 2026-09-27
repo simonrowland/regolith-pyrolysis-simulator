@@ -1006,6 +1006,38 @@ def _assert_schema_shape(payload: dict) -> None:
     assert len(yield_disposition["destination_bins"]) == 12
     assert "metal_phase_retained" in yield_disposition["destination_bins"]
     assert yield_disposition["closure"]["maximum_residual_fraction"] <= 5.0e-14
+    ideal_train = yield_disposition["ideal_train_melt_boundary"]
+    assert ideal_train["basis"] == "feedstock_element_atom_fraction"
+    assert ideal_train["control_volume"] == "pot"
+    assert {
+        "surface_crossed",
+        "drain_tapped",
+        "retained_melt",
+        "retained_redox_buffer",
+    }.issubset(ideal_train["terms"])
+    assert ideal_train["status"] in {"ok", "partial", "refused"}
+    assert ideal_train["closure"]["maximum_residual_fraction"] <= 5.0e-12
+    for row in ideal_train["rows"]:
+        assert row["status"] in {"ok", "refused"}
+        if row["status"] == "ok":
+            assert abs(row["partition_residual_fraction"]) <= 5.0e-12
+        else:
+            assert row["refusals"]
+            assert row["ideal_train_fraction"] is None
+            assert any(
+                provenance["status"] == "refused"
+                for provenance in row["term_provenance"].values()
+            )
+        assert row["term_provenance"]["surface_crossed"]["authority"] == (
+            "ledger_derived"
+        )
+        assert row["term_provenance"]["drain_tapped"]["authority"] == (
+            "ledger_derived"
+        )
+        assert (
+            row["term_provenance"]["retained_redox_buffer"]["flags"]
+            == ["redox_buffer_meaning_under_investigation"]
+        )
     for row in yield_disposition["fraction_table"]["rows"]:
         assert abs(sum(row["destination_fractions"].values()) - 1.0) <= 5.0e-14
         assert row["attribution_method"] in {"tracked", "pool_ratio"}
@@ -1495,12 +1527,45 @@ def test_runner_golden_fixture_matches(scenario):
 
     _assert_schema_shape(actual)
     _assert_mass_balance_bound(actual)
+    if scenario["campaign"] == "C2A":
+        ideal_train = actual["yield_disposition"]["ideal_train_melt_boundary"]
+        assert ideal_train["status"] == "ok"
+        assert all(row["status"] == "ok" for row in ideal_train["rows"])
     assert actual == expected, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
         "regenerate all canonical scenarios via "
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
         "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
+
+
+def test_runner_short_c2a_derives_stage0_native_metal_taps():
+    """Short C2A runner proof for typed Stage-0 Co/Ni drain-tap provenance."""
+
+    payload = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    ).run()
+    ideal_train = payload["yield_disposition"]["ideal_train_melt_boundary"]
+    rows = {row["element"]: row for row in ideal_train["rows"]}
+
+    assert payload["status"] == "ok"
+    assert ideal_train["status"] == "ok"
+    for element in ("Co", "Ni"):
+        assert rows[element]["status"] == "ok"
+        assert rows[element]["drain_tapped_mol_atoms"] == pytest.approx(
+            rows[element]["feedstock_input_mol_atoms"]
+        )
+        assert rows[element]["ideal_train_fraction"] == pytest.approx(1.0)
+        assert rows[element]["partition_residual_fraction"] <= 5.0e-12
+        assert (
+            "drain_tapped_native_metal_seed"
+            in rows[element]["term_provenance"]["drain_tapped"]["flags"]
+        )
+    assert ideal_train["closure"]["maximum_residual_fraction"] <= 5.0e-12
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS, ids=lambda s: s["name"])

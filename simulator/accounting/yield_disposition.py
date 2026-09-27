@@ -76,6 +76,29 @@ _CLEANUP_CAMPAIGNS = frozenset({"C0", "C0B"})
 _CONDENSATION_AMALGAMATED_ELEMENTS = frozenset({"Na", "K"})
 _WALL_PREFIX = "process.wall_deposit_segment_"
 _CLOSURE_LIMIT_FRACTION = 5.0e-14
+_IDEAL_TRAIN_CLOSURE_LIMIT_FRACTION = 5.0e-12
+_IDEAL_TRAIN_EVAPORATION_PREFIX = "evaporate_"
+_IDEAL_TRAIN_TAP_ACCOUNT = "terminal.drain_tap_material"
+_IDEAL_TRAIN_NATIVE_METAL_SEED_SOURCE_SUFFIX = " Stage 0 metal alloy"
+_IDEAL_TRAIN_NATIVE_METAL_SEED_FLAG = "drain_tapped_native_metal_seed"
+_IDEAL_TRAIN_OXYGEN_EXCHANGE = "oxygen_reservoir_exchange"
+_IDEAL_TRAIN_IN_POT_DESTINATION_TERMS: Mapping[str, str] = {
+    "melt_retained": "retained_melt",
+    "metal_phase_retained": "retained_metal_phase",
+    "charge_unprocessed": "retained_charge_unprocessed",
+    "redox_buffer_retained": "retained_redox_buffer",
+    "cleanup_sequestered": "retained_cleanup_sequestered",
+    "overhead_terminal_inventory": "retained_overhead_terminal_inventory",
+}
+_IDEAL_TRAIN_OTHER_DESTINATION_TERMS: Mapping[str, str] = {
+    "product_condensed": "other_product_condensed",
+    "product_tapped": "other_product_tapped",
+    "product_oxygen": "other_product_oxygen",
+    "cleanup_volatile_product": "other_cleanup_volatile_product",
+    "wall_deposit": "other_wall_deposit",
+    "offgas_vented": "other_offgas_vented",
+}
+_IDEAL_TRAIN_REDOX_FLAG = "redox_buffer_meaning_under_investigation"
 # Absolute cancellation dust below any physically meaningful mol-atom ledger
 # quantity.  The Chapman-Enskog correction can leave 1.74e-18 mol-atoms in a
 # terminal account after tracked-origin pools have cancelled to zero.
@@ -121,7 +144,7 @@ def capture_ledger_snapshot(sim: Any, snapshot: Any) -> None:
     origin_unattributed = ledger.unresolved_origin_atom_moles_by_account()
     origin_methods = ledger.origin_attribution_methods_by_account()
     gross_flows = ledger.gross_account_flows()
-    rows[key] = {
+    row = {
         "hour": key[0],
         "campaign": campaign,
         "campaign_hour": key[2],
@@ -159,6 +182,10 @@ def capture_ledger_snapshot(sim: Any, snapshot: Any) -> None:
             if event.get("account") == _CONDENSATION_ACCOUNT
         ],
     }
+    evaporation_authority = _evaporation_authority_snapshot(sim, snapshot)
+    if evaporation_authority:
+        row["evaporation_authority"] = evaporation_authority
+    rows[key] = row
 
 
 def ledger_snapshots_from_sim(sim: Any) -> tuple[Mapping[str, Any], ...]:
@@ -345,6 +372,13 @@ def build_yield_disposition(
         reagent_terminal,
         origin_dust_mol_atoms,
     )
+    ideal_train_melt_boundary = _build_ideal_train_melt_boundary(
+        ledger,
+        registry,
+        feedstock_input,
+        sim,
+        snapshots,
+    )
 
     atoms_by_bin: dict[str, defaultdict[str, float]] = {
         name: defaultdict(float) for name in YIELD_DISPOSITION_BINS
@@ -498,6 +532,7 @@ def build_yield_disposition(
             "basis": "feedstock_element_atom_fraction",
             "rows": fraction_rows,
         },
+        "ideal_train_melt_boundary": ideal_train_melt_boundary,
         "melt_retained_subdispositions": {
             "basis": "feedstock_element_mol_atoms",
             "subdispositions": list(MELT_RETAINED_SUBDISPOSITIONS),
@@ -1509,6 +1544,742 @@ def _destination_for_account(account: str) -> str | None:
     if account == "process.wall_deposit" or account.startswith(_WALL_PREFIX):
         return "wall_deposit"
     return None
+
+
+def _build_ideal_train_melt_boundary(
+    ledger: Any,
+    registry: Mapping[str, Any],
+    feedstock_input: Mapping[str, float],
+    sim: Any,
+    snapshots: tuple[Mapping[str, Any], ...],
+) -> dict[str, Any]:
+    """Build the pot-boundary ideal-train projection from ledger evidence."""
+
+    surface_crossed: defaultdict[str, float] = defaultdict(float)
+    drain_tapped: defaultdict[str, float] = defaultdict(float)
+    surface_species_by_element: defaultdict[str, set[str]] = defaultdict(set)
+    surface_transition_flags: defaultdict[str, set[str]] = defaultdict(set)
+    surface_refusals: defaultdict[str, list[dict[str, str]]] = defaultdict(list)
+    tap_refusals: defaultdict[str, list[dict[str, str]]] = defaultdict(list)
+    tap_provenance_flags: defaultdict[str, set[str]] = defaultdict(set)
+    oxygen_exchange_outward: defaultdict[str, float] = defaultdict(float)
+    oxygen_exchange_returned: defaultdict[str, float] = defaultdict(float)
+
+    # Derivation: Stage-0 native metal is a typed external load whose source
+    # record names the metal-alloy seed.  It already represents native metal
+    # leaving through the drain tap, so use that record as provenance instead
+    # of inferring yield from the terminal account balance.
+    for load in tuple(getattr(ledger, "external_loads", ())):
+        if (
+            str(getattr(load, "account", "")) != _IDEAL_TRAIN_TAP_ACCOUNT
+            or getattr(load, "material_origin", None) != "feedstock"
+            or not str(getattr(load, "source", "")).endswith(
+                _IDEAL_TRAIN_NATIVE_METAL_SEED_SOURCE_SUFFIX
+            )
+        ):
+            continue
+        seed_atoms, seed_refusals = _feedstock_atoms_from_lots(
+            (load,),
+            registry,
+            _IDEAL_TRAIN_TAP_ACCOUNT,
+        )
+        for element, amount in seed_atoms.items():
+            drain_tapped[element] += float(amount)
+            tap_provenance_flags[element].add(
+                _IDEAL_TRAIN_NATIVE_METAL_SEED_FLAG
+            )
+        for element in seed_refusals:
+            tap_refusals[element].append(
+                {
+                    "code": "native_metal_seed_origin_unresolved",
+                    "source": str(getattr(load, "source", "")),
+                }
+            )
+
+    # Derivation: surface_crossed is the feedstock-origin atom content of the
+    # melt debit on each committed evaporation transition.  Oxygen credited to
+    # reservoir.fo2_buffer by that same transition remains a separately
+    # reported redox-buffer term, so it is removed from this surface debit.
+    # Downstream condensation, wall, stage, and vent accounts never enter this
+    # calculation; their fate cannot reduce the amount that left the melt.
+    for transition in tuple(getattr(ledger, "transitions", ())):
+        name = str(getattr(transition, "name", ""))
+        if name.startswith(_IDEAL_TRAIN_EVAPORATION_PREFIX):
+            species = name[len(_IDEAL_TRAIN_EVAPORATION_PREFIX) :]
+            debit_atoms, debit_refusals = _transition_feedstock_atoms(
+                transition,
+                "debits",
+                "process.cleaned_melt",
+                registry,
+            )
+            buffer_atoms, buffer_refusals = _transition_feedstock_atoms(
+                transition,
+                "credits",
+                "reservoir.fo2_buffer",
+                registry,
+            )
+            for element in sorted(
+                set(debit_atoms) | set(buffer_atoms) | debit_refusals | buffer_refusals
+            ):
+                if element in debit_refusals or element in buffer_refusals:
+                    surface_refusals[element].append(
+                        {
+                            "code": "evaporation_origin_unresolved",
+                            "transition": name,
+                        }
+                    )
+                    continue
+                amount = float(debit_atoms.get(element, 0.0)) - float(
+                    buffer_atoms.get(element, 0.0)
+                )
+                if amount < -_atom_tolerance(max(abs(amount), 1.0)):
+                    surface_refusals[element].append(
+                        {
+                            "code": "evaporation_surface_debit_negative",
+                            "transition": name,
+                        }
+                    )
+                    continue
+                amount = max(0.0, amount)
+                if amount > 0.0:
+                    surface_crossed[element] += amount
+                    surface_species_by_element[element].add(species)
+
+        if name == "native_fe_metal_partition":
+            # Derivation: native Fe metallic partition has no parent oxide
+            # debit; its feedstock-origin Fe credit to process.overhead_gas is
+            # the explicit vapour leg that crossed the melt boundary.
+            vapor_atoms, vapor_refusals = _transition_feedstock_atoms(
+                transition,
+                "credits",
+                "process.overhead_gas",
+                registry,
+            )
+            for element in sorted(set(vapor_atoms) | vapor_refusals):
+                if element in vapor_refusals:
+                    surface_refusals[element].append(
+                        {
+                            "code": "native_vapor_origin_unresolved",
+                            "transition": name,
+                        }
+                    )
+                    continue
+                amount = float(vapor_atoms.get(element, 0.0))
+                if amount > 0.0:
+                    surface_crossed[element] += amount
+                    surface_species_by_element[element].add("Fe")
+                    surface_transition_flags[element].add(
+                        "native_fe_metal_partition_authoritative"
+                    )
+
+        if name == "native_fe_saturation_split":
+            # Derivation: FeO -> Fe tap + overhead O2 releases the oxygen
+            # coproduct across the melt boundary even though this is a native
+            # Fe partition transition rather than an evaporation transition.
+            oxygen_atoms, oxygen_refusals = _transition_feedstock_atoms(
+                transition,
+                "credits",
+                "process.overhead_gas",
+                registry,
+            )
+            for element in sorted(set(oxygen_atoms) | oxygen_refusals):
+                if element in oxygen_refusals:
+                    surface_refusals[element].append(
+                        {
+                            "code": "native_saturation_vapor_origin_unresolved",
+                            "transition": name,
+                        }
+                    )
+                    continue
+                amount = float(oxygen_atoms.get(element, 0.0))
+                if amount > 0.0:
+                    surface_crossed[element] += amount
+                    surface_species_by_element[element].add("O2")
+                    surface_transition_flags[element].add(
+                        "native_fe_saturation_split_authoritative"
+                    )
+
+        if name == _IDEAL_TRAIN_OXYGEN_EXCHANGE:
+            # Derivation: oxygen_reservoir_exchange is bidirectional.  Count
+            # feedstock-origin atoms on buffer debits as outward crossings and
+            # subtract feedstock-origin atoms on buffer credits returned from
+            # the overhead.  The net exchange is the only exchange-derived
+            # surface term, so returned O is not also retained in the buffer.
+            outward_atoms, outward_refusals = _transition_feedstock_atoms(
+                transition,
+                "debits",
+                "reservoir.fo2_buffer",
+                registry,
+            )
+            returned_atoms, returned_refusals = _transition_feedstock_atoms(
+                transition,
+                "credits",
+                "reservoir.fo2_buffer",
+                registry,
+            )
+            for element in sorted(
+                set(outward_atoms)
+                | set(returned_atoms)
+                | outward_refusals
+                | returned_refusals
+            ):
+                if element in outward_refusals or element in returned_refusals:
+                    surface_refusals[element].append(
+                        {
+                            "code": "oxygen_exchange_origin_unresolved",
+                            "transition": name,
+                        }
+                    )
+                    continue
+                oxygen_exchange_outward[element] += float(
+                    outward_atoms.get(element, 0.0)
+                )
+                oxygen_exchange_returned[element] += float(
+                    returned_atoms.get(element, 0.0)
+                )
+
+        if name == _IDEAL_TRAIN_OXYGEN_EXCHANGE:
+            continue
+
+        # Derivation: drain_tapped is the feedstock-origin atom content of
+        # credits to the drain account on committed transitions.  A residual
+        # already present in that typed terminal account is kept as a separate
+        # terminal term and refused; it never contributes to drain_tapped.
+        tap_atoms, tap_origin_refusals = _transition_feedstock_atoms(
+            transition,
+            "credits",
+            _IDEAL_TRAIN_TAP_ACCOUNT,
+            registry,
+        )
+        if tap_atoms or tap_origin_refusals:
+            for element, amount in tap_atoms.items():
+                drain_tapped[element] += float(amount)
+            for element in tap_origin_refusals:
+                tap_refusals[element].append(
+                    {
+                        "code": "tap_transition_origin_unresolved",
+                        "transition": name,
+                    }
+                )
+            if name == "native_fe_metal_partition":
+                for element in tap_atoms:
+                    tap_provenance_flags[element].add(
+                        "native_fe_metal_partition_authoritative"
+                    )
+
+    for element in sorted(
+        set(oxygen_exchange_outward) | set(oxygen_exchange_returned)
+    ):
+        exchange_net = float(
+            oxygen_exchange_outward.get(element, 0.0)
+        ) - float(oxygen_exchange_returned.get(element, 0.0))
+        surface_value = float(surface_crossed.get(element, 0.0))
+        net_surface_value = surface_value + exchange_net
+        if net_surface_value < -_atom_tolerance(max(abs(net_surface_value), 1.0)):
+            surface_refusals[element].append(
+                {
+                    "code": "oxygen_exchange_return_exceeds_surface_evidence",
+                    "surface_mol_atoms": surface_value,
+                    "outward_mol_atoms": float(
+                        oxygen_exchange_outward.get(element, 0.0)
+                    ),
+                    "returned_mol_atoms": float(
+                        oxygen_exchange_returned.get(element, 0.0)
+                    ),
+                }
+            )
+            continue
+        surface_crossed[element] = max(0.0, net_surface_value)
+        if abs(exchange_net) > _atom_tolerance(max(abs(exchange_net), 1.0)):
+            surface_transition_flags[element].add(
+                "oxygen_reservoir_exchange_authoritative"
+            )
+        if surface_crossed[element] > 0.0:
+            surface_species_by_element[element].add("O2")
+
+    feedstock_by_account = _feedstock_origin_by_account(ledger)
+    tap_account_atoms = feedstock_by_account.get(_IDEAL_TRAIN_TAP_ACCOUNT, {})
+    account_terms: dict[str, defaultdict[str, float]] = {
+        term: defaultdict(float)
+        for term in (
+            *_IDEAL_TRAIN_IN_POT_DESTINATION_TERMS.values(),
+            *_IDEAL_TRAIN_OTHER_DESTINATION_TERMS.values(),
+        )
+    }
+    term_accounts: dict[str, set[str]] = {
+        term: set() for term in account_terms
+    }
+    for account, element_atoms in feedstock_by_account.items():
+        destination = _destination_for_account(account)
+        term = _IDEAL_TRAIN_IN_POT_DESTINATION_TERMS.get(destination or "")
+        if term is None:
+            if destination == "product_tapped":
+                continue
+            term = _IDEAL_TRAIN_OTHER_DESTINATION_TERMS.get(destination or "")
+        if term is None:
+            continue
+        term_accounts[term].add(account)
+        _merge_atoms(account_terms[term], element_atoms)
+
+    authority_by_species = _surface_authority_by_species(sim, snapshots)
+    rows: list[dict[str, Any]] = []
+    maximum_residual_fraction = 0.0
+    maximum_residual_mol_atoms = 0.0
+    refused_elements: list[str] = []
+    derived_elements: list[str] = []
+    term_names = [
+        *_IDEAL_TRAIN_IN_POT_DESTINATION_TERMS.values(),
+        *_IDEAL_TRAIN_OTHER_DESTINATION_TERMS.values(),
+    ]
+    for element, denominator_raw in sorted(feedstock_input.items()):
+        denominator = float(denominator_raw)
+        if denominator <= 0.0:
+            continue
+        row_refusals: list[dict[str, Any]] = []
+        surface_value: float | None = float(surface_crossed.get(element, 0.0))
+        tap_value: float | None = float(drain_tapped.get(element, 0.0))
+
+        if surface_refusals.get(element):
+            surface_value = None
+            row_refusals.extend(surface_refusals[element])
+        if tap_refusals.get(element):
+            tap_value = None
+            row_refusals.extend(tap_refusals[element])
+        tap_account_residual = float(tap_account_atoms.get(element, 0.0)) - float(
+            drain_tapped.get(element, 0.0)
+        )
+        if (
+            tap_account_residual > _atom_tolerance(denominator)
+        ):
+            term_accounts["other_product_tapped"].add(
+                _IDEAL_TRAIN_TAP_ACCOUNT
+            )
+            tap_value = None
+            row_refusals.append(
+                {
+                    "code": "drain_account_not_backed_by_tap_transition",
+                    "account_mol_atoms": float(tap_account_atoms[element]),
+                    "transition_mol_atoms": float(drain_tapped.get(element, 0.0)),
+                }
+            )
+
+        terms: dict[str, float | None] = {}
+        term_provenance: dict[str, dict[str, Any]] = {}
+        for term in term_names:
+            amount = float(account_terms[term].get(element, 0.0))
+            if term == "other_product_tapped":
+                amount = max(0.0, tap_account_residual)
+            # An in-pot or downstream account is retained as its own named
+            # term only when no surface transition already proves those atoms
+            # crossed the melt boundary. Never infer ideal yield by subtracting
+            # a downstream account; an overlap larger than the direct event
+            # evidence is a typed refusal.
+            if (
+                (
+                    term == "retained_overhead_terminal_inventory"
+                    or term in _IDEAL_TRAIN_OTHER_DESTINATION_TERMS.values()
+                )
+                and surface_value is not None
+                and surface_value > _atom_tolerance(denominator)
+                and amount > _atom_tolerance(denominator)
+            ):
+                if amount <= surface_value + _atom_tolerance(denominator):
+                    amount = 0.0
+                else:
+                    row_refusals.append(
+                        {
+                            "code": "downstream_account_exceeds_surface_transition",
+                            "term": term,
+                            "account_mol_atoms": amount,
+                            "transition_mol_atoms": surface_value,
+                        }
+                    )
+                    amount = None
+            terms[term] = amount
+            term_provenance[term] = {
+                "status": "derived" if amount is not None else "refused",
+                "authority": "ledger_derived",
+                "source_accounts": sorted(term_accounts[term]),
+                "flags": [],
+            }
+            if amount is None:
+                term_provenance[term]["refusal"] = [
+                    {
+                        "code": "downstream_account_exceeds_surface_transition",
+                        "term": term,
+                    }
+                ]
+
+        surface_provenance: dict[str, Any] = {
+            "status": "derived" if surface_value is not None else "refused",
+            "authority": "ledger_derived",
+            "source": (
+                "ledger.transitions: evaporate_* debits of "
+                "process.cleaned_melt, excluding same-transition "
+                "reservoir.fo2_buffer credits; plus direct "
+                "reservoir.fo2_buffer-to-overhead oxygen exchange net of "
+                "feedstock-origin buffer credits returned from overhead"
+            ),
+            "flags": [],
+            "by_species": {},
+        }
+        for species in sorted(surface_species_by_element.get(element, ())):
+            records = authority_by_species.get(species, ())
+            if records:
+                surface_provenance["by_species"][species] = copy.deepcopy(records)
+                for record in records:
+                    surface_provenance["flags"].extend(record.get("flags", ()))
+        surface_provenance["flags"].extend(
+            surface_transition_flags.get(element, ())
+        )
+        surface_provenance["flags"] = sorted(set(surface_provenance["flags"]))
+        if surface_value is None:
+            surface_provenance["refusal"] = copy.deepcopy(
+                surface_refusals.get(element, ())
+            )
+        term_provenance["surface_crossed"] = surface_provenance
+
+        tap_provenance: dict[str, Any] = {
+            "status": "derived" if tap_value is not None else "refused",
+            "authority": "ledger_derived",
+            "source": (
+                "ledger.transitions: credits to terminal.drain_tap_material; "
+                "ledger.external_loads: typed Stage-0 native-metal seed"
+            ),
+            "flags": sorted(tap_provenance_flags.get(element, ())),
+        }
+        if tap_value is None:
+            tap_provenance["refusal"] = [
+                refusal
+                for refusal in row_refusals
+                if str(refusal.get("code", "")).startswith("tap_")
+                or str(refusal.get("code", "")).startswith("drain_")
+            ]
+        term_provenance["drain_tapped"] = tap_provenance
+
+        redox_provenance = term_provenance["retained_redox_buffer"]
+        redox_provenance["flags"] = [_IDEAL_TRAIN_REDOX_FLAG]
+        redox_provenance["source_accounts"] = ["reservoir.fo2_buffer"]
+
+        all_term_values: dict[str, float | None] = {
+            "surface_crossed": surface_value,
+            "drain_tapped": tap_value,
+            **terms,
+        }
+        numeric_terms = [
+            value for value in all_term_values.values() if value is not None
+        ]
+        if len(numeric_terms) == len(all_term_values):
+            total = math.fsum(float(value) for value in numeric_terms)
+            residual_mol_atoms = total - denominator
+            residual_fraction = residual_mol_atoms / denominator
+            if abs(residual_fraction) > _IDEAL_TRAIN_CLOSURE_LIMIT_FRACTION:
+                row_refusals.append(
+                    {
+                        "code": "ideal_train_partition_not_closed",
+                        "residual_mol_atoms": residual_mol_atoms,
+                        "residual_fraction": residual_fraction,
+                    }
+                )
+            maximum_residual_fraction = max(
+                maximum_residual_fraction,
+                abs(residual_fraction),
+            )
+            maximum_residual_mol_atoms = max(
+                maximum_residual_mol_atoms,
+                abs(residual_mol_atoms),
+            )
+        else:
+            residual_mol_atoms = None
+            residual_fraction = None
+
+        status = "ok" if not row_refusals else "refused"
+        if status == "refused":
+            refused_elements.append(element)
+            term_provenance["ideal_train_fraction"] = {
+                "status": "refused",
+                "authority": "ledger_derived",
+                "flags": [],
+                "refusal": row_refusals,
+            }
+        else:
+            derived_elements.append(element)
+        ideal_train_mol_atoms = (
+            None
+            if row_refusals or surface_value is None or tap_value is None
+            else surface_value + tap_value
+        )
+        ideal_train_fraction = (
+            None
+            if ideal_train_mol_atoms is None
+            else ideal_train_mol_atoms / denominator
+        )
+        row = {
+            "element": element,
+            "status": status,
+            "feedstock_input_mol_atoms": denominator,
+            "terms_mol_atoms": all_term_values,
+            "term_provenance": term_provenance,
+            "surface_crossed_mol_atoms": surface_value,
+            "drain_tapped_mol_atoms": tap_value,
+            "ideal_train_mol_atoms": ideal_train_mol_atoms,
+            "ideal_train_fraction": ideal_train_fraction,
+            "partition_residual_mol_atoms": residual_mol_atoms,
+            "partition_residual_fraction": residual_fraction,
+        }
+        for term, amount in all_term_values.items():
+            row[term] = amount
+            row[f"{term}_mol_atoms"] = amount
+        if row_refusals:
+            row["refusals"] = row_refusals
+        rows.append(row)
+
+    return {
+        "basis": "feedstock_element_atom_fraction",
+        "control_volume": "pot",
+        "status": (
+            "ok"
+            if derived_elements and not refused_elements
+            else "partial"
+            if derived_elements
+            else "refused"
+        ),
+        "terms": ["surface_crossed", "drain_tapped", *term_names],
+        "other_in_pot_terms": [
+            term
+            for term in _IDEAL_TRAIN_IN_POT_DESTINATION_TERMS.values()
+            if term not in {"retained_melt", "retained_redox_buffer"}
+        ],
+        "other_terminal_terms": list(
+            _IDEAL_TRAIN_OTHER_DESTINATION_TERMS.values()
+        ),
+        "derivation": {
+            "surface_crossed": (
+                "feedstock-origin element atoms in each evaporate_* "
+                "transition's process.cleaned_melt debit, minus same-transition "
+                "reservoir.fo2_buffer credits; plus the explicit Fe vapour "
+                "credit of native_fe_metal_partition and native Fe saturation "
+                "overhead-vapour credits, and oxygen_reservoir_exchange "
+                "net feedstock-origin atoms: reservoir.fo2_buffer debits "
+                "outward minus buffer credits returned from process.overhead_gas"
+            ),
+            "drain_tapped": (
+                "feedstock-origin element atoms in ledger transition credits "
+                "to terminal.drain_tap_material, plus the typed Stage-0 "
+                "native-metal external load"
+            ),
+            "retained_melt": (
+                "feedstock-origin atoms in accounts mapped to melt_retained"
+            ),
+            "retained_redox_buffer": (
+                "feedstock-origin atoms in reservoir.fo2_buffer; meaning remains "
+                "under investigation"
+            ),
+            "other_in_pot_terms": (
+                "each named current ledger account mapped to an in-pot destination "
+                "term"
+            ),
+            "other_terminal_terms": (
+                "typed current account atoms without an evaporation transition "
+                "claim; these terms are excluded from ideal-train yield"
+            ),
+        },
+        "rows": rows,
+        "closure": {
+            "limit_fraction": _IDEAL_TRAIN_CLOSURE_LIMIT_FRACTION,
+            "maximum_residual_fraction": maximum_residual_fraction,
+            "maximum_residual_mol_atoms": maximum_residual_mol_atoms,
+            "refused_elements": refused_elements,
+        },
+    }
+
+
+def _transition_feedstock_atoms(
+    transition: Any,
+    side: str,
+    account: str,
+    registry: Mapping[str, Any],
+) -> tuple[dict[str, float], set[str]]:
+    return _feedstock_atoms_from_lots(
+        getattr(transition, side, ()),
+        registry,
+        account,
+    )
+
+
+def _feedstock_atoms_from_lots(
+    lots: Iterable[Any],
+    registry: Mapping[str, Any],
+    account: str,
+) -> tuple[dict[str, float], set[str]]:
+    atoms: defaultdict[str, float] = defaultdict(float)
+    unresolved: set[str] = set()
+    for lot in lots:
+        if str(getattr(lot, "account", "")) != account:
+            continue
+        physical_atoms = _element_atoms(
+            _positive_species(getattr(lot, "species_kg", {})),
+            registry,
+        )
+        raw_origins = getattr(lot, "origin_atom_moles", {})
+        origin_atoms = (
+            raw_origins.get("feedstock", {})
+            if isinstance(raw_origins, Mapping)
+            else {}
+        )
+        all_typed_atoms: defaultdict[str, float] = defaultdict(float)
+        if isinstance(raw_origins, Mapping):
+            for elements in raw_origins.values():
+                if not isinstance(elements, Mapping):
+                    continue
+                for element, raw_amount in elements.items():
+                    all_typed_atoms[str(element)] += float(raw_amount)
+        for element, physical_amount in physical_atoms.items():
+            if (
+                float(physical_amount)
+                - float(all_typed_atoms.get(element, 0.0))
+                > _atom_tolerance(physical_amount)
+            ):
+                unresolved.add(element)
+        if isinstance(origin_atoms, Mapping):
+            for element, raw_amount in origin_atoms.items():
+                amount = float(raw_amount)
+                if not math.isfinite(amount) or amount < 0.0:
+                    raise YieldDispositionError(
+                        f"invalid feedstock transition origin for {account}.{element}"
+                    )
+                if amount > 0.0:
+                    atoms[str(element)] += amount
+    return dict(atoms), unresolved
+
+
+def _feedstock_origin_by_account(ledger: Any) -> dict[str, dict[str, float]]:
+    result: dict[str, dict[str, float]] = {}
+    origin_balances = ledger.origin_atom_moles_by_account()
+    for account, element_origins in origin_balances.items():
+        if not isinstance(element_origins, Mapping):
+            continue
+        values: defaultdict[str, float] = defaultdict(float)
+        for element, origins in element_origins.items():
+            if not isinstance(origins, Mapping):
+                continue
+            amount = float(origins.get("feedstock", 0.0))
+            if amount > 0.0:
+                values[str(element)] += amount
+        if values:
+            result[str(account)] = dict(values)
+    return result
+
+
+def _evaporation_authority_snapshot(sim: Any, snapshot: Any) -> dict[str, Any]:
+    flux = getattr(snapshot, "evap_flux", None)
+    alpha = getattr(flux, "alpha_authority_status_by_species", {})
+    carrier = getattr(flux, "carrier_authority_by_species", {})
+    result: dict[str, Any] = {}
+    if isinstance(alpha, Mapping) and alpha:
+        result["alpha_authority_status_by_species"] = copy.deepcopy(dict(alpha))
+    if isinstance(carrier, Mapping) and carrier:
+        result["carrier_authority_by_species"] = copy.deepcopy(dict(carrier))
+    return result
+
+
+def _surface_authority_by_species(
+    sim: Any,
+    snapshots: tuple[Mapping[str, Any], ...],
+) -> dict[str, list[dict[str, Any]]]:
+    result: dict[str, list[dict[str, Any]]] = defaultdict(list)
+
+    def add_records(
+        alpha: Any,
+        carrier: Any,
+        notices: Mapping[str, Any] | None = None,
+    ) -> None:
+        alpha_map = alpha if isinstance(alpha, Mapping) else {}
+        carrier_map = carrier if isinstance(carrier, Mapping) else {}
+        notice_map = notices if isinstance(notices, Mapping) else {}
+        for species in sorted(set(alpha_map) | set(carrier_map) | set(notice_map)):
+            record = _compact_authority_record(
+                alpha_map.get(species),
+                carrier_map.get(species),
+                notice_map.get(species),
+            )
+            if record and record not in result[str(species)]:
+                result[str(species)].append(record)
+
+    for snapshot in snapshots:
+        authority = snapshot.get("evaporation_authority")
+        if not isinstance(authority, Mapping):
+            continue
+        add_records(
+            authority.get("alpha_authority_status_by_species"),
+            authority.get("carrier_authority_by_species"),
+        )
+
+    add_records(
+        getattr(sim, "_alpha_authority_status_by_species_engaged", {}),
+        {},
+    )
+    report = getattr(sim, "_last_vapour_batch_report", {})
+    channels = report.get("channels_by_species") if isinstance(report, Mapping) else {}
+    add_records({}, channels)
+    diagnostic = getattr(sim, "_last_evaporation_flux_diagnostic", {})
+    series = (
+        diagnostic.get("evaporation_series_resistance")
+        if isinstance(diagnostic, Mapping)
+        else {}
+    )
+    notices = {}
+    if isinstance(series, Mapping):
+        notices = {
+            str(species): data.get("continuum_extrapolation_notice")
+            for species, data in series.items()
+            if isinstance(data, Mapping) and data.get("continuum_extrapolation_notice")
+        }
+    add_records({}, {}, notices)
+    return {species: records for species, records in result.items()}
+
+
+def _compact_authority_record(
+    alpha_status: Any,
+    carrier_record: Any,
+    extrapolation_notice: Any = None,
+) -> dict[str, Any]:
+    flags: list[str] = []
+    record: dict[str, Any] = {}
+    if alpha_status not in (None, ""):
+        value = str(alpha_status)
+        record["alpha_authority_status"] = value
+        flags.append(f"alpha_authority_status:{value}")
+    if isinstance(carrier_record, Mapping):
+        for key in ("authority_status", "authority_level", "status"):
+            value = carrier_record.get(key)
+            if value not in (None, ""):
+                record[key] = copy.deepcopy(value)
+                flags.append(f"carrier_{key}:{value}")
+        raw_flags = carrier_record.get("flags")
+        if isinstance(raw_flags, (list, tuple, set, frozenset)):
+            record["carrier_flags"] = [str(value) for value in raw_flags]
+            flags.extend(str(value) for value in raw_flags)
+        extra = carrier_record.get("extra")
+        notices = []
+        if isinstance(extra, Mapping):
+            candidate_notices = [extra.get("extrapolation_notice")]
+            candidate_notices.extend(extra.get("extrapolation_notices", ()))
+            notices.extend(
+                value for value in candidate_notices if isinstance(value, Mapping)
+            )
+        if notices:
+            record["extrapolation_notices"] = copy.deepcopy(notices)
+            flags.append("extrapolation_notice")
+    if isinstance(extrapolation_notice, Mapping):
+        record.setdefault("extrapolation_notices", []).append(
+            copy.deepcopy(dict(extrapolation_notice))
+        )
+        flags.append("extrapolation_notice")
+    if not record:
+        return {}
+    record["flags"] = sorted(set(flags))
+    return record
 
 
 def _account_subdisposition(account: str) -> str | None:
