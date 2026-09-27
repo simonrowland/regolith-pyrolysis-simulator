@@ -393,7 +393,10 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_log_fO2_from_fe3_over_sigma_fe,
     kress91_split,
+    kress91_temperature_band_case,
     melt_mol_fractions_for_kress91,
+    REDOX_CERTIFIED_PO2_BAND_BAR,
+    RedoxDomainRecord,
 )
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.config_flags import bool_feature_flag
@@ -1267,6 +1270,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_impurity_delta: Dict[Tuple[int, str], float] = {}
         self._last_native_fe_partition_diagnostic: Dict[str, Any] = {}
         self._last_native_fe_saturation_event: Dict[str, Any] = {}
+        self._last_redox_domain: RedoxDomainRecord | dict[str, Any] = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr: float | None = None
 
         # --- Gas train feedback state ---
@@ -1585,6 +1589,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._target_inventory_depletion_hour = None
         self._last_native_fe_partition_diagnostic = {}
         self._last_native_fe_saturation_event = {}
+        self._last_redox_domain = {}
         self._last_fe_redox_respeciation_diagnostic = {}
         self._last_melt_redox_liquidus_gate_diagnostic = {}
         self._last_melt_redox_liquid_fraction_diagnostic = {}
@@ -5551,6 +5556,52 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
         )
 
+    @staticmethod
+    def _redox_domain_record(
+        *,
+        fO2_log: float,
+        basis: Literal['fe_feo_buffer', 'kress91_inverse'],
+        endpoint_clamped: bool,
+        endpoint_epsilon: float,
+        endpoint_provenance: str,
+        authority_level: str,
+        reason: str,
+    ) -> RedoxDomainRecord:
+        try:
+            equivalent_pO2_bar = 10.0 ** float(fO2_log)
+        except (OverflowError, TypeError, ValueError):
+            equivalent_pO2_bar = float('inf')
+        certified_min_bar, certified_max_bar = REDOX_CERTIFIED_PO2_BAND_BAR
+        in_certified_band = (
+            math.isfinite(equivalent_pO2_bar)
+            and certified_min_bar <= equivalent_pO2_bar <= certified_max_bar
+        )
+        status = 'ok' if in_certified_band else 'out_of_domain'
+        effective_authority = (
+            str(authority_level) if in_certified_band else 'extrapolated'
+        )
+        effective_reason = str(reason)
+        if not in_certified_band:
+            effective_reason = (
+                f'{effective_reason}; '
+                'derived_pO2_outside_certified_band'
+            )
+        return {
+            'status': status,
+            'derived_fO2_log': float(fO2_log),
+            'equivalent_pO2_bar': float(equivalent_pO2_bar),
+            'basis': basis,
+            'certified_band': {
+                'pO2_bar': (certified_min_bar, certified_max_bar),
+            },
+            'endpoint_clamped': bool(endpoint_clamped),
+            'endpoint_epsilon': float(endpoint_epsilon),
+            'endpoint_provenance': str(endpoint_provenance),
+            'authority': effective_authority,
+            'authority_level': effective_authority,
+            'reason': effective_reason,
+        }
+
     def _melt_fO2_from_ledger(
         self,
         *,
@@ -5558,14 +5609,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> Optional[float]:
         """Derive intrinsic melt fO2 from the ledger Fe3+/sumFe state.
 
-        The ledger ratio is the sole melt-redox state.  Kress91 is a relation
-        used in the forward direction for diagnostics and in this inverse
-        direction for the reported intrinsic fO2; no oxygen source term may
-        integrate a second fO2 state.  Clamping q only to the open Kress domain
-        keeps a finite derived value when a valid atom ledger reaches an exact
-        FeO/Fe2O3 endpoint.  It does not change the ledger or create O2.
+        The ledger remains authoritative for Fe inventory.  When native Fe
+        metal coexists with FeO in that melt, the Fe--FeO buffer supplies the
+        redox state; Kress91 inversion is retained for the non-coexisting
+        case.  Both paths preserve endpoint provenance in the typed domain
+        record, and neither path mutates the ledger or creates O2.
         """
 
+        self._last_redox_domain = {}
+        melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
+        feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
+        fe2o3_mol = max(0.0, float(melt_mol.get('Fe2O3', 0.0) or 0.0))
+        total_fe_mol = feo_mol + 2.0 * fe2o3_mol
+        if total_fe_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+            return None
+        raw_ferric = (2.0 * fe2o3_mol) / total_fe_mol
         ferric = self._ledger_fe3_over_sigma_fe()
         if ferric is None:
             return None
@@ -5587,6 +5645,104 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             float(self.melt.p_total_mbar) / 1000.0,
             floor_bar=self._vacuum_floor_bar(),
         )
+        endpoint_clamped = (
+            raw_ferric <= KRESS91_FERRIC_FRACTION_EPSILON
+            or raw_ferric >= 1.0 - KRESS91_FERRIC_FRACTION_EPSILON
+        )
+        endpoint_provenance = (
+            'ledger_fe3_over_sigma_fe='
+            f'{raw_ferric:.17g}; endpoint_clamped={endpoint_clamped}; '
+            f'epsilon={KRESS91_FERRIC_FRACTION_EPSILON:.17g}'
+        )
+        temperature_band = kress91_temperature_band_case(
+            temperature_K - 273.15
+        )
+        authority_level = (
+            'certified'
+            if bool(temperature_band.get('authoritative', False))
+            else 'extrapolated'
+        )
+
+        native_partition = dict(
+            getattr(self, '_last_native_fe_partition_diagnostic', {}) or {}
+        )
+        native_metal_account = self.atom_ledger.project_account_mol(
+            'process.metal_phase'
+        )
+        native_fe_mol = max(
+            0.0,
+            float(native_metal_account.get('Fe', 0.0) or 0.0),
+            float(native_partition.get('native_fe_pool_mol', 0.0) or 0.0),
+        )
+        native_fe_coexists = (
+            native_fe_mol > OXYGEN_RESERVOIR_NOOP_MOL
+            and feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
+        )
+        buffer_failure_reason = ''
+        if native_fe_coexists:
+            cached_a_feo = native_partition.get('native_fe_activity')
+            try:
+                a_feo = float(cached_a_feo)
+            except (TypeError, ValueError):
+                a_feo = 0.0
+            activity_source = 'cached_native_fe_saturation_activity'
+            if not math.isfinite(a_feo) or a_feo <= 0.0:
+                activity_source = 'current_melt_activity_path'
+                reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+                activity_fO2_log = getattr(
+                    reservoir,
+                    'melt_intrinsic_fO2_log',
+                    getattr(self.melt, 'melt_fO2_log', -9.0),
+                )
+                try:
+                    activity = calphad_ferrous_feo_activity_diagnostic(
+                        comp_wt=comp,
+                        fO2_log=float(activity_fO2_log),
+                        T_K=temperature_K,
+                        pressure_bar=pressure_bar,
+                    )
+                    a_feo = float(
+                        activity.get('a_FeO_authoritative', 0.0) or 0.0
+                    )
+                except Exception as exc:  # noqa: BLE001 -- prediction fallback
+                    buffer_failure_reason = (
+                        'fe_feo_buffer_activity_error:'
+                        f'{type(exc).__name__}'
+                    )
+                    a_feo = 0.0
+            if math.isfinite(a_feo) and a_feo > 0.0:
+                # From 2Fe + O2 = 2FeO, K = a_FeO^2/(a_Fe^2 fO2).
+                # Therefore log10(fO2) = log10(fO2(IW,T)) +
+                # 2*log10(a_FeO) - 2*log10(a_Fe); native Fe is pure here,
+                # so a_Fe=1 unless an alloy activity is carried explicitly.
+                fO2_log = (
+                    feo_iw_log10_fO2_bar(temperature_K, a_feo=1.0)
+                    + 2.0 * math.log10(a_feo)
+                    - 2.0 * math.log10(1.0)
+                )
+                fO2_log = self._finite_oxygen_reservoir_fO2_log(
+                    fO2_log,
+                    context='ledger_fe_feo_buffered_melt_fO2',
+                )
+                self._last_redox_domain = self._redox_domain_record(
+                    fO2_log=fO2_log,
+                    basis='fe_feo_buffer',
+                    endpoint_clamped=endpoint_clamped,
+                    endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
+                    endpoint_provenance=endpoint_provenance,
+                    authority_level=authority_level,
+                    reason=(
+                        'native_fe_metal_coexists_with_melt; '
+                        f'a_FeO_source={activity_source}; a_Fe=1_pure_native_Fe; '
+                        f'{endpoint_provenance}'
+                    ),
+                )
+                return fO2_log
+            if not buffer_failure_reason:
+                buffer_failure_reason = (
+                    'fe_feo_buffer_unavailable_nonpositive_a_FeO'
+                )
+
         fO2_log = kress91_log_fO2_from_fe3_over_sigma_fe(
             fe3_over_sigma_fe=max(
                 KRESS91_FERRIC_FRACTION_EPSILON,
@@ -5596,10 +5752,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K=temperature_K,
             pressure_bar=pressure_bar,
         )
-        return self._finite_oxygen_reservoir_fO2_log(
+        fO2_log = self._finite_oxygen_reservoir_fO2_log(
             fO2_log,
             context='ledger_derived_melt_fO2',
         )
+        inverse_reason = (
+            'kress91_inverse_from_ledger_ferric_fraction; '
+            f'{endpoint_provenance}'
+        )
+        if buffer_failure_reason:
+            inverse_reason = f'{inverse_reason}; {buffer_failure_reason}'
+        self._last_redox_domain = self._redox_domain_record(
+            fO2_log=fO2_log,
+            basis='kress91_inverse',
+            endpoint_clamped=endpoint_clamped,
+            endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
+            endpoint_provenance=endpoint_provenance,
+            authority_level=authority_level,
+            reason=inverse_reason,
+        )
+        return fO2_log
 
     def _melt_redox_capacity_mol_per_ln_fO2(
         self,
@@ -7589,8 +7761,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_fe_redox_respeciation_diagnostics_this_hr', []) or []
             )
         ]
+        redox_domain = dict(
+            getattr(self, '_last_redox_domain', {}) or {}
+        )
         if not terms and not respeciation_attempts:
-            return {}
+            return {'redox_domain': redox_domain} if redox_domain else {}
         applied_terms = _filtered_terms('_redox_source_applied_terms_this_hr')
         skipped_terms = _filtered_terms('_redox_source_skipped_terms_this_hr')
         all_skip_reasons = dict(
@@ -7638,6 +7813,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'source_campaign': str(source_context.get('campaign', '')),
             'source_hour': int(source_context.get('hour', 0)),
             'source_campaign_hour': int(source_context.get('campaign_hour', 0)),
+            **({'redox_domain': redox_domain} if redox_domain else {}),
         }
 
     def _apply_oxygen_reservoir_exchange(
@@ -8564,6 +8740,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         native = min(1.0, max(0.0, float(
             native_extent.get('native_fe_frac', 0.0) or 0.0,
         )))
+        redox_domain = dict(
+            getattr(self, '_last_redox_domain', {}) or {}
+        )
         ferrous = max(0.0, 1.0 - fe3 - native)
         return {
             **base,
@@ -8587,6 +8766,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'authoritative': bool(split.get('authoritative', False)),
             'extrapolation': bool(split.get('extrapolation', False)),
             'high_uncertainty': bool(split.get('high_uncertainty', False)),
+            **({'redox_domain': redox_domain} if redox_domain else {}),
             **(
                 {'native_fe_partition': dict(
                     getattr(self, '_last_native_fe_partition_diagnostic', {})
@@ -9145,6 +9325,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return {**split, **event}
         partition = self._native_fe_partition_diagnostic(native_fe_mol)
         partition['native_fe_source_account'] = native_fe_source_account
+        native_fe_state = dict(native_extent.get('native_fe_state', {}) or {})
+        native_fe_activity = native_fe_state.get('native_fe_activity')
+        try:
+            native_fe_activity = float(native_fe_activity)
+        except (TypeError, ValueError):
+            native_fe_activity = 0.0
+        if math.isfinite(native_fe_activity) and native_fe_activity > 0.0:
+            # Preserve the melt-activity path evaluated before the FeO debit;
+            # the post-transition ledger can be at the ferric endpoint and
+            # cannot reconstruct that Fe--FeO coexistence activity by itself.
+            partition['native_fe_activity'] = native_fe_activity
+            partition['native_fe_activity_source'] = str(
+                native_fe_state.get('native_fe_activity_source', '')
+                or 'native_fe_saturation_activity'
+            )
 
         control_inputs = {
             'native_fe_mol': native_fe_mol,
@@ -14979,6 +15174,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_impurity_delta = {}
         self._last_native_fe_partition_diagnostic = {}
         self._last_native_fe_saturation_event = {}
+        self._last_redox_domain = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_partial_melt_offgassing_diagnostic = {}
         self._silent_zero_notes = []
