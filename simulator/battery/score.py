@@ -34,6 +34,7 @@ from simulator.battery.enums import (
     MEASURED_EVIDENCE,
     MELT_ACTIVITY_QUANTITIES,
     MetricOperation,
+    MethodToken,
     NoticeKind,
     Phase,
     PURE_STANDARD_THERMO,
@@ -82,6 +83,7 @@ from simulator.battery.records import (
     phase_token,
     union_notices,
 )
+from simulator.battery.source_lineage import coefficient_lineage_sources
 from simulator.battery.validate import (
     _observation_lineage,
     _pressure_blocking_notices,
@@ -310,6 +312,7 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "ellingham": ("janaf-4th", "nasa-cea-thermo", "nasa-glenn"),
     "imcc-sf04-v1.0.2": ("sf04-magma-companion-workbook",),
     "imcc-sf04-ext-v4": ("sf04-magma-companion-workbook",),
+    "openimcc-v1.0.2": ("sf04-magma-companion-workbook",),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
@@ -764,10 +767,13 @@ def lineage_complete_for(
     must return a set (unknown strings are not independence).
     """
 
-    for src in sources:
+    lineage_sources = coefficient_lineage_sources(sources)
+    if not lineage_sources:
+        return False
+    for src in lineage_sources:
         if src in _ENGINE_SOURCE_ALIASES and src not in COEFFICIENT_SOURCE_STORE_IDS:
             return False
-    expanded = expand_coefficient_sources(sources)
+    expanded = expand_coefficient_sources(lineage_sources)
     if works is None or observations is None:
         return True
     return (
@@ -790,7 +796,10 @@ def resolve_source_relation(
     table_ids = _table_ids(works)
     ref_ids = _observation_lineage(reference.observation_id, observations, table_ids)
     cand_ids = _resolve_coefficient_sources(
-        coefficient_sources, observations, works, experiments
+        coefficient_lineage_sources(coefficient_sources),
+        observations,
+        works,
+        experiments,
     )
     if ref_ids is None or cand_ids is None:
         return SourceRelation.UNKNOWN
@@ -882,19 +891,232 @@ def unit_dimension(unit: str) -> str | None:
 def band_dimension_matches(quantity: Quantity, band: DecisionBand) -> bool:
     """True only when the band and the quantity share one dimension.
 
-    kJ/mol does not match J/mol/K or a dimensionless quantity. Scale
-    aliases that are not in ``_UNIT_DIMENSION`` fail closed.
+    Residual metrics (relative and dex) are dimensionless even when their
+    source quantity has a physical unit. kJ/mol does not match J/mol/K.
+    Scale aliases that are not in ``_UNIT_DIMENSION`` fail closed.
     """
 
+    if (
+        band.unit == "dimensionless"
+        and metric_operation(quantity) in {MetricOperation.RELATIVE, MetricOperation.DEX}
+    ):
+        return True
     quantity_dim = unit_dimension(QUANTITY_UNITS[quantity])
     band_dim = unit_dimension(band.unit)
     return quantity_dim is not None and quantity_dim == band_dim
 
 
+def pooled_log_pressure_sd(
+    replicate_log_pressures: Sequence[Sequence[Decimal | int | float]],
+) -> Decimal | None:
+    """Return the pooled sample SD of replicate ``log10(p)`` values.
+
+    Premise: rows in one replicate group share composition, temperature, and
+    method, so their log-pressure spread estimates measurement scatter.
+    Algebra: for group g, s²_g = Σ(x_g−x̄_g)²/(n_g−1); pool with
+    s² = Σ(n_g−1)s²_g / Σ(n_g−1). Unit check: x = log10(p), so s is dex;
+    no pressure unit remains. Sanity: groups ``(−1, 0, 1)`` and ``(9, 10,
+    11)`` both have SD 1, hence the pooled result is 1 dex.
+    """
+
+    sum_squares = Decimal(0)
+    degrees_of_freedom = 0
+    for raw_group in replicate_log_pressures:
+        group: list[Decimal] = []
+        for raw_value in raw_group:
+            try:
+                value = as_decimal(raw_value)
+            except (TypeError, ValueError, ArithmeticError):
+                continue
+            if value.is_finite():
+                group.append(value)
+        if len(group) < 2:
+            continue
+        mean = sum(group, Decimal(0)) / Decimal(len(group))
+        sum_squares += sum((value - mean) ** 2 for value in group)
+        degrees_of_freedom += len(group) - 1
+    if degrees_of_freedom == 0:
+        return None
+    return (sum_squares / Decimal(degrees_of_freedom)).sqrt()
+
+
+def _printed_pressure_uncertainty_dex(observation: Observation) -> Decimal | None:
+    uncertainty = observation.uncertainty
+    if uncertainty.kind is not UncertaintyKind.PRINTED:
+        return None
+    if uncertainty.value is not None and uncertainty.basis in {
+        "relative",
+        "fraction",
+    }:
+        raw = uncertainty.value
+        if isinstance(raw, tuple):
+            fraction = max(abs(raw[0]), abs(raw[1]))
+        else:
+            fraction = abs(raw)
+        if fraction.is_finite() and fraction > 0:
+            return (Decimal(1) + fraction).ln() / Decimal(10).ln()
+    try:
+        text = json.dumps(to_plain(uncertainty.verbatim), sort_keys=True)
+    except (TypeError, ValueError):
+        text = str(uncertainty.verbatim)
+    for match in re.finditer(r"(\d+(?:\.\d+)?)\s*(?:%|percent)", text, re.IGNORECASE):
+        window = text[max(0, match.start() - 80) : min(len(text), match.end() + 80)]
+        if not re.search(r"\b(?:k\s+)?pressure\b|\bp[_\s]?k\b", window, re.IGNORECASE):
+            continue
+        fraction = Decimal(match.group(1)) / Decimal(100)
+        if fraction > 0:
+            # The source prints a relative pressure envelope. Convert its
+            # upper multiplicative edge to the dex residual metric; this is
+            # the same ~0.15 dex reading used by the source's ±40% statement.
+            return (Decimal(1) + fraction).ln() / Decimal(10).ln()
+    return None
+
+
+def _kems_replicate_groups(
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+) -> tuple[tuple[Decimal, ...], ...]:
+    groups: dict[tuple[object, ...], list[Decimal]] = {}
+    for observation in observations.values():
+        identity = observation.identity
+        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+        if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
+            continue
+        evidence = observation.evidence.class_
+        if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
+            continue
+        experiment = experiments.get(observation.experiment_id)
+        if (
+            experiment is None
+            or not experiment.method.is_value
+            or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+            or observation.admission.status is not AdmissionStatus.ADMITTED
+        ):
+            continue
+        temperature = temperature_of(identity)
+        composition = identity.composition
+        point = point_magnitude(observation.value)
+        if (
+            temperature is None
+            or composition is None
+            or not composition.is_value
+            or composition.value is None
+            or point is None
+            or point <= 0
+        ):
+            continue
+        key = (
+            observation.experiment_id,
+            identity.species.formula,
+            str(temperature),
+            tuple((name, str(amount)) for name, amount in composition.value.components),
+        )
+        groups.setdefault(key, []).append(
+            point.ln() / Decimal(10).ln()
+        )
+    return tuple(tuple(values) for values in groups.values() if len(values) >= 2)
+
+
+def derive_kems_partial_pressure_band(
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+) -> DecisionBand | None:
+    """Derive one KEMS p_partial band from admitted measured observations.
+
+    Printed pressure uncertainty is preferred. If a row has no usable printed
+    pressure uncertainty, exact composition/T replicate groups supply the
+    pooled log-pressure scatter; no engine residual enters this calculation.
+    """
+
+    candidates = []
+    for observation in observations.values():
+        identity = observation.identity
+        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+        if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
+            continue
+        evidence = observation.evidence.class_
+        if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
+            continue
+        experiment = experiments.get(observation.experiment_id)
+        if (
+            experiment is None
+            or not experiment.method.is_value
+            or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+            or observation.admission.status is not AdmissionStatus.ADMITTED
+            or rail_for_quantity(quantity, species_formula=identity.species.formula)
+            is not Rail.VAPOUR
+        ):
+            continue
+        candidates.append(observation)
+    if not candidates:
+        return None
+
+    printed_observations = [
+        (observation, width)
+        for observation in candidates
+        if (width := _printed_pressure_uncertainty_dex(observation)) is not None
+    ]
+    printed = [width for _, width in printed_observations]
+    if printed:
+        width = _rms(printed)
+        if width is None or not width.is_finite() or width <= 0:
+            return None
+        if any(
+            observation.source_id == "kems-042-plante-1979"
+            for observation, _ in printed_observations
+        ):
+            rule = (
+                "KEMS p_partial measured uncertainty: source-printed pressure "
+                "envelope (RMS of admitted printed log10 pressure envelopes only); "
+                "Plante width log10(1.40) from the printed page-280 1500 K "
+                "sentence, using the upper multiplicative edge and accepting "
+                "pressure ratios [1/1.40, 1.40] (-28.6%..+40%), not a symmetric "
+                "+/-40% relative band; NOTICE: the single 1500 K figure is "
+                "applied across the tabulated T range"
+            )
+        else:
+            rule = (
+                "KEMS p_partial measured uncertainty: source-printed pressure "
+                "envelope (RMS of admitted printed log10 pressure envelopes only)"
+            )
+        return DecisionBand(width, "dimensionless", rule)
+
+    replicate_scatter = pooled_log_pressure_sd(
+        _kems_replicate_groups(observations, experiments)
+    )
+    if replicate_scatter is None:
+        return None
+    width = replicate_scatter
+    if width is None or not width.is_finite() or width <= 0:
+        return None
+    rule = (
+        "KEMS p_partial measured uncertainty: replicate scatter (pooled replicate "
+        "log10 pressure SD; used because no admitted printed pressure envelope "
+        "exists)"
+    )
+    return DecisionBand(width, "dimensionless", rule)
+
+
 def decision_band_for(
     quantity: Quantity | None,
     source_relation: SourceRelation,
+    *,
+    rail: Rail | None = None,
+    method: MethodToken | None = None,
+    observations: Mapping[str, Observation] | None = None,
+    experiments: Mapping[str, Experiment] | None = None,
+    derived_band: DecisionBand | None = None,
 ) -> DecisionBand | None:
+    if (
+        quantity is Quantity.P_PARTIAL
+        and rail is Rail.VAPOUR
+        and method is MethodToken.KNUDSEN_EFFUSION
+        and observations is not None
+        and experiments is not None
+    ):
+        band = derived_band or derive_kems_partial_pressure_band(observations, experiments)
+        if band is not None and band_dimension_matches(quantity, band):
+            return band
     if quantity not in GIBBS_BAND_QUANTITIES:
         return None
     band = THERMOCHEMISTRY_DECISION_BANDS.get(source_relation)
@@ -912,6 +1134,11 @@ def populate_numeric(
     reference: Decimal,
     source_relation: SourceRelation,
     metric_uncertainty: Uncertainty | None = None,
+    rail: Rail | None = None,
+    method: MethodToken | None = None,
+    observations: Mapping[str, Observation] | None = None,
+    experiments: Mapping[str, Experiment] | None = None,
+    derived_band: DecisionBand | None = None,
 ) -> tuple[ResidualNumeric | None, RefusalReason | None, dict[str, object]]:
     operation = metric_operation(quantity)
     if operation is None:
@@ -926,7 +1153,25 @@ def populate_numeric(
             "candidate": str(candidate),
             "reference": str(reference),
         }
-    band = decision_band_for(quantity, source_relation)
+    if (
+        rail is None
+        and method is None
+        and observations is None
+        and experiments is None
+    ):
+        # Keep the narrow two-argument call for existing focused callers that
+        # replace the band resolver while testing the dimension guard.
+        band = decision_band_for(quantity, source_relation)
+    else:
+        band = decision_band_for(
+            quantity,
+            source_relation,
+            rail=rail,
+            method=method,
+            observations=observations,
+            experiments=experiments,
+            derived_band=derived_band,
+        )
     # Dimension guard. decision_band_for normally filters mismatched bands;
     # keep this check for callers that replace it in a focused test.
     if band is not None and not band_dimension_matches(quantity, band):
@@ -2076,6 +2321,7 @@ def compile_residual(
     handles: Mapping[str, object] | None = None,
     lineage_observation_id: str | None = None,
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
+    derived_band: DecisionBand | None = None,
 ) -> tuple[Residual, Observation | None]:
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
@@ -2319,6 +2565,15 @@ def compile_residual(
             if reference.uncertainty.kind is UncertaintyKind.PRINTED
             else None
         ),
+        rail=rail,
+        method=(
+            experiment.method.value
+            if experiment is not None and experiment.method.is_value
+            else None
+        ),
+        observations=context.observations,
+        experiments=context.experiments,
+        derived_band=derived_band,
     )
     if numeric is None:
         return _refused(
@@ -2516,6 +2771,7 @@ def score_store(
     from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
 
     table_index = build_printed_thermo_index(observations)
+    kems_band = derive_kems_partial_pressure_band(observations, context.experiments)
     with bound_work_inputs(context.works, observations, context.experiments):
         for obs, points in expanded_refs:
             origin = origins.get(obs.observation_id)
@@ -2572,6 +2828,7 @@ def score_store(
                             else None
                         ),
                         table_index=table_index,
+                        derived_band=kems_band,
                     )
                     residuals.append(residual)
                     if candidate is not None:
@@ -2803,6 +3060,17 @@ def _median_abs(values: Sequence[Decimal]) -> Decimal | None:
     return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
 
 
+def _median(values: Sequence[Decimal]) -> Decimal | None:
+    if not values:
+        return None
+    ordered = sorted(values)
+    n = len(ordered)
+    mid = n // 2
+    if n % 2:
+        return ordered[mid]
+    return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
+
+
 def _rms(values: Sequence[Decimal]) -> Decimal | None:
     if not values:
         return None
@@ -2847,6 +3115,20 @@ def _compilation_residuals(
     ]
 
 
+def _headline_band_width(bucket: Sequence[Residual]) -> Decimal | None:
+    widths = {
+        residual.numeric.decision_band.value
+        for residual in bucket
+        if (
+            residual.numeric is not None
+            and residual.numeric.operation is MetricOperation.DEX
+            and residual.numeric.decision_band is not None
+            and residual.numeric.decision_band.unit == "dimensionless"
+        )
+    }
+    return next(iter(widths)) if len(widths) == 1 else None
+
+
 def _headline_metric_row(
     rail: str,
     engine: str,
@@ -2855,7 +3137,10 @@ def _headline_metric_row(
     tier: str,
 ) -> dict[str, object]:
     if tier == "measured":
-        scored = [r for r in bucket if r.score_eligible and r.numeric is not None]
+        # Numeric measured rows remain in the report even when a gate keeps
+        # them out of score_eligible. ``n_inside_band`` separates the
+        # measured agreement result from those other eligibility gates.
+        scored = [r for r in bucket if r.numeric is not None]
     elif tier == "compilation":
         scored = [r for r in bucket if r.numeric is not None]
     else:
@@ -2875,9 +3160,16 @@ def _headline_metric_row(
         for r in scored
         if r.numeric is not None and r.numeric.operation is MetricOperation.DEX
     ]
+    band_width = _headline_band_width(scored)
     median = _median_abs(dex_values)
+    signed_median = _median(dex_values)
     rms = _rms(dex_values)
     n_scored = len(scored)
+    rms_over_band = (
+        None
+        if rms is None or band_width is None or band_width <= 0
+        else rms / band_width
+    )
     match_rate: str | float | None
     if not banded:
         match_rate = None
@@ -2891,12 +3183,17 @@ def _headline_metric_row(
         "n_candidates": len(bucket),
         "n_refused": sum(1 for r in bucket if r.status is ResidualStatus.REFUSED),
         "n_scored": n_scored,
+        "n_score_eligible": sum(1 for r in scored if r.score_eligible),
+        "n_inside_band": len(matches),
         "n_match": len(matches),
         "match_rate": match_rate,
         "rms_dex": None if rms is None else str(rms),
+        "median_dex": None if signed_median is None else str(signed_median),
         "median_abs_dex": None if median is None else str(median),
+        "band_width_dex": None if band_width is None else str(band_width),
+        "rms_over_band": None if rms_over_band is None else str(rms_over_band),
         "n_no_band": sum(1 for r in scored if r.status is ResidualStatus.NO_BAND),
-        "data_scatter_ratio": None,
+        "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
     }
 
 
@@ -2909,8 +3206,9 @@ def headline_rows(
 ) -> list[dict[str, object]]:
     """Per rail × engine headline for one tier.
 
-    Measured rows use ``score_eligible``. Compilation rows use numeric
-    residuals and remain a separate diagnostic tier.
+    Measured and compilation rows use numeric residuals for descriptive
+    accuracy. ``score_eligible`` remains a separately reported gate result;
+    compilation rows remain a separate diagnostic tier.
     """
 
     groups: dict[tuple[str, str], list[Residual]] = {}
@@ -3173,9 +3471,10 @@ def render_score_report(
         "",
         "Generated only. Pins are an independent baseline and are never",
         "re-centred from these residuals. Refusals are diagnostics, never hidden.",
-        "The measured tier is score_eligible rows; its headline reports n,",
-        "RMS dex, median |dex|, and n no band. The compilation tier is",
-        "beside it and is never added to it. Match rate is banded rows only.",
+        "The measured tier keeps numeric rows visible; its headline reports",
+        "n, n inside band, RMS dex, signed and absolute median dex, band width,",
+        "RMS/band, and score_eligible separately. The compilation tier is beside",
+        "it and is never added to it. Match rate is banded rows only.",
         "",
         f"Hostname: `{context.hostname}`.",
     ]
@@ -3227,7 +3526,16 @@ def render_score_report(
         for row in unassigned_census:
             lines.append(_census_count_line(row, f"`{row['reason']}`"))
 
-    lines.extend(["", "## Measured tier", "", "score_eligible only. Compilation rows are not in this table.", ""])
+    lines.extend(
+        [
+            "",
+            "## Measured tier",
+            "",
+            "Numeric measured rows stay visible. score_eligible and inside-band "
+            "counts are reported separately. Compilation rows are not in this table.",
+            "",
+        ]
+    )
     if not residuals:
         lines.append(
             "Not regenerated. Match rate is blank. score_eligible is 0."
@@ -3235,18 +3543,24 @@ def render_score_report(
     else:
         lines.extend(
             [
-                "| rail | engine | n candidates | n refused | n | RMS dex | median abs dex | n no band | match rate |",
-                "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+                "| rail | engine | n candidates | n refused | n scored | n score eligible | "
+                "n inside band | RMS dex | median dex | median abs dex | band width dex | "
+                "RMS/band | n no band | match rate |",
+                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
         for row in headline_rows(residuals, context=context):
             rate = row["match_rate"]
             rate_s = "—" if rate is None else f"{rate:.3f}"
             rms = row["rms_dex"] or "—"
-            med = row["median_abs_dex"] or "—"
+            med = row["median_dex"] or "—"
+            med_abs = row["median_abs_dex"] or "—"
+            band = row["band_width_dex"] or "—"
+            ratio = row["rms_over_band"] or "—"
             lines.append(
                 f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
-                f"{row['n_refused']} | {row['n']} | {rms} | {med} | "
+                f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
+                f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
                 f"{row['n_no_band']} | {rate_s} |"
             )
     from simulator.battery.compilation_tier import compilation_tier_lines
@@ -3435,7 +3749,7 @@ def headline_payloads(
             scored = [
                 r
                 for r in bucket
-                if r.get("score_eligible") and isinstance(r.get("numeric"), Mapping)
+                if isinstance(r.get("numeric"), Mapping)
             ]
         else:
             scored = [r for r in bucket if isinstance(r.get("numeric"), Mapping)]
@@ -3449,6 +3763,7 @@ def headline_payloads(
             in {ResidualStatus.MATCH.value, ResidualStatus.MISMATCH.value}
         ]
         dex_values = []
+        band_widths = []
         for r in scored:
             numeric = r.get("numeric") if isinstance(r.get("numeric"), Mapping) else None
             if numeric and numeric.get("operation") == MetricOperation.DEX.value:
@@ -3456,8 +3771,25 @@ def headline_payloads(
                     dex_values.append(as_decimal(numeric.get("value")))
                 except (TypeError, ValueError, ArithmeticError):
                     pass
+                band = numeric.get("decision_band")
+                if isinstance(band, Mapping) and band.get("unit") == "dimensionless":
+                    try:
+                        band_widths.append(as_decimal(band.get("value")))
+                    except (TypeError, ValueError, ArithmeticError):
+                        pass
         n_scored = len(scored)
         rms = _rms(dex_values)
+        signed_median = _median(dex_values)
+        band_width = (
+            band_widths[0]
+            if band_widths and all(value == band_widths[0] for value in band_widths)
+            else None
+        )
+        rms_over_band = (
+            None
+            if rms is None or band_width is None or band_width <= 0
+            else rms / band_width
+        )
         out.append(
             {
                 "tier": tier,
@@ -3467,14 +3799,19 @@ def headline_payloads(
                 "n_candidates": len(bucket),
                 "n_refused": sum(1 for r in bucket if r.get("status") == ResidualStatus.REFUSED.value),
                 "n_scored": n_scored,
+                "n_score_eligible": sum(1 for r in scored if r.get("score_eligible")),
+                "n_inside_band": len(matches),
                 "n_match": len(matches),
                 "match_rate": None if not banded else len(matches) / len(banded),
                 "rms_dex": None if rms is None else str(rms),
+                "median_dex": None if signed_median is None else str(signed_median),
                 "median_abs_dex": None if not dex_values else str(_median_abs(dex_values)),
+                "band_width_dex": None if band_width is None else str(band_width),
+                "rms_over_band": None if rms_over_band is None else str(rms_over_band),
                 "n_no_band": sum(
                     1 for r in scored if r.get("status") == ResidualStatus.NO_BAND.value
                 ),
-                "data_scatter_ratio": None,
+                "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
             }
         )
     return out
@@ -3583,9 +3920,9 @@ def render_score_report_from_payloads(
         "",
         "Generated only. Pins are an independent baseline and are never",
         "re-centred from these residuals. Refusals are diagnostics, never hidden.",
-        "Headline accuracy per rail reports n, RMS dex, median |dex|, and",
-        "no-band rows. Measured and compilation tiers are separate and never",
-        "summed; match rate is secondary.",
+        "Headline accuracy per rail reports numeric n, inside-band n, RMS dex,",
+        "median dex, band width, and RMS/band. Measured and compilation tiers",
+        "are separate and never summed; match rate is secondary.",
         "",
         f"Hostname: `{hostname}`.",
     ]
@@ -3602,22 +3939,32 @@ def render_score_report_from_payloads(
             "## Measured tier" if observations is not None else "## Per rail × engine headline",
             "",
             *(
-                ["score_eligible only. Compilation rows are not in this table.", ""]
+                [
+                    "Numeric measured rows stay visible. score_eligible and inside-band "
+                    "counts are reported separately.",
+                    "",
+                ]
                 if observations is not None
                 else []
             ),
-            "| rail | engine | n candidates | n refused | n | RMS dex | median abs dex | n no band | match rate |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+            "| rail | engine | n candidates | n refused | n scored | n score eligible | "
+            "n inside band | RMS dex | median dex | median abs dex | band width dex | "
+            "RMS/band | n no band | match rate |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
     for row in headline_payloads(measured_rows, engines):
         rate = row["match_rate"]
         rate_s = "—" if rate is None else f"{rate:.3f}"
         rms = row["rms_dex"] or "—"
-        med = row["median_abs_dex"] or "—"
+        med = row["median_dex"] or "—"
+        med_abs = row["median_abs_dex"] or "—"
+        band = row["band_width_dex"] or "—"
+        ratio = row["rms_over_band"] or "—"
         lines.append(
             f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
-            f"{row['n_refused']} | {row['n']} | {rms} | {med} | "
+            f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
+            f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
             f"{row['n_no_band']} | {rate_s} |"
         )
     if compilation_lines:
