@@ -59,6 +59,8 @@ def _request(
 ) -> IntentRequest:
     controls = dict(control_inputs or {})
     controls.setdefault("pO2_bar", pO2_bar)
+    # b-588 two-film split: interface pO2 drives melt release; transport pO2 remains the gas-side rail.
+    controls.setdefault("interface_pO2_bar", pO2_bar)
     return IntentRequest(
         intent=intent,
         account_view=_account_view(),
@@ -144,7 +146,12 @@ def test_non_feo_metal_dissociation_uses_intrinsic_melt_fo2(
                 transport_pO2_bar,
                 temperature_C=temperature_C,
                 fO2_log=intrinsic_fO2_log,
-                control_inputs={"intrinsic_fO2_log": intrinsic_fO2_log},
+                # b-588 keeps transport and melt-interface pO2 distinct; hold
+                # the interface at intrinsic fO2 to isolate that tested rail.
+                control_inputs={
+                    "intrinsic_fO2_log": intrinsic_fO2_log,
+                    "interface_pO2_bar": 10.0**intrinsic_fO2_log,
+                },
             )
         )
         diagnostic = result.diagnostic

@@ -2875,7 +2875,7 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
     ]
 
 
-def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> None:
+def test_pn2_native_fe_partition_e2e_reports_staged_na_deferral() -> None:
     def run_case(*, through: bool):
         sim = _make_sim()
         if through:
@@ -2897,27 +2897,25 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
         )
         return sim, snapshot, summary
 
-    # Keep the existing report test on the through route; the default-diverted
-    # sibling below asserts the new zero-capture report contract.
+    # t-992 staged Na-shuttle authority defers the native-Fe split; see integrate-report.md:63,94-97.
     sim, snapshot, summary = run_case(through=True)
-    partition = snapshot.fe_redox_split["native_fe_partition"]
+    split = snapshot.fe_redox_split
+    event = split["native_fe_saturation_event"]
     tap_mol = sim.atom_ledger.mol_by_account("terminal.drain_tap_material")
 
     assert snapshot.campaign == CampaignPhase.C2A_STAGED
     assert 1650.0 <= snapshot.temperature_C <= 1700.0
     assert summary["P_total_bar"] == pytest.approx(0.01)
     assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
-    assert partition["native_fe_pool_mol"] > 0.0
-    assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
-    escape_fraction = partition["native_fe_vapor_escape_fraction_of_pool"]
-    assert math.isfinite(escape_fraction)
-    assert 0.0 <= escape_fraction <= 1.0
-    assert partition["overhead_pressure_pa"] == pytest.approx(1000.0)
-    assert partition["carrier_gas"] == "N2"
-    assert tap_mol["Fe"] == pytest.approx(partition["native_fe_tap_mol"])
+    assert event == {
+        "native_fe_event": "deferred_for_staged_na_shuttle",
+        "native_fe_event_reason": "staged_path_reserves_feo_for_na_shuttle",
+        "native_fe_event_status": "deferred",
+    }
+    assert "native_fe_partition" not in split
+    assert tap_mol.get("Fe", 0.0) == pytest.approx(0.0)
     assert sim.train.stages[1].collected_kg.get("Fe", 0.0) > 0.0
     assert snapshot.evap_flux.species_kg_hr["SiO"] > 1.0e-7
-    assert "stage_3_fe_wt_pct" not in partition
     stage_3_capture = summary["stage_3_capture"]
     assert stage_3_capture["Fe_kg"] > 0.0
     assert stage_3_capture["total_kg"] >= stage_3_capture["Fe_kg"]

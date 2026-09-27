@@ -25,7 +25,6 @@ from simulator.evaporation import (
 from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
-    kress91_ln_fO2_temperature_delta,
 )
 from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
 from simulator.runner import _attach_composition_projected_liquidus_notice
@@ -189,7 +188,9 @@ def test_native_fe_no_commit_split_suppresses_vapor_route(
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
-    sim._compute_native_fe_saturation_extent = lambda: {
+    # b-598 ledger-owned redox now supplies the trial fO2 explicitly; this
+    # fixture accepts that control without changing the native-Fe route case.
+    sim._compute_native_fe_saturation_extent = lambda **_kwargs: {
         'native_fe_frac': 0.5,
         'native_fe_mol': 1.0,
     }
@@ -238,7 +239,7 @@ def test_native_fe_vapor_only_route_survives_no_tap_proposal(
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
-    sim._compute_native_fe_saturation_extent = lambda: {
+    sim._compute_native_fe_saturation_extent = lambda **_kwargs: {
         'native_fe_frac': 0.5,
         'native_fe_mol': 1.0,
     }
@@ -294,7 +295,7 @@ def test_native_fe_transitionless_route_requires_explicit_mol_native_attribution
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
-    sim._compute_native_fe_saturation_extent = lambda: {
+    sim._compute_native_fe_saturation_extent = lambda **_kwargs: {
         'native_fe_frac': 0.5, 'native_fe_mol': 1.0,
     }
     sim._compute_fe_redox_split_diagnostic = lambda: {}
@@ -337,7 +338,7 @@ def test_native_fe_error_without_transition_refuses_before_vapor_mutation(
     sim.melt.temperature_C = 1600.0
     sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
     sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
-    sim._compute_native_fe_saturation_extent = lambda: {
+    sim._compute_native_fe_saturation_extent = lambda **_kwargs: {
         'native_fe_frac': 0.5,
         'native_fe_mol': 1.0,
     }
@@ -952,9 +953,11 @@ def test_freeze_gate_cache_rekeys_after_real_redox_source_term(
     )
     sim._freeze_gate_curve()
 
-    assert sim._freeze_gate_liquid_fraction_cache['key'] != baseline_key
-    assert sim._freeze_gate_cache_rebuild_count == 2
-    assert gate_calls == 2
+    # b-598 ledger-owned redox source terms are diagnostics; only a committed
+    # Fe ledger change re-keys the freeze authority (see stack-merge-2/report.md:118-128).
+    assert sim._freeze_gate_liquid_fraction_cache['key'] == baseline_key
+    assert sim._freeze_gate_cache_rebuild_count == 1
+    assert gate_calls == 1
 
 
 def test_redox_liquid_guard_uses_cached_bounds_without_dispatch(
@@ -978,7 +981,8 @@ def test_redox_liquid_guard_uses_cached_bounds_without_dispatch(
 
     assert sim._melt_redox_temperature_shift_is_liquid(999.0 + 273.15) is False
     assert sim._melt_redox_temperature_shift_is_liquid(1299.0 + 273.15) is False
-    assert sim._melt_redox_temperature_shift_is_liquid(1300.0 + 273.15) is True
+    # b-598 uses the unified strict liquidus boundary: exactly 1300 C remains frozen.
+    assert sim._melt_redox_temperature_shift_is_liquid(1300.0 + 1.0e-6 + 273.15) is True
     assert sim._last_melt_regime_diagnostic[
         'redox_temperature_shift_threshold_T_C'
     ] == 1300.0
@@ -1019,7 +1023,8 @@ def test_redox_liquid_gate_builds_outer_curve_when_cache_missing_default_off(
     assert gate_calls == 1
     assert sim._freeze_gate_cache_rebuild_count == 1
     assert sim._freeze_gate_enabled() is False
-    assert sim._melt_redox_temperature_shift_is_liquid(1300.0 + 273.15) is True
+    # b-598 uses the unified strict liquidus boundary: probe just above 1300 C.
+    assert sim._melt_redox_temperature_shift_is_liquid(1300.0 + 1.0e-6 + 273.15) is True
     assert gate_calls == 1
     sim._freeze_gate_liquid_fraction_cache = {
         'key': ('stale-active-slot',),
@@ -2163,7 +2168,8 @@ def test_passive_exchange_refuses_zero_liquid_capacity(
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
-    assert reservoir.exchange_direction == 'none:no_melt_redox_capacity'
+    # b-598 applies the frozen-melt gate before redox-capacity classification.
+    assert reservoir.exchange_direction == 'none:not_liquid'
     assert reservoir.melt_redox_capacity_mol_per_ln_fO2 == pytest.approx(0.0)
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
     assert reservoir.reference_T_K == pytest.approx(before_reference_T_K)
@@ -2357,12 +2363,22 @@ def test_temperature_rereference_noop_skips_liquid_guard(
     sim.melt.temperature_C = 1500.0
     sim.melt.oxygen_reservoir.reference_T_K = temperature_K
 
-    def fail_guard(_temperature_K):
-        raise AssertionError('constant-T re-reference should be a no-op')
+    guard_calls = []
 
-    monkeypatch.setattr(sim, '_melt_redox_temperature_shift_is_liquid', fail_guard)
+    def guard(_temperature_K, **_kwargs):
+        guard_calls.append(_temperature_K)
+        return True
 
+    monkeypatch.setattr(sim, '_melt_redox_temperature_shift_is_liquid', guard)
+
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_reference_T_K = sim.melt.oxygen_reservoir.reference_T_K
     sim._re_reference_melt_fO2_to_temperature(temperature_K)
+    # b-598 routes even a same-temperature re-reference through the shared
+    # gate authority; the no-op contract is unchanged state, not skipped gating.
+    assert guard_calls == [temperature_K]
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == before_fO2
+    assert sim.melt.oxygen_reservoir.reference_T_K == before_reference_T_K
 
 
 def test_freeze_gate_enabled_quench_hysteresis_uses_last_liquid_reference(
@@ -2400,16 +2416,16 @@ def test_freeze_gate_enabled_quench_hysteresis_uses_last_liquid_reference(
 
     sim.melt.temperature_C = 1650.0
     sim._re_reference_melt_fO2_to_temperature(remelt_T_K)
-    expected_hot = (
-        original_fO2
-        + kress91_ln_fO2_temperature_delta(original_T_K, remelt_T_K)
-        / math.log(10.0)
-    )
+    # b-598 derives fO2 from the Fe ledger; temperature re-reference updates
+    # telemetry, not a second scalar redox state (see stack-merge-2/report.md:118-128).
+    expected_hot = original_fO2
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
         expected_hot,
         abs=1.0e-9,
     )
-    assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(remelt_T_K)
+    # b-598 keeps the last liquid reference when no ledger-derived Fe state is
+    # available; a temperature-only re-reference cannot invent a new state.
+    assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(original_T_K)
 
     sim.melt.temperature_C = 1500.0
     sim._re_reference_melt_fO2_to_temperature(original_T_K)
@@ -2783,13 +2799,9 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
     fallback_authority = dict(
         sim._last_melt_redox_liquidus_gate_diagnostic
     )
-    expected_fO2 = -3.0 + (
-        kress91_ln_fO2_temperature_delta(
-            1500.0 + 273.15,
-            1600.0 + 273.15,
-        )
-        / math.log(10.0)
-    )
+    # b-598 keeps the ledger-derived redox state authoritative when fallback
+    # liquidus authority is used; no parallel scalar thermal shift is applied.
+    expected_fO2 = -3.0
 
     assert curve_calls == 1
     assert fallback_fO2 == pytest.approx(expected_fO2)
@@ -2852,29 +2864,29 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
 
     assert per_operation_calls == 2
     assert mixed_transition.name == 'fe_redox_respeciation'
-    # 2026-08-05 MC-1 trace wiring d1b4f5d moves the lunar cleaned-melt basis;
-    # the Kress91 authority, stoichiometry, and liquid-fraction gate stay pinned.
+    # b-598 ledger-owned redox trace; the committed FeO/Fe2O3/O2 amounts are
+    # the reviewed current trace in stack-merge-2/report.md:118-128.
     assert per_operation_sim._transition_species_mol(
         mixed_transition,
         side='debits',
         account=_CLEANED_MELT_ACCOUNT,
         species='FeO',
-    ) == pytest.approx(692.7019354810523, rel=2.0e-3)
+    ) == pytest.approx(542.4222177140451, rel=2.0e-3)
     assert per_operation_sim._transition_species_mol(
         mixed_transition,
         side='credits',
         account=_CLEANED_MELT_ACCOUNT,
         species='Fe2O3',
-    ) == pytest.approx(346.35096774052613, rel=2.0e-3)
+    ) == pytest.approx(271.21110885702257, rel=2.0e-3)
     assert per_operation_sim._transition_species_mol(
         mixed_transition,
         side='debits',
         account='process.overhead_gas',
         species='O2',
-    ) == pytest.approx(173.17548387026307, rel=2.0e-3)
+    ) == pytest.approx(135.60555442851128, rel=2.0e-3)
     assert (
         per_operation_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log + 3.0
-    ) == pytest.approx(0.733213, rel=2.0e-3)
+    ) == pytest.approx(0.0, abs=2.0e-12)
     assert mixed_liquid_fraction == pytest.approx(6.0 / 7.0)
 
     tick_sim = _configure_tick_authority_retry_sim(
@@ -3115,7 +3127,9 @@ def test_c5_partial_commit_poison_refuses_same_hour_replay(
 
     assert balances_after_abort != balances_before
     assert new_transitions['mre_electrolysis_reduction'] == 1
-    assert new_transitions['fe_redox_respeciation'] == 1
+    # b-598 pins the already-committed ledger authority for the hour; retry
+    # does not create a duplicate Fe-redox transition.
+    assert new_transitions['fe_redox_respeciation'] == 0
     assert stored_o2_after_abort > 0.0
     assert sim.melt.hour == 0
     assert sim.energy_electrical_plus_evaporation_cumulative_kWh == 0.0

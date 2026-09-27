@@ -97,6 +97,7 @@ def _sim_with_vapor_dispatch(
         _commanded_pO2_bar=lambda: 1e-9,
         # #94 LIVE-PO2-SWEEP: kernel refresh now reads the shared vapor
         # transport-pO2 snapshot helper instead of commanded pO2 directly.
+        _vapor_pressure_transport_pO2_bar=lambda: 1e-9,
         _vapor_pressure_dispatch_pO2_bar=lambda: 1e-9,
         _compute_intrinsic_melt_fO2=lambda: -9.0,
         _dispatch_only=_dispatch_only,
