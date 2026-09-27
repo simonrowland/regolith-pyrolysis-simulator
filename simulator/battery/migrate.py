@@ -5430,10 +5430,53 @@ _PRESSURE_NON_POINT_RE = re.compile(
     r"|[~≈–—]|(?:\d\s*-\s*\d)|範囲|约|約",
     re.IGNORECASE,
 )
+_PRESSURE_BOUND_OPERATOR_RE = re.compile(
+    r"(?:^|\s)(?:pressure|vacuum)?\s*[<>≤≥]\s*(?:\d|$)",
+    re.IGNORECASE,
+)
+_PRESSURE_EXACT_ASSIGNMENT_RE = re.compile(
+    r"(?:\bP[_ ]?[A-Za-z0-9]+|\b(?:pressure|vacuum))\s*(?:is|=|:|of)\s*"
+    r"(?:about\s+|approximately\s+|~\s*)?(?:\d|[.]\d)",
+    re.IGNORECASE,
+)
 _PRESSURE_CHAMBER_RE = re.compile(
-    r"(?:chamber|background|ultimate\s*[_ ]?vacuum|residual\s*[_ ]?pressure|"
+    r"(?:chamber|background|vacuum|ultimate\s*[_ ]?vacuum|residual\s*[_ ]?pressure|"
     r"到達真空度|到达真空度)",
     re.IGNORECASE,
+)
+_PRESSURE_EXPERIMENTAL_KEY_RE = re.compile(
+    r"(?:chamber|furnace|cell|sweep|carrier|background|vacuum|residual)",
+    re.IGNORECASE,
+)
+_PRESSURE_MODEL_PROVENANCE_RE = re.compile(
+    r"(?:model|calculat|comput|grid|input|output|derived|equilibrium|solgasmix|offgas)",
+    re.IGNORECASE,
+)
+_PRESSURE_EXPERIMENTAL_PROVENANCE_RE = re.compile(
+    r"(?:experiment|experimental|condition|chamber|furnace|cell|sweep|printed|quoted)",
+    re.IGNORECASE,
+)
+_PRESSURE_PROVENANCE_KEYS = (
+    "provenance",
+    "pressure_provenance",
+    "pressure_role",
+    "pressure_source",
+    "pressure_origin",
+    "source_type",
+    "role",
+    "classification",
+)
+_PRESSURE_CONTEXT_KEYS = (
+    "quantity",
+    "model",
+    "generator",
+    "regime",
+    "semantics",
+    "admission_status",
+    "evidence_class",
+    "derivation",
+    "status",
+    "reason",
 )
 _PRESSURE_IDENTITY_UNKNOWN = {
     "reaction": "source reaction/equilibrium not grounded",
@@ -5462,6 +5505,138 @@ def _pressure_row_is_model_derived(
         if method_class == "model" or method_class.startswith("model_"):
             return True
     return False
+
+
+def _pressure_context_text(*payloads: Mapping[str, Any]) -> str:
+    parts: list[str] = []
+    for payload in payloads:
+        if not isinstance(payload, Mapping):
+            continue
+        for key in _PRESSURE_CONTEXT_KEYS:
+            if payload.get(key) not in (None, ""):
+                parts.append(_extract_text(payload[key]))
+    return " ".join(parts)
+
+
+def _pressure_own_provenance_text(raw: object) -> str:
+    if not isinstance(raw, Mapping):
+        return ""
+    return " ".join(
+        _extract_text(raw[key])
+        for key in _PRESSURE_PROVENANCE_KEYS
+        if raw.get(key) not in (None, "")
+    )
+
+
+def _pressure_has_experimental_own_provenance(name: str, raw: object) -> bool:
+    if _PRESSURE_EXPERIMENTAL_KEY_RE.search(str(name)):
+        return True
+    return bool(
+        _PRESSURE_EXPERIMENTAL_PROVENANCE_RE.search(
+            _pressure_own_provenance_text(raw)
+        )
+    )
+
+
+def _pressure_value_is_model_calculation(
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+    name: str,
+    raw: object,
+) -> bool:
+    """Reject a model pressure only when its own scope is not experimental.
+
+    A carrier row's method class cannot demote a pressure explicitly attached to
+    a chamber/furnace/cell condition. Generic pressure fields on a model row
+    remain unknown unless the pressure payload carries an experimental role.
+    """
+
+    own_provenance = _pressure_own_provenance_text(raw)
+    if _PRESSURE_MODEL_PROVENANCE_RE.search(own_provenance):
+        return True
+    if _pressure_has_experimental_own_provenance(name, raw):
+        return False
+    context = _pressure_context_text(obs, values)
+    if _PRESSURE_MODEL_PROVENANCE_RE.search(context):
+        return True
+    # An unqualified generic pressure on a model row is ambiguous. Fail
+    # closed; an explicit chamber/furnace/cell key was handled above.
+    return _pressure_row_is_model_derived(obs, values)
+
+
+def _pressure_hit_is_model_calculation(
+    hit: LabHit,
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+) -> bool:
+    name = hit.path.rsplit(".", 1)[-1]
+    return _pressure_value_is_model_calculation(
+        obs, values, name, hit.mapping or {}
+    )
+
+
+def _pressure_hit_is_chamber_condition(
+    hit: LabHit,
+    values: Mapping[str, Any],
+    method: State[MethodToken] | None,
+    knudsen_cell: bool,
+) -> bool:
+    if not _PRESSURE_CHAMBER_RE.search(hit.path):
+        return False
+    if knudsen_cell and (method is None or not method.is_value):
+        # With no resolved method, an explicitly identified Knudsen cell means
+        # this chamber value cannot establish the in-cell total.
+        return True
+    mapping = hit.mapping or {}
+    own_printed = " ".join(
+        _extract_text(value)
+        for value in (
+            mapping.get("value"),
+            mapping.get("as_printed"),
+            mapping.get("as_published"),
+            hit.as_published,
+        )
+        if value not in (None, "")
+    )
+    if (
+        bool(_PRESSURE_NON_POINT_RE.search(own_printed))
+        or bool(_PRESSURE_BOUND_OPERATOR_RE.search(own_printed))
+        or str(mapping.get("kind") or "").casefold()
+        in {"about_nominal", "approximate", "pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"}
+    ):
+        return True
+    # Source keys such as chamber_pressure_Pa_about carry the pressure's own
+    # qualifier even when the numeric value is scalar.
+    printed_name = str(hit.entry.printed or hit.path.rsplit(".", 1)[-1])
+    if re.search(r"(?:about|approx|ultimate|range|upper[_ ]?end)", printed_name, re.I):
+        return True
+    # Structured pressure ranges elsewhere in the same payload are still
+    # pressure values, not locator prose. They make an exact chamber hit
+    # ambiguous; fail closed. Do not treat arbitrary row notes as ranges.
+    for key, raw in values.items():
+        if not re.search(r"(?:pressure|vacuum)", str(key), re.I):
+            continue
+        if isinstance(raw, (list, tuple)):
+            return True
+        if isinstance(raw, Mapping):
+            value = raw.get("value", raw.get("as_printed", raw.get("as_published")))
+            if isinstance(value, (list, tuple)):
+                return True
+            if str(raw.get("kind") or "").casefold() in {
+                "about_nominal", "approximate", "pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"
+            }:
+                return True
+    # A cell-local note can qualify a chamber field as a range. If it also
+    # names an exact pressure assignment, the exact cell wins (TS1985).
+    note = " ".join(
+        _extract_text(mapping[key])
+        for key in ("note", "qualifier")
+        if mapping.get(key) not in (None, "")
+    )
+    return bool(
+        _PRESSURE_NON_POINT_RE.search(note)
+        and not _PRESSURE_EXACT_ASSIGNMENT_RE.search(note)
+    )
 
 
 def _extract_text(payload: object) -> str:
@@ -5751,22 +5926,34 @@ def _pressure_total_from_extract(
     gas_formula: str | None,
     source_text: str,
 ) -> tuple[State[Decimal] | None, str | None]:
-    if _pressure_row_is_model_derived(obs, values):
-        return None, None
     raw = _pressure_payload_value(obs, values, "total_pressure_Pa")
-    if isinstance(raw, Mapping) and raw.get("tag") is not None:
+    if (
+        raw is not None
+        and not _pressure_value_is_model_calculation(
+            obs, values, "total_pressure_Pa", raw
+        )
+        and isinstance(raw, Mapping)
+        and raw.get("tag") is not None
+    ):
         try:
             return _state_from_plain(raw, as_decimal), "identity.total_pressure_Pa=source state"
         except (KeyError, TypeError, ValueError):
             return State.unknown("source total_pressure_Pa is not decodable"), None
-    if raw not in (None, ""):
+    if (
+        raw not in (None, "")
+        and not _pressure_value_is_model_calculation(
+            obs, values, "total_pressure_Pa", raw
+        )
+    ):
         converted = _pressure_numeric_with_unit(raw, "Pa")
         if converted is not None:
             amount, trail = converted
             return State.of(amount), f"identity.total_pressure_Pa=source row total; {trail}"
     for name, units in _PRESSURE_TOTAL_KEYS:
         raw = _pressure_payload_value(obs, values, name)
-        if raw in (None, ""):
+        if raw in (None, "") or _pressure_value_is_model_calculation(
+            obs, values, name, raw
+        ):
             continue
         converted = _pressure_numeric_with_unit(raw, units)
         if converted is not None:
@@ -5776,6 +5963,8 @@ def _pressure_total_from_extract(
         for key in _PRESSURE_SUM_KEYS:
             raw = payload.get(key)
             if not isinstance(raw, Mapping) or not raw:
+                continue
+            if _pressure_value_is_model_calculation(obs, values, key, raw):
                 continue
             total = Decimal("0")
             trails: list[str] = []
@@ -6024,8 +6213,6 @@ def _partial_pressure_point_condition(
 
 def _printed_experiment_pressure(
     located: Located[Any] | None,
-    *,
-    method: State[MethodToken] | None = None,
 ) -> Decimal | None:
     """Return an exact printed experiment pressure, never an inferred one."""
 
@@ -6045,28 +6232,6 @@ def _printed_experiment_pressure(
         )
     ):
         return None
-    metadata = []
-    if inference is not None:
-        metadata.extend(inference.inputs)
-    if located.locator is not None:
-        metadata.extend(
-            str(getattr(located.locator, name) or "")
-            for name in ("note", "paragraph", "section", "table", "figure", "equation", "record")
-        )
-    metadata_text = " ".join(metadata)
-    if _PRESSURE_NON_POINT_RE.search(metadata_text):
-        return None
-    effective_method = method
-    if (
-        effective_method is not None
-        and not effective_method.is_value
-        and effective_method.is_unknown
-    ):
-        effective_method = None
-    if effective_method is not None and effective_method.is_value:
-        is_knudsen = effective_method.value is MethodToken.KNUDSEN_EFFUSION
-        if is_knudsen and _PRESSURE_CHAMBER_RE.search(metadata_text):
-            return None
     return raw.point
 
 
@@ -7705,6 +7870,7 @@ def collect_lab_hits(
 def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[Decimal]:
     converted = conversion_derivation(trail, hit.amount, hit.locator)
     mapping = hit.mapping or {}
+    is_pressure = _lab_kind(hit.entry.field) == "pressure"
     inferred = mapping.get("inferred") is True
     if inferred:
         extra = (
@@ -7721,25 +7887,40 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
         [f"{key}=true" for key in ("upper_bound", "lower_bound") if mapping.get(key) is True]
         + [str(mapping.get(key) or "") for key in ("inference", "qualifier", "note", "quote")]
     )
-    non_point = any(mapping.get(key) is True for key in ("upper_bound", "lower_bound")) or any(
-        re.search(
-            r"\b(?:less than|better than|did not exceed)\b"
-            r"|^\s*(?:(?:pressure|vacuum)\s*)?[<>≤≥](?:\s*\d|\s*$)",
-            str(mapping.get(key) or ""), re.I,
+    if is_pressure:
+        own_printed = " ".join(
+            _extract_text(value)
+            for value in (
+                mapping.get("value"),
+                mapping.get("as_printed"),
+                mapping.get("as_published"),
+                hit.as_published,
+            )
+            if value not in (None, "")
         )
-        for key in ("inference", "qualifier", "note", "quote")
-    )
-    if _lab_kind(hit.entry.field) == "pressure" and _PRESSURE_NON_POINT_RE.search(
-        qualification
-    ):
-        non_point = True
+        non_point = (
+            any(mapping.get(key) is True for key in ("upper_bound", "lower_bound"))
+            or bool(_PRESSURE_NON_POINT_RE.search(own_printed))
+            or bool(_PRESSURE_BOUND_OPERATOR_RE.search(own_printed))
+            or str(mapping.get("kind") or "").casefold()
+            in {"pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"}
+        )
+    else:
+        non_point = any(mapping.get(key) is True for key in ("upper_bound", "lower_bound")) or any(
+            re.search(
+                r"\b(?:less than|better than|did not exceed)\b"
+                r"|^\s*(?:(?:pressure|vacuum)\s*)?[<>≤≥](?:\s*\d|\s*$)",
+                str(mapping.get(key) or ""), re.I,
+            )
+            for key in ("inference", "qualifier", "note", "quote")
+        )
     approximate = (
-        _lab_kind(hit.entry.field) == "pressure"
+        is_pressure
         and isinstance(mapping, Mapping)
         and (
             str(mapping.get("kind") or "").lower() in {"about_nominal", "approximate"}
             or bool(mapping.get("approximate"))
-            or bool(_PRESSURE_NON_POINT_RE.search(str(mapping.get("as_printed") or "")))
+            or bool(_PRESSURE_NON_POINT_RE.search(own_printed))
         )
     )
     state = (
@@ -8277,18 +8458,30 @@ def pressure_from_equipment(
     vocabulary: tuple[VocabEntry, ...] | None = None,
     values: object = None,
     locator: Locator | None = None,
+    method: State[MethodToken] | None = None,
 ) -> PressureEnvironment:
-    if _pressure_row_is_model_derived(values if isinstance(values, Mapping) else {}):
-        # A model/derived row may describe a nominal calculation pressure, but
-        # that row is not a printed experimental condition for the experiment
-        # registry or for observations of another method.
-        equipment = None
-        values = None
     vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
     roots = _lab_roots(equipment, values)
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     field = "pressure_environment.total_pressure_Pa"
-    pressure_hits = _hits_for(hits, field)
+    payload_values = values if isinstance(values, Mapping) else {}
+    knudsen_cell = any(
+        hit.entry.field == "apparatus.cell_material_and_liner"
+        and re.search(r"\bknudsen\b", cell_text, re.IGNORECASE)
+        and not re.search(
+            r"\b(?:not|non[- ])\s*knudsen\b", cell_text, re.IGNORECASE
+        )
+        for hit in hits
+        for cell_text in (_extract_text(hit.mapping),)
+    )
+    pressure_hits = [
+        hit
+        for hit in _hits_for(hits, field)
+        if not _pressure_hit_is_model_calculation(hit, payload_values, payload_values)
+        and not _pressure_hit_is_chamber_condition(
+            hit, payload_values, method, knudsen_cell
+        )
+    ]
     located = _unique_located(pressure_hits)
     pumping = _mapping_located_from_hits(hits, "pressure_environment.pumping")
     gauge = _mapping_located_from_hits(hits, "pressure_environment.gauge")
@@ -9415,6 +9608,7 @@ class Migrator:
             vocabulary=self._vocab,
             values=values,
             locator=locator,
+            method=method,
         )
         apparatus = apparatus_from_equipment(
             equipment,
@@ -9617,22 +9811,12 @@ class Migrator:
 
         existing_pressure = existing.get("total_pressure_Pa")
         pressure_can_fill = "total_pressure_Pa" not in existing
-        if (
-            isinstance(existing_pressure, State)
-            and existing_pressure.is_unknown
-            and existing_pressure.reason
-            == _PRESSURE_IDENTITY_UNKNOWN["total_pressure_Pa"]
-        ):
+        if isinstance(existing_pressure, State) and existing_pressure.is_unknown:
             pressure_can_fill = True
         if pressure_can_fill:
             pressure_source = "experiment.pressure_environment.total_pressure_Pa"
             pressure = _printed_experiment_pressure(
                 experiment.pressure_environment.total_pressure_Pa,
-                method=(
-                    method
-                    if method is not None and method.is_value
-                    else experiment.method
-                ),
             )
             effective_method = (
                 method
@@ -10794,15 +10978,15 @@ class Migrator:
             skip_tables=True,
         )
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
-            experiment_id, ident_kwargs, method=method
+            experiment_id,
+            ident_kwargs,
+            method=method,
         )
         for name, state in experiment_identity.items():
             if name not in ident_kwargs or (
                 name == "total_pressure_Pa"
                 and isinstance(ident_kwargs[name], State)
                 and ident_kwargs[name].is_unknown
-                and ident_kwargs[name].reason
-                == _PRESSURE_IDENTITY_UNKNOWN["total_pressure_Pa"]
             ):
                 ident_kwargs[name] = state
         identity_provenance += experiment_provenance

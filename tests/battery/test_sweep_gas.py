@@ -307,6 +307,75 @@ def test_sossi_printed_one_atmosphere_still_inherits(tmp_path) -> None:
     assert observation.identity.total_pressure_Pa == State.of(Decimal("100000"))
 
 
+@pytest.mark.parametrize(
+    "observation_id",
+    [
+        "sossi_2019_na_alpha_e_authors_adopted_unity",
+        "sossi_2019_na_alpha_e_authors_adopted_unity_quoted_20260906",
+        "sossi_2019_na_logKstar_table3",
+        "sossi_2019_na_logKstar_table3_quoted_20260906",
+        "sossi_2019_na_pure_system_LH_table5",
+        "sossi_2019_na_pure_system_LH_table5_quoted_20260906",
+        "sossi_2019_k_open_furnace_alpha_e_context",
+    ],
+)
+def test_model_carrier_keeps_printed_sossi_furnace_condition(
+    tmp_path, observation_id: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
+    observation = result.observations[
+        f"kems-012-sossi-2019::{observation_id}"
+    ]
+    assert observation.identity.total_pressure_Pa == State.of(Decimal("100000"))
+
+
+def test_model_carrier_keeps_printed_fedkin_chamber_condition(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-005-fedkin-2006.yaml")
+    points = [
+        observation
+        for observation in result.observations.values()
+        if "fedkin_2006_sio_hashimoto_table3_complete_b1::" in observation.observation_id
+    ]
+    assert len(points) == 4
+    assert all(
+        observation.identity.total_pressure_Pa == State.of(Decimal("0.0013"))
+        for observation in points
+    )
+
+
+def test_norris_printed_atmosphere_ignores_page_range_locator(tmp_path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "norris-2017-earth-volatiles-nature.yaml"
+    )
+    observation = result.observations[
+        "norris-2017-earth-volatiles-nature::norris_2017_volatile_loss_conditions"
+    ]
+    assert observation.identity.total_pressure_Pa == State.of(Decimal("101325"))
+
+
+@pytest.mark.parametrize(
+    "observation_id",
+    [
+        "ts1985_na2o_table2_log10_a_AT_B",
+        "ts1985_na2o_prose_1200C_range",
+    ],
+)
+def test_ts1985_printed_atmosphere_ignores_sibling_range_prose(
+    tmp_path, observation_id: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, "ts1985.yaml")
+    matches = [
+        observation
+        for observation in result.observations.values()
+        if f"::{observation_id}" in observation.observation_id
+    ]
+    assert len(matches) == (4 if observation_id.endswith("log10_a_AT_B") else 1)
+    assert all(
+        observation.identity.total_pressure_Pa == State.of(Decimal("101325"))
+        for observation in matches
+    )
+
+
 @pytest.mark.parametrize("defect", [
     "scalar", "missing_flow", "extra_field", "component_extra_field", "component_missing_fraction",
     "bad_fraction", "bad_components", "bad_alternatives", "both_forms", "empty_species",
