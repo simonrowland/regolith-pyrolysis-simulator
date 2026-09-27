@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 47228
-records out (observations): 109687
+rows in: 47278
+records out (observations): 109737
 works: 255
 experiments: 3498
-queue size: 77149
+queue size: 77038
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -18,14 +18,14 @@ hard issues: 3229
 | doi_works | 56 | 121 (mismatch) |
 | no_doi_works | 91 | 134 (mismatch) |
 | admission_statuses | 374 | 911 (mismatch) |
-| supersedes | 422 | 599 (mismatch) |
-| series | 60 | 538 (mismatch) |
+| supersedes | 422 | 649 (mismatch) |
+| series | 60 | 588 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2010 (mismatch) |
 | equipment_payloads | 670 | 972 (mismatch) |
-| absent_admissions | 3511 | 4725 (mismatch) |
+| absent_admissions | 3511 | 4775 (mismatch) |
 | absent_classes | 2174 | 2203 (mismatch) |
 | range_only_T | 3125 | 2734 (mismatch) |
 | system_like_phases | 1065 | 2805 (mismatch) |
@@ -17999,7 +17999,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-007-costa-2015.yaml` | 4 | 4 | 22 |
 | `data/literature/extracts/kems-008-schaefer-fegley-2004.yaml` | 78 | 78 | 338 |
 | `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 10 |
-| `data/literature/extracts/kems-010-richter-2007.yaml` | 106 | 106 | 416 |
+| `data/literature/extracts/kems-010-richter-2007.yaml` | 156 | 156 | 365 |
 | `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 89 |
 | `data/literature/extracts/kems-012-sossi-2019.yaml` | 192 | 612 | 1379 |
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 17 | 45 |
@@ -18171,7 +18171,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 39 |
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 35 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 19 | 57 | 84 |
-| `data/literature/extracts/ta-badro-2021.yaml` | 28 | 28 | 92 |
+| `data/literature/extracts/ta-badro-2021.yaml` | 28 | 28 | 68 |
 | `data/literature/extracts/ta-dacko-conradt-low-p-transpiration.yaml` | 47 | 47 | 37 |
 | `data/literature/extracts/ta-flemetakis-2024.yaml` | 8 | 72 | 139 |
 | `data/literature/extracts/ta-mendybaev-2002-lpsc.yaml` | 6 | 6 | 28 |
@@ -18193,7 +18193,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 6 |
 | `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 69 |
 | `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 64 |
-| `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 104 |
+| `data/literature/extracts/wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml` | 41 | 60 | 68 |
 | `data/literature/extracts/yam1983.yaml` | 3 | 16 | 40 |
 | `data/literature/gibbs_battery_residual_ledger.yaml` | 58 | 58 | 63 |
 | `data/literature/kems_measurements.yaml` | 6 | 6 | 18 |
@@ -18269,8 +18269,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 216602
+advisory issues: 216966
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 216602 |
+| `identity_incomplete` | 216966 |

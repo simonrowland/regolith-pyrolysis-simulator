@@ -84,89 +84,24 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
           - - SiO2
-            - '0.5001446588270395579114693973'
+            - '0.502765581893791'
+          - - Al2O3
+            - '0.090283840430231'
+          - - MgO
+            - '0.15474029220659'
+          - - CaO
+            - '0.252210285469388'
           amount_basis: mole_fraction
       locator:
-        pdf_page_index: 3
-        table: S2
-        note: supplement 1_low isotherm ~1742 K
+        page: 15
+        table: '6'
+        note: Derived from printed start EPMA wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j); components are not printed mole fractions
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 3
-              table: S2
-              note: supplement 1_low isotherm ~1742 K
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 3
-              table: S2
-              note: supplement 1_low isotherm ~1742 K
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 3
-              table: S2
-              note: supplement 1_low isotherm ~1742 K
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 3
-              table: S2
-              note: supplement 1_low isotherm ~1742 K
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 3
-              table: S2
-              note: supplement 1_low isotherm ~1742 K
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 3
-              table: S2
-              note: supplement 1_low isotherm ~1742 K
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 3
-              table: S2
-              note: supplement 1_low isotherm ~1742 K
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 3
-              table: S2
-              note: supplement 1_low isotherm ~1742 K
+        - sample.printed_composition
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -359,80 +294,24 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
           - - SiO2
-            - '0.5001446588270395579114693973'
+            - '0.502765581893791'
+          - - Al2O3
+            - '0.090283840430231'
+          - - MgO
+            - '0.15474029220659'
+          - - CaO
+            - '0.252210285469388'
           amount_basis: mole_fraction
       locator:
-        pdf_page_index: 5
-        table: S3-cont
+        page: 15
+        table: '6'
+        note: Derived from printed start EPMA wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j); components are not printed mole fractions
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 5
-              table: S3-cont
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 5
-              table: S3-cont
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 5
-              table: S3-cont
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 5
-              table: S3-cont
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 5
-              table: S3-cont
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 5
-              table: S3-cont
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 5
-              table: S3-cont
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 5
-              table: S3-cont
+        - sample.printed_composition
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -624,80 +503,24 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
           - - SiO2
-            - '0.5001446588270395579114693973'
+            - '0.502726948745817'
+          - - Al2O3
+            - '0.0902682729887964'
+          - - MgO
+            - '0.154801423150046'
+          - - CaO
+            - '0.25220335511534'
           amount_basis: mole_fraction
       locator:
-        pdf_page_index: 6
-        table: S4-gamma
+        page: 15
+        table: '6'
+        note: Derived from printed start EPMA wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j); components are not printed mole fractions
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 6
-              table: S4-gamma
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 6
-              table: S4-gamma
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 6
-              table: S4-gamma
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 6
-              table: S4-gamma
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 6
-              table: S4-gamma
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 6
-              table: S4-gamma
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 6
-              table: S4-gamma
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 6
-              table: S4-gamma
+        - sample.printed_composition
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
