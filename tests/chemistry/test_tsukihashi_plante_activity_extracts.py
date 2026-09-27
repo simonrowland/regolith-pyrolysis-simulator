@@ -47,7 +47,6 @@ def _six_criteria(obs: dict) -> None:
     assert values.get("activity") is not None and float(values["activity"]) > 0.0
     assert obs.get("T_range_K") and len(obs["T_range_K"]) == 2
     assert values.get("composition_mol") or values.get("composition_wt_pct")
-    assert float(values["pO2_bar"]) > 0.0
     assert values.get("system_class") == "silicate_melt"
     assert obs["condensed_form"]["state"] == "liquid_melt"
     assert obs.get("locator")
@@ -60,6 +59,7 @@ def test_tsukihashi_table2_quoted_coefficients_and_evaluated_activity() -> None:
     obs = _obs_by_id(doc, "ts1985_na2o_table2_X0p40_T1200C")
     _six_criteria(obs)
     values = obs["values"]
+    assert float(values["pO2_bar"]) > 0.0
     assert values["X_Na2O_as_published"] == pytest.approx(0.40)
     assert values["A"] == pytest.approx(-14600.0)
     assert values["B"] == pytest.approx(3.03)
@@ -77,9 +77,13 @@ def test_tsukihashi_sio2_gibbs_duhem_start_quoted() -> None:
     doc = _load(TSUKI)
     obs = _obs_by_id(doc, "ts1985_sio2_gibbs_duhem_1200C_X0500")
     _six_criteria(obs)
+    assert "pO2_bar" not in obs["values"]
     assert obs["values"]["activity"] == pytest.approx(0.00601)
     assert obs["values"]["activity_as_printed"] == "6.01 × 10^{-3}"
     assert obs["values"]["composition_mol"] == {"Na2O": 0.5, "SiO2": 0.5}
+    assert obs["experiment"] == "na2o-sio2-table1-xna2o-0p50-t1200"
+    anchor = next(e for e in doc["experiments"] if e["experiment_id"] == obs["experiment"])
+    assert anchor["locator"]["table"] == "1"
 
 
 def _wt(amount: object) -> Decimal:
