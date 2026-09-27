@@ -8,7 +8,10 @@ import math
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
-from simulator.optimize.doe import _condition_pressure_pair_values
+from simulator.optimize.doe import (
+    _condition_pressure_pair_values,
+    _condition_stage3_temperature_window_values,
+)
 from simulator.optimize.objective import (
     ObjectiveDefinition,
     canonical_objective_mapping,
@@ -340,7 +343,9 @@ def _couple_suggested_pressure_defaults(
     schema: RecipeSchema,
     values: dict[KeyPath, Any],
 ) -> None:
-    _condition_pressure_pair_values(schema, tuple(schema.search_allowlist), values)
+    specs = tuple(schema.search_allowlist)
+    _condition_pressure_pair_values(schema, specs, values)
+    _condition_stage3_temperature_window_values(schema, specs, values)
 
 
 def _sync_conditioned_trial_params(
