@@ -10209,6 +10209,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         gate_authority = self._resolved_melt_redox_gate_authority(
             gate_authority
         )
+        if (
+            self.melt.campaign == CampaignPhase.C2A_STAGED
+        ):
+            # Path A deliberately hands its residual FeO to the cool C3_NA
+            # cleanup window.  The b-598 ledger-derived fO2 can make native-Fe
+            # saturation appear at the earlier hot stage; committing that
+            # competing FeO -> Fe + 1/2 O2 split would consume the exact FeO
+            # inventory that the next operation must debit for
+            # 2 Na + FeO -> Na2O + Fe.  Na's oxygen is captured by the committed
+            # Na2O coproduct, so this branch must not ask the Fe redox-buffer
+            # capacity gate to fund (or suppress) the metallothermic transfer.
+            # Defer only the native-Fe competitor; the C3 provider's liquid and
+            # Ellingham gates still refuse infeasible shuttle proposals.
+            split = self._compute_fe_redox_split_diagnostic()
+            event = {
+                'native_fe_event': 'deferred_for_staged_na_shuttle',
+                'native_fe_event_reason': (
+                    'staged_path_reserves_feo_for_na_shuttle'
+                ),
+                'native_fe_event_status': 'deferred',
+            }
+            self._last_native_fe_partition_diagnostic = {}
+            self._last_native_fe_saturation_event = dict(event)
+            return {**split, **event}
         T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
         if not self._melt_redox_temperature_shift_is_liquid(
             T_K,
