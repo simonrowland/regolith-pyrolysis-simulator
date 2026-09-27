@@ -176,33 +176,54 @@ def test_provider_flags_floor_inversion_and_completes(monkeypatch) -> None:
     )
 
 
-def test_provider_refuses_only_species_above_catalog_ceiling_before_flux() -> None:
+def test_provider_predicts_and_flags_species_above_catalog_ceiling() -> None:
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
 
     result = provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0))
 
     assert result.status == "ok"
     pressures = result.diagnostic["vapor_pressures_Pa"]
-    refusals = result.diagnostic["vapor_pressure_species_refusals"]
-    assert refusals
-    assert set(refusals).isdisjoint(pressures)
+    notices = result.diagnostic["vapor_pressure_out_of_domain_notices"]
+    assert notices
+    assert result.diagnostic["vapor_pressure_species_refusals"] == {}
     assert pressures
-    for species, refusal in refusals.items():
-        assert refusal["status"] == "refused"
-        assert refusal["flux_status"] == "refused"
-        assert refusal["reason"] == "vapor_pressure_physical_pressure_ceiling"
-        assert refusal["pressure_Pa"] > CATALOG_PHYSICAL_PRESSURE_CEILING_PA
-        assert refusal["ceiling_Pa"] == CATALOG_PHYSICAL_PRESSURE_CEILING_PA
-        assert refusal["measured_zero"] is False
-        assert refusal["ledger_moved_mol"] == 0.0
-    assert all(
-        float(pressure) <= CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+    assert set(notices).issubset(pressures)
+    for species, notice in notices.items():
+        assert notice["status"] == "out_of_domain"
+        assert notice["output_status"] == "status_bearing"
+        assert notice["flux_status"] == "predicted"
+        assert notice["availability"] == "available"
+        assert notice["reason"] == "vapor_pressure_physical_pressure_ceiling"
+        assert notice["pressure_Pa"] == pressures[species]
+        assert notice["pressure_Pa"] > CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+        assert notice["ceiling_Pa"] == CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["certified_band"]["pressure_Pa"] == (
+            0.0,
+            CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
+        )
+        assert notice["certified_band"]["pO2_bar"] == (
+            MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
+            MELT_DISSOCIATION_PO2_MAX_BAR,
+        )
+        assert (
+            result.diagnostic["vapor_pressure_numerator_provenance"][species][
+                "physical_pressure_ceiling_notice"
+            ]
+            == notice
+        )
+        assert _is_noncertifying_vapor_extrapolation(
+            species, result.diagnostic["vapor_pressures_source"][species]
+        )
+        assert notice["measured_zero"] is False
+    assert any(
+        float(pressure) > CATALOG_PHYSICAL_PRESSURE_CEILING_PA
         for pressure in pressures.values()
     )
 
 
-def test_one_species_ceiling_refusal_completes_runner_and_is_flagged(monkeypatch) -> None:
-    """A forced ceiling breach refuses one flux and leaves other fluxes live."""
+def test_one_species_genuine_refusal_completes_runner_and_is_unavailable(monkeypatch) -> None:
+    """A forced genuine refusal stays unavailable while peer fluxes live."""
 
     original_dispatch = BuiltinVaporPressureProvider.dispatch
     forced_species: list[str] = []
@@ -220,7 +241,7 @@ def test_one_species_ceiling_refusal_completes_runner_and_is_flagged(monkeypatch
         refusals[species] = {
             "status": "refused",
             "flux_status": "refused",
-            "reason": "vapor_pressure_physical_pressure_ceiling",
+            "reason": "vapor_pressure_missing_input",
             "species": species,
             "pressure_Pa": max(
                 pressure,
@@ -229,6 +250,7 @@ def test_one_species_ceiling_refusal_completes_runner_and_is_flagged(monkeypatch
             "ceiling_Pa": float(CATALOG_PHYSICAL_PRESSURE_CEILING_PA),
             "flagged": True,
             "backlog": True,
+            "availability": "unavailable",
             "measured_zero": False,
             "ledger_moved_mol": 0.0,
             "mass_moved_mol": 0.0,
@@ -274,6 +296,29 @@ def test_one_species_ceiling_refusal_completes_runner_and_is_flagged(monkeypatch
     backlog = payload["run_metadata"]["flag_backlog"]
     assert backlog["count"] >= 1
     assert backlog["by_species"][species] >= 1
+    ideal_train = payload["yield_disposition"]["ideal_train_melt_boundary"]
+    unavailable_rows = [
+        row
+        for row in ideal_train["rows"]
+        if any(
+            refusal.get("species") == species
+            and refusal.get("code") == "vapor_pressure_species_unavailable"
+            for refusal in row.get("refusals", ())
+        )
+    ]
+    assert unavailable_rows
+    for row in unavailable_rows:
+        assert row["status"] == "refused"
+        assert row["surface_crossed_mol_atoms"] is None
+        assert row["ideal_train_fraction"] is None
+        assert any(
+            refusal.get("species") == species
+            and refusal.get("reason") == "vapor_pressure_missing_input"
+            for refusal in row["refusals"]
+        )
+        assert row["term_provenance"]["ideal_train_fraction"]["status"] == (
+            "refused"
+        )
 
 
 def test_provider_flags_exact_minus_30_without_clamp_warning(monkeypatch) -> None:

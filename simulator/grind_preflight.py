@@ -645,11 +645,11 @@ def _is_noncertifying_vapor_extrapolation(_species: Any, source: Any) -> bool:
     the first colon-separated segment, so a label such as
     ``builtin_authoritative:standard_reaction_term:extrapolated_beyond_valid_range_K``
     (or ``...:out_of_gamma_domain``) would otherwise pass
-    ``APPROVED_LIVE_VAPOR_SOURCES``. Range-extrapolation, gamma-domain, and
-    floor-inversion suffixes must be load-bearing for every species — not
-    Mg-only — or process-envelope extrapolation silently certifies ledger
-    yields. Species is retained for call-site symmetry; rejection is
-    token-driven today.
+    ``APPROVED_LIVE_VAPOR_SOURCES``. Range-extrapolation, gamma-domain,
+    floor-inversion, and physical-pressure-ceiling suffixes must be
+    load-bearing for every species — not Mg-only — or process-envelope
+    extrapolation silently certifies ledger yields. Species is retained for
+    call-site symmetry; rejection is token-driven today.
     """
     tokens = set(str(source or "").split(":"))
     return bool(
@@ -659,6 +659,7 @@ def _is_noncertifying_vapor_extrapolation(_species: Any, source: Any) -> bool:
             "extrapolated_beyond_valid_range_K",
             "melt_dissociation_pO2_floor_inverted_through_mass_action",
             "out_of_gamma_domain",
+            "vapor_pressure_physical_pressure_ceiling",
         }
     )
 
