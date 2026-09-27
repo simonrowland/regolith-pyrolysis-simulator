@@ -461,9 +461,11 @@ def _point_result(monkeypatch, conditions, sample=None):
         for parent in (row.get("derived_from") or ())
         if isinstance(parent, str)
     }
+    assert parent_ids == {"holzheid_1997_equilibrium_free_energy_fits"}
     retained_species = {"CoO": {"observations": [row]}}
-    # Keep measured lineage roots in this reduced fixture. The full source's
-    # model-derived fit has its own known backlog and is not needed here.
+    # Keep the fit parent in this reduced fixture. Its full source record has
+    # the known missing O'Neill/Barin ancestry; omit its classification here
+    # so this consumer-boundary fixture does not validate that backlog.
     for formula, body in document["species"].items():
         if formula == "CoO" or not isinstance(body, dict):
             continue
@@ -475,9 +477,14 @@ def _point_result(monkeypatch, conditions, sample=None):
             ):
                 continue
             method_class = (parent.get("values") or {}).get("method_class")
-            if method_class in {"calculated", "author_derived", "model_derived"}:
+            if method_class in {"calculated", "author_derived"}:
                 continue
-            roots.append(deepcopy(parent))
+            root = deepcopy(parent)
+            if root.get("observation_id") == "holzheid_1997_equilibrium_free_energy_fits":
+                root_values = dict(root.get("values") or {})
+                root_values.pop("method_class", None)
+                root["values"] = root_values
+            roots.append(root)
         if roots:
             retained_species[formula] = {"observations": roots}
     document["species"] = retained_species
