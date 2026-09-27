@@ -1278,24 +1278,20 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     assert not sim._last_evaporation_flux_diagnostic.get(
         "continuum_extrapolation_notice"
     )
-    # Same-tick duct transport rebaseline: the finite-capacity partials are
-    # reused by condensation, so channels suppressed by their physical
-    # backpressure are absent from the committed vapor map.
+    # b-603 same-tick duct backpressure suppresses K2/K2O_gas/Na2; values are
+    # re-pinned from the stack run, source: stack-merge-2 report.
     expected_rates = {
         "AlO2": 2.143585875533841e-11,
         "CaO_gas": 2.2577755434146795e-11,
         "CrO": 5.132850977988064e-09,
         "CrO2": 5.170334723468988e-04,
         "CrO3": 4.4565392212870376e-02,
-        "K": 3.74276683431972e-07,
-        "K2": 1.3598634000432232e-09,
-        "K2O_gas": 2.006067083688738e-06,
+        "K": 3.743132671178778e-07,
         "Mg": 2.683943219427042e-10,
         "MgO_gas": 1.1255291572060186e-07,
         "Mn": 8.386507309776792e-11,
-        "Na": 1.133473071483502e-05,
-        "Na2": 1.52010943077418e-08,
-        "Na2O_gas": 4.457650024160285e-06,
+        "Na": 1.1335348535353611e-05,
+        "Na2O_gas": 3.920869170460704e-11,
         "SiO": 6.811100915552663e-09,
         "SiO2_gas": 5.021561852435548e-06,
         "TiO2_gas": 5.228240451642386e-08,

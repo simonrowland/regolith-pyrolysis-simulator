@@ -128,7 +128,12 @@ def _vapor_request(
         ),
         temperature_C=temperature_c,
         pressure_bar=1.0,
-        control_inputs={"pO2_bar": pO2_bar},
+        # b-588 requires the physical melt/interface rail in addition to the
+        # gas-side transport pO2 used by these fail-loud probes.
+        control_inputs={
+            "pO2_bar": pO2_bar,
+            "interface_pO2_bar": pO2_bar,
+        },
     )
 
 

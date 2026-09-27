@@ -91,8 +91,10 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # No other key changed. The digest tracks file content by design.
     # Recomputed 2026-09-26 (t-1004): the continuous C2A Stage-3 window
     # defaults are now explicit setpoint values, so the resolved digest moves.
+    # t-1004 Stage-3 defaults change this executable resolved-setpoints digest;
+    # source: docs-private/research/2026-09-26-stack-merge-2/report.md.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "49b6846d09ca70ecefe5ff307f37c85a49212bd1361abaaa85c70f04f426c7ad"
+        "bbcf3975992b7fdfa25776f5f586377dbee2d5d5aaeb8279d26839f9a8049df2"
     )
     # bounds_digest moved with the knob bounds themselves: the furnace envelope
     # top (2000 -> catalog max), hot-wall ceiling (1750 -> inherited), and the
@@ -657,8 +659,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # hashed the pre-VR-3 payload (fingerprints present, June corpus). That
     # payload is unreachable: current canonical_evalspec_json does not
     # serialize those fingerprints, and the June corpus is not interoperable.
-    # Pin recomputed from this tree's executable cache_key(spec).
-    assert cache_key(spec) == "8cd68431dc39a32ed8addb05ccfd936b6ad8d866569cac6473fbb7c4cc671baf"
+    # t-1004 Stage-3 vocabulary changes EvalSpec identity; recomputed from the
+    # executable cache_key(spec), source: stack-merge-2 report.
+    assert cache_key(spec) == "fddbc3ef49ec06580f9d70cf5d0dc4182eb7384e58cb2d3ab5490d12261cdbcd"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

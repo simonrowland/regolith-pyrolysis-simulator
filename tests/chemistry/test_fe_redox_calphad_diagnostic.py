@@ -185,6 +185,9 @@ def test_builtin_vapor_pressure_consumes_calphad_feo_authority_below_iw(
         fO2_log=fO2_log,
         control_inputs={
             "pO2_bar": 1e-9,
+            # b-588 separates melt/interface pO2 from transport pO2; direct
+            # provider fixtures keep both rails at the reviewed vacuum value.
+            "interface_pO2_bar": 1e-9,
             "intrinsic_fO2_log": fO2_log,
         },
     )
@@ -369,6 +372,7 @@ def test_iron_rich_basalt_clamp_reports_unclamped_band_and_closes_fe_atoms(
         fO2_log=fO2_log,
         control_inputs={
             "pO2_bar": 1e-9,
+            "interface_pO2_bar": 1e-9,
             "intrinsic_fO2_log": fO2_log,
         },
     )

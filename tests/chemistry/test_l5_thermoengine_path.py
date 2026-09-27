@@ -49,6 +49,9 @@ class _MatchingThermoEngineBackend:
             fO2_log=fO2_log,
             control_inputs={
                 "pO2_bar": float(vapor_transport_pO2_bar),
+                # b-588 keeps the melt/interface release rail explicit while
+                # the backend still records the transport rail separately.
+                "interface_pO2_bar": float(vapor_transport_pO2_bar),
                 "intrinsic_fO2_log": fO2_log,
             },
         )
@@ -193,7 +196,11 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
-        control_inputs={"pO2_bar": sim._vapor_pressure_dispatch_pO2_bar()},
+        # b-588 direct kernel probes must declare both physical pO2 rails.
+        control_inputs={
+            "pO2_bar": sim._vapor_pressure_dispatch_pO2_bar(),
+            "interface_pO2_bar": sim._interface_pO2_bar(),
+        },
         fO2_log=sim._compute_intrinsic_melt_fO2(),
     )
     kernel_vp = dict((kernel.diagnostic or {}).get("vapor_pressures_Pa") or {})

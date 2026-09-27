@@ -1569,6 +1569,7 @@ def _build_ideal_train_melt_boundary(
     tap_provenance_flags: defaultdict[str, set[str]] = defaultdict(set)
     oxygen_exchange_outward: defaultdict[str, float] = defaultdict(float)
     oxygen_exchange_returned: defaultdict[str, float] = defaultdict(float)
+    redox_boundary_adjustment: defaultdict[str, float] = defaultdict(float)
 
     # Derivation: Stage-0 native metal is a typed external load whose source
     # record names the metal-alloy seed.  It already represents native metal
@@ -1704,6 +1705,40 @@ def _build_ideal_train_melt_boundary(
                         "native_fe_saturation_split_authoritative"
                     )
 
+        if name == "fe_redox_respeciation":
+            # Fe redox respeciation can use feedstock-origin oxygen from the
+            # overhead carrier or return it there.  That carrier movement is
+            # itself a melt-boundary crossing and must adjust surface evidence.
+            overhead_debits, debit_refusals = _transition_feedstock_atoms(
+                transition,
+                "debits",
+                "process.overhead_gas",
+                registry,
+            )
+            overhead_credits, credit_refusals = _transition_feedstock_atoms(
+                transition,
+                "credits",
+                "process.overhead_gas",
+                registry,
+            )
+            for element in sorted(
+                set(overhead_debits)
+                | set(overhead_credits)
+                | debit_refusals
+                | credit_refusals
+            ):
+                if element in debit_refusals or element in credit_refusals:
+                    surface_refusals[element].append(
+                        {
+                            "code": "fe_redox_respeciation_origin_unresolved",
+                            "transition": name,
+                        }
+                    )
+                    continue
+                redox_boundary_adjustment[element] += float(
+                    overhead_credits.get(element, 0.0)
+                ) - float(overhead_debits.get(element, 0.0))
+
         if name == _IDEAL_TRAIN_OXYGEN_EXCHANGE:
             # Derivation: oxygen_reservoir_exchange is bidirectional.  Count
             # feedstock-origin atoms on buffer debits as outward crossings and
@@ -1800,6 +1835,26 @@ def _build_ideal_train_melt_boundary(
                 "oxygen_reservoir_exchange_authoritative"
             )
         if surface_crossed[element] > 0.0:
+            surface_species_by_element[element].add("O2")
+
+    for element, adjustment in sorted(redox_boundary_adjustment.items()):
+        surface_value = float(surface_crossed.get(element, 0.0))
+        net_surface_value = surface_value + float(adjustment)
+        if net_surface_value < -_atom_tolerance(max(abs(net_surface_value), 1.0)):
+            surface_refusals[element].append(
+                {
+                    "code": "fe_redox_respeciation_return_exceeds_surface_evidence",
+                    "surface_mol_atoms": surface_value,
+                    "net_adjustment_mol_atoms": float(adjustment),
+                }
+            )
+            continue
+        surface_crossed[element] = max(0.0, net_surface_value)
+        if abs(adjustment) > _atom_tolerance(max(abs(adjustment), 1.0)):
+            surface_transition_flags[element].add(
+                "fe_redox_respeciation_boundary_authoritative"
+            )
+        if element == "O" and surface_crossed[element] > 0.0:
             surface_species_by_element[element].add("O2")
 
     feedstock_by_account = _feedstock_origin_by_account(ledger)
@@ -1945,7 +2000,9 @@ def _build_ideal_train_melt_boundary(
                 "process.cleaned_melt, excluding same-transition "
                 "reservoir.fo2_buffer credits; plus direct "
                 "reservoir.fo2_buffer-to-overhead oxygen exchange net of "
-                "feedstock-origin buffer credits returned from overhead"
+                "feedstock-origin buffer credits returned from overhead; "
+                "plus feedstock-origin overhead oxygen net of "
+                "fe_redox_respeciation"
             ),
             "flags": [],
             "by_species": {},

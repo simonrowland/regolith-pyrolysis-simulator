@@ -416,7 +416,9 @@ def _runtime_recovered_reference_pressure_pa(
             ),
             temperature_C=temperature_K - 273.15,
             pressure_bar=1e-6,
-            control_inputs={"pO2_bar": 1e-9},
+            # b-588 separates the melt/interface release rail from transport;
+            # this ground-truth fixture pins both at the reviewed vacuum value.
+            control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
         )
     )
 
@@ -679,7 +681,7 @@ def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_liquid_oxide_standard() ->
                 ),
                 temperature_C=temperature_K - 273.15,
                 pressure_bar=1e-6,
-                control_inputs={"pO2_bar": 1e-9},
+                control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
             )
         )
         assert result.status == "ok"
@@ -925,7 +927,7 @@ def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pres
             ),
             temperature_C=temperature_K - 273.15,
             pressure_bar=1e-6,
-            control_inputs={"pO2_bar": 1e-9},
+            control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
         )
     )
 
