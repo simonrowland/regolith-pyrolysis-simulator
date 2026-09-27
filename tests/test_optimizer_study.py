@@ -36,6 +36,7 @@ from simulator.electrolysis import (
 )
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize import cli as optimizer_cli
+import simulator.optimize.evaluate as evaluate_module
 from simulator.optimize import physics as physics_module
 from simulator.optimize import study
 from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
@@ -4351,6 +4352,158 @@ def test_backend_status_field_survives_strip_and_store_for_real_backend(tmp_path
     assert light.run_reference.backend_status == "ok"
     assert light.run_reference.backend_authoritative is True
     ResultStore(tmp_path / "cache.sqlite").store(spec, light, created_at="t1")
+
+
+def test_predict_and_flag_notice_survives_evaluation_store_and_study_summary(
+    tmp_path: Path,
+) -> None:
+    flag = {
+        "status": "status_bearing",
+        "flux_status": "eligible",
+        "reason": "outside certified vapor-pressure band",
+        "species": "SiO",
+        "authority_level": "extrapolated",
+        "certified_band": {"pO2_bar": (1.0e-9, 1.0e-3)},
+        "flagged": True,
+        "is_refused": False,
+        "measured_zero": False,
+    }
+    execution = SimpleNamespace(
+        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
+        per_hour=(
+            {
+                "hour": 1,
+                "campaign": "C2A",
+                "vapor_pressure_refusals": {"SiO": flag},
+                "condensation_refusals_by_species": {
+                    "Al": {
+                        "status": "unavailable",
+                        "reason": "missing carrier transport parameters",
+                        "authority_level": "unavailable",
+                    }
+                },
+                "redox_source_breakdown": {
+                    "fe_redox_respeciation": {
+                        "status": "predicted_extrapolation",
+                        "reason": "outside liquid respeciation band",
+                        "authority": "extrapolated",
+                        "certified_band": {"temperature_K": (1200.0, 1800.0)},
+                        "species": "FeO",
+                    }
+                },
+                "mre_uncertified_yield": {"Al": 1.23},
+                "mre_ellingham_ladder_diagnostic": {
+                    "schema": "c5_ellingham_ladder_diagnostic_v1"
+                },
+            },
+        ),
+        trace=SimpleNamespace(),
+        simulator=SimpleNamespace(
+            composition_projected_liquidus_run_notice=lambda: {
+                "kind": "composition_projected",
+                "reason": "composition projected onto supported bulk",
+                "authority": "extrapolated",
+                "certified_band": {"temperature_K": (1000.0, 1900.0)},
+                "notices": [
+                    {
+                        "kind": "composition_projected",
+                        "dropped_components": [
+                            {"component": "Cr", "mass_fraction": 0.01}
+                        ],
+                    }
+                ],
+            }
+        ),
+        backend_status="ok",
+        backend_authoritative=True,
+        reason="",
+        refusal_diagnostic={},
+    )
+    trace = evaluate_module._cache_trace_payload(execution, None)
+    reference = _run_reference(
+        status="ok",
+        trace=trace,
+        product_summary={
+            "mass_closure": {
+                "status": "closed",
+                "mass_balance_error_pct": 0.0,
+            }
+        },
+        backend_name="alphamelts",
+        backend_status="ok",
+        backend_authoritative=True,
+    )
+    spec = replace(_scope_spec(), backend_name="alphamelts")
+    scored = ScoredResult(
+        candidate_id="flagged-candidate",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", 1.0, "kg", ordinal=0),
+                ObjectiveValue("energy_kWh", "minimize", 1.0, "kWh", ordinal=1),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=reference,
+    )
+    light = study._strip_heavy_result(scored)
+
+    store = ResultStore(tmp_path / "cache.sqlite")
+    store.store(spec, light, created_at="t1")
+    loaded = store.fetch(scored.cache_key)
+    assert loaded is not None and loaded.run_reference is not None
+
+    candidate = Candidate(
+        id="flagged-candidate",
+        patch=RecipePatch({}),
+        metadata={"proposal_source": "test", "strategy": "test"},
+    )
+    record = study._to_record(candidate, loaded, cache_hit=True, already_light=True)
+
+    for surface in (
+        loaded.run_reference.trace,
+        record.result_blob,
+        record.trace_summary,
+    ):
+        assert surface["flag_backlog"]["count"] == 1
+        assert surface["per_hour_summary"][0]["vapor_pressure_refusals"]["SiO"][
+            "reason"
+        ] == "outside certified vapor-pressure band"
+        assert surface["l5_notices"]["count_by_kind"] == {
+            "composition_projected_liquidus_notice": 1,
+            "condensation_refusals_by_species": 1,
+            "mre_ellingham_ladder_diagnostic": 1,
+            "mre_uncertified_yield": 1,
+            "redox_source_breakdown": 1,
+            "vapor_pressure_refusals": 1,
+        }
+        notice = surface["l5_notices"]["entries"][0]
+        assert notice["quantity"] == "SiO"
+        assert notice["reason"] == "outside certified vapor-pressure band"
+        assert notice["authority_level"] == "extrapolated"
+        assert notice["certified_band"] == {
+            "pO2_bar": [1.0e-9, 1.0e-3]
+        }
+        assert notice["availability"] == "available"
+        unavailable = next(
+            item
+            for item in surface["l5_notices"]["entries"]
+            if item["kind"] == "condensation_refusals_by_species"
+        )
+        assert unavailable["quantity"] == "Al"
+        assert unavailable["availability"] == "unavailable"
+        composition = next(
+            item
+            for item in surface["l5_notices"]["entries"]
+            if item["kind"] == "composition_projected_liquidus_notice"
+        )
+        assert composition["reason"] == "composition projected onto supported bulk"
+        assert composition["authority"] == "extrapolated"
+        assert composition["certified_band"] == {
+            "temperature_K": [1000.0, 1900.0]
+        }
 
 
 def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_path) -> None:
