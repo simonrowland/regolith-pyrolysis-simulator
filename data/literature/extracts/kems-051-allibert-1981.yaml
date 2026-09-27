@@ -194,72 +194,80 @@ species:
           phase_as_printed: melt
           a_CaO: 0.42
           a_CaO_as_printed: '0.42'
-          composition_mol:
-            CaO: 0.645
-            Al2O3: 0.355
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.645'], [Al2O3, '0.355']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 64.5 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.42
           activity_as_published: '0.42'
         - composition_mol_pct_CaO: 57.8
           phase_as_printed: melt
           a_CaO: 0.2
           a_CaO_as_printed: '0.20'
-          composition_mol:
-            CaO: 0.578
-            Al2O3: 0.42200000000000004
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.578'], [Al2O3, '0.422']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 57.8 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.2
           activity_as_published: '0.20'
         - composition_mol_pct_CaO: 54.8
           phase_as_printed: melt
           a_CaO: 0.14
           a_CaO_as_printed: '0.14'
-          composition_mol:
-            CaO: 0.5479999999999999
-            Al2O3: 0.45200000000000007
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.548'], [Al2O3, '0.452']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 54.8 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.14
           activity_as_published: '0.14'
         - composition_mol_pct_CaO: 49.5
           phase_as_printed: melt
           a_CaO: 0.082
           a_CaO_as_printed: '0.082'
-          composition_mol:
-            CaO: 0.495
-            Al2O3: 0.505
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.495'], [Al2O3, '0.505']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 49.5 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.082
           activity_as_published: '0.082'
         - composition_mol_pct_CaO: 43.8
           phase_as_printed: melt
           a_CaO: 0.048
           a_CaO_as_printed: '0.048'
-          composition_mol:
-            CaO: 0.43799999999999994
-            Al2O3: 0.562
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.438'], [Al2O3, '0.562']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 43.8 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.048
           activity_as_published: '0.048'
         - composition_mol_pct_CaO: 41.4
           phase_as_printed: melt
           a_CaO: 0.04
           a_CaO_as_printed: '0.040'
-          composition_mol:
-            CaO: 0.414
-            Al2O3: 0.5860000000000001
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.414'], [Al2O3, '0.586']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 41.4 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.04
           activity_as_published: '0.040'
         - composition_mol_pct_CaO: 35.2
           phase_as_printed: melt
           a_CaO: 0.025
           a_CaO_as_printed: '0.025'
-          composition_mol:
-            CaO: 0.35200000000000004
-            Al2O3: 0.6479999999999999
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.352'], [Al2O3, '0.648']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 35.2 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.025
           activity_as_published: '0.025'
         - composition_mol_pct_CaO: 80
           phase_as_printed: CaO + melt
           a_CaO: 1
           a_CaO_as_printed: '1'
-          composition_mol:
-            CaO: 0.8
-            Al2O3: 0.19999999999999996
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.8'], [Al2O3, '0.2']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 80 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 1.0
           activity_as_published: '1'
         quantity_as_published: CaO_activity
@@ -325,193 +333,217 @@ species:
         - X_Al2O3_as_printed: '.29'
           T_K: 2060
           log10_activity: -0.11
-          composition_mol:
-            CaO: 0.71
-            Al2O3: 0.29
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.71'], [Al2O3, '0.29']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.29; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.7762471166286917
           activity_log10_as_plotted: -0.11
         - X_Al2O3_as_printed: '.29'
           T_K: 1773
           log10_activity: 0.0
-          composition_mol:
-            CaO: 0.71
-            Al2O3: 0.29
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.71'], [Al2O3, '0.29']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.29; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 1.0
           activity_log10_as_plotted: 0.0
         - X_Al2O3_as_printed: '.29'
           T_K: 1633
           log10_activity: 0.08
-          composition_mol:
-            CaO: 0.71
-            Al2O3: 0.29
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.71'], [Al2O3, '0.29']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.29; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 1.202264434617413
           activity_log10_as_plotted: 0.08
         - X_Al2O3_as_printed: '.32'
           T_K: 2060
           log10_activity: -0.15
-          composition_mol:
-            CaO: 0.6799999999999999
-            Al2O3: 0.32
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.68'], [Al2O3, '0.32']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.32; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.7079457843841379
           activity_log10_as_plotted: -0.15
         - X_Al2O3_as_printed: '.32'
           T_K: 1773
           log10_activity: -0.09
-          composition_mol:
-            CaO: 0.6799999999999999
-            Al2O3: 0.32
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.68'], [Al2O3, '0.32']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.32; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.8128305161640993
           activity_log10_as_plotted: -0.09
         - X_Al2O3_as_printed: '.32'
           T_K: 1633
           log10_activity: -0.04
-          composition_mol:
-            CaO: 0.6799999999999999
-            Al2O3: 0.32
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.68'], [Al2O3, '0.32']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.32; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.9120108393559098
           activity_log10_as_plotted: -0.04
         - X_Al2O3_as_printed: '.34'
           T_K: 2060
           log10_activity: -0.18
-          composition_mol:
-            CaO: 0.6599999999999999
-            Al2O3: 0.34
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.66'], [Al2O3, '0.34']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.34; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.660693448007596
           activity_log10_as_plotted: -0.18
         - X_Al2O3_as_printed: '.34'
           T_K: 1773
           log10_activity: -0.15
-          composition_mol:
-            CaO: 0.6599999999999999
-            Al2O3: 0.34
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.66'], [Al2O3, '0.34']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.34; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.7079457843841379
           activity_log10_as_plotted: -0.15
         - X_Al2O3_as_printed: '.34'
           T_K: 1633
           log10_activity: -0.13
-          composition_mol:
-            CaO: 0.6599999999999999
-            Al2O3: 0.34
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.66'], [Al2O3, '0.34']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.34; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.7413102413009175
           activity_log10_as_plotted: -0.13
         - X_Al2O3_as_printed: '.36'
           T_K: 2060
           log10_activity: -0.24
-          composition_mol:
-            CaO: 0.64
-            Al2O3: 0.36
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [Al2O3, '0.36']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.36; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.5754399373371569
           activity_log10_as_plotted: -0.24
         - X_Al2O3_as_printed: '.36'
           T_K: 1773
           log10_activity: -0.22
-          composition_mol:
-            CaO: 0.64
-            Al2O3: 0.36
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [Al2O3, '0.36']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.36; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.6025595860743578
           activity_log10_as_plotted: -0.22
         - X_Al2O3_as_printed: '.36'
           T_K: 1633
           log10_activity: -0.21
-          composition_mol:
-            CaO: 0.64
-            Al2O3: 0.36
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [Al2O3, '0.36']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.36; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.6165950018614822
           activity_log10_as_plotted: -0.21
         - X_Al2O3_as_printed: '.38'
           T_K: 2060
           log10_activity: -0.29
-          composition_mol:
-            CaO: 0.62
-            Al2O3: 0.38
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [Al2O3, '0.38']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.38; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.5128613839913648
           activity_log10_as_plotted: -0.29
         - X_Al2O3_as_printed: '.38'
           T_K: 1773
           log10_activity: -0.27
-          composition_mol:
-            CaO: 0.62
-            Al2O3: 0.38
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [Al2O3, '0.38']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.38; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.5370317963702527
           activity_log10_as_plotted: -0.27
         - X_Al2O3_as_printed: '.38'
           T_K: 1633
           log10_activity: -0.27
-          composition_mol:
-            CaO: 0.62
-            Al2O3: 0.38
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [Al2O3, '0.38']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.38; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.5370317963702527
           activity_log10_as_plotted: -0.27
         - X_Al2O3_as_printed: '.40'
           T_K: 2060
           log10_activity: -0.34
-          composition_mol:
-            CaO: 0.6
-            Al2O3: 0.4
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [Al2O3, '0.4']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.40; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.457088189614875
           activity_log10_as_plotted: -0.34
         - X_Al2O3_as_printed: '.40'
           T_K: 1773
           log10_activity: -0.32
-          composition_mol:
-            CaO: 0.6
-            Al2O3: 0.4
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [Al2O3, '0.4']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.40; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.4786300923226383
           activity_log10_as_plotted: -0.32
         - X_Al2O3_as_printed: '.40'
           T_K: 1633
           log10_activity: -0.32
-          composition_mol:
-            CaO: 0.6
-            Al2O3: 0.4
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [Al2O3, '0.4']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.40; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.4786300923226383
           activity_log10_as_plotted: -0.32
         - X_Al2O3_as_printed: '.42'
           T_K: 2060
           log10_activity: -0.39
-          composition_mol:
-            CaO: 0.5800000000000001
-            Al2O3: 0.42
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.58'], [Al2O3, '0.42']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.42; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.40738027780411273
           activity_log10_as_plotted: -0.39
         - X_Al2O3_as_printed: '.42'
           T_K: 1773
           log10_activity: -0.38
-          composition_mol:
-            CaO: 0.5800000000000001
-            Al2O3: 0.42
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.58'], [Al2O3, '0.42']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.42; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.4168693834703354
           activity_log10_as_plotted: -0.38
         - X_Al2O3_as_printed: '.42'
           T_K: 1633
           log10_activity: -0.37
-          composition_mol:
-            CaO: 0.5800000000000001
-            Al2O3: 0.42
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.58'], [Al2O3, '0.42']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.42; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.42657951880159267
           activity_log10_as_plotted: -0.37
         - X_Al2O3_as_printed: '.5'
           T_K: 2060
           log10_activity: -0.82
-          composition_mol:
-            CaO: 0.5
-            Al2O3: 0.5
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [Al2O3, '0.5']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.5; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.15135612484362082
           activity_log10_as_plotted: -0.82
         - X_Al2O3_as_printed: '.5'
           T_K: 1773
           log10_activity: -0.87
-          composition_mol:
-            CaO: 0.5
-            Al2O3: 0.5
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [Al2O3, '0.5']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.5; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.13489628825916536
           activity_log10_as_plotted: -0.87
         - X_Al2O3_as_printed: '.5'
           T_K: 1633
           log10_activity: -0.96
-          composition_mol:
-            CaO: 0.5
-            Al2O3: 0.5
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [Al2O3, '0.5']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.5; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.1096478196143185
           activity_log10_as_plotted: -0.96
       point_conditions:
@@ -701,72 +733,120 @@ species:
         - temperature_K: 2103
           phase_diagram_as_printed: Ref. 9
           melt_X_Al2O3_as_printed: '0.74'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.26'], [Al2O3, '0.74']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.74; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.74) + Al2O3 + CaO·6Al2O3
           compound_as_printed: CaO·6Al2O3
           delta_G_kJ_per_mol: '-94.7'
         - temperature_K: 2035
           phase_diagram_as_printed: Ref. 9
           melt_X_Al2O3_as_printed: '0.66'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.34'], [Al2O3, '0.66']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.66; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.66) + CaO·6Al2O3 + CaO·2Al2O3
           compound_as_printed: CaO·6Al2O3
           delta_G_kJ_per_mol: '-92.3'
         - temperature_K: 2035
           phase_diagram_as_printed: Ref. 9
           melt_X_Al2O3_as_printed: '0.66'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.34'], [Al2O3, '0.66']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.66; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.66) + CaO·6Al2O3 + CaO·2Al2O3
           compound_as_printed: CaO·2Al2O3
           delta_G_kJ_per_mol: '-73.6'
         - temperature_K: 1875
           phase_diagram_as_printed: Ref. 9
           melt_X_Al2O3_as_printed: '0.494'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.506'], [Al2O3, '0.494']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.494; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.494) + CaO·2Al2O3 + CaO·Al2O3
           compound_as_printed: CaO·2Al2O3
           delta_G_kJ_per_mol: '-69.0'
         - temperature_K: 1875
           phase_diagram_as_printed: Ref. 9
           melt_X_Al2O3_as_printed: '0.494'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.506'], [Al2O3, '0.494']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.494; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.494) + CaO·2Al2O3 + CaO·Al2O3
           compound_as_printed: CaO·Al2O3
           delta_G_kJ_per_mol: '-54.0'
         - temperature_K: 1812
           phase_diagram_as_printed: Ref. 9
           melt_X_Al2O3_as_printed: '0.29'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.71'], [Al2O3, '0.29']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.29; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.29) + CaO + 3CaO·Al2O3
           compound_as_printed: 3CaO·Al2O3
           delta_G_kJ_per_mol: '-73.0'
         - temperature_K: 1633
           phase_diagram_as_printed: Ref. 9
           melt_X_Al2O3_as_printed: '0.36'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [Al2O3, '0.36']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.36; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.36) + 3CaO·Al2O3 + CaO·Al2O3
           compound_as_printed: 3CaO·Al2O3
           delta_G_kJ_per_mol: '-72.0'
         - temperature_K: 1633
           phase_diagram_as_printed: Ref. 9
           melt_X_Al2O3_as_printed: '0.36'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [Al2O3, '0.36']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.36; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.36) + 3CaO·Al2O3 + CaO·Al2O3
           compound_as_printed: CaO·Al2O3
           delta_G_kJ_per_mol: '-46.7'
         - temperature_K: 1633
           phase_diagram_as_printed: Fig. 2295 of Ref. 3
           melt_X_Al2O3_as_printed: '0.38'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [Al2O3, '0.38']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.38; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.38) + 12CaO·7Al2O3 + CaO·Al2O3
           compound_as_printed: 12CaO·7Al2O3
           delta_G_kJ_per_mol: '-396'
         - temperature_K: 1633
           phase_diagram_as_printed: Fig. 2295 of Ref. 3
           melt_X_Al2O3_as_printed: '0.38'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [Al2O3, '0.38']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.38; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.38) + 12CaO·7Al2O3 + CaO·Al2O3
           compound_as_printed: CaO·Al2O3
           delta_G_kJ_per_mol: '-45.1'
         - temperature_K: 1633
           phase_diagram_as_printed: Fig. 2295 of Ref. 3
           melt_X_Al2O3_as_printed: '0.35'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.65'], [Al2O3, '0.35']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.35; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.35) + 12CaO·7Al2O3 + 3CaO·Al2O3
           compound_as_printed: 12CaO·7Al2O3
           delta_G_kJ_per_mol: '-393'
         - temperature_K: 1633
           phase_diagram_as_printed: Fig. 2295 of Ref. 3
           melt_X_Al2O3_as_printed: '0.35'
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.65'], [Al2O3, '0.35']]}}
+              locator: {published_page: 312, pdf_page_index: 6, table: 'V', note: 'Printed melt X(Al2O3)=0.35; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           phases_in_equilibrium_as_printed: Melt (X_Al2O3=0.35) + 12CaO·7Al2O3 + 3CaO·Al2O3
           compound_as_printed: 3CaO·Al2O3
           delta_G_kJ_per_mol: '-70.6'
@@ -813,72 +893,80 @@ species:
           phase_as_printed: melt
           a_Al2O3: 0.02
           a_Al2O3_as_printed: '0.02'
-          composition_mol:
-            CaO: 0.645
-            Al2O3: 0.355
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.645'], [Al2O3, '0.355']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 64.5 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.02
           activity_as_published: '0.02'
         - composition_mol_pct_CaO: 57.8
           phase_as_printed: melt
           a_Al2O3: 0.05
           a_Al2O3_as_printed: '.05'
-          composition_mol:
-            CaO: 0.578
-            Al2O3: 0.42200000000000004
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.578'], [Al2O3, '0.422']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 57.8 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.05
           activity_as_published: '.05'
         - composition_mol_pct_CaO: 54.8
           phase_as_printed: melt
           a_Al2O3: 0.06
           a_Al2O3_as_printed: '.06'
-          composition_mol:
-            CaO: 0.5479999999999999
-            Al2O3: 0.45200000000000007
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.548'], [Al2O3, '0.452']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 54.8 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.06
           activity_as_published: '.06'
         - composition_mol_pct_CaO: 49.5
           phase_as_printed: melt
           a_Al2O3: 0.2
           a_Al2O3_as_printed: '.20'
-          composition_mol:
-            CaO: 0.495
-            Al2O3: 0.505
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.495'], [Al2O3, '0.505']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 49.5 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.2
           activity_as_published: '.20'
         - composition_mol_pct_CaO: 43.8
           phase_as_printed: melt
           a_Al2O3: 0.41
           a_Al2O3_as_printed: '.41'
-          composition_mol:
-            CaO: 0.43799999999999994
-            Al2O3: 0.562
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.438'], [Al2O3, '0.562']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 43.8 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.41
           activity_as_published: '.41'
         - composition_mol_pct_CaO: 41.4
           phase_as_printed: melt
           a_Al2O3: 0.25
           a_Al2O3_as_printed: '.25'
-          composition_mol:
-            CaO: 0.414
-            Al2O3: 0.5860000000000001
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.414'], [Al2O3, '0.586']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 41.4 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.25
           activity_as_published: '.25'
         - composition_mol_pct_CaO: 35.2
           phase_as_printed: melt
           a_Al2O3: 0.5
           a_Al2O3_as_printed: '.50'
-          composition_mol:
-            CaO: 0.35200000000000004
-            Al2O3: 0.6479999999999999
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.352'], [Al2O3, '0.648']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 35.2 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.5
           activity_as_published: '.50'
         - composition_mol_pct_CaO: 80
           phase_as_printed: CaO + melt
           a_Al2O3: 0.005
           a_Al2O3_as_printed: '.005'
-          composition_mol:
-            CaO: 0.8
-            Al2O3: 0.19999999999999996
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.8'], [Al2O3, '0.2']]}}
+              locator: {published_page: 309, pdf_page_index: 3, table: 'II', note: 'Printed 80 mol% CaO; Al2O3=1-X(CaO) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.005
           activity_as_published: '.005'
         quantity_as_published: Al2O3_activity
@@ -938,51 +1026,30 @@ species:
         points:
         - X_Al2O3: 0.2
           log10_a_Al2O3: -2.43
-          composition_mol:
-            CaO: 0.8
-            Al2O3: 0.2
           activity: 0.003715352290971724
           activity_log10_as_plotted: -2.43
         - X_Al2O3: 0.3
           log10_a_Al2O3: -1.65
-          composition_mol:
-            CaO: 0.7
-            Al2O3: 0.3
           activity: 0.0223872113856834
           activity_log10_as_plotted: -1.65
         - X_Al2O3: 0.4
           log10_a_Al2O3: -1.06
-          composition_mol:
-            CaO: 0.6
-            Al2O3: 0.4
           activity: 0.08709635899560805
           activity_log10_as_plotted: -1.06
         - X_Al2O3: 0.5
           log10_a_Al2O3: -0.63
-          composition_mol:
-            CaO: 0.5
-            Al2O3: 0.5
           activity: 0.2344228815319922
           activity_log10_as_plotted: -0.63
         - X_Al2O3: 0.6
           log10_a_Al2O3: -0.33
-          composition_mol:
-            CaO: 0.4
-            Al2O3: 0.6
           activity: 0.4677351412871982
           activity_log10_as_plotted: -0.33
         - X_Al2O3: 0.7
           log10_a_Al2O3: -0.13
-          composition_mol:
-            CaO: 0.30000000000000004
-            Al2O3: 0.7
           activity: 0.7413102413009175
           activity_log10_as_plotted: -0.13
         - X_Al2O3: 0.8
           log10_a_Al2O3: 0.0
-          composition_mol:
-            CaO: 0.19999999999999996
-            Al2O3: 0.8
           activity: 1.0
           activity_log10_as_plotted: 0.0
         digitization_uncertainty_dex: 0.08
@@ -1046,193 +1113,217 @@ species:
         - X_Al2O3_as_printed: '.5'
           T_K: 2060
           log10_activity: -0.41
-          composition_mol:
-            CaO: 0.5
-            Al2O3: 0.5
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [Al2O3, '0.5']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.5; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.3890451449942806
           activity_log10_as_plotted: -0.41
         - X_Al2O3_as_printed: '.5'
           T_K: 1773
           log10_activity: -0.21
-          composition_mol:
-            CaO: 0.5
-            Al2O3: 0.5
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [Al2O3, '0.5']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.5; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.6165950018614822
           activity_log10_as_plotted: -0.21
         - X_Al2O3_as_printed: '.5'
           T_K: 1633
           log10_activity: 0.03
-          composition_mol:
-            CaO: 0.5
-            Al2O3: 0.5
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.5'], [Al2O3, '0.5']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.5; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 1.0715193052376064
           activity_log10_as_plotted: 0.03
         - X_Al2O3_as_printed: '.42'
           T_K: 2060
           log10_activity: -0.97
-          composition_mol:
-            CaO: 0.5800000000000001
-            Al2O3: 0.42
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.58'], [Al2O3, '0.42']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.42; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.10715193052376065
           activity_log10_as_plotted: -0.97
         - X_Al2O3_as_printed: '.42'
           T_K: 1773
           log10_activity: -0.69
-          composition_mol:
-            CaO: 0.5800000000000001
-            Al2O3: 0.42
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.58'], [Al2O3, '0.42']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.42; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.20417379446695297
           activity_log10_as_plotted: -0.69
         - X_Al2O3_as_printed: '.42'
           T_K: 1633
           log10_activity: -0.48
-          composition_mol:
-            CaO: 0.5800000000000001
-            Al2O3: 0.42
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.58'], [Al2O3, '0.42']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.42; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.3311311214825911
           activity_log10_as_plotted: -0.48
         - X_Al2O3_as_printed: '.40'
           T_K: 2060
           log10_activity: -1.1
-          composition_mol:
-            CaO: 0.6
-            Al2O3: 0.4
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [Al2O3, '0.4']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.40; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.07943282347242814
           activity_log10_as_plotted: -1.1
         - X_Al2O3_as_printed: '.40'
           T_K: 1773
           log10_activity: -0.83
-          composition_mol:
-            CaO: 0.6
-            Al2O3: 0.4
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [Al2O3, '0.4']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.40; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.14791083881682077
           activity_log10_as_plotted: -0.83
         - X_Al2O3_as_printed: '.40'
           T_K: 1633
           log10_activity: -0.62
-          composition_mol:
-            CaO: 0.6
-            Al2O3: 0.4
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.6'], [Al2O3, '0.4']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.40; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.23988329190194904
           activity_log10_as_plotted: -0.62
         - X_Al2O3_as_printed: '.38'
           T_K: 2060
           log10_activity: -1.21
-          composition_mol:
-            CaO: 0.62
-            Al2O3: 0.38
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [Al2O3, '0.38']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.38; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.06165950018614822
           activity_log10_as_plotted: -1.21
         - X_Al2O3_as_printed: '.38'
           T_K: 1773
           log10_activity: -0.97
-          composition_mol:
-            CaO: 0.62
-            Al2O3: 0.38
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [Al2O3, '0.38']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.38; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.10715193052376065
           activity_log10_as_plotted: -0.97
         - X_Al2O3_as_printed: '.38'
           T_K: 1633
           log10_activity: -0.76
-          composition_mol:
-            CaO: 0.62
-            Al2O3: 0.38
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.62'], [Al2O3, '0.38']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.38; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.17378008287493754
           activity_log10_as_plotted: -0.76
         - X_Al2O3_as_printed: '.36'
           T_K: 2060
           log10_activity: -1.34
-          composition_mol:
-            CaO: 0.64
-            Al2O3: 0.36
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [Al2O3, '0.36']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.36; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.04570881896148749
           activity_log10_as_plotted: -1.34
         - X_Al2O3_as_printed: '.36'
           T_K: 1773
           log10_activity: -1.1
-          composition_mol:
-            CaO: 0.64
-            Al2O3: 0.36
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [Al2O3, '0.36']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.36; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.07943282347242814
           activity_log10_as_plotted: -1.1
         - X_Al2O3_as_printed: '.36'
           T_K: 1633
           log10_activity: -0.93
-          composition_mol:
-            CaO: 0.64
-            Al2O3: 0.36
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.64'], [Al2O3, '0.36']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.36; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.11748975549395294
           activity_log10_as_plotted: -0.93
         - X_Al2O3_as_printed: '.34'
           T_K: 2060
           log10_activity: -1.48
-          composition_mol:
-            CaO: 0.6599999999999999
-            Al2O3: 0.34
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.66'], [Al2O3, '0.34']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.34; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.03311311214825911
           activity_log10_as_plotted: -1.48
         - X_Al2O3_as_printed: '.34'
           T_K: 1773
           log10_activity: -1.24
-          composition_mol:
-            CaO: 0.6599999999999999
-            Al2O3: 0.34
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.66'], [Al2O3, '0.34']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.34; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.057543993733715694
           activity_log10_as_plotted: -1.24
         - X_Al2O3_as_printed: '.34'
           T_K: 1633
           log10_activity: -1.1
-          composition_mol:
-            CaO: 0.6599999999999999
-            Al2O3: 0.34
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.66'], [Al2O3, '0.34']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.34; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.07943282347242814
           activity_log10_as_plotted: -1.1
         - X_Al2O3_as_printed: '.32'
           T_K: 2060
           log10_activity: -1.62
-          composition_mol:
-            CaO: 0.6799999999999999
-            Al2O3: 0.32
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.68'], [Al2O3, '0.32']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.32; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.023988329190194897
           activity_log10_as_plotted: -1.62
         - X_Al2O3_as_printed: '.32'
           T_K: 1773
           log10_activity: -1.48
-          composition_mol:
-            CaO: 0.6799999999999999
-            Al2O3: 0.32
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.68'], [Al2O3, '0.32']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.32; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.03311311214825911
           activity_log10_as_plotted: -1.48
         - X_Al2O3_as_printed: '.32'
           T_K: 1633
           log10_activity: -1.34
-          composition_mol:
-            CaO: 0.6799999999999999
-            Al2O3: 0.32
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.68'], [Al2O3, '0.32']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.32; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.04570881896148749
           activity_log10_as_plotted: -1.34
         - X_Al2O3_as_printed: '.29'
           T_K: 2060
           log10_activity: -2.0
-          composition_mol:
-            CaO: 0.71
-            Al2O3: 0.29
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.71'], [Al2O3, '0.29']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.29; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.01
           activity_log10_as_plotted: -2.0
         - X_Al2O3_as_printed: '.29'
           T_K: 1773
           log10_activity: -2.41
-          composition_mol:
-            CaO: 0.71
-            Al2O3: 0.29
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.71'], [Al2O3, '0.29']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.29; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.003890451449942805
           activity_log10_as_plotted: -2.41
         - X_Al2O3_as_printed: '.29'
           T_K: 1633
           log10_activity: -2.69
-          composition_mol:
-            CaO: 0.71
-            Al2O3: 0.29
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.71'], [Al2O3, '0.29']]}}
+              locator: {published_page: 311, pdf_page_index: 5, figure: 6, note: 'Printed per-series X(Al2O3)=.29; CaO=1-X(Al2O3) is the documented complement for the binary CaO-Al2O3 system; not printed.'}
           activity: 0.0020417379446695297
           activity_log10_as_plotted: -2.69
       point_conditions:
