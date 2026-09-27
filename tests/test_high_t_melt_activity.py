@@ -63,10 +63,12 @@ def _request(
     high_t_melt_activity: str | None = None,
     previous_temperature_K: float | None = None,
     crossing: bool = False,
+    pO2_bar: float = 1.0e-9,
+    intrinsic_fO2_log: float | None = -10.0,
 ) -> IntentRequest:
     controls: dict[str, object] = {
-        "pO2_bar": 1.0e-9,
-        "intrinsic_fO2_log": -10.0,
+        "pO2_bar": pO2_bar,
+        "intrinsic_fO2_log": intrinsic_fO2_log,
     }
     if high_t_melt_activity is not None:
         controls["high_t_melt_activity"] = high_t_melt_activity
@@ -258,6 +260,49 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
     ]
     assert fe_provenance
     assert all(row["activity_basis"] != "kress91_ferrous" for row in fe_provenance)
+
+
+def test_relaxed_openimcc_preserves_constant_gamma_carrier_set() -> None:
+    composition = _moles_from_wt(_cr_mn_projection_weights())
+    provider = _provider()
+    regression_temperature_K = 1700.0 + 273.15
+    request_options = {
+        "pO2_bar": 1.0e-4,
+        "intrinsic_fO2_log": None,
+    }
+
+    constant_gamma = provider.dispatch(
+        _request(
+            composition,
+            regression_temperature_K,
+            high_t_melt_activity="constant_gamma",
+            **request_options,
+        )
+    )
+    openimcc = provider.dispatch(
+        _request(
+            composition,
+            regression_temperature_K,
+            high_t_melt_activity="openimcc",
+            **request_options,
+        )
+    )
+
+    constant_gamma_species = set(
+        constant_gamma.diagnostic["vapor_pressures_Pa"]
+    )
+    openimcc_species = set(openimcc.diagnostic["vapor_pressures_Pa"])
+    assert openimcc_species == constant_gamma_species
+    assert openimcc.diagnostic["high_t_melt_activity"][
+        "openimcc_projection_crmn_relaxed"
+    ]["code"] == "openimcc_projection_crmn_relaxed"
+    assert openimcc.diagnostic["vapor_pressures_Pa"]["Ti"] > 0.0
+    assert (
+        openimcc.diagnostic["vapor_pressure_numerator_provenance"]["Ti"][
+            "melt_activity_authority"
+        ]
+        == "openimcc"
+    )
 
 
 def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
