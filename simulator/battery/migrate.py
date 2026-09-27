@@ -5435,7 +5435,8 @@ _PRESSURE_SUM_KEYS = (
     "significant_partial_pressures",
 )
 _PRESSURE_NON_POINT_RE = re.compile(
-    r"(?:about|approximately|approx\.?|range|upper\s+end\s+pinned)"
+    r"(?:about|approximately|approx\.?|range|upper\s+end\s+pinned|"
+    r"less\s+than|better\s+than|did\s+not\s+exceed|does\s+not\s+exceed)"
     r"|[~≈–—]|(?:\d\s*-\s*\d)|範囲|约|約",
     re.IGNORECASE,
 )
@@ -5597,27 +5598,9 @@ def _pressure_hit_is_chamber_condition(
         # this chamber value cannot establish the in-cell total.
         return True
     mapping = hit.mapping or {}
-    own_printed = " ".join(
-        _extract_text(value)
-        for value in (
-            mapping.get("value"),
-            mapping.get("as_printed"),
-            mapping.get("as_published"),
-            hit.as_published,
-        )
-        if value not in (None, "")
-    )
-    if (
-        bool(_PRESSURE_NON_POINT_RE.search(own_printed))
-        or bool(_PRESSURE_BOUND_OPERATOR_RE.search(own_printed))
-        or str(mapping.get("kind") or "").casefold()
-        in {"about_nominal", "approximate", "pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"}
-    ):
-        return True
-    # Source keys such as chamber_pressure_Pa_about carry the pressure's own
-    # qualifier even when the numeric value is scalar.
-    printed_name = str(hit.entry.printed or hit.path.rsplit(".", 1)[-1])
-    if re.search(r"(?:about|approx|ultimate|range|upper[_ ]?end)", printed_name, re.I):
+    if str(mapping.get("kind") or "").casefold() in {
+        "about_nominal", "approximate", "pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"
+    }:
         return True
     # Structured pressure ranges elsewhere in the same payload are still
     # pressure values, not locator prose. They make an exact chamber hit
@@ -5635,17 +5618,9 @@ def _pressure_hit_is_chamber_condition(
                 "about_nominal", "approximate", "pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"
             }:
                 return True
-    # A cell-local note can qualify a chamber field as a range. If it also
-    # names an exact pressure assignment, the exact cell wins (TS1985).
-    note = " ".join(
-        _extract_text(mapping[key])
-        for key in ("note", "qualifier")
-        if mapping.get(key) not in (None, "")
-    )
-    return bool(
-        _PRESSURE_NON_POINT_RE.search(note)
-        and not _PRESSURE_EXACT_ASSIGNMENT_RE.search(note)
-    )
+    # Keep the hit's own qualification metadata for _located_from_hit to
+    # preserve as a typed unknown instead of dropping it.
+    return False
 
 
 def _extract_text(payload: object) -> str:
@@ -6242,6 +6217,22 @@ def _printed_experiment_pressure(
     ):
         return None
     return raw.point
+
+
+def _identity_provenance_for_value_derivation(
+    provenance: tuple[str, ...], derivation: Derivation | None,
+) -> tuple[str, ...]:
+    """Keep experiment pressure coordinates out of an existing value derivation."""
+
+    if derivation is None:
+        return provenance
+    return tuple(
+        item
+        for item in provenance
+        if not item.startswith(
+            "identity.total_pressure_Pa=experiment.pressure_environment."
+        )
+    )
 
 
 def polymorph_from_extract(obs: Mapping[str, Any]) -> State[str] | None:
@@ -7917,6 +7908,20 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
             or bool(_PRESSURE_BOUND_OPERATOR_RE.search(own_printed))
             or str(mapping.get("kind") or "").casefold()
             in {"pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"}
+            or bool(
+                re.search(
+                    r"(?:about|approx|ultimate|range|upper[_ ]?end)",
+                    hit.entry.printed,
+                    re.I,
+                )
+            )
+            or (
+                (
+                    bool(_PRESSURE_NON_POINT_RE.search(qualification))
+                    or bool(_PRESSURE_BOUND_OPERATOR_RE.search(qualification))
+                )
+                and not bool(_PRESSURE_EXACT_ASSIGNMENT_RE.search(qualification))
+            )
         )
     else:
         non_point = any(mapping.get(key) is True for key in ("upper_bound", "lower_bound")) or any(
@@ -11046,14 +11051,33 @@ class Migrator:
             ident_kwargs,
             method=method,
         )
+        identity_profile = (
+            profile_for(
+                Identity(
+                    quantity=State.of(q_token),
+                    species=species,
+                    **ident_kwargs,
+                )
+            )
+            if isinstance(q_token, Quantity)
+            else None
+        )
+        inherited_identity_fields: set[str] = set()
         for name, state in experiment_identity.items():
+            if identity_profile is not None and name not in identity_profile.required:
+                continue
             if name not in ident_kwargs or (
                 name == "total_pressure_Pa"
                 and isinstance(ident_kwargs[name], State)
                 and ident_kwargs[name].is_unknown
             ):
                 ident_kwargs[name] = state
-        identity_provenance += experiment_provenance
+                inherited_identity_fields.add(name)
+        identity_provenance += tuple(
+            item
+            for item in experiment_provenance
+            if any(item.startswith(f"identity.{name}=") for name in inherited_identity_fields)
+        )
         identity = fill_identity(quantity, species, **ident_kwargs)
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs, locator
@@ -11371,8 +11395,11 @@ class Migrator:
                     origin=obs_id,
                 )
             )
-        if identity_provenance:
-            identity_relation = "; ".join(identity_provenance)
+        derivation_identity_provenance = _identity_provenance_for_value_derivation(
+            identity_provenance, value_derivation
+        )
+        if derivation_identity_provenance:
+            identity_relation = "; ".join(derivation_identity_provenance)
             if value_derivation is None:
                 value_derivation = Derivation(
                     relation=identity_relation,
@@ -11651,8 +11678,11 @@ class Migrator:
                     derivation,
                     relation=f"{derivation.relation}; {phase_provenance}",
                 )
-        if identity_provenance:
-            identity_relation = "; ".join(identity_provenance)
+        derivation_identity_provenance = _identity_provenance_for_value_derivation(
+            identity_provenance, derivation
+        )
+        if derivation_identity_provenance:
+            identity_relation = "; ".join(derivation_identity_provenance)
             if derivation is None:
                 derivation = Derivation(
                     relation=identity_relation,
