@@ -103,6 +103,37 @@ def test_imcc_battery_emits_notice_for_strict_envelope_edge() -> None:
             assert matching[0]["authority"] == "extrapolated"
 
 
+def test_imcc_battery_surfaces_complex_saturation_notice() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _ImccBatteryBackend,
+        _OpenImccBatteryBackend,
+    )
+
+    for name in ("imcc_sf04", "imcc_sf04_ext", "openimcc"):
+        backend = (
+            _OpenImccBatteryBackend("openimcc")
+            if name == "openimcc"
+            else _ImccBatteryBackend(name)
+        )
+        for x_k2o in (0.50, 0.55):
+            binary_mol = {"K2O": x_k2o, "SiO2": 1.0 - x_k2o}
+            binary_kg = {
+                "K2O": binary_mol["K2O"] * 94.196 / 1000.0,
+                "SiO2": binary_mol["SiO2"] * 60.0843 / 1000.0,
+            }
+            saturated = backend.equilibrate(
+                temperature_C=1800.0 - 273.15,
+                composition_kg=binary_kg,
+                composition_mol=binary_mol,
+            )
+            assert any(
+                row.get("kind") == "imcc_complex_saturation"
+                and row.get("flag", "").startswith("species-coverage-edge")
+                and row.get("acid_sink_ratio") is not None
+                for row in saturated.imcc_notices
+            )
+
+
 @pytest.mark.parametrize(
     "composition_mol",
     [
@@ -235,6 +266,48 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert "openimcc" in cell.vapor_pressures_source["K"]
     assert "gas-shomate.csv" in cell.vapor_pressures_source["K"]
     assert cell.model_id == "IMCC-SF04"
+
+
+def test_imcc_battery_reports_single_cation_gamma() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _ImccBatteryBackend,
+        _OpenImccBatteryBackend,
+    )
+
+    composition_wt = {
+        "SiO2": 45.94,
+        "Al2O3": 16.0,
+        "FeO": 10.67,
+        "MgO": 7.09,
+        "CaO": 11.21,
+        "TiO2": 1.79,
+        "Na2O": 2.27,
+        "K2O": 2.49,
+    }
+    composition_kg, composition_mol = composition_kg_and_mol(composition_wt)
+    kwargs = {
+        "temperature_C": 1673.15 - 273.15,
+        "composition_kg": composition_kg,
+        "composition_mol": composition_mol,
+    }
+    for name in ("imcc_sf04", "imcc_sf04_ext", "openimcc"):
+        backend = (
+            _OpenImccBatteryBackend("openimcc")
+            if name == "openimcc"
+            else _ImccBatteryBackend(name)
+        )
+        result = backend.equilibrate(**kwargs)
+        gamma = result.reported_activity_coefficients["KO0.5"]
+        assert gamma > 0.0
+        assert result.activity_coefficient_details["KO0.5"] == {
+            "value": gamma,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": "KO0.5",
+            },
+        }
 
 
 def test_openimcc_not_importable_is_typed_in_a_clean_subprocess() -> None:

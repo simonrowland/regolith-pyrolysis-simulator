@@ -386,6 +386,53 @@ def test_bridge_envelope_matches_green_edge_decisions() -> None:
         )
 
 
+def test_species_coverage_edge_flag_contract_and_typed_notice() -> None:
+    _openimcc_or_skip()
+    from simulator.melt_backend.openimcc_bridge import imcc_complex_saturation_notice
+
+    for alkali in ("Na2O", "K2O"):
+        for fraction in (0.50, 0.55):
+            result = bridge_evaluate(
+                composition_mol={alkali: fraction, "SiO2": 1.0 - fraction},
+                temperature_K=1800.0,
+                allow_out_of_envelope=True,
+            )
+            notice = imcc_complex_saturation_notice(
+                result.flags, result.acid_sink_ratio
+            )
+            assert notice is not None
+            assert notice["kind"] == "imcc_complex_saturation"
+            assert notice["flag"].startswith("species-coverage-edge")
+            assert notice["acid_sink_ratio"] == result.acid_sink_ratio
+
+    pinned = bridge_evaluate(
+        composition_mol={"K2O": 0.55, "SiO2": 0.45},
+        temperature_K=1800.0,
+        allow_out_of_envelope=True,
+    )
+    assert any(flag.startswith("species-coverage-edge") for flag in pinned.flags)
+
+    lunar = {
+        "SiO2": 44.5,
+        "TiO2": 1.5,
+        "Al2O3": 13.5,
+        "FeO": 16.5,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 0.4,
+        "K2O": 0.1,
+    }
+    for temperature_K in (1700.0, 2200.0):
+        result = bridge_evaluate(
+            composition_kg=lunar,
+            temperature_K=temperature_K,
+            allow_extrapolation=True,
+        )
+        assert imcc_complex_saturation_notice(
+            result.flags, result.acid_sink_ratio
+        ) is None
+
+
 def test_bridge_extrapolation_and_envelope_flags_are_explicit() -> None:
     openimcc = _openimcc_or_skip()
     with pytest.raises(openimcc.ImccTOutsideDatapackDomainError) as temperature_refusal:
@@ -417,3 +464,44 @@ def test_bridge_extrapolation_and_envelope_flags_are_explicit() -> None:
         allow_out_of_envelope=True,
     )
     assert outside.envelope_status == "outside_validated"
+
+
+def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
+    _openimcc_or_skip()
+    composition = {
+        "SiO2": 45.94,
+        "Al2O3": 16.0,
+        "FeO": 10.67,
+        "MgO": 7.09,
+        "CaO": 11.21,
+        "TiO2": 1.79,
+        "Na2O": 2.27,
+        "K2O": 2.49,
+    }
+    expected = {
+        1473.15: {"KO0.5": 3.49e-9, "NaO0.5": 6.87e-5},
+        1673.15: {"KO0.5": 2.45e-8, "NaO0.5": 2.76e-4},
+    }
+    for temperature_K, anchors in expected.items():
+        result = bridge_evaluate(
+            composition_kg=composition,
+            temperature_K=temperature_K,
+            allow_extrapolation=True,
+        )
+        for component, anchor in anchors.items():
+            row = result.activity_coefficients[component]
+            assert row["value"] == pytest.approx(anchor, rel=1e-2)
+            assert row["coefficient_basis"] == "single_cation"
+            assert row["standard_state"] == {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": component,
+            }
+
+
+def test_single_cation_gamma_ideal_pure_oxide_limit() -> None:
+    _openimcc_or_skip()
+    result = bridge_evaluate(
+        composition_mol={"SiO2": 1.0}, temperature_K=1800.0
+    )
+    assert result.activity_coefficients["SiO2"]["value"] == 1.0
