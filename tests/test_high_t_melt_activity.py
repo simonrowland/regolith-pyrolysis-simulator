@@ -123,6 +123,28 @@ def _projected_weights(*, over_threshold: bool = False) -> dict[str, float]:
     }
 
 
+def _cr_mn_projection_weights(
+    *,
+    p2o5_wt_pct: float = 0.0,
+    include_cr_mn: bool = True,
+) -> dict[str, float]:
+    cr2o3_wt_pct = 1.0 if include_cr_mn else 0.0
+    mno_wt_pct = 0.5 if include_cr_mn else 0.0
+    return {
+        "Na2O": 5.0,
+        "K2O": 1.0,
+        "SiO2": 50.5 - cr2o3_wt_pct - mno_wt_pct - p2o5_wt_pct,
+        "FeO": 10.0,
+        "MgO": 10.0,
+        "CaO": 15.0,
+        "Al2O3": 8.0,
+        "TiO2": 0.5,
+        "Cr2O3": cr2o3_wt_pct,
+        "MnO": mno_wt_pct,
+        "P2O5": p2o5_wt_pct,
+    }
+
+
 def _element_inventory_mol(sim, balances: dict[str, dict[str, float]], element: str) -> float:
     return sum(
         float(moles)
@@ -436,6 +458,87 @@ def test_projected_bulk_within_one_percent_has_notice_and_classifier_record() ->
     assert classifier["projection_verdict"] == "within_threshold"
     assert 0.0 < classifier["dropped_total_wt_pct"] <= 1.0
     assert policy["notice"]["code"] == "openimcc_projected_bulk"
+
+
+def test_cr_mn_projection_relaxes_threshold_and_reaches_provenance() -> None:
+    composition = _moles_from_wt(_cr_mn_projection_weights())
+    cleaned = evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
+    classifier = cleaned.policy["composition_projection_classification"]
+
+    assert classifier["projection_verdict"] == "within_threshold"
+    assert classifier["dropped_total_wt_pct"] == pytest.approx(1.5)
+    assert classifier["thresholded_dropped_total_wt_pct"] == pytest.approx(0.0)
+    assert set(classifier["dropped_components"]) == {"Cr2O3", "MnO"}
+    relaxed = cleaned.policy["openimcc_projection_crmn_relaxed"]
+    assert relaxed["code"] == "openimcc_projection_crmn_relaxed"
+    assert relaxed["wt_pct"] == pytest.approx({"Cr2O3": 1.0, "MnO": 0.5})
+    assert relaxed["ruling"] == "owner 2026-09-27"
+
+    result = _provider().dispatch(
+        _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
+    )
+    high_t = result.diagnostic["high_t_melt_activity"]
+    assert high_t["provider"] == "openimcc"
+    assert high_t["openimcc_projection_crmn_relaxed"] == relaxed
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
+    openimcc_rows = [
+        row
+        for row in provenance.values()
+        if row.get("melt_activity_authority") == "openimcc"
+    ]
+    assert openimcc_rows
+    assert all(
+        row["openimcc_projection_crmn_relaxed"] == relaxed
+        for row in openimcc_rows
+    )
+
+
+def test_non_cr_mn_projection_still_uses_one_percent_threshold() -> None:
+    composition = _moles_from_wt(
+        _cr_mn_projection_weights(p2o5_wt_pct=1.5, include_cr_mn=False)
+    )
+
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as refusal:
+        evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
+
+    assert refusal.value.code == "openimcc_projection_over_threshold"
+    classifier = refusal.value.diagnostics["composition_projection_classification"]
+    assert classifier["projection_verdict"] == "over_threshold"
+    assert classifier["dropped_total_wt_pct"] == pytest.approx(1.5)
+    result = _provider().dispatch(
+        _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
+    )
+    high_t = result.diagnostic["high_t_melt_activity"]
+    assert high_t["provider"] == "constant_gamma"
+    assert high_t["fallback_reason"]["code"] == (
+        "openimcc_projection_over_threshold"
+    )
+
+
+@pytest.mark.parametrize(
+    ("p2o5_wt_pct", "should_project"),
+    ((0.8, True), (1.2, False)),
+)
+def test_cr_mn_relaxation_does_not_change_other_projection_gate(
+    p2o5_wt_pct: float,
+    should_project: bool,
+) -> None:
+    composition = _moles_from_wt(
+        _cr_mn_projection_weights(p2o5_wt_pct=p2o5_wt_pct)
+    )
+
+    if should_project:
+        result = evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
+        classifier = result.policy["composition_projection_classification"]
+        assert classifier["projection_verdict"] == "within_threshold"
+        assert classifier["thresholded_dropped_total_wt_pct"] == pytest.approx(
+            p2o5_wt_pct
+        )
+        return
+
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as refusal:
+        evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
+    assert refusal.value.code == "openimcc_projection_over_threshold"
 
 
 def test_projection_over_one_percent_refuses_and_provider_flags_fallback() -> None:

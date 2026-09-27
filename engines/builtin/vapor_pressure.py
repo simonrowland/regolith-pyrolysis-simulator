@@ -632,6 +632,13 @@ def _build_high_t_melt_activity_authority(
                 ),
             }
         )
+        relaxed_projection = (
+            classification.get("openimcc_projection_crmn_relaxed")
+            if isinstance(classification, Mapping)
+            else None
+        )
+        if isinstance(relaxed_projection, Mapping):
+            base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
         return base
 
     bridge = cleaned.bridge
@@ -640,6 +647,9 @@ def _build_high_t_melt_activity_authority(
         policy_notices.append(dict(cleaned.policy["notice"]))
     if cleaned.policy.get("fe2o3_fold"):
         policy_notices.append(dict(cleaned.policy["fe2o3_fold"]))
+    relaxed_projection = cleaned.policy.get("openimcc_projection_crmn_relaxed")
+    if isinstance(relaxed_projection, Mapping):
+        policy_notices.append(dict(relaxed_projection))
     base.update(
         {
             "activities_by_oxide": dict(cleaned.single_cation_activities),
@@ -668,6 +678,8 @@ def _build_high_t_melt_activity_authority(
             ),
         }
     )
+    if isinstance(relaxed_projection, Mapping):
+        base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
 
     max_abs_dex = 0.0
     for oxide in _HIGH_T_FLUX_OXIDES:
@@ -913,6 +925,15 @@ def _attach_high_t_activity_provenance(
             provenance["composition_projection_classification"] = dict(
                 classification
             )
+            relaxed_projection = (
+                classification.get("openimcc_projection_crmn_relaxed")
+                if isinstance(classification, Mapping)
+                else None
+            )
+            if isinstance(relaxed_projection, Mapping):
+                provenance["openimcc_projection_crmn_relaxed"] = dict(
+                    relaxed_projection
+                )
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):
             source = f"{source}:{token}"
