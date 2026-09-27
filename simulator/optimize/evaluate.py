@@ -134,7 +134,11 @@ from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor
 from simulator.scalar_boundary import is_declared_real_scalar
-from simulator.runner import PyrolysisRun, RunnerError
+from simulator.runner import (
+    PyrolysisRun,
+    RunnerError,
+    _vapor_pressure_refusal_flag_backlog,
+)
 from simulator.transport_regime import TransportRegimeRefusal
 from simulator.optimize.backend_status import (
     crash_point_from_carrier,
@@ -200,6 +204,47 @@ _RUN_REFERENCE_CANONICAL_FIELDS = (
     "degradation_reason",
     "backend_real_active",
     "certification_allowed",
+)
+L5_NOTICE_TRACE_KEYS = ("flag_backlog", "l5_notices", "per_hour_summary")
+_L5_PER_HOUR_NOTICE_FIELDS = (
+    "vapor_pressure_refusals",
+    "condensation_refusals_by_species",
+    "redox_source_breakdown",
+    "mre_uncertified_yield",
+    "mre_ellingham_ladder_diagnostic",
+    "vapour_batch_summary",
+    "vapour_batch_flux_overlay",
+    "high_t_melt_activity",
+)
+_L5_NOTICE_DETAIL_KEYS = frozenset(
+    {
+        "reason",
+        "authority",
+        "authority_level",
+        "authority_status",
+        "certified_band",
+        "valid_range",
+        "projection_certified_band",
+        "flagged",
+        "backlog",
+        "is_refused",
+        "availability",
+        "status",
+        "output_status",
+        "flux_status",
+        "verdict_status",
+        "respeciation_status",
+        "certification",
+        "out_of_range",
+        "acquisition_flag",
+        "validation_status",
+        "melt_activity_authority",
+        "melt_oxide_activity_authority_status",
+        "kind",
+        "component",
+        "dropped_components",
+        "schema",
+    }
 )
 _TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES = (
     CampaignPressureSetpointRefusal,
@@ -5926,6 +5971,207 @@ def _live_run_reference_trace(
     return _TraceOverlay(trace, MappingProxyType(dict(payload)))
 
 
+def _l5_notice_payload(
+    run_execution: Any,
+    existing_payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Project runner predict-and-flag notices onto the optimizer trace.
+
+    The runner keeps the full per-hour rows for the JSON artifact.  Optimizer
+    artifacts need only the notice-bearing subtrees: copying the whole row
+    would retain heavy measurements while still making it easy to lose the
+    reason/authority/band fields at a later serialization boundary.
+    """
+    per_hour = getattr(run_execution, "per_hour", ()) or ()
+    entries: list[dict[str, Any]] = []
+    count_by_kind: dict[str, int] = {}
+    notice_rows: list[dict[str, Any]] = []
+
+    def add_entry(
+        kind: str,
+        value: Any,
+        *,
+        hour: Any = None,
+        path: tuple[str, ...] = (),
+        inherited: Mapping[str, Any] | None = None,
+    ) -> None:
+        detail = _compact_jsonable(value)
+        if isinstance(detail, MappingABC) and inherited:
+            inherited_detail = _compact_jsonable(inherited)
+            detail = {**inherited_detail, **detail}
+        if isinstance(detail, MappingABC):
+            quantity = (
+                detail.get("affected_quantity")
+                or detail.get("quantity")
+                or detail.get("species")
+                or detail.get("species_id")
+                or detail.get("component")
+                or detail.get("kind")
+                or (path[-1] if path else None)
+            )
+            if quantity is None:
+                scalar_keys = [
+                    str(key)
+                    for key in detail
+                    if str(key) not in _L5_NOTICE_DETAIL_KEYS
+                ]
+                quantity = scalar_keys[0] if len(scalar_keys) == 1 else kind
+            status = (
+                detail.get("status")
+                or detail.get("output_status")
+                or detail.get("flux_status")
+                or detail.get("verdict_status")
+                or detail.get("respeciation_status")
+            )
+            reason = detail.get("reason")
+            authority = (
+                detail.get("authority")
+                or detail.get("authority_level")
+                or detail.get("authority_status")
+                or detail.get("melt_activity_authority")
+                or detail.get("melt_oxide_activity_authority_status")
+            )
+            certified_band = (
+                detail.get("certified_band")
+                or detail.get("valid_range")
+                or detail.get("projection_certified_band")
+            )
+            status_text = str(status).strip().lower()
+            authority_text = str(authority).strip().lower()
+            explicit_availability = detail.get("availability")
+            if (
+                bool(detail.get("is_refused"))
+                or status_text in {"refused", "unavailable"}
+                or authority_text in {"missing", "unavailable"}
+                or str(explicit_availability).strip().lower()
+                in {"refused", "unavailable"}
+            ):
+                availability = "unavailable"
+            elif explicit_availability is not None:
+                availability = str(explicit_availability)
+            elif detail.get("flagged") or authority or reason:
+                availability = "available"
+            else:
+                availability = None
+        else:
+            quantity = path[-1] if path else None
+            status = reason = authority = certified_band = availability = None
+        entry = {
+            "kind": kind,
+            "hour": hour,
+            "path": list(path),
+            "affected_quantity": str(quantity) if quantity is not None else None,
+            "quantity": str(quantity) if quantity is not None else None,
+            "status": str(status) if status is not None else None,
+            "reason": str(reason) if reason is not None else None,
+            "authority": str(authority) if authority is not None else None,
+            "authority_level": (
+                str(detail.get("authority_level"))
+                if isinstance(detail, MappingABC)
+                and detail.get("authority_level") is not None
+                else None
+            ),
+            "certified_band": _compact_jsonable(certified_band),
+            "availability": availability,
+            "details": detail,
+        }
+        entries.append(entry)
+        count_by_kind[kind] = count_by_kind.get(kind, 0) + 1
+
+    def walk(
+        kind: str,
+        value: Any,
+        *,
+        hour: Any = None,
+        path: tuple[str, ...] = (),
+        inherited: Mapping[str, Any] | None = None,
+    ) -> None:
+        if isinstance(value, MappingABC):
+            inherited_detail = dict(inherited or {})
+            for key in _L5_NOTICE_DETAIL_KEYS:
+                if key in value:
+                    inherited_detail[str(key)] = value[key]
+            if path and any(str(key) in _L5_NOTICE_DETAIL_KEYS for key in value):
+                add_entry(
+                    kind,
+                    value,
+                    hour=hour,
+                    path=path,
+                    inherited=inherited,
+                )
+                return
+            for key, child in value.items():
+                walk(
+                    kind,
+                    child,
+                    hour=hour,
+                    path=(*path, str(key)),
+                    inherited=inherited_detail,
+                )
+            return
+        if isinstance(value, (list, tuple)):
+            for index, child in enumerate(value):
+                walk(
+                    kind,
+                    child,
+                    hour=hour,
+                    path=(*path, str(index)),
+                    inherited=inherited,
+                )
+
+    def walk_or_add_root(kind: str, value: Any, *, hour: Any = None) -> None:
+        before = len(entries)
+        walk(kind, value, hour=hour)
+        if len(entries) == before:
+            add_entry(kind, value, hour=hour)
+
+    for index, row in enumerate(per_hour, start=1):
+        if not isinstance(row, MappingABC):
+            continue
+        hour = row.get("hour", index)
+        notice_row: dict[str, Any] = {"hour": hour}
+        for field in ("campaign", "T_C"):
+            if row.get(field) is not None:
+                notice_row[field] = _compact_jsonable(row[field])
+        for kind in _L5_PER_HOUR_NOTICE_FIELDS:
+            value = row.get(kind)
+            if not value:
+                continue
+            notice_row[kind] = _compact_jsonable(value)
+            walk_or_add_root(kind, value, hour=hour)
+        if len(notice_row) > 1:
+            notice_rows.append(notice_row)
+
+    for kind in (
+        "engine_commissioning_notice",
+        "diagnostic_gate_authority_notice",
+        "sulfur_saturation_notice",
+        "rump_expectation_notice",
+        "composition_projected_liquidus_notice",
+    ):
+        value = existing_payload.get(kind)
+        if isinstance(value, MappingABC) and value:
+            walk_or_add_root(kind, value)
+
+    alpha_authority = existing_payload.get("alpha_authority_status_by_species")
+    if isinstance(alpha_authority, MappingABC):
+        for species, status in sorted(alpha_authority.items(), key=lambda item: str(item[0])):
+            add_entry(
+                "alpha_authority_status_by_species",
+                {"species": str(species), "authority_level": str(status)},
+            )
+
+    if not entries:
+        return {}
+    return {
+        "schema_version": "l5-notices-v1",
+        "count": len(entries),
+        "count_by_kind": dict(sorted(count_by_kind.items())),
+        "entries": entries,
+        "per_hour_summary": notice_rows,
+    }
+
+
 def _cache_trace_payload(
     run_execution: Any,
     trace_payload: Mapping[str, Any] | None,
@@ -5993,6 +6239,17 @@ def _cache_trace_payload(
             payload["rump_expectation_notice"] = _compact_jsonable(
                 dict(rump_notice)
             )
+    composition_reader = getattr(
+        simulator,
+        "composition_projected_liquidus_run_notice",
+        None,
+    )
+    if callable(composition_reader):
+        composition_notice = composition_reader()
+        if isinstance(composition_notice, MappingABC) and composition_notice:
+            payload["composition_projected_liquidus_notice"] = _compact_jsonable(
+                dict(composition_notice)
+            )
     alpha_authority_status_by_species = getattr(
         simulator,
         "_alpha_authority_status_by_species_engaged",
@@ -6034,6 +6291,17 @@ def _cache_trace_payload(
         payload["per_hour"] = per_hour_cache
     if pO2_enforcement_by_hour:
         payload["pO2_enforcement_by_hour"] = pO2_enforcement_by_hour
+
+    flag_backlog = _vapor_pressure_refusal_flag_backlog(
+        getattr(run_execution, "per_hour", ()) or ()
+    )
+    if flag_backlog:
+        payload["flag_backlog"] = _compact_jsonable(flag_backlog)
+    l5_notices = _l5_notice_payload(run_execution, payload)
+    if l5_notices:
+        payload["l5_notices"] = l5_notices
+        if l5_notices["per_hour_summary"]:
+            payload["per_hour_summary"] = l5_notices["per_hour_summary"]
 
     if payload:
         return payload

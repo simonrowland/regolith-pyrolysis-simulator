@@ -44,6 +44,7 @@ from simulator.optimize.determinism import pin_seeds
 from simulator.optimize.evaluate import (
     EvaluationAbort,
     FailureCategory,
+    L5_NOTICE_TRACE_KEYS,
     RunReference,
     ScoredResult,
     _build_eval_inputs,
@@ -4131,6 +4132,7 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "neighbor_disagreement",
             "reduced_real_cache",
             "per_hour_summary",
+            *L5_NOTICE_TRACE_KEYS,
         ):
             if key in trace:
                 payload[key] = _jsonable_value(trace[key])
@@ -4421,6 +4423,7 @@ def _light_backend_status_trace_for_reference(
             "kernel_fallback_used",
             "knob_saturation",
             "interpolation_feasibility_verdict",
+            *L5_NOTICE_TRACE_KEYS,
         ):
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])

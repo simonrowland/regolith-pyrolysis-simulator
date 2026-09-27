@@ -37,6 +37,7 @@ from simulator.optimize.evalspec import (
 )
 from simulator.optimize.evaluate import (
     FailureCategory,
+    L5_NOTICE_TRACE_KEYS,
     MASS_BALANCE_ABORT_PCT,
     RunReference,
     ScoredResult,
@@ -1754,6 +1755,7 @@ def _storage_run_reference_trace(run_reference: RunReference) -> dict[str, Any]:
         "proof_grade",
         "refusal_reason",
         "refusal_diagnostic",
+        *L5_NOTICE_TRACE_KEYS,
     ):
         if key in source_trace:
             trace[key] = _jsonable(source_trace[key])
