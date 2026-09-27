@@ -11,11 +11,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -88,11 +88,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -165,11 +165,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -242,11 +242,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -319,11 +319,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -396,11 +396,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -473,11 +473,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -550,11 +550,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -627,11 +627,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -704,11 +704,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -781,11 +781,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -816,30 +816,90 @@ observations:
     table: '3'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   read_from: unknown:kems-006-zhang-2021
-- observation_id: kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients
+- observation_id: kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients::T=1473.15:h=21e4432dd130
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::kems-006-zhang-2021
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'evaporation_coefficient_gamma_equals_alpha'
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: unknown
-      reason: source T_range_K [1473.15, 1673.15]; no midpoint invented
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_coefficient_gamma_equals_alpha'; refusing
-      to pick a number
+    kind: point
+    point: '0.000000069'
     approximate: false
   uncertainty:
     kind: printed
@@ -847,12 +907,19 @@ observations:
       note: Table 4 ±0.1 at 1400 °C is printed (large); prose 0.132 is a distinct printed value
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'langmuir_free_evaporation'
-    original_method_class: langmuir_free_evaporation
+      tag: value
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: tail-close
+      date: '2026-08-27'
+      evidence:
+        page: 74
+        table: '4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   notices: []
   source_id: kems-006-zhang-2021
   locator:
@@ -860,30 +927,323 @@ observations:
     table: '4'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   read_from: unknown:kems-006-zhang-2021
-- observation_id: kems-006-zhang-2021::zhang_2021_table4_this_study_evaporation_coefficients
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 74
+        table: '4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 74
+              table: '4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: '4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+  derived_from:
+  - tables:kems-006-zhang-2021
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters:
+    - - conversion
+      - state:
+          tag: unknown
+          reason: extractor transform does not state its original numeric input
+        inference:
+          relation: table4_evaporation_coefficient_alpha_fit
+          inputs:
+          - tables:kems-006-zhang-2021
+          parameters: []
+          output_unit: dimensionless
+    output_unit: dimensionless
+  provenance:
+    scoring:
+      kind: implied_alpha_from_alpha_times_Gamma
+      oxide_formula: K2O
+      measured_field: alpha_times_Gamma
+      gamma_basis: single_cation
+      gamma_basis_quote: 'Table 4 p. 74: ΓKO0.5'
+      literature_alpha_band:
+      - '0.07'
+      - '0.3'
+      literature_alpha_band_locator: Zhang 2021 Table 4, physical p. 74
+- observation_id: kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients::T=1673.15:h=b4575af6b446
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::kems-006-zhang-2021
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'evaporation_coefficient_gamma_equals_alpha'
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
-      formula: Na
+      formula: K
       phase:
-        tag: unknown
-        reason: phase string 'basaltic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: unknown
-      reason: source T_range_K [1473.15, 1673.15]; no midpoint invented
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_coefficient_gamma_equals_alpha'; refusing
-      to pick a number
+    kind: point
+    point: '0.00000111'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 4 ±0.1 at 1400 °C is printed (large); prose 0.132 is a distinct printed value
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: tail-close
+      date: '2026-08-27'
+      evidence:
+        page: 74
+        table: '4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 74
+    table: '4'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 74
+        table: '4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 74
+              table: '4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: '4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+  derived_from:
+  - tables:kems-006-zhang-2021
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters:
+    - - conversion
+      - state:
+          tag: unknown
+          reason: extractor transform does not state its original numeric input
+        inference:
+          relation: table4_evaporation_coefficient_alpha_fit
+          inputs:
+          - tables:kems-006-zhang-2021
+          parameters: []
+          output_unit: dimensionless
+    output_unit: dimensionless
+  provenance:
+    scoring:
+      kind: implied_alpha_from_alpha_times_Gamma
+      oxide_formula: K2O
+      measured_field: alpha_times_Gamma
+      gamma_basis: single_cation
+      gamma_basis_quote: 'Table 4 p. 74: ΓKO0.5'
+      literature_alpha_band:
+      - '0.07'
+      - '0.3'
+      literature_alpha_band_locator: Zhang 2021 Table 4, physical p. 74
+- observation_id: kems-006-zhang-2021::zhang_2021_table4_this_study_evaporation_coefficients::T=1473.15:h=b558b0448f0e
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::kems-006-zhang-2021
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0000032'
     approximate: false
   uncertainty:
     kind: printed
@@ -897,12 +1257,19 @@ observations:
       note: ± as printed in Table 4
   evidence:
     class:
-      tag: unknown
-      reason: unmapped regime 'langmuir_free_evaporation'
-    original_method_class: langmuir_free_evaporation
+      tag: value
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: tail-close
+      date: '2026-08-27'
+      evidence:
+        page: 74
+        table: '4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   notices: []
   source_id: kems-006-zhang-2021
   locator:
@@ -910,3 +1277,242 @@ observations:
     table: '4'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
   read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 74
+        table: '4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              page: 74
+              table: '4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: '4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+  derived_from:
+  - tables:kems-006-zhang-2021
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters:
+    - - conversion
+      - state:
+          tag: unknown
+          reason: extractor transform does not state its original numeric input
+        inference:
+          relation: table4_evaporation_coefficient_alpha_fit
+          inputs:
+          - tables:kems-006-zhang-2021
+          parameters: []
+          output_unit: dimensionless
+    output_unit: dimensionless
+  provenance:
+    scoring:
+      kind: implied_alpha_from_alpha_times_Gamma
+      oxide_formula: Na2O
+      measured_field: alpha_times_Gamma
+      gamma_basis: single_cation
+      gamma_basis_quote: 'Table 4 p. 74: ΓNaO0.5'
+      literature_alpha_band:
+      - '0.07'
+      - '0.3'
+      literature_alpha_band_locator: Zhang 2021 Table 4, physical p. 74
+- observation_id: kems-006-zhang-2021::zhang_2021_table4_this_study_evaporation_coefficients::T=1673.15:h=e48181f17560
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::kems-006-zhang-2021
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Na
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Na2O
+          - '0.02391735874316515239764588901'
+        - - MgO
+          - '0.1148753313202567723917830081'
+        - - CaO
+          - '0.1305417807745096914068286727'
+        - - TiO2
+          - '0.01463609524221209297126908714'
+        - - SiO2
+          - '0.499307481588041653260565299'
+        - - Al2O3
+          - '0.1024751398848478785295547634'
+        - - FeO
+          - '0.09698456164147551033877893278'
+        - - K2O
+          - '0.01726225080549124870357434797'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.0000262'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_range_1400_C:
+      - '0.11'
+      - '0.17'
+      alpha_range_1200_C:
+      - '0.06'
+      - '0.1'
+      note: ± as printed in Table 4
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: tail-close
+      date: '2026-08-27'
+      evidence:
+        page: 74
+        table: '4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 74
+    table: '4'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: unknown:kems-006-zhang-2021
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 74
+        table: '4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 74
+              table: '4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 74
+              table: '4'
+              source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+        output_unit: K
+  derived_from:
+  - tables:kems-006-zhang-2021
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters:
+    - - conversion
+      - state:
+          tag: unknown
+          reason: extractor transform does not state its original numeric input
+        inference:
+          relation: table4_evaporation_coefficient_alpha_fit
+          inputs:
+          - tables:kems-006-zhang-2021
+          parameters: []
+          output_unit: dimensionless
+    output_unit: dimensionless
+  provenance:
+    scoring:
+      kind: implied_alpha_from_alpha_times_Gamma
+      oxide_formula: Na2O
+      measured_field: alpha_times_Gamma
+      gamma_basis: single_cation
+      gamma_basis_quote: 'Table 4 p. 74: ΓNaO0.5'
+      literature_alpha_band:
+      - '0.07'
+      - '0.3'
+      literature_alpha_band_locator: Zhang 2021 Table 4, physical p. 74

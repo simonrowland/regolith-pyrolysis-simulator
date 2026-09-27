@@ -1,14 +1,14 @@
 # Battery v2.1 migration report
 
 rows in: 47306
-records out (observations): 109980
+records out (observations): 109982
 works: 257
 experiments: 3500
-queue size: 77148
+queue size: 76715
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
-hard issues: 3254
+hard issues: 3242
 
 ## Spec vs measured
 
@@ -17,18 +17,18 @@ hard issues: 3254
 | citations | 147 | 260 (mismatch) |
 | doi_works | 56 | 123 (mismatch) |
 | no_doi_works | 91 | 134 (mismatch) |
-| admission_statuses | 374 | 941 (mismatch) |
+| admission_statuses | 374 | 947 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
-| series | 60 | 590 (mismatch) |
+| series | 60 | 592 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2030 (mismatch) |
 | equipment_payloads | 670 | 972 (mismatch) |
-| absent_admissions | 3511 | 4773 (mismatch) |
-| absent_classes | 2174 | 2203 (mismatch) |
+| absent_admissions | 3511 | 4767 (mismatch) |
+| absent_classes | 2174 | 2201 (mismatch) |
 | range_only_T | 3125 | 2743 (mismatch) |
-| system_like_phases | 1065 | 2822 (mismatch) |
+| system_like_phases | 1065 | 2620 (mismatch) |
 | missing_phases | 237 | 367 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -36,7 +36,7 @@ hard issues: 3254
 
 | source method_class | count |
 |---|---:|
-| `absent` | 577 |
+| `absent` | 575 |
 | `compilation_assessed` | 95 |
 | `method_only` | 38 |
 | `quoted_attributed` | 22 |
@@ -17995,13 +17995,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-002-ohno-1967.yaml` | 12 | 25 | 83 |
 | `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 65 |
 | `data/literature/extracts/kems-005-fedkin-2006.yaml` | 14 | 27 | 85 |
-| `data/literature/extracts/kems-006-zhang-2021.yaml` | 13 | 13 | 69 |
+| `data/literature/extracts/kems-006-zhang-2021.yaml` | 13 | 15 | 50 |
 | `data/literature/extracts/kems-007-costa-2015.yaml` | 4 | 4 | 22 |
 | `data/literature/extracts/kems-008-schaefer-fegley-2004.yaml` | 78 | 78 | 338 |
 | `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/kems-010-richter-2007.yaml` | 156 | 156 | 365 |
 | `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 89 |
-| `data/literature/extracts/kems-012-sossi-2019.yaml` | 192 | 612 | 1379 |
+| `data/literature/extracts/kems-012-sossi-2019.yaml` | 192 | 612 | 966 |
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 17 | 45 |
 | `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 167 | 414 | 815 |
 | `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 10 | 23 | 69 |
@@ -18166,7 +18166,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 96 |
 | `data/literature/extracts/smales-1971-lpsc-12022.yaml` | 2 | 2 | 12 |
 | `data/literature/extracts/sossi-2020-cu-zn-isotope-evap-formalism.yaml` | 75 | 101 | 242 |
-| `data/literature/extracts/sossi-et-al-2019.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/sossi-et-al-2019.yaml` | 1 | 1 | 3 |
 | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 5 | 5 | 35 |
 | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 8 | 43 | 151 |
@@ -18207,14 +18207,14 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3254
+hard issues: 3242
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 1630 |
-| `conditional_field:derivation` | 1624 |
+| `conditional_field:derived_from` | 1624 |
+| `conditional_field:derivation` | 1618 |
 
 ## Hard issues (first 50)
 
@@ -18271,8 +18271,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 217182
+advisory issues: 217221
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 217182 |
+| `identity_incomplete` | 217221 |
