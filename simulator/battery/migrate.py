@@ -5100,6 +5100,9 @@ def uncertainty_for(raw: object) -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=str(raw))
 
 
+# Wimpenny's printed isotope rows use this explicit 2-sigma column name.
+_WIMPENNY_DELTA_2SIGMA_FIELD = "delta66Zn_2sigma_permil"
+
 
 _VAPORIZATION_DFG_RE = re.compile(
     r"dfG\(g\)-dfG\((cr|l)\)"
@@ -7900,8 +7903,27 @@ def _form_and_container(
     return form_located, container_located
 
 
+def _printed_composition_values_equal(old: object, new: object) -> bool:
+    if not isinstance(old, Mapping) or not isinstance(new, Mapping):
+        return False
+    if old.keys() != new.keys():
+        return False
+    for key in old:
+        old_number = _as_dec_or_none(old[key])
+        new_number = _as_dec_or_none(new[key])
+        if old_number is None or new_number is None:
+            if old[key] != new[key]:
+                return False
+        elif old_number != new_number:
+            return False
+    return True
+
+
 def _prefer_located(
-    old: Located[Any] | None, new: Located[Any] | None
+    old: Located[Any] | None,
+    new: Located[Any] | None,
+    *,
+    numeric_mapping: bool = False,
 ) -> Located[Any] | None:
     if new is None:
         return old
@@ -7925,6 +7947,8 @@ def _prefer_located(
             and old_value.approximate != new_value.approximate
         ):
             return new if new_value.approximate else old
+        if numeric_mapping and _printed_composition_values_equal(old_value, new_value):
+            return old
     if old.state.is_value and new.state.is_value and old.state.value != new.state.value:
         return None
     if (
@@ -8045,15 +8069,29 @@ def _merge_experiment_lab_params(
     sample: Sample,
     apparatus: Apparatus | None,
     pressure_env: PressureEnvironment,
+    *,
+    prefer_existing_initial: bool = False,
 ) -> Experiment:
+    existing_initial = existing.sample.initial_composition
+    incoming_initial = sample.initial_composition
+    if (
+        prefer_existing_initial
+        and existing_initial is not None
+        and incoming_initial is not None
+        and existing_initial.state.is_value
+        and incoming_initial.state.is_value
+    ):
+        initial_composition = existing_initial
+    else:
+        initial_composition = _prefer_located(existing_initial, incoming_initial)
     merged_sample = Sample(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
         volume_m3=_prefer_located(existing.sample.volume_m3, sample.volume_m3),
-        initial_composition=_prefer_located(
-            existing.sample.initial_composition, sample.initial_composition
-        ),
+        initial_composition=initial_composition,
         printed_composition=_prefer_located(
-            existing.sample.printed_composition, sample.printed_composition
+            existing.sample.printed_composition,
+            sample.printed_composition,
+            numeric_mapping=True,
         ),
         form=_prefer_located(existing.sample.form, sample.form),
         container=_prefer_located(existing.sample.container, sample.container),
@@ -9171,6 +9209,9 @@ class Migrator:
         self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
         self._oxygen_pressure_landed: dict[str, Decimal] = {}
         self._oxygen_pressure_conflict: set[str] = set()
+        # Only an initial composition declared as a registry value may take
+        # precedence over later legacy lab-parameter rows.
+        self._registry_value_initial_experiments: set[str] = set()
         # Compilation record JSON paths registered as Work assets (not INDEX).
         self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
 
@@ -9311,6 +9352,7 @@ class Migrator:
         conditions: dict[str, Located[Decimal]] | None = None,
         observation_id: str | None = None,
         source: str | None = None,
+        prefer_existing_initial: bool = False,
     ) -> Experiment:
         existing = self.result.experiments.get(experiment_id)
         cond = conditions or {
@@ -9338,7 +9380,11 @@ class Migrator:
         )
         if existing is not None:
             merged = _merge_experiment_lab_params(
-                existing, sample, apparatus, pressure_env
+                existing,
+                sample,
+                apparatus,
+                pressure_env,
+                prefer_existing_initial=prefer_existing_initial,
             )
             self.result.experiments[experiment_id] = merged
             return merged
@@ -9731,6 +9777,11 @@ class Migrator:
                         )
                     )
                 continue
+            if (
+                experiment.sample.initial_composition is not None
+                and experiment.sample.initial_composition.state.is_value
+            ):
+                self._registry_value_initial_experiments.add(experiment.experiment_id)
             self.result.experiments[experiment.experiment_id] = experiment
             if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
                 self.result.experiments_by_work[work.work_id].append(
@@ -10575,6 +10626,9 @@ class Migrator:
                 values=values if isinstance(values, Mapping) else None,
                 observation_id=obs_id,
                 source=source_key,
+                prefer_existing_initial=(
+                    declared_experiment_id in self._registry_value_initial_experiments
+                ),
             )
         oxygen_roots: list[object] = []
         if isinstance(values, Mapping):
@@ -10980,6 +11034,7 @@ class Migrator:
         val = None
         trail = "identity"
         extra_unc = None
+        extra_unc_k: int | None = None
         point_locator = locator
         t_trail: str | None = None
         t_original: object = None
@@ -11081,6 +11136,10 @@ class Migrator:
                     observation_id=point_id,
                 )
             extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
+            if extra_unc is None and _WIMPENNY_DELTA_2SIGMA_FIELD in raw_item:
+                extra_unc = raw_item.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
+                if extra_unc not in (None, ""):
+                    extra_unc_k = 2
         else:
             if content_stable_id:
                 point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
@@ -11197,10 +11256,27 @@ class Migrator:
             self._author_derivations[point_id] = self._author_derivations[parent_id]
         unc = uncertainty
         if extra_unc is not None:
-            unc = Uncertainty(
-                kind=UncertaintyKind.PRINTED,
-                verbatim={"sigma": extra_unc, "parent": parent_id},
-            )
+            verbatim = {"sigma": extra_unc, "parent": parent_id}
+            if extra_unc_k is not None:
+                verbatim["k"] = extra_unc_k
+                numeric_extra_unc = _as_dec_or_none(extra_unc)
+                if numeric_extra_unc is not None:
+                    unc = Uncertainty(
+                        kind=UncertaintyKind.PRINTED,
+                        verbatim=verbatim,
+                        value=numeric_extra_unc,
+                        basis="2sigma",
+                    )
+                else:
+                    unc = Uncertainty(
+                        kind=UncertaintyKind.PRINTED,
+                        verbatim=verbatim,
+                    )
+            else:
+                unc = Uncertainty(
+                    kind=UncertaintyKind.PRINTED,
+                    verbatim=verbatim,
+                )
         point_conditions = None
         if coord is not None:
             point_conditions = {

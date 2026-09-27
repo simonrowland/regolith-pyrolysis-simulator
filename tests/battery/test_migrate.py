@@ -35,6 +35,7 @@ from simulator.battery.enums import (
     ReferenceStateConvention,
     RefusalReason,
     StateTag,
+    UncertaintyKind,
     ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
@@ -1106,6 +1107,63 @@ def test_g10_kems_uncertainty_is_retained(tmp_path: Path) -> None:
     obs = result.observations["cao_p_ca_isothermal"]
     assert obs.uncertainty.kind.value == "printed"
     assert obs.uncertainty.verbatim is not None
+
+
+_WIMPENNY_EXTRACT = (
+    REPO_ROOT
+    / "data"
+    / "literature"
+    / "extracts"
+    / "wimpenny-2019-zn-isotope-evaporation-extreme-t.yaml"
+)
+
+
+def test_wimpenny_arkose_row_keeps_printed_two_sigma_uncertainty() -> None:
+    migrator = Migrator()
+    migrator._migrate_extract(_WIMPENNY_EXTRACT)
+    observation = next(
+        observation
+        for observation_id, observation in migrator.result.observations.items()
+        if ":rows:row=arkose-soil:" in observation_id
+    )
+
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == as_decimal("0.22")
+    assert observation.locator is not None
+    assert observation.locator.published_page == 33
+    assert observation.uncertainty.kind is UncertaintyKind.PRINTED
+    assert observation.uncertainty.value == as_decimal("0.02")
+    assert observation.uncertainty.basis == "2sigma"
+    assert observation.uncertainty.verbatim is not None
+    assert (
+        as_decimal(observation.uncertainty.verbatim["sigma"]) == as_decimal("0.02")
+    )
+    assert observation.uncertainty.verbatim["k"] == 2
+
+
+def test_wimpenny_unknown_uncertainty_column_is_not_guessed(tmp_path: Path) -> None:
+    doc = yaml.safe_load(_WIMPENNY_EXTRACT.read_text(encoding="utf-8"))
+    row = next(
+        row
+        for species in doc["species"].values()
+        for observation in species.get("observations", [])
+        for row in observation.get("values", {}).get("rows", [])
+        if row.get("sample") == "Arkose soil"
+    )
+    row["delta66Zn_1sigma_permil"] = row.pop("delta66Zn_2sigma_permil")
+    doc["source_id"] = "fixture-source"
+
+    result = migrate(_write_min_tree(tmp_path, doc), write=False)
+    observation = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if ":rows:row=arkose-soil:" in observation_id
+    )
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == as_decimal("0.22")
+    assert observation.uncertainty.value is None
+    assert observation.uncertainty.basis is None
+    assert "delta66Zn_1sigma_permil" not in str(observation.uncertainty.verbatim)
 
 
 def test_h04_ocr_locator_does_not_fall_through_to_pdf(tmp_path: Path) -> None:
@@ -2645,7 +2703,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # mass_loss_fraction 9->19, n_numeric 209->223. The counts moved because the
     # data became visible, not because a check was relaxed - mismatches stays 0.
     assert census.get("evaporation_rate") == 25
-    assert census.get("mass_loss_fraction") == 19
+    # Re-pinned after the loader-survival regeneration: Richter +50 measured
+    # mass_loss_pct / 100 singleton series; mismatches remains 0.
+    assert census.get("mass_loss_fraction") == 69
     assert census.get("mass_loss_rate", 0) == 0
     # Re-pinned once for the reviewed Ueshima replacement: its Fe-Mo Table 4
     # adds 58 printed T_C points, routed as transition_temperature. The
@@ -2655,7 +2715,10 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("ueshima-1982-fe-mo-thermal") == {
         "transition_temperature": 58
     }
-    assert n_numeric == 450, (n_numeric, census, n_unavailable)
+    # Re-pinned for the loader-survival batch: Richter 2007 +50 printed mass-loss cells
+    # (starting-material initial compositions now survive migration), on top of the
+    # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; mismatches remains 0.
+    assert n_numeric == 500, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
