@@ -3718,6 +3718,33 @@ class CondensationModel:
                         self._headspace_transport_pO2_bar,
                     )
                     if not bool(gate.get('favoured')):
+                        gate_notice = gate.get('notice', {})
+                        # Missing or invalid transport pO2 cannot certify
+                        # that silica is safe from the arriving alkali.
+                        if (
+                            isinstance(gate_notice, Mapping)
+                            and gate_notice.get('headspace_pO2_missing')
+                        ):
+                            findings.append({
+                                'key': 'silica_exposed_to_alkali',
+                                'severity': 'error',
+                                'status': 'unavailable',
+                                'output_status': 'unavailable',
+                                'authority_level': 'unavailable',
+                                'reason': 'headspace_pO2_missing',
+                                'stage_number': 3,
+                                'species': species,
+                                'arriving_flux_kg_hr': arriving_kg_hr,
+                                'route': self.stage3_route,
+                                'd025_gate_on': None,
+                                'gate_notice': copy.deepcopy(gate_notice),
+                                'campaign': str(
+                                    getattr(getattr(melt, 'campaign', None), 'name', '')
+                                ),
+                                'campaign_hour': float(
+                                    getattr(melt, 'campaign_hour', 0.0) or 0.0
+                                ),
+                            })
                         continue
                     findings.append({
                         'key': 'silica_exposed_to_alkali',
