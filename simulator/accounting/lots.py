@@ -210,7 +210,11 @@ class MaterialLot:
                 raise AccountingError(f"mass for species {name!r} must be finite")
             if value < -EMPTY_KG_TOLERANCE:
                 raise AccountingError(f"lot mass for species {name!r} must be non-negative")
-            if abs(value) <= EMPTY_KG_TOLERANCE:
+            # A positive sub-floor mass is still a real coproduct.  Coupled
+            # mol-native transitions can put their smallest species below
+            # EMPTY_KG_TOLERANCE; normalizing that species to zero here would
+            # delete mass before the AtomLedger can validate the transition.
+            if value < 0.0:
                 value = 0.0
             normalized[name] = normalized.get(name, 0.0) + value
 
