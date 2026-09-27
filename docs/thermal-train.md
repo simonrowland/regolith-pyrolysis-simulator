@@ -48,9 +48,10 @@ cost.
    data are reported in the [NIST Chemistry WebBook oxygen record](https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782447&Mask=1E).
 
 5. **Pressurized LOX storage.** Store the condensed oxygen as ordinary
-   pressurized liquid oxygen (LOX) in insulated tanks. Passive boil-off
-   management re-condenses oxygen that returns to the tank's cold-end heat
-   balance. The baseline has no frost cavern and no deep-cryo tail.
+   pressurized liquid oxygen (LOX) in insulated tanks. Within the available
+   cold-end capacity, the passive radiator rejects the heat from re-condensing
+   tank boil-off, and the condensate returns to storage. The baseline has no
+   frost cavern and no deep-cryo tail.
 
 6. **Explicit excess handling.** The cold train has a finite capacity. Oxygen
    above that capacity is vented and reported as an oxygen stream, rather than
@@ -71,8 +72,9 @@ h₀ = h + v²/2
 
 The flow can become colder while it accelerates, but it re-heats when the
 kinetic energy is dissipated in a diffuser, wall impact, or reservoir. An
-expansion ratio therefore does not provide a heat sink. Heat leaves the train
-through radiator surfaces or through shaft work delivered to a machine.
+expansion ratio therefore does not provide a heat sink. Radiators reject heat;
+a work-producing expander can export energy as shaft work; and the product and
+vent streams carry their own energy out of the train.
 
 ### 2. Reject heat hot, and lift the cold end with compression
 
