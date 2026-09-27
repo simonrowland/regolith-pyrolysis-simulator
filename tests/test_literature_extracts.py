@@ -946,6 +946,68 @@ def test_stolyarova_wilson_numbers_are_gibbs_model_parameters_only():
     assert al_si["l210"] == 316.3
 
 
+def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    atomic_source = _repo_observation(
+        "kems-053-stolyarova-1991.yaml",
+        "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium",
+    )
+    assert atomic_source["values"]["method_class"] == "derived"
+    assert atomic_source["reaction_as_printed"] == "(WO3)(g) = (WO2)(g) + (O)(g)"
+    assert "reservoir" not in atomic_source
+    assert "reservoir_formula" not in atomic_source
+
+    figure_source = _repo_observation(
+        "kems-053-stolyarova-1991.yaml",
+        "stolyarova_1991_o2_pressure_fig4",
+    )
+    assert figure_source["values"]["calculation_method"] == "Eq. [15]"
+    assert figure_source["values"]["admission_status"] == "figure_only"
+    assert figure_source["values"]["status"] == "typed_refusal"
+    assert "[15]" in figure_source["derivation"]["relation"]
+    assert "reaction" not in figure_source
+    assert "reaction_as_printed" not in figure_source
+
+    result = _migrate_real_extract(
+        tmp_path, "kems-053-stolyarova-1991.yaml"
+    )
+    source = "kems-053-stolyarova-1991"
+    atomic_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source
+        and observation.observation_id.startswith(
+            f"{source}::stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium::"
+        )
+    ]
+    figure_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source
+        and observation.observation_id.startswith(
+            f"{source}::stolyarova_1991_o2_pressure_fig4::"
+        )
+    ]
+    assert len(atomic_rows) == 9
+    assert len(figure_rows) == 8
+
+    for observation in atomic_rows:
+        reaction = observation.identity.reaction
+        assert reaction is not None and reaction.is_value
+        assert [
+            (term.species.formula, term.species.phase.value, str(term.coefficient))
+            for term in reaction.value.terms
+        ] == [("WO3", "g", "-1"), ("WO2", "g", "1"), ("O", "g", "1")]
+        reservoir = observation.identity.reservoir
+        assert reservoir is not None and reservoir.is_unknown
+
+    for observation in figure_rows:
+        reaction = observation.identity.reaction
+        assert reaction is not None and reaction.is_unknown
+        assert observation.admission.status.value == "rejected"
+
+
 def test_halwax_pure_solid_formation_enthalpies_are_symmetric():
     expected = {
         "halwax_2024_cao_third_law_formation_enthalpy": (-624.5, 3.5, "CaO(s)"),

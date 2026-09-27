@@ -1142,24 +1142,20 @@ species:
       reaction:
         terms:
         - species:
-            formula: CaO
-            phase: l
+            formula: WO3
+            phase: g
           coefficient: -1
         - species:
-            formula: Ca
+            formula: WO2
             phase: g
           coefficient: 1
         - species:
             formula: O
             phase: g
           coefficient: 1
-      reaction_as_printed: Calculated from equilibrium (1)
+      reaction_as_printed: (WO3)(g) = (WO2)(g) + (O)(g)
       standard_state: O(g) partial pressure relative to ideal-gas standard at 1 bar
       reference_state: O(g) partial pressure relative to ideal-gas standard at 1 bar
-      reservoir_formula: CaO
-      reservoir:
-        formula: CaO
-        phase: l
       point_conditions:
         total_pressure_Pa:
           state:
@@ -1992,21 +1988,6 @@ species:
         digitization_uncertainty_dex: 0.04
         axis_calibration_uncertainty_dex: 0.01
         note: Figure digitization uncertainty only; no source uncertainty was printed for this curve.
-      reaction:
-        terms:
-        - species:
-            formula: CaO
-            phase: l
-          coefficient: -1
-        - species:
-            formula: Ca
-            phase: g
-          coefficient: 1
-        - species:
-            formula: O2
-            phase: g
-          coefficient: 0.5
-      reaction_as_printed: CaO(l) -> Ca(g) + 1/2 O2(g)
       reference_state: O2(g) partial pressure relative to ideal-gas standard at 1 bar
       reservoir_formula: CaO
       reservoir:
