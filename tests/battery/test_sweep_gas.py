@@ -148,6 +148,14 @@ def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
     assert located.locator.pdf_page_index == 2
     assert located.locator.section == "2. Experimental principle"
     assert "printed P_CO = 1 atm" in located.locator.note
+    activity = result.observations["ts1985::ts1985_na2o_table2_X0p40_T1100C"]
+    assert activity.identity.total_pressure_Pa.is_value
+    assert activity.identity.total_pressure_Pa.value == Decimal("101325")
+    assert activity.identity.fO2_Pa.is_value
+    assert activity.identity.fO2_Pa.value > 0
+    assert activity.derivation is not None
+    assert "experiment.pressure_environment.total_pressure_Pa" in activity.derivation.relation
+    assert "graphite_c_co_buffer" in activity.derivation.relation
 
     anchor_experiment = next(e for e in result.experiments.values()
                              if e.experiment_id.endswith("::na2o-sio2-table1-xna2o-0p50-t1200"))
@@ -174,6 +182,51 @@ def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
     round_tripped = experiment_from_plain(to_plain(experiment))
     assert to_plain(round_tripped.pressure_environment.sweep_gas) == to_plain(located)
     assert not any("sweep_gas" in i.path for i in result.validation.hard_issues)
+
+
+def _ts1985_single_activity_doc() -> dict:
+    doc = load_cached_safe_yaml((EXTRACTS / "ts1985.yaml").read_text())
+    experiment_id = "na2o-sio2-xna2o-0p40-t1100"
+    experiment = next(
+        item for item in doc["experiments"] if item["experiment_id"] == experiment_id
+    )
+    observation = next(
+        item
+        for item in doc["species"]["Na2O"]["observations"]
+        if item["observation_id"] == "ts1985_na2o_table2_X0p40_T1100C"
+    )
+    doc["experiments"] = [copy.deepcopy(experiment)]
+    doc["species"]["Na2O"]["observations"] = [copy.deepcopy(observation)]
+    doc["species"]["Na2O"].pop("context", None)
+    return doc
+
+
+def test_experiment_unknown_pressure_is_not_inherited(tmp_path) -> None:
+    doc = _ts1985_single_activity_doc()
+    experiment = doc["experiments"][0]
+    experiment["pressure_environment"]["total_pressure_Pa"] = UNKNOWN.copy()
+    experiment["pressure_environment"]["sweep_gas"]["state"]["value"][
+        "partial_pressure_Pa"
+    ] = UNKNOWN.copy()
+    doc["species"]["Na2O"]["observations"][0].pop("equipment", None)
+    result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
+    observation = next(iter(result.observations.values()))
+    assert observation.identity.total_pressure_Pa.is_unknown
+    assert observation.identity.total_pressure_Pa.reason == (
+        "no total_pressure_Pa mapped from source"
+    )
+
+
+def test_missing_cco_waypoint_keeps_fo2_refused(tmp_path) -> None:
+    doc = _ts1985_single_activity_doc()
+    doc["experiments"][0].pop("fO2_control", None)
+    result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
+    observation = next(iter(result.observations.values()))
+    assert observation.identity.total_pressure_Pa.is_value
+    assert observation.identity.fO2_Pa.is_unknown
+    assert observation.identity.fO2_Pa.reason == (
+        "no fO2_Pa mapped from source"
+    )
 
 
 @pytest.mark.parametrize("defect", [

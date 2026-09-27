@@ -5989,6 +5989,28 @@ def _partial_pressure_point_condition(
     return located_value(total.value, locator)
 
 
+def _printed_experiment_pressure(located: Located[Any] | None) -> Decimal | None:
+    """Return an exact printed experiment pressure, never an inferred one."""
+
+    if located is None or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if not isinstance(raw, Value) or raw.kind is not ValueKind.POINT:
+        return None
+    if raw.point is None or raw.approximate:
+        return None
+    inference = located.inference
+    if inference is not None and (
+        inference.relation in {"extract_inference", "extract_limit", "default", "assumed"}
+        or any(
+            marker in inference.inputs
+            for marker in ("inferred=true", "default=true", "assumed=true")
+        )
+    ):
+        return None
+    return raw.point
+
+
 def polymorph_from_extract(obs: Mapping[str, Any]) -> State[str] | None:
     form = obs.get("condensed_form")
     if isinstance(form, Mapping) and form.get("polymorph"):
@@ -9501,6 +9523,101 @@ class Migrator:
             merged["fO2_Pa"] = ratio_oxygen
         return merged or None
 
+    def _experiment_identity_fields(
+        self,
+        experiment_id: str,
+        existing: Mapping[str, Any],
+    ) -> tuple[dict[str, Any], tuple[str, ...]]:
+        """Lift printed experiment conditions into an observation identity.
+
+        An observation may omit conditions that its declared experiment records
+        once. Only an exact experiment-scope pressure is inherited. The C–CO
+        route is deliberately resolved through the same guarded waypoint used
+        by consumers; its log pressure is converted to Pa and remains marked
+        derived in the observation lineage.
+        """
+
+        experiment = self.result.experiments.get(experiment_id)
+        if experiment is None:
+            return {}, ()
+        known: dict[str, Any] = {}
+        provenance: list[str] = []
+
+        existing_pressure = existing.get("total_pressure_Pa")
+        pressure_can_fill = "total_pressure_Pa" not in existing
+        if (
+            isinstance(existing_pressure, State)
+            and existing_pressure.is_unknown
+            and existing_pressure.reason
+            == _PRESSURE_IDENTITY_UNKNOWN["total_pressure_Pa"]
+        ):
+            pressure_can_fill = True
+        if pressure_can_fill:
+            pressure_source = "experiment.pressure_environment.total_pressure_Pa"
+            pressure = _printed_experiment_pressure(
+                experiment.pressure_environment.total_pressure_Pa
+            )
+            if pressure is None:
+                sweep = experiment.pressure_environment.sweep_gas
+                if sweep.state.is_value and isinstance(sweep.state.value, SweepGas):
+                    gas = sweep.state.value
+                    if (
+                        gas.alternatives is None
+                        and gas.species
+                        and gas.partial_pressure_Pa.is_value
+                    ):
+                        pressure = as_decimal(gas.partial_pressure_Pa.value)
+                        pressure_source = (
+                            "experiment.pressure_environment.sweep_gas"
+                        )
+            if pressure is not None:
+                known["total_pressure_Pa"] = State.of(pressure)
+                provenance.append(
+                    "identity.total_pressure_Pa="
+                    f"{pressure_source} (printed experiment scope)"
+                )
+
+        sweep_is_valid = (
+            experiment.pressure_environment.sweep_gas.state.is_value
+            and isinstance(
+                experiment.pressure_environment.sweep_gas.state.value, SweepGas
+            )
+        )
+        if "fO2_Pa" not in existing and experiment.bench_id and sweep_is_valid:
+            bench = self.result.benches.get(experiment.bench_id)
+            if bench is not None:
+                # Local import avoids the migrate ↔ waypoints module cycle at
+                # import time; this path runs only after both modules load.
+                from simulator.battery.waypoints import oxygen_condition
+
+                oxygen = oxygen_condition(experiment, bench)
+                cco = next(
+                    (
+                        route
+                        for route in oxygen.routes
+                        if route.route == "graphite_c_co_buffer"
+                        and str(route.authority) == "derived"
+                    ),
+                    None,
+                )
+                value = cco.value if cco is not None else None
+                if (
+                    isinstance(value, Value)
+                    and value.kind is ValueKind.POINT
+                    and value.point is not None
+                    and value.point.is_finite()
+                ):
+                    with localcontext() as ctx:
+                        ctx.prec = 50
+                        f_o2 = Decimal("100000") * (Decimal(10) ** value.point)
+                    known["fO2_Pa"] = State.of(f_o2)
+                    provenance.append(
+                        "identity.fO2_Pa=derived via oxygen_condition "
+                        "graphite_c_co_buffer; not a printed measurement; "
+                        + ",".join(cco.inputs)
+                    )
+        return known, tuple(provenance)
+
     def _add_observation(
         self,
         observation: Observation,
@@ -10528,8 +10645,6 @@ class Migrator:
             if t_as_value.available:
                 value = t_as_value.value
                 value_sel = t_as_value
-        identity = fill_identity(quantity, species, **ident_kwargs)
-
         distinguisher = None
         if isinstance(values, Mapping):
             cid = values.get("composition_id") or values.get("composition_name")
@@ -10592,6 +10707,20 @@ class Migrator:
             locator,
             skip_tables=True,
         )
+        experiment_identity, experiment_provenance = self._experiment_identity_fields(
+            experiment_id, ident_kwargs
+        )
+        for name, state in experiment_identity.items():
+            if name not in ident_kwargs or (
+                name == "total_pressure_Pa"
+                and isinstance(ident_kwargs[name], State)
+                and ident_kwargs[name].is_unknown
+                and ident_kwargs[name].reason
+                == _PRESSURE_IDENTITY_UNKNOWN["total_pressure_Pa"]
+            ):
+                ident_kwargs[name] = state
+        identity_provenance += experiment_provenance
+        identity = fill_identity(quantity, species, **ident_kwargs)
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs, locator
         )
