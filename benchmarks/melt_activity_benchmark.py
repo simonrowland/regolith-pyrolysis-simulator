@@ -155,12 +155,17 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _missing_builtin_pack_name(path: Path) -> str | None:
+    names = {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}
+    if os.path.lexists(path) or path.name not in names:
+        return None
+    if str(path) == path.name or path == REPO_ROOT / "data/melt_activity/imcc" / path.name:
+        return path.name
+    return None
+
+
 def _imcc_pack_sha256(path: Path) -> str:
-    if (
-        not path.is_file()
-        and str(path) == path.name
-        and path.name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}
-    ):
+    if _missing_builtin_pack_name(path) is not None:
         from importlib import resources
 
         resource = resources.files("openimcc").joinpath("data", "packs", path.name)
@@ -425,11 +430,7 @@ class ImccEngine:
                 "imcc-sf04-v1.0.2.json",
                 "imcc-sf04-ext-v4.json",
             }
-            if (
-                pack_name in package_names
-                and str(self.pack_path) == pack_name
-                and not self.pack_path.is_file()
-            ):
+            if _missing_builtin_pack_name(self.pack_path) in package_names:
                 resource = resources.files("openimcc").joinpath(
                     "data", "packs", pack_name
                 )

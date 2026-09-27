@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from importlib import resources
 from pathlib import Path
@@ -38,7 +39,6 @@ from typing import Any, Mapping, Sequence
 
 from openimcc import (
     ImccLoadedDatapack,
-    evaluate,
     load_datapack,
 )
 from openimcc.kernel import ImccRefusal
@@ -103,7 +103,7 @@ def _pack_metadata(pack: ImccLoadedDatapack) -> dict[str, Any]:
 def _load_pack(path: str | Path) -> ImccLoadedDatapack:
     pack_name = Path(path).name
     if (
-        not Path(path).is_file()
+        not os.path.lexists(path)
         and str(path) == pack_name
         and pack_name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}
     ):
@@ -247,6 +247,8 @@ def _cmd_validate_pack(args: argparse.Namespace) -> int:
 
 
 def _cmd_solve(args: argparse.Namespace) -> int:
+    from simulator.melt_backend.imcc_sf04.adapter import evaluate
+
     composition = _load_composition(args.composition, args.oxide)
     pack = _load_pack(args.pack)
     result = evaluate(

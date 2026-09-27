@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import re
 import statistics
 import sys
@@ -54,7 +55,6 @@ from openimcc import (
     ImccNonconvergenceError,
     ImccRefusal,
     ImccTOutsideDatapackDomainError,
-    evaluate,
     label_research_datapack,
     load_datapack,
 )
@@ -329,7 +329,7 @@ def load_pack(pack_path: Path) -> _PackedEngine:
     """
     package_name = pack_path.name
     if (
-        not pack_path.is_file()
+        not os.path.lexists(pack_path)
         and str(pack_path) == package_name
         and package_name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}
     ):
@@ -374,6 +374,8 @@ def _evaluate_imcc(
     temperature_K: float,
 ) -> tuple[str, dict[str, float], dict[str, float], str]:
     """Return (status, activities, gammas, reason) with ImccEngine mapping."""
+    from simulator.melt_backend.imcc_sf04.adapter import evaluate
+
     try:
         result = evaluate(
             composition_wt_pct,

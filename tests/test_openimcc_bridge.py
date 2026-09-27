@@ -361,18 +361,23 @@ def test_bridge_envelope_matches_green_edge_decisions() -> None:
         if not line.startswith("#")
     ))
     assert fixture["edge_row"]["code"] == "imcc_composition_outside_validated_envelope"
-    with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError):
-        bridge_evaluate(
-            composition_mol={"K2O": 0.500002, "SiO2": 0.499998},
-            temperature_K=1800.0,
-        )
+    inside_slack = bridge_evaluate(
+        composition_mol={"K2O": 0.500002, "SiO2": 0.499998},
+        temperature_K=1800.0,
+    )
+    assert inside_slack.envelope_status == "inside"
     inside = bridge_evaluate(
         composition_mol={"K2O": 0.5, "SiO2": 0.5}, temperature_K=1800.0
     )
     assert inside.envelope_status == "inside"
+    within_package_slack = bridge_evaluate(
+        composition_mol={"K2O": 0.500004, "SiO2": 0.499996},
+        temperature_K=1800.0,
+    )
+    assert within_package_slack.envelope_status == "inside"
     with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError):
         bridge_evaluate(
-            composition_mol={"K2O": 0.500006, "SiO2": 0.499994},
+            composition_mol={"K2O": 0.50002, "SiO2": 0.49998},
             temperature_K=1800.0,
         )
 

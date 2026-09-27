@@ -91,6 +91,21 @@ def test_out_of_domain_is_a_typed_refusal_not_a_crash(capsys):
     assert "900" in payload["reason"]
 
 
+def test_cli_keeps_strict_envelope_at_vendored_boundary(capsys):
+    code = cli.main(
+        [
+            "solve", "--pack", str(PACK), "--temperature", "1800",
+            "--basis-type", "mol", "--oxide", "K2O=0.500002",
+            "--oxide", "SiO2=0.499998", "--json",
+        ]
+    )
+
+    assert code == cli.EXIT_REFUSED
+    assert json.loads(capsys.readouterr().out)["code"] == (
+        "imcc_composition_outside_validated_envelope"
+    )
+
+
 def test_extrapolation_flag_turns_the_refusal_into_a_flagged_answer(capsys):
     """The same point answers when extrapolation is explicitly allowed, and the
     answer carries the flag. Silent extrapolation would be the real defect."""
@@ -193,7 +208,11 @@ def _simulator_imports(module_path: Path) -> set[str]:
 
 # The model half may depend on its own package and on scalar_boundary -- a
 # 30-line stdlib-only leaf that travels with the package on extraction.
-_MODEL_ALLOWED = {"simulator.melt_backend.imcc_sf04.gas"}
+_MODEL_ALLOWED = {
+    "simulator.melt_backend.imcc_sf04.gas",
+    # Strict-envelope callers explicitly cross into the simulator adapter.
+    "simulator.melt_backend.imcc_sf04.adapter",
+}
 
 _PKG = Path("simulator/melt_backend/imcc_sf04")
 
@@ -318,6 +337,8 @@ def test_the_glue_direction_check_catches_relative_and_facade_imports(tmp_path):
 # checking the runner degrades instead of crashing -- lives in
 # tests/test_imcc_bench.py::test_bench_still_runs_without_the_simulator_gas_layer.
 _BENCH_DEFERRED_ALLOWED = {
+    # The standalone bench shares the strict simulator envelope boundary.
+    "simulator.melt_backend.imcc_sf04.adapter",
     # Formula parsing for the single-cation basis conversion. Reached only from
     # _single_cation_gas_activities, which is called only from the gas branch.
     "simulator.accounting.formulas",

@@ -516,9 +516,7 @@ def evaluate(
         raise TypeError("composition_mol or composition_kg is required")
 
     loaded_pack = _load_pack(pack)
-    from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
-
-    result = evaluate_imcc(
+    result = package.evaluate(
         composition,
         float(temperature_K),
         loaded_pack,
@@ -532,7 +530,22 @@ def evaluate(
         name: float(value)
         for name, value in zip(parent_oxides, result.parent_activity, strict=True)
     }
-    labels = result.labels
+    package_labels = result.labels
+    from simulator.melt_backend.imcc_sf04.adapter import ImccAdapterLabels
+
+    labels = ImccAdapterLabels(
+        identity=package_labels.identity,
+        coverage=package_labels.coverage,
+        trust="internal-analytical",
+        envelope_status=package_labels.envelope_status,
+        flags=tuple(package_labels.flags),
+        notices=tuple(package_labels.notices),
+        acid_sink_ratio=(
+            None
+            if package_labels.acid_sink_ratio is None
+            else float(package_labels.acid_sink_ratio)
+        ),
+    )
     identity = labels.identity
     return OpenImccBridgeResult(
         parent_oxide_activities=activities,

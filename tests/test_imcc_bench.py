@@ -136,6 +136,25 @@ points:
     }
 
 
+def test_standalone_bench_keeps_strict_envelope():
+    from simulator.melt_backend.imcc_sf04.bench import _evaluate_imcc, load_pack
+
+    engine = load_pack(Path("imcc-sf04-v1.0.2.json"))
+    x_me2o = 0.500002
+    composition_wt_pct = {
+        "K2O": x_me2o * 94.196,
+        "SiO2": (1.0 - x_me2o) * 60.0843,
+    }
+
+    status, activities, gammas, reason = _evaluate_imcc(
+        engine, composition_wt_pct, 1800.0
+    )
+
+    assert status == "out_of_domain"
+    assert not activities and not gammas
+    assert "X_Me2O=0.500002" in reason
+
+
 def test_run_bench_ok_out_of_domain_and_refused(tmp_path: Path) -> None:
     fixture = _three_point_fixture(tmp_path / "bench.yaml")
     report = run_bench(fixture, DATAPACK_PATH)

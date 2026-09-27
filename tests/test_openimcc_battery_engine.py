@@ -103,6 +103,34 @@ def test_imcc_battery_emits_notice_for_strict_envelope_edge() -> None:
             assert matching[0]["authority"] == "extrapolated"
 
 
+@pytest.mark.parametrize(
+    "composition_mol",
+    [
+        {"K2O": 0.500002, "SiO2": 0.499998},
+        {"K2O": 0.25, "Na2O": 0.250001, "SiO2": 0.499999},
+        {"K2O": 0.25, "Na2O": 0.250005, "SiO2": 0.499995},
+    ],
+)
+def test_openimcc_battery_keeps_package_envelope_slack(composition_mol) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    molar_mass = {"K2O": 94.196, "Na2O": 61.9789, "SiO2": 60.0843}
+    result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_kg={
+            oxide: amount * molar_mass[oxide] / 1000.0
+            for oxide, amount in composition_mol.items()
+        },
+    )
+
+    assert not any(
+        notice["kind"] == "openimcc_composition_outside_validated_envelope"
+        for notice in result.diagnostics["imcc_notices"]
+    )
+    assert result.diagnostics["authority"] is None
+
+
 def _scratch_path() -> Path | None:
     return PLANTE_HAND_ROWS if PLANTE_HAND_ROWS.is_file() else None
 
