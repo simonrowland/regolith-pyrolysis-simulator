@@ -3106,23 +3106,9 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     out: list[Observation] = []
     for obs in context.observations.values():
         ev = obs.evidence.class_
-        if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
+        if not (ev.is_value and ev.value in MEASURED_EVIDENCE):
             continue
-        measured = ev.is_value and ev.value in MEASURED_EVIDENCE
-        comparison_activity = False
-        identity = obs.identity
-        if isinstance(identity, Identity):
-            quantity = quantity_token(identity)
-            experiment = context.experiments.get(obs.experiment_id)
-            comparison_activity = (
-                quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
-                and experiment is not None
-                and experiment.method.is_value
-                and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-                and point_magnitude(obs.value) is not None
-                and comparison_method_cell_constant_cancels(obs.provenance)
-            )
-        if not (measured or comparison_activity):
+        if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
             continue
         out.append(obs)
     return tuple(sorted(out, key=lambda o: o.observation_id))
