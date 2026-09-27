@@ -159,40 +159,49 @@ def test_gas_resistance_lookups_route_through_helper():
 
 
 _OXYGEN_EXCHANGE_BASE_CONFIG = {
-    "k_O_ref_m_s": 2.0e-5,
-    "k_O_min_m_s": 5.0e-6,
-    "k_O_max_m_s": 5.0e-5,
-    "T_ref_K": 1773.15,
-    "Ea_J_mol": 150000.0,
+    "melt_oxygen_diffusivity_m2_s": {
+        "value": 1.0e-9,
+        "units": "m2/s",
+        "source": "test melt redox diffusivity",
+        "range": [1.0e-10, 1.0e-8],
+    },
+    "surface_renewal_velocity_ref_m_s": {
+        "value": 1.0e-2,
+        "units": "m/s",
+        "source": "test surface renewal speed",
+        "range": [1.0e-4, 1.0e-1],
+    },
     "effective_melt_depth_m": 0.2,
 }
 
 
-def _oxygen_exchange_k(config: dict, T_K: float = 1800.0) -> tuple[float, str]:
+def _oxygen_exchange_k(
+    config: dict,
+    T_K: float = 1800.0,
+    *,
+    axial: float = 6.0,
+) -> tuple[float, str, dict]:
     declared_config = {**_OXYGEN_EXCHANGE_BASE_CONFIG, **config}
     sim = SimpleNamespace(
         _oxygen_exchange_config=lambda: declared_config,
         _require_oxygen_exchange_config=lambda: declared_config,
+        _oxygen_exchange_effective_melt_depth_m=lambda: 0.2,
+        melt=SimpleNamespace(
+            stir_state=SimpleNamespace(axial=axial, radial=1.0),
+        ),
     )
     return PyrolysisSimulator._oxygen_exchange_k_m_s(sim, T_K)
 
 
-def test_present_null_temperature_dependence_keeps_arrhenius_on():
-    """Site 2: null must not disable sso_r.oxygen_exchange temperature dependence."""
+def test_axial_stirring_controls_melt_side_surface_renewal():
+    low, low_source, low_transport = _oxygen_exchange_k({}, axial=4.0)
+    high, high_source, high_transport = _oxygen_exchange_k({}, axial=8.0)
 
-    k_absent, source_absent = _oxygen_exchange_k({})
-    k_null, source_null = _oxygen_exchange_k(
-        {"temperature_dependence_enabled": None}
-    )
-    k_false, source_false = _oxygen_exchange_k(
-        {"temperature_dependence_enabled": False}
-    )
-
-    assert k_null == pytest.approx(k_absent, rel=0.0)
-    assert source_null == source_absent
-    assert "arrhenius" in source_absent
-    assert k_false != pytest.approx(k_absent, rel=1e-12)
-    assert "temperature_dependence_disabled" in source_false
+    assert low_source == high_source == "higbie_forced_surface_renewal"
+    assert high_transport["melt_side_surface_renewal_time_s"] < low_transport[
+        "melt_side_surface_renewal_time_s"
+    ]
+    assert high > low
 
 
 def test_present_null_needs_experiment_stays_raised():

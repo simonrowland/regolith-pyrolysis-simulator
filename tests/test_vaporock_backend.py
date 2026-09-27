@@ -1059,13 +1059,19 @@ def test_vaporock_as_active_backend_fails_closed_with_clear_message():
             "campaigns": {},
             "sso_r": {
                 "oxygen_exchange": {
-                    "k_O_ref_m_s": 2.0e-5,
-                    "k_O_min_m_s": 5.0e-6,
-                    "k_O_max_m_s": 5.0e-5,
-                    "T_ref_K": 1773.15,
-                    "Ea_J_mol": 150000.0,
+                    "melt_oxygen_diffusivity_m2_s": {
+                        "value": 1.0e-9,
+                        "units": "m2/s",
+                        "source": "test melt redox diffusivity",
+                        "range": [1.0e-10, 1.0e-8],
+                    },
+                    "surface_renewal_velocity_ref_m_s": {
+                        "value": 1.0e-2,
+                        "units": "m/s",
+                        "source": "test surface renewal speed",
+                        "range": [1.0e-4, 1.0e-1],
+                    },
                     "effective_melt_depth_m": 0.2,
-                    "temperature_dependence_enabled": True,
                 },
             },
         },
