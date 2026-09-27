@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from importlib import resources
 import math
+import numbers
 from types import MappingProxyType
 from typing import Any
 
@@ -188,12 +189,43 @@ def _cleaned_melt_wt_pct(
     source_mass_kg: dict[str, float] = {}
     for raw_name, raw_mol in canonical.items():
         name = str(raw_name)
+        if not isinstance(raw_mol, numbers.Real) or isinstance(raw_mol, bool):
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_invalid_input",
+                (
+                    f"invalid mole inventory for {name!r}: "
+                    f"value={raw_mol!r}; expected a real numeric value"
+                ),
+            )
+        if raw_mol < 0.0:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_invalid_input",
+                (
+                    f"invalid mole inventory for {name!r}: "
+                    f"value={raw_mol!r}; inventory must be non-negative"
+                ),
+            )
         try:
             mol = float(raw_mol)
-            if not math.isfinite(mol) or mol < 0.0:
-                if not math.isfinite(mol):
-                    raise ValueError("mole inventory must be finite")
-                continue
+        except (OverflowError, TypeError, ValueError) as exc:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_invalid_input",
+                (
+                    f"invalid mole inventory for {name!r}: "
+                    f"value={raw_mol!r}; cannot convert to float"
+                ),
+            ) from exc
+        if not math.isfinite(mol):
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_composition_invalid_input",
+                (
+                    f"invalid mole inventory for {name!r}: "
+                    f"value={raw_mol!r}; inventory must be finite"
+                ),
+            )
+        if mol == 0.0:
+            continue
+        try:
             mass_kg = mol * resolve_species_formula(name).molar_mass_kg_per_mol()
         except Exception as exc:  # noqa: BLE001 - policy turns this into a typed refusal
             raise OpenImccCompositionPolicyRefusal(
@@ -311,11 +343,40 @@ def evaluate_cleaned_melt(
     )
     single_cation = {}
     for oxide in OPENIMCC_PARENT_OXIDES:
-        parent_activity = float(bridge.parent_oxide_activities.get(oxide, 0.0))
+        if oxide not in composition_wt_pct:
+            continue
+        if (
+            oxide not in bridge.parent_oxides
+            or oxide not in bridge.parent_oxide_activities
+        ):
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_result_shape",
+                (
+                    "openimcc result is missing the parent activity for "
+                    f"present oxide {oxide!r}"
+                ),
+            )
+        raw_activity = bridge.parent_oxide_activities[oxide]
+        try:
+            parent_activity = float(raw_activity)
+        except (OverflowError, TypeError, ValueError) as exc:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_result_shape",
+                (
+                    f"openimcc parent activity for {oxide!r} is invalid: "
+                    f"value={raw_activity!r}"
+                ),
+            ) from exc
+        if not math.isfinite(parent_activity) or parent_activity <= 0.0:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_result_shape",
+                (
+                    f"openimcc parent activity for {oxide!r} is invalid: "
+                    f"value={raw_activity!r}; expected a finite positive value"
+                ),
+            )
         cations = float(MELT_OXIDE_CATIONS_PER_FORMULA.get(oxide, 1.0))
-        single_cation[oxide] = (
-            0.0 if parent_activity <= 0.0 else parent_activity ** (1.0 / cations)
-        )
+        single_cation[oxide] = parent_activity ** (1.0 / cations)
     return OpenImccCleanedMeltResult(
         bridge=bridge,
         composition_wt_pct=composition_wt_pct,

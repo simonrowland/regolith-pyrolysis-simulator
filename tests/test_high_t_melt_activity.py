@@ -23,6 +23,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
     FE2O3_TO_FEO_TOTAL_WT_FACTOR,
+    OpenImccBridgeResult,
     OpenImccCompositionPolicyRefusal,
     evaluate_cleaned_melt,
 )
@@ -268,6 +269,66 @@ def test_above_cap_k2o_keeps_constant_gamma_with_exclusion_provenance() -> None:
     ]["Na2O"]
 
 
+def test_missing_present_parent_refuses_and_labels_provider_fallback(
+    monkeypatch,
+) -> None:
+    def omit_na(**kwargs):
+        return OpenImccBridgeResult(
+            parent_oxide_activities={"SiO2": 1.0},
+            parent_oxides=("SiO2",),
+            flags=(),
+            notices=(),
+            acid_sink_ratio=None,
+            pack_model_id="fake",
+            pack_version="fake",
+            pack_digest="fake",
+            openimcc_version="fake",
+            envelope_status="in_domain",
+            extrapolated=False,
+            labels=SimpleNamespace(),
+            coverage={},
+        )
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", omit_na)
+    composition = {"Na2O": 0.2, "SiO2": 5.0}
+
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as refusal:
+        evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
+    assert refusal.value.code == "openimcc_result_shape"
+    assert "Na2O" in str(refusal.value)
+
+    result = _provider().dispatch(
+        _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
+    )
+    high_t = result.diagnostic["high_t_melt_activity"]
+    assert result.status == "ok"
+    assert high_t["provider"] == "constant_gamma"
+    assert high_t["fallback"] is True
+    assert high_t["fallback_reason"]["code"] == "openimcc_result_shape"
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
+    for species in ("Na", "Na2", "Na2O_gas"):
+        assert provenance[species]["melt_activity_authority"] == "constant_gamma"
+        assert provenance[species]["openimcc_refusal"]["code"] == (
+            "openimcc_result_shape"
+        )
+
+
+def test_absent_parent_stays_out_of_openimcc_authority() -> None:
+    result = _provider().dispatch(
+        _request({"SiO2": 1.0}, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
+    )
+    high_t = result.diagnostic["high_t_melt_activity"]
+
+    assert "Na2O" not in high_t["activities_by_oxide"]
+    assert high_t["seam"]["Na2O"]["openimcc_activity"] is None
+    assert high_t["seam"]["Na2O"]["selected_activity_basis"] == (
+        "constant_gamma"
+    )
+    assert high_t["authority_exclusions"]["Na2O"]["code"] == (
+        "openimcc_parent_absent"
+    )
+
+
 def test_provider_omitted_high_t_control_defaults_to_openimcc() -> None:
     result = _provider().dispatch(_request(BASE_MELT_MOL, CAP_PLUS_T_K))
 
@@ -404,6 +465,59 @@ def test_projection_over_one_percent_refuses_and_provider_flags_fallback() -> No
         == "over_threshold"
         for row in fallback_provenance.values()
         if "composition_projection_classification" in row
+    )
+
+
+def test_invalid_inventory_reaches_typed_constant_gamma_fallback() -> None:
+    authority = vapor_pressure_module._build_high_t_melt_activity_authority(
+        composition_mol={"SiO2": 1.0, "NaCl": -1.0},
+        temperature_K=CAP_PLUS_T_K,
+        controls={"high_t_melt_activity": "openimcc"},
+        below_cap_fe_activity=0.1,
+        below_cap_fe_activity_basis="constant_gamma",
+    )
+
+    assert authority["provider"] == "constant_gamma"
+    assert authority["fallback"] is True
+    assert authority["fallback_reason"]["code"] == (
+        "openimcc_composition_invalid_input"
+    )
+
+
+def test_provider_provenance_records_typed_refusal(
+    monkeypatch,
+) -> None:
+    def refuse_invalid_inventory(*args, **kwargs):
+        raise OpenImccCompositionPolicyRefusal(
+            "openimcc_composition_invalid_input",
+            "invalid mole inventory for 'MgO': value=-1.0",
+        )
+
+    monkeypatch.setattr(
+        openimcc_bridge_module,
+        "evaluate_cleaned_melt",
+        refuse_invalid_inventory,
+    )
+    result = _provider().dispatch(
+        _request(
+            BASE_MELT_MOL,
+            CAP_PLUS_T_K,
+            high_t_melt_activity="openimcc",
+        )
+    )
+
+    high_t = result.diagnostic["high_t_melt_activity"]
+    assert high_t["provider"] == "constant_gamma"
+    assert high_t["fallback"] is True
+    assert high_t["fallback_reason"]["code"] == (
+        "openimcc_composition_invalid_input"
+    )
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
+    assert any(
+        row.get("melt_activity_authority") == "constant_gamma"
+        and row.get("openimcc_refusal", {}).get("code")
+        == "openimcc_composition_invalid_input"
+        for row in provenance.values()
     )
 
 

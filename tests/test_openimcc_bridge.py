@@ -6,14 +6,20 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 
 from simulator.melt_backend.imcc_sf04 import evaluate as vendored_evaluate
 from simulator.melt_backend.imcc_sf04 import load_datapack as vendored_load_datapack
 from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
+    OpenImccCompositionPolicyRefusal,
+    OpenImccBridgeResult,
     OpenImccUnavailableError,
+    OPENIMCC_PARENT_OXIDES,
+    _cleaned_melt_wt_pct,
     evaluate as bridge_evaluate,
+    evaluate_cleaned_melt,
 )
 
 
@@ -90,6 +96,107 @@ def _openimcc_or_skip():
             "checkout's src/ directory on PYTHONPATH before running the parity check"
         ),
     )
+
+
+@pytest.mark.parametrize(
+    "invalid_inventory",
+    (-1.0, float("nan"), float("inf"), True, "1.0"),
+)
+def test_cleaned_melt_rejects_invalid_inventory(invalid_inventory) -> None:
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        _cleaned_melt_wt_pct({"SiO2": 1.0, "MgO": invalid_inventory})
+
+    refusal = exc_info.value
+    assert refusal.code == "openimcc_composition_invalid_input"
+    assert "MgO" in str(refusal)
+    assert repr(invalid_inventory) in str(refusal)
+
+
+def test_cleaned_melt_treats_zero_inventory_as_absent() -> None:
+    source_wt_pct, folded_wt_pct, _ = _cleaned_melt_wt_pct(
+        {"SiO2": 1.0, "MgO": 0.0}
+    )
+
+    assert "MgO" not in source_wt_pct
+    assert "MgO" not in folded_wt_pct
+
+
+def test_cleaned_melt_omits_absent_parent_activity() -> None:
+    result = evaluate_cleaned_melt({"SiO2": 1.0}, 2200.0)
+
+    assert "SiO2" in result.single_cation_activities
+    assert "Na2O" not in result.single_cation_activities
+
+
+def test_cleaned_melt_refuses_missing_present_parent_activity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.melt_backend.imcc_sf04.openimcc_bridge as bridge
+
+    monkeypatch.setattr(
+        bridge,
+        "evaluate",
+        lambda **kwargs: OpenImccBridgeResult(
+            parent_oxide_activities={"SiO2": 1.0},
+            parent_oxides=("SiO2",),
+            flags=(),
+            notices=(),
+            acid_sink_ratio=None,
+            pack_model_id="fake",
+            pack_version="fake",
+            pack_digest="fake",
+            openimcc_version="fake",
+            envelope_status="in_domain",
+            extrapolated=False,
+            labels=SimpleNamespace(),
+            coverage={},
+        ),
+    )
+
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        evaluate_cleaned_melt({"SiO2": 1.0, "Na2O": 0.1}, 2200.0)
+
+    refusal = exc_info.value
+    assert refusal.code == "openimcc_result_shape"
+    assert "Na2O" in str(refusal)
+
+
+@pytest.mark.parametrize("invalid_activity", (0.0, -1.0, float("nan")))
+def test_cleaned_melt_refuses_invalid_present_parent_activity(
+    monkeypatch: pytest.MonkeyPatch,
+    invalid_activity: float,
+) -> None:
+    import simulator.melt_backend.imcc_sf04.openimcc_bridge as bridge
+
+    activities = {oxide: 1.0 for oxide in OPENIMCC_PARENT_OXIDES}
+    activities["Na2O"] = invalid_activity
+    monkeypatch.setattr(
+        bridge,
+        "evaluate",
+        lambda **kwargs: OpenImccBridgeResult(
+            parent_oxide_activities=activities,
+            parent_oxides=OPENIMCC_PARENT_OXIDES,
+            flags=(),
+            notices=(),
+            acid_sink_ratio=None,
+            pack_model_id="fake",
+            pack_version="fake",
+            pack_digest="fake",
+            openimcc_version="fake",
+            envelope_status="in_domain",
+            extrapolated=False,
+            labels=SimpleNamespace(),
+            coverage={},
+        ),
+    )
+
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        evaluate_cleaned_melt({"SiO2": 1.0, "Na2O": 0.1}, 2200.0)
+
+    refusal = exc_info.value
+    assert refusal.code == "openimcc_result_shape"
+    assert "Na2O" in str(refusal)
+    assert repr(invalid_activity) in str(refusal)
 
 
 def test_missing_openimcc_is_a_typed_refusal(monkeypatch: pytest.MonkeyPatch) -> None:
