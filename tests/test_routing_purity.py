@@ -1,6 +1,7 @@
 import math
 from copy import deepcopy
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -21,6 +22,7 @@ from simulator.condensation_routing import (
     product_stage_number,
     target_species_for_stage_number,
 )
+from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.state import CampaignPhase, CondensationTrain, EvaporationFlux, MeltState
 
 
@@ -201,6 +203,83 @@ def test_stage3_through_exposes_alkali_and_surfaces_d025_finding():
     assert report[STAGE_KEY_BY_NUMBER[3]]["finding_keys"] == [
         "silica_exposed_to_alkali"
     ]
+
+
+@pytest.mark.parametrize("headspace_pO2_bar", [None, math.nan])
+def test_stage3_through_missing_transport_pO2_is_unavailable_and_infeasible(
+    headspace_pO2_bar,
+):
+    setpoints = deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
+    setpoints["campaigns"]["C2A_continuous"].update({
+        "stage3_open_T_C": 900,
+        "stage3_close_T_C": 1200,
+    })
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A, temperature_C=1050.0)
+    resolution = manager.stage3_route_resolution_for(melt)
+    assert resolution["stage3_route"] == "through"
+    melt.oxygen_reservoir.headspace_transport_pO2_bar = headspace_pO2_bar
+
+    train = CondensationTrain.create_default()
+    model = CondensationModel(
+        train,
+        bypass_segment_config=STAGE3_BYPASS_CONFIG,
+    )
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 0.1, "K": 0.1},
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in train.stages
+        },
+        campaign_name="C2A_continuous",
+        stage3_route=resolution["stage3_route"],
+        stage3_route_basis=resolution,
+    )
+    flux = EvaporationFlux({"Na": 0.1, "K": 0.1})
+    flux.update_totals()
+    route = model.route(flux, melt)
+
+    diagnostic = route.stage3_route_diagnostic
+    assert diagnostic["finding_keys"] == ["silica_exposed_to_alkali"]
+    assert {finding["status"] for finding in diagnostic["findings"]} == {
+        "unavailable"
+    }
+    assert {
+        finding["reason"] for finding in diagnostic["findings"]
+    } == {"headspace_pO2_missing"}
+    assert all(
+        finding["gate_notice"]["headspace_pO2_missing"] is True
+        for finding in diagnostic["findings"]
+    )
+
+    trace = SimpleNamespace(
+        simulator=SimpleNamespace(condensation_model=model),
+        wall_fouling_report={
+            "campaigns_to_resinter_total": math.inf,
+            "resinter_threshold_kg": None,
+            "wall_deposit_kg_per_campaign": 0.0,
+            "upstream_wall_deposit_records": [],
+            "authoritative_for_resinter": True,
+            "output_status": "authoritative",
+            "status_reason": "",
+            "feedstock_charge_mass_kg": 1000.0,
+            "coating_constraint_mode": "upstream_deposit_fraction",
+            "coating_constraint_authoritative": True,
+            "sticking_alpha_authority": {
+                "authoritative_for_deposit_mass": True,
+            },
+        },
+    )
+    coating = PhysicsConstraintSet(active_gates=("coating",)).evaluate(
+        trace
+    ).margins["coating"]
+
+    assert not coating.feasible
+    assert coating.status_payload["coating_verdict"] == "violated"
+    assert any(
+        reason["reason"] == "silica_exposed_to_alkali"
+        for reason in coating.status_payload["coating_violation_reasons"]
+    )
 
 
 def test_stage3_open_knob_uses_existing_alkali_hard_finding():
