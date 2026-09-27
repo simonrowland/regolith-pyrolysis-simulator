@@ -1211,6 +1211,11 @@ class HourSnapshot:
     # yielded a zero/empty/default indistinguishable from a computed zero.
     # Diagnostic only — does not change flux, ledger, or refusal behaviour.
 
+    vapor_pressure_refusals: Dict[str, Any] = field(default_factory=dict)
+    # Per-species vapor-pressure refusals for this hour. A refused species is
+    # absent from the live flux mapping, not a measured zero, so no ledger mass
+    # moves for that species-hour.
+
     # --- C2A staged gas-control diagnostic (SSO-2) ---
     c2a_staged_gas: Dict[str, Any] = field(default_factory=dict)
     # Per-tick stage-owned gas cover selected before process execution.

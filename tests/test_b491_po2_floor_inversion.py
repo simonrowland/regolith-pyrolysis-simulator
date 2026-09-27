@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -15,7 +16,6 @@ from engines.builtin.vapor_pressure import (
     MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
     melt_dissociation_pO2_floor_inversion_notice,
     physical_melt_dissociation_pO2_bar,
-    VaporPressurePhysicalPressureCeilingError,
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -29,6 +29,8 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MAX_BAR,
     MELT_DISSOCIATION_PO2_MIN_BAR,
 )
+from simulator.run_executor import RunExecutor
+from simulator.runner import PyrolysisRun
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -174,17 +176,104 @@ def test_provider_flags_floor_inversion_and_completes(monkeypatch) -> None:
     )
 
 
-def test_provider_enforces_catalog_ceiling_before_flux() -> None:
+def test_provider_refuses_only_species_above_catalog_ceiling_before_flux() -> None:
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
 
-    with pytest.raises(VaporPressurePhysicalPressureCeilingError) as exc_info:
-        provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0))
+    result = provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0))
 
-    error = exc_info.value
-    assert error.terminal_refusal is True
-    assert error.pressure_Pa > CATALOG_PHYSICAL_PRESSURE_CEILING_PA
-    assert error.ceiling_Pa == CATALOG_PHYSICAL_PRESSURE_CEILING_PA
-    assert error.species
+    assert result.status == "ok"
+    pressures = result.diagnostic["vapor_pressures_Pa"]
+    refusals = result.diagnostic["vapor_pressure_species_refusals"]
+    assert refusals
+    assert set(refusals).isdisjoint(pressures)
+    assert pressures
+    for species, refusal in refusals.items():
+        assert refusal["status"] == "refused"
+        assert refusal["flux_status"] == "refused"
+        assert refusal["reason"] == "vapor_pressure_physical_pressure_ceiling"
+        assert refusal["pressure_Pa"] > CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+        assert refusal["ceiling_Pa"] == CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+        assert refusal["measured_zero"] is False
+        assert refusal["ledger_moved_mol"] == 0.0
+    assert all(
+        float(pressure) <= CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+        for pressure in pressures.values()
+    )
+
+
+def test_one_species_ceiling_refusal_completes_runner_and_is_flagged(monkeypatch) -> None:
+    """A forced ceiling breach refuses one flux and leaves other fluxes live."""
+
+    original_dispatch = BuiltinVaporPressureProvider.dispatch
+    forced_species: list[str] = []
+
+    def force_one_species_refusal(self, request):
+        result = original_dispatch(self, request)
+        diagnostic = dict(result.diagnostic or {})
+        pressures = dict(diagnostic.get("vapor_pressures_Pa") or {})
+        if not pressures:
+            return result
+        species = "Na" if "Na" in pressures else sorted(pressures)[0]
+        pressure = float(pressures.pop(species))
+        forced_species.append(species)
+        refusals = dict(diagnostic.get("vapor_pressure_species_refusals") or {})
+        refusals[species] = {
+            "status": "refused",
+            "flux_status": "refused",
+            "reason": "vapor_pressure_physical_pressure_ceiling",
+            "species": species,
+            "pressure_Pa": max(
+                pressure,
+                float(CATALOG_PHYSICAL_PRESSURE_CEILING_PA) * 2.0,
+            ),
+            "ceiling_Pa": float(CATALOG_PHYSICAL_PRESSURE_CEILING_PA),
+            "flagged": True,
+            "backlog": True,
+            "measured_zero": False,
+            "ledger_moved_mol": 0.0,
+            "mass_moved_mol": 0.0,
+        }
+        diagnostic["vapor_pressures_Pa"] = pressures
+        diagnostic["vapor_pressure_species_refusals"] = refusals
+        return replace(result, diagnostic=diagnostic)
+
+    monkeypatch.setattr(
+        BuiltinVaporPressureProvider,
+        "dispatch",
+        force_one_species_refusal,
+    )
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        mass_kg=1.0,
+        backend_name="internal-analytical",
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        force_builtin_vapor_pressure=True,
+    )
+    session = run._start_session()
+    session.simulator.melt.temperature_C = 1600.0
+    session.simulator.melt.target_temperature_C = 1600.0
+    execution = RunExecutor().execute_session(session, hours=1)
+    payload = run._build_output(execution)
+
+    assert execution.status == "ok"
+    assert payload["status"] == "ok"
+    assert forced_species
+    species = forced_species[-1]
+    row = payload["per_hour_summary"][-1]
+    refusal = row["vapor_pressure_refusals"][species]
+    assert refusal["status"] == "refused"
+    assert refusal["measured_zero"] is False
+    assert refusal["ledger_moved_mol"] == 0.0
+    assert any(
+        species_name != species and float(rate) > 0.0
+        for species_name, rate in row["vapor_species_kg_hr"].items()
+    )
+    backlog = payload["run_metadata"]["flag_backlog"]
+    assert backlog["count"] >= 1
+    assert backlog["by_species"][species] >= 1
 
 
 def test_provider_flags_exact_minus_30_without_clamp_warning(monkeypatch) -> None:

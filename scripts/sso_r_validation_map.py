@@ -20,7 +20,6 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.core import (
-    FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
     PyrolysisSimulator,
 )
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
@@ -507,12 +506,7 @@ def run_row(
         sim._apply_lab_surface_temperatures(sample_time_h=SAMPLE_TIME_H)
         sim._route_to_condensation(evap_flux)
     sim._update_melt_composition(evap_flux)
-    if sim._has_remaining_fe_redox_internal_o2_capacity():
-        second_respeciation = sim._apply_fe_redox_respeciation(
-            oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
-        )
-    else:
-        second_respeciation = sim._apply_fe_redox_respeciation()
+    second_respeciation = sim._apply_fe_redox_respeciation()
 
     snapshot = sim._make_snapshot()
     snapshot.evap_flux = evap_flux

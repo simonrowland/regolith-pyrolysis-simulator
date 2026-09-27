@@ -563,8 +563,9 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "mre_ellingham_ladder_diagnostic",
     "fe_redox_split",
     "stage_3_capture",
-    "redox_source_breakdown",
-    "mass_balance_error_category",
+        "redox_source_breakdown",
+        "vapor_pressure_refusals",
+        "mass_balance_error_category",
     "reduced_real_cache_state",
     "c2a_staged_gas",
     "metal_phase_stratification",
@@ -2761,6 +2762,7 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
         _fe_redox_split_observables,
         _mre_ellingham_ladder_diagnostic_observables,
         _mre_uncertified_yield_observables,
+        _vapor_pressure_refusal_observables,
     )
 
     snapshot = SimpleNamespace(
@@ -2782,6 +2784,12 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
                 "native_fe_event_status": "deferred",
             },
         },
+        vapor_pressure_refusals={
+            "Si": {
+                "status": "refused",
+                "reason": "vapor_pressure_physical_pressure_ceiling",
+            },
+        },
     )
 
     # The native-Fe saturation event is a Mapping and must serialize as a
@@ -2798,8 +2806,9 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
     emitted |= set(_mre_uncertified_yield_observables(snapshot))
     emitted |= set(_mre_ellingham_ladder_diagnostic_observables(snapshot))
     emitted |= set(_fe_redox_split_observables(snapshot))
+    emitted |= set(_vapor_pressure_refusal_observables(snapshot))
 
-    # All four helper-backed observables must emit given non-empty inputs
+    # All five helper-backed observables must emit given non-empty inputs
     # (guards against the helpers silently short-circuiting and making this test
     # a no-op).
     assert emitted == {
@@ -2807,6 +2816,7 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
         "mre_uncertified_yield",
         "mre_ellingham_ladder_diagnostic",
         "fe_redox_split",
+        "vapor_pressure_refusals",
     }
     # The contract under test: every emitted conditional key is whitelisted as
     # optional, and none collides with a required key.

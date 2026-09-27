@@ -1409,6 +1409,13 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        vapor_pressure_flag_backlog = _vapor_pressure_refusal_flag_backlog(
+            execution.per_hour
+        )
+        if vapor_pressure_flag_backlog:
+            run_metadata["flag_backlog"] = _json_safe(
+                vapor_pressure_flag_backlog
+            )
         run_metadata["campaigns_elapsed"] = float(execution.campaigns_elapsed)
         run_metadata.update(
             {
@@ -2356,6 +2363,13 @@ def _redox_source_breakdown_observables(snapshot: HourSnapshot) -> dict[str, Any
     return {"redox_source_breakdown": _json_safe(summary)}
 
 
+def _vapor_pressure_refusal_observables(snapshot: HourSnapshot) -> dict[str, Any]:
+    summary = dict(getattr(snapshot, "vapor_pressure_refusals", {}) or {})
+    if not summary:
+        return {}
+    return {"vapor_pressure_refusals": _json_safe(summary)}
+
+
 def _mre_uncertified_yield_observables(snapshot: HourSnapshot) -> dict[str, Any]:
     summary = dict(getattr(snapshot, "mre_uncertified_yield", {}) or {})
     if not summary:
@@ -2600,6 +2614,7 @@ def build_per_hour_summary(
         **_knudsen_regime_observables(snapshot),
         **_evap_plane_selectivity_observables(snapshot),
         **_redox_source_breakdown_observables(snapshot),
+        **_vapor_pressure_refusal_observables(snapshot),
         **_mre_uncertified_yield_observables(snapshot),
         **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
@@ -4975,6 +4990,36 @@ def _execution_per_hour_summary(execution: RunExecution | None) -> list[Any]:
     if execution is None:
         return []
     return _json_safe(list(getattr(execution, "per_hour", ()) or ()))
+
+
+def _vapor_pressure_refusal_flag_backlog(
+    per_hour: Any,
+) -> dict[str, Any]:
+    entries: list[dict[str, Any]] = []
+    for row in per_hour or ():
+        if not isinstance(row, Mapping):
+            continue
+        refusals = row.get("vapor_pressure_refusals")
+        if not isinstance(refusals, Mapping):
+            continue
+        for species, refusal in sorted(refusals.items(), key=lambda item: str(item[0])):
+            if not isinstance(refusal, Mapping):
+                continue
+            entries.append({
+                "hour": int(row.get("hour", 0) or 0),
+                "species": str(species),
+                **dict(refusal),
+            })
+    if not entries:
+        return {}
+    by_species = Counter(str(item["species"]) for item in entries)
+    by_reason = Counter(str(item.get("reason", "")) for item in entries)
+    return {
+        "count": len(entries),
+        "by_species": dict(sorted(by_species.items())),
+        "by_reason": dict(sorted(by_reason.items())),
+        "entries": _json_safe(entries),
+    }
 
 
 def _execution_shadow_trace(execution: RunExecution | None) -> list[Any]:

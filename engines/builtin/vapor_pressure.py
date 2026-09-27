@@ -2674,14 +2674,36 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # The catalog ceiling is an evaluator output contract.  Enforce it
         # after every rail has produced its final per-species pressure and
         # before an IntentResult can expose the mapping to evaporation.  A
-        # ceiling violation is therefore a typed terminal outcome, never a
-        # pressure value that can be interpreted as a Hertz-Knudsen flux.
+        # ceiling violation refuses only that species' flux for this hour;
+        # omitting it from the live pressure mapping prevents the value from
+        # being interpreted as a Hertz-Knudsen flux while other species continue.
+        vapor_pressure_species_refusals: dict[str, dict[str, Any]] = {}
         for species, pressure_Pa in sorted(vapor_pressures.items()):
             pressure = float(pressure_Pa)
             if pressure > CATALOG_PHYSICAL_PRESSURE_CEILING_PA:
-                raise VaporPressurePhysicalPressureCeilingError(
-                    species,
-                    pressure,
+                species_name = str(species)
+                ceiling = float(CATALOG_PHYSICAL_PRESSURE_CEILING_PA)
+                vapor_pressure_species_refusals[species_name] = {
+                    "status": "refused",
+                    "flux_status": "refused",
+                    "reason": "vapor_pressure_physical_pressure_ceiling",
+                    "species": species_name,
+                    "pressure_Pa": pressure,
+                    "ceiling_Pa": ceiling,
+                    "flagged": True,
+                    "backlog": True,
+                    "measured_zero": False,
+                    "ledger_moved_mol": 0.0,
+                    "mass_moved_mol": 0.0,
+                }
+                vapor_pressures.pop(species, None)
+                vapor_pressure_sources.pop(species, None)
+                vapor_pressure_provenance.pop(species, None)
+                species_authority.pop(species, None)
+                warnings.append(
+                    "vapor_pressure_physical_pressure_ceiling: "
+                    f"species={species_name} pressure_Pa={pressure:g} "
+                    f"ceiling_Pa={ceiling:g}; flux refused for this hour"
                 )
 
         floor_inversion_notices = _attach_pO2_floor_inversion_notices(
@@ -2711,6 +2733,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "vapor_pressures_Pa": vapor_pressures,
             "vapor_pressures_source": vapor_pressure_sources,
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
+            "vapor_pressure_species_refusals": (
+                vapor_pressure_species_refusals
+            ),
             "activities": activities,
             "activities_provider": "BuiltinVaporPressureProvider",
             "activities_standard_state": {
