@@ -18,7 +18,8 @@ from typing import Any
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.melt_activity import (
-    MELT_OXIDE_CATIONS_PER_FORMULA,
+    single_cation_activity_and_fraction,
+    single_cation_component_formula,
 )
 from simulator.composition_projection import (
     PROJECTED_BULK_CLASSIFICATION_KEY,
@@ -123,6 +124,7 @@ class OpenImccBridgeResult:
     extrapolated: bool
     labels: Any
     coverage: Mapping[str, str]
+    activity_coefficients: Mapping[str, Mapping[str, Any]] | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -131,6 +133,16 @@ class OpenImccBridgeResult:
             MappingProxyType(dict(self.parent_oxide_activities)),
         )
         object.__setattr__(self, "coverage", MappingProxyType(dict(self.coverage)))
+        object.__setattr__(
+            self,
+            "activity_coefficients",
+            MappingProxyType(
+                {
+                    str(key): MappingProxyType(dict(value))
+                    for key, value in (self.activity_coefficients or {}).items()
+                }
+            ),
+        )
 
 
 @dataclass(frozen=True)
@@ -437,8 +449,10 @@ def evaluate_cleaned_melt(
                     f"value={raw_activity!r}; expected a finite positive value"
                 ),
             )
-        cations = float(MELT_OXIDE_CATIONS_PER_FORMULA.get(oxide, 1.0))
-        single_cation[oxide] = parent_activity ** (1.0 / cations)
+        single_activity, _ = single_cation_activity_and_fraction(
+            oxide, parent_activity, composition_mol
+        )
+        single_cation[oxide] = single_activity
     return OpenImccCleanedMeltResult(
         bridge=bridge,
         composition_wt_pct=composition_wt_pct,
@@ -530,6 +544,32 @@ def evaluate(
         name: float(value)
         for name, value in zip(parent_oxides, result.parent_activity, strict=True)
     }
+    if basis_type == "mol":
+        composition_mol_for_fraction = composition
+    else:
+        composition_mol_for_fraction = {
+            str(name): float(value)
+            / resolve_species_formula(str(name)).molar_mass_kg_per_mol()
+            for name, value in composition.items()
+            if float(value) > 0.0
+        }
+    activity_coefficients: dict[str, dict[str, Any]] = {}
+    for oxide, parent_activity in activities.items():
+        single_activity, fraction = single_cation_activity_and_fraction(
+            oxide, parent_activity, composition_mol_for_fraction
+        )
+        if fraction <= 0.0:
+            continue
+        component = single_cation_component_formula(oxide)
+        activity_coefficients[component] = {
+            "value": single_activity / fraction,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": component,
+            },
+        }
     package_labels = result.labels
     from simulator.melt_backend.imcc_sf04.adapter import ImccAdapterLabels
 
@@ -563,6 +603,7 @@ def evaluate(
         extrapolated=bool(result.extrapolated),
         labels=labels,
         coverage={str(name): str(value) for name, value in labels.coverage.items()},
+        activity_coefficients=activity_coefficients,
     )
 
 

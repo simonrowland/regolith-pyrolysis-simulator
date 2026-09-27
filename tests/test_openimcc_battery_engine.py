@@ -237,6 +237,48 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert cell.model_id == "IMCC-SF04"
 
 
+def test_imcc_battery_reports_single_cation_gamma() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _ImccBatteryBackend,
+        _OpenImccBatteryBackend,
+    )
+
+    composition_wt = {
+        "SiO2": 45.94,
+        "Al2O3": 16.0,
+        "FeO": 10.67,
+        "MgO": 7.09,
+        "CaO": 11.21,
+        "TiO2": 1.79,
+        "Na2O": 2.27,
+        "K2O": 2.49,
+    }
+    composition_kg, composition_mol = composition_kg_and_mol(composition_wt)
+    kwargs = {
+        "temperature_C": 1673.15 - 273.15,
+        "composition_kg": composition_kg,
+        "composition_mol": composition_mol,
+    }
+    for name in ("imcc_sf04", "imcc_sf04_ext", "openimcc"):
+        backend = (
+            _OpenImccBatteryBackend("openimcc")
+            if name == "openimcc"
+            else _ImccBatteryBackend(name)
+        )
+        result = backend.equilibrate(**kwargs)
+        gamma = result.reported_activity_coefficients["KO0.5"]
+        assert gamma > 0.0
+        assert result.activity_coefficient_details["KO0.5"] == {
+            "value": gamma,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": "KO0.5",
+            },
+        }
+
+
 def test_openimcc_not_importable_is_typed_in_a_clean_subprocess() -> None:
     code = r'''
 import importlib.abc

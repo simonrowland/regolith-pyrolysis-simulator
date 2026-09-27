@@ -257,6 +257,9 @@ class EquilibrateCell:
     # gamma, where the engine reports it. Activity stays on melt_activities.
     # a = gamma * x. An empty map is not activity reused as a coefficient.
     melt_activity_coefficients: dict[str, float] = field(default_factory=dict)
+    melt_activity_coefficient_details: dict[str, dict[str, Any]] = field(
+        default_factory=dict
+    )
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -271,6 +274,10 @@ class EquilibrateCell:
             "engine_annotation": self.engine_annotation,
             "melt_activities": dict(self.melt_activities),
             "melt_activity_coefficients": dict(self.melt_activity_coefficients),
+            "melt_activity_coefficient_details": {
+                str(name): dict(row)
+                for name, row in self.melt_activity_coefficient_details.items()
+            },
             "gas_partial_pressures_Pa": dict(self.gas_partial_pressures_Pa),
             "liquid_fraction": self.liquid_fraction,
             "wall_s": self.wall_s,
@@ -329,6 +336,13 @@ class EquilibrateCell:
                 for name, value in dict(
                     payload.get("melt_activity_coefficients") or {}
                 ).items()
+            },
+            melt_activity_coefficient_details={
+                str(name): dict(value)
+                for name, value in dict(
+                    payload.get("melt_activity_coefficient_details") or {}
+                ).items()
+                if isinstance(value, Mapping)
             },
             liquid_fraction=_finite_float(payload.get("liquid_fraction")),
             wall_s=float(payload.get("wall_s") or 0.0),
@@ -894,6 +908,39 @@ def reported_activity_coefficients(result: Any) -> dict[str, float]:
     return gammas
 
 
+def _imcc_activity_coefficient_reports(
+    parent_activities: Mapping[str, float], composition_mol: Mapping[str, float]
+) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
+    """Build single-cation Gamma values and their reference-state labels."""
+
+    from simulator.chemistry.melt_activity import (
+        single_cation_activity_and_fraction,
+        single_cation_component_formula,
+    )
+
+    values: dict[str, float] = {}
+    details: dict[str, dict[str, Any]] = {}
+    for oxide, parent_activity in parent_activities.items():
+        single_activity, fraction = single_cation_activity_and_fraction(
+            str(oxide), float(parent_activity), composition_mol
+        )
+        if fraction <= 0.0:
+            continue
+        component = single_cation_component_formula(str(oxide))
+        gamma = single_activity / fraction
+        values[component] = gamma
+        details[component] = {
+            "value": gamma,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": component,
+            },
+        }
+    return values, details
+
+
 def _plain_data(value: Any) -> Any:
     """JSON-safe copy. Commissioning notices carry tuples; report dumps do not."""
 
@@ -1434,7 +1481,7 @@ class _ImccBatteryBackend:
         import openimcc
         from openimcc.kernel import ImccRefusal
 
-        del composition_mol, pressure_bar
+        del pressure_bar
         if self._pack is None:
             raise RuntimeError("IMCC datapack failed to load")
         composition_wt = {
@@ -1458,16 +1505,23 @@ class _ImccBatteryBackend:
             allow_out_of_envelope=True,
         )
         activities: dict[str, float] = {}
-        gammas: dict[str, float] = {}
-        for name, value, gamma in zip(
-            result.parent_oxides, result.parent_activity, result.parent_gamma
+        for name, value in zip(
+            result.parent_oxides, result.parent_activity, strict=True
         ):
             number = _finite_float(value)
             if number is not None and number > 0.0:
                 activities[str(name)] = number
-            gamma_number = _finite_float(gamma)
-            if gamma_number is not None and gamma_number > 0.0:
-                gammas[str(name)] = gamma_number
+        if composition_mol is None:
+            from simulator.accounting.formulas import resolve_species_formula
+
+            composition_mol = {
+                name: mass / resolve_species_formula(name).molar_mass_kg_per_mol()
+                for name, mass in (composition_kg or {}).items()
+                if float(mass) > 0.0
+            }
+        gammas, gamma_details = _imcc_activity_coefficient_reports(
+            activities, composition_mol
+        )
         notices: list[dict[str, Any]] = []
         if result.extrapolated:
             notices.append(
@@ -1539,6 +1593,7 @@ class _ImccBatteryBackend:
             warnings=[],
             activity_coefficients=activities,
             reported_activity_coefficients=gammas,
+            activity_coefficient_details=gamma_details,
             vapor_pressures_Pa=pressures,
             liquid_fraction=1.0,
             phase_assemblage_available=True,
@@ -1741,12 +1796,20 @@ class _OpenImccBatteryBackend:
             "vapor_pressure_backend_status": "openimcc",
             "authoritative_for_requested_vapor_pressure": True,
         }
+        reported_gammas = {
+            str(name): float(row["value"])
+            for name, row in result.activity_coefficients.items()
+        }
         return SimpleNamespace(
             status="ok",
             diagnostics=diagnostics,
             warnings=[],
             activity_coefficients=dict(result.parent_oxide_activities),
-            reported_activity_coefficients={},
+            reported_activity_coefficients=reported_gammas,
+            activity_coefficient_details={
+                str(name): dict(row)
+                for name, row in result.activity_coefficients.items()
+            },
             vapor_pressures_Pa=pressures,
             vapor_pressures_source=vapor_sources,
             vapor_pressure_backend_status="openimcc",
@@ -2559,6 +2622,9 @@ def equilibrate_cell(
             engine_annotation = None
         activities, pressures = extract_reported_quantities(result)
         coefficients = reported_activity_coefficients(result)
+        coefficient_details = dict(
+            getattr(result, "activity_coefficient_details", None) or {}
+        )
         vapor_authority = extract_vapor_authority(result)
         flag_notices, flag_authority, flag_band = engine_flags_from_result(result)
         crash_diag = diagnostics.get("subprocess_failure") or {}
@@ -2576,6 +2642,7 @@ def equilibrate_cell(
             engine_annotation=engine_annotation,
             melt_activities=activities,
             melt_activity_coefficients=coefficients,
+            melt_activity_coefficient_details=coefficient_details,
             gas_partial_pressures_Pa=pressures,
             liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),
             vapor_pressures_source=dict(vapor_authority["vapor_pressures_source"]),
