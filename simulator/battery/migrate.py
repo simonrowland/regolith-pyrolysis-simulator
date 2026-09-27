@@ -5163,7 +5163,8 @@ def make_species(
         if polymorph is None:
             polymorph = State.unknown("phase unknown; polymorph unresolved")
     else:
-        polymorph = State.not_applicable("not crystal")
+        if polymorph is None or polymorph.is_value:
+            polymorph = State.not_applicable("not crystal")
     return Species(
         formula=formula,
         phase=phase_state,

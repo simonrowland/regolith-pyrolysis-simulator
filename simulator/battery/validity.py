@@ -369,6 +369,28 @@ def underdetermined_apparatus(
         )
         if not calibrated:
             return _fail(RefusalReason.UNDERDETERMINED_APPARATUS, checks, "kems_calibration")
+        # A calibrated KEMS pressure does not need geometry when it is absent,
+        # but supplied geometry must still be a usable point. Never let an
+        # interval, bound, or unavailable value masquerade as one.
+        if geometry is not None:
+            if (
+                geometry.orifice_area_m2 is not None
+                and geometry.orifice_area_m2.state.is_value
+                and _finite_positive(geometry.orifice_area_m2) is None
+            ):
+                missing.append("orifice_area_m2")
+            if (
+                geometry.orifice_diameter_m is not None
+                and geometry.orifice_diameter_m.state.is_value
+                and _finite_positive(geometry.orifice_diameter_m) is None
+            ):
+                missing.append("orifice_diameter_m")
+            if (
+                geometry.clausing_factor is not None
+                and geometry.clausing_factor.state.is_value
+                and not _clausing_ok(geometry.clausing_factor)
+            ):
+                missing.append("clausing_factor")
     elif _is_effusion_pressure(method, quantity):
         comparison_activity = (
             quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
