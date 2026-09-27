@@ -64,8 +64,15 @@ class RefusalStateSnapshotError(TypeError):
 class OxygenInterfaceConfigurationError(ValueError):
     """Typed refusal for an unavailable SSO-R oxygen interface."""
 
-    def __init__(self, reason: str, detail: str) -> None:
+    def __init__(
+        self,
+        reason: str,
+        detail: str,
+        *,
+        notice: Mapping[str, Any] | None = None,
+    ) -> None:
         self.reason = str(reason)
+        self.notice = dict(notice or {})
         super().__init__(f'{self.reason}: {detail}')
 
 
@@ -3960,11 +3967,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _require_oxygen_exchange_config(self) -> Dict[str, Any]:
         config = self._oxygen_exchange_config()
         required = (
-            'k_O_ref_m_s',
-            'k_O_min_m_s',
-            'k_O_max_m_s',
-            'T_ref_K',
-            'Ea_J_mol',
             'effective_melt_depth_m',
         )
         missing = [key for key in required if key not in config]
@@ -3975,54 +3977,229 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         return config
 
-    def _oxygen_exchange_k_m_s(self, T_K: float) -> tuple[float, str]:
+    def _oxygen_exchange_k_m_s(
+        self,
+        T_K: float,
+    ) -> tuple[float, str, Dict[str, Any]]:
         config = self._require_oxygen_exchange_config()
-        declared_values = {
-            'T_K': T_K,
-            'k_O_ref_m_s': config['k_O_ref_m_s'],
-            'k_O_min_m_s': config['k_O_min_m_s'],
-            'k_O_max_m_s': config['k_O_max_m_s'],
-            'T_ref_K': config['T_ref_K'],
-            'Ea_J_mol': config['Ea_J_mol'],
-        }
-        if not all(
-            is_declared_real_scalar(value, allow_numeric_str=True)
-            for value in declared_values.values()
-        ):
+        if not is_declared_real_scalar(T_K, allow_numeric_str=True):
             raise ValueError(
-                'invalid sso_r.oxygen_exchange numeric config: '
+                'invalid sso_r.oxygen_exchange temperature_K: '
                 'missing declared real scalar'
             )
-        T_K = float(declared_values['T_K'])
-        k_ref = float(declared_values['k_O_ref_m_s'])
-        k_min = float(declared_values['k_O_min_m_s'])
-        k_max = float(declared_values['k_O_max_m_s'])
-        T_ref = float(declared_values['T_ref_K'])
-        Ea = float(declared_values['Ea_J_mol'])
+        T_K = float(T_K)
+        if not math.isfinite(T_K) or T_K <= 0.0:
+            raise ValueError(
+                'invalid sso_r.oxygen_exchange temperature_K: '
+                f'{T_K!r}'
+            )
+
+        diffusivity_entry = config.get('melt_oxygen_diffusivity_m2_s')
+        unavailable_notice = {
+            'flag': 'melt_side_transport_unavailable',
+            'reason': 'missing_or_invalid_melt_oxygen_diffusivity',
+            'authority_level': 'refused',
+            'certified_band': None,
+        }
+        if not isinstance(diffusivity_entry, Mapping):
+            raise OxygenInterfaceConfigurationError(
+                'unavailable_melt_side_transport',
+                'melt_oxygen_diffusivity_m2_s must be a typed mapping',
+                notice=unavailable_notice,
+            )
+        required_diffusivity_keys = {'value', 'units', 'source', 'range'}
+        if not required_diffusivity_keys <= set(diffusivity_entry):
+            raise OxygenInterfaceConfigurationError(
+                'unavailable_melt_side_transport',
+                'melt_oxygen_diffusivity_m2_s requires value, units, source, '
+                'and range',
+                notice=unavailable_notice,
+            )
+        if diffusivity_entry['units'] != 'm2/s':
+            raise OxygenInterfaceConfigurationError(
+                'invalid_melt_oxygen_diffusivity',
+                'melt_oxygen_diffusivity_m2_s.units must be m2/s',
+                notice=unavailable_notice,
+            )
+        diffusivity_source = diffusivity_entry['source']
+        diffusivity_range = diffusivity_entry['range']
+        if (
+            not isinstance(diffusivity_source, str)
+            or not diffusivity_source.strip()
+            or not isinstance(diffusivity_range, (list, tuple))
+            or len(diffusivity_range) != 2
+            or not all(
+                is_declared_real_scalar(value, allow_numeric_str=True)
+                for value in (
+                    diffusivity_entry['value'],
+                    *diffusivity_range,
+                )
+            )
+        ):
+            raise OxygenInterfaceConfigurationError(
+                'invalid_melt_oxygen_diffusivity',
+                'melt diffusivity source must be text and range must be '
+                '[low, high]',
+                notice=unavailable_notice,
+            )
+        try:
+            diffusivity = float(diffusivity_entry['value'])
+            diffusivity_low = float(diffusivity_range[0])
+            diffusivity_high = float(diffusivity_range[1])
+        except (TypeError, ValueError) as exc:
+            raise OxygenInterfaceConfigurationError(
+                'invalid_melt_oxygen_diffusivity',
+                'melt diffusivity value and range must be numeric',
+                notice=unavailable_notice,
+            ) from exc
         if (
             not all(math.isfinite(value) for value in (
-                T_K, k_ref, k_min, k_max, T_ref, Ea
+                diffusivity,
+                diffusivity_low,
+                diffusivity_high,
             ))
-            or T_K <= 0.0
-            or min(k_ref, k_min, k_max, T_ref) <= 0.0
-            or Ea < 0.0
-            or k_min > k_max
+            or diffusivity <= 0.0
+            or diffusivity_low <= 0.0
+            or diffusivity_high < diffusivity_low
         ):
-            raise ValueError(
-                'invalid sso_r.oxygen_exchange k_O config: '
-                f'k_ref={k_ref:g} k_min={k_min:g} '
-                f'k_max={k_max:g} T_ref={T_ref:g}'
+            raise OxygenInterfaceConfigurationError(
+                'invalid_melt_oxygen_diffusivity',
+                'melt diffusivity value and range must be finite and positive',
+                notice=unavailable_notice,
             )
-        if bool_feature_flag(config, 'temperature_dependence_enabled', True):
-            raw = k_ref * math.exp((-Ea / GAS_CONSTANT) * (1.0 / T_K - 1.0 / T_ref))
-            source = (
-                'findings:baseline_2e-5_arrhenius_Ea_150kJ_'
-                'clamped_5e-6_5e-5'
+        diffusivity_range = [diffusivity_low, diffusivity_high]
+        transport_notice: Dict[str, Any] = {}
+        if not diffusivity_low <= diffusivity <= diffusivity_high:
+            transport_notice.update({
+                'flag': 'melt_oxygen_diffusivity_out_of_declared_range',
+                'reason': 'melt oxygen/redox diffusivity is outside its '
+                          'declared source range',
+                'authority_level': 'extrapolated',
+                'certified_band': list(diffusivity_range),
+            })
+
+        h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
+        velocity_entry = config.get('surface_renewal_velocity_ref_m_s')
+        axial_stir_factor = clamp_stir_factor(
+            getattr(getattr(self, 'melt', None), 'stir_state', None)
+            and getattr(self.melt.stir_state, 'axial', None)
+        )
+        if velocity_entry is None or axial_stir_factor <= 0.0:
+            # A quiescent liquid has a characteristic diffusion time L²/D.
+            # Converting that time to a film coefficient gives k_m ~ D/L,
+            # which is deliberately separate from the forced-renewal film.
+            k_m = diffusivity / h_eff_m
+            source = 'quiescent_diffusion_D_over_L'
+            transport_mode = 'quiescent_diffusion'
+            transport_notice.setdefault(
+                'flag', 'quiescent_diffusion_fallback'
             )
+            transport_notice.setdefault(
+                'reason',
+                'forced surface-renewal velocity is not sourced or stirring '
+                'is zero',
+            )
+            transport_notice.setdefault('authority_level', 'assumed')
+            transport_notice.setdefault(
+                'certified_band', list(diffusivity_range)
+            )
+            surface_renewal_time_s = None
+            surface_renewal_velocity_m_s = None
         else:
-            raw = k_ref
-            source = 'findings:baseline_2e-5_clamped_temperature_dependence_disabled'
-        return min(k_max, max(k_min, raw)), source
+            if not isinstance(velocity_entry, Mapping):
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_melt_surface_renewal_input',
+                    'surface_renewal_velocity_ref_m_s must be a typed mapping',
+                )
+            required_velocity_keys = {'value', 'units', 'source', 'range'}
+            if not required_velocity_keys <= set(velocity_entry):
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_melt_surface_renewal_input',
+                    'surface_renewal_velocity_ref_m_s requires value, units, '
+                    'source, and range',
+                )
+            if velocity_entry['units'] != 'm/s':
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_melt_surface_renewal_input',
+                    'surface_renewal_velocity_ref_m_s.units must be m/s',
+                )
+            velocity_source = velocity_entry['source']
+            velocity_range = velocity_entry['range']
+            if (
+                not isinstance(velocity_source, str)
+                or not velocity_source.strip()
+                or not isinstance(velocity_range, (list, tuple))
+                or len(velocity_range) != 2
+                or not all(
+                    is_declared_real_scalar(value, allow_numeric_str=True)
+                    for value in (
+                        velocity_entry['value'],
+                        *velocity_range,
+                    )
+                )
+            ):
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_melt_surface_renewal_input',
+                    'surface renewal velocity source must be text and range '
+                    'must be [low, high]',
+                )
+            try:
+                velocity_ref = float(velocity_entry['value'])
+                velocity_low = float(velocity_range[0])
+                velocity_high = float(velocity_range[1])
+            except (TypeError, ValueError) as exc:
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_melt_surface_renewal_input',
+                    'surface renewal velocity value and range must be numeric',
+                ) from exc
+            if (
+                not all(math.isfinite(value) for value in (
+                    velocity_ref,
+                    velocity_low,
+                    velocity_high,
+                ))
+                or velocity_ref <= 0.0
+                or velocity_low <= 0.0
+                or velocity_high < velocity_low
+            ):
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_melt_surface_renewal_input',
+                    'surface renewal velocity value and range must be finite '
+                    'and positive',
+                )
+            surface_renewal_velocity_m_s = velocity_ref * axial_stir_factor
+            surface_renewal_time_s = h_eff_m / surface_renewal_velocity_m_s
+            # Higbie's penetration model solves unsteady diffusion into a
+            # freshly exposed surface for contact time t_c, giving
+            # k_m = 2*sqrt(D/(pi*t_c)).  Here t_c is the time for the stirred
+            # melt to renew a length L: t_c ~ L/u, with u supplied by the
+            # equipment reference speed times the axial stirring state.
+            k_m = 2.0 * math.sqrt(
+                diffusivity / (math.pi * surface_renewal_time_s)
+            )
+            source = 'higbie_forced_surface_renewal'
+            transport_mode = 'forced_surface_renewal'
+            if not velocity_low <= velocity_ref <= velocity_high:
+                transport_notice.update({
+                    'flag': 'surface_renewal_velocity_out_of_declared_range',
+                    'reason': 'surface renewal reference velocity is outside '
+                              'its declared source range',
+                    'authority_level': 'extrapolated',
+                    'certified_band': [velocity_low, velocity_high],
+                })
+
+        transport = {
+            'melt_side_transport_mode': transport_mode,
+            'melt_side_surface_renewal_time_s': surface_renewal_time_s,
+            'melt_side_surface_renewal_velocity_m_s': (
+                surface_renewal_velocity_m_s
+            ),
+            'melt_oxygen_diffusivity_m2_s': diffusivity,
+            'melt_oxygen_diffusivity_source': diffusivity_source,
+            'melt_oxygen_diffusivity_range_m2_s': list(diffusivity_range),
+            'melt_side_transport_notice': transport_notice,
+        }
+        return k_m, source, transport
 
     def _oxygen_exchange_effective_melt_depth_m(self) -> float:
         config = self._require_oxygen_exchange_config()
@@ -4053,6 +4230,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         Premise: the SSO-R exchange configuration supplies the melt-side film;
         the existing Sherwood evaporation path supplies the gas-side film.
+        Forced melt renewal uses the axial equipment state and the typed melt
+        oxygen diffusivity input; quiescent diffusion remains a separate
+        ``D/L`` fallback when no renewal velocity is sourced.
         The two films do not share a concentration scale. For the gas film,
         ``C_g = p_O2/(R*T_g)`` is an ideal-gas concentration. For the melt
         film, the existing Kress91 differential capacity ``C_m`` is mol O2 per
@@ -4111,7 +4291,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'invalid_sso_r_oxygen_exchange_config',
                 f'non-positive temperature_K={T_K!r}',
             )
-        k_O, k_source = self._oxygen_exchange_k_m_s(T_K)
+        k_O, k_source, melt_transport = self._oxygen_exchange_k_m_s(T_K)
         if intrinsic_fO2_log is None:
             current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
             if callable(current_fO2):
@@ -4299,6 +4479,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'gas_side_source': gas_source,
             'melt_side_k_O_m_s': k_O,
             'melt_side_source': k_source,
+            **melt_transport,
             'melt_intrinsic_pO2_bar': melt_pO2_bar,
             'redox_buffer_fraction': redox_buffer_fraction,
             'redox_buffer_status': redox_buffer_status,
@@ -4443,6 +4624,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         reservoir.interface_gas_side_k_m_s = float(
             state['gas_side_k_m_s']
+        )
+        reservoir.k_O_m_s = float(state['melt_side_k_O_m_s'])
+        reservoir.k_O_source = str(state['melt_side_source'])
+        reservoir.melt_side_transport_mode = str(
+            state['melt_side_transport_mode']
+        )
+        reservoir.melt_side_surface_renewal_time_s = (
+            None
+            if state['melt_side_surface_renewal_time_s'] is None
+            else float(state['melt_side_surface_renewal_time_s'])
+        )
+        reservoir.melt_side_surface_renewal_velocity_m_s = (
+            None
+            if state['melt_side_surface_renewal_velocity_m_s'] is None
+            else float(state['melt_side_surface_renewal_velocity_m_s'])
+        )
+        reservoir.melt_oxygen_diffusivity_m2_s = float(
+            state['melt_oxygen_diffusivity_m2_s']
+        )
+        reservoir.melt_oxygen_diffusivity_source = str(
+            state['melt_oxygen_diffusivity_source']
+        )
+        reservoir.melt_oxygen_diffusivity_range_m2_s = list(
+            state['melt_oxygen_diffusivity_range_m2_s']
+        )
+        reservoir.melt_side_transport_notice = dict(
+            state['melt_side_transport_notice']
         )
         reservoir.redox_buffer_status = str(
             state['redox_buffer_status']
@@ -7694,7 +7902,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         redox_buffer_status = str(redox_buffer_state['status'])
         C_m = float(redox_buffer_state['capacity_mol_per_ln_fO2'])
-        k_O, k_source = self._oxygen_exchange_k_m_s(T_K)
+        k_O, k_source, melt_transport = self._oxygen_exchange_k_m_s(T_K)
         h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
         tau_s = h_eff_m / k_O
         alpha = 1.0 - math.exp(-3600.0 / tau_s)
@@ -7719,6 +7927,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             headspace_control_floor_pO2_bar=control_floor,
             k_O_m_s=k_O,
             k_O_source=k_source,
+            melt_side_transport_mode=str(
+                melt_transport['melt_side_transport_mode']
+            ),
+            melt_side_surface_renewal_time_s=(
+                melt_transport['melt_side_surface_renewal_time_s']
+            ),
+            melt_side_surface_renewal_velocity_m_s=(
+                melt_transport['melt_side_surface_renewal_velocity_m_s']
+            ),
+            melt_oxygen_diffusivity_m2_s=float(
+                melt_transport['melt_oxygen_diffusivity_m2_s']
+            ),
+            melt_oxygen_diffusivity_source=str(
+                melt_transport['melt_oxygen_diffusivity_source']
+            ),
+            melt_oxygen_diffusivity_range_m2_s=list(
+                melt_transport['melt_oxygen_diffusivity_range_m2_s']
+            ),
+            melt_side_transport_notice=dict(
+                melt_transport['melt_side_transport_notice']
+            ),
             effective_melt_depth_m=h_eff_m,
             tau_hr=tau_s / 3600.0,
             melt_redox_capacity_mol_per_ln_fO2=C_m,

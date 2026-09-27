@@ -468,6 +468,15 @@ class OxygenReservoirState:
     interface_gas_side_k_m_s: float = 0.0
     k_O_m_s: float = 0.0
     k_O_source: str = ""
+    melt_side_transport_mode: str = ""
+    melt_side_surface_renewal_time_s: float | None = None
+    melt_side_surface_renewal_velocity_m_s: float | None = None
+    melt_oxygen_diffusivity_m2_s: float | None = None
+    melt_oxygen_diffusivity_source: str = ""
+    melt_oxygen_diffusivity_range_m2_s: List[float] = field(
+        default_factory=list
+    )
+    melt_side_transport_notice: Dict[str, Any] = field(default_factory=dict)
     effective_melt_depth_m: float = 0.0
     tau_hr: float = 0.0
     melt_redox_capacity_mol_per_ln_fO2: float = 0.0
