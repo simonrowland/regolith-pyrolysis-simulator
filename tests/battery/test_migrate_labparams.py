@@ -21,6 +21,7 @@ from simulator.battery.migrate import (
     pressure_from_equipment,
     sample_from_equipment,
     to_plain,
+    wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import Located, State, Value, ValueKind, as_decimal
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
@@ -279,6 +280,100 @@ def test_labparam_richter_initial_weight_mg_reaches_sample_mass_kg(tmp_path: Pat
     assert located.inference.relation == "mg_to_kg"
     params = dict(located.inference.parameters)
     assert params["original"].state.value == as_decimal("25.4")
+
+
+_RICHTER_STARTING_EXPERIMENTS = (
+    "cai-r3-12",
+    "cai-r-16",
+    "cai-r-14",
+    "cai-r-15",
+    "cai-r-17",
+    "cai-r-6",
+    "cai-r2-21",
+    "cai-r2-20",
+    "cai-r2-18",
+    "cai-r2-19",
+    "cai-r2-17",
+    "cai-r2-7",
+    "cai-r2-13",
+    "cai-r2-15",
+    "cai-r2-14",
+    "cai-r2-9",
+    "cai-r2-8",
+    "cai-r3-2",
+)
+_RICHTER_EXTRACT = (
+    REPO_ROOT
+    / "data"
+    / "literature"
+    / "extracts"
+    / "kems-010-richter-2007.yaml"
+)
+
+
+def test_richter_declared_sample_survives_fresh_migration() -> None:
+    doc = yaml.safe_load(_RICHTER_EXTRACT.read_text(encoding="utf-8"))
+    source_experiments = {
+        str(item["experiment_id"]): item for item in doc["experiments"]
+    }
+    migrator = Migrator()
+    migrator._migrate_extract(_RICHTER_EXTRACT)
+
+    for raw_id in _RICHTER_STARTING_EXPERIMENTS:
+        source = source_experiments[raw_id]
+        experiment_id = next(
+            experiment_id
+            for experiment_id in migrator.result.experiments
+            if experiment_id.endswith(f"::experiment::{raw_id}")
+        )
+        sample = migrator.result.experiments[experiment_id].sample
+        initial = sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert initial.inference is not None
+        assert initial.inference.relation == "wt_pct_to_mole_fraction"
+        assert "original_unit=wt_pct" in initial.inference.inputs
+        assert initial.inference.output_unit == "mole_fraction"
+        assert initial.locator is not None and initial.locator.published_page == 5549
+
+        expected_initial = tuple(
+            (str(name), as_decimal(value))
+            for name, value in source["sample"]["initial_composition"]["state"][
+                "value"
+            ]["components"]
+        )
+        assert initial.state.value.components == expected_initial
+
+        printed = sample.printed_composition
+        assert printed is not None and printed.state.is_value
+        expected_printed = {
+            str(name): as_decimal(value)
+            for name, value in source["sample"]["printed_composition"]["state"][
+                "value"
+            ].items()
+        }
+        actual_printed = {
+            str(name): as_decimal(value)
+            for name, value in printed.state.value.items()
+        }
+        assert actual_printed == expected_printed
+
+
+def test_conflicting_explicit_initial_compositions_remain_refused() -> None:
+    first = Located(
+        State.of(
+            wt_pct_to_mole_fraction(
+                {"MgO": Decimal("40"), "SiO2": Decimal("60")}
+            )
+        )
+    )
+    second = Located(
+        State.of(
+            wt_pct_to_mole_fraction(
+                {"MgO": Decimal("50"), "SiO2": Decimal("50")}
+            )
+        )
+    )
+    assert _prefer_located(first, second) is None
 
 
 def test_labparam_vocabulary_is_data(tmp_path: Path) -> None:
