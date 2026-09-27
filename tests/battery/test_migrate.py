@@ -1960,6 +1960,15 @@ def test_t998_admitted_source_rows_survive_migration(tmp_path: Path) -> None:
         "K2O",
         "Na2O",
     }
+    assert {row.provenance["scoring"]["gamma_basis"] for row in zhang_rows} == {
+        "single_cation",
+    }
+    assert {
+        row.provenance["scoring"]["gamma_basis_quote"] for row in zhang_rows
+    } == {
+        "Table 4 p. 74: ΓNaO0.5",
+        "Table 4 p. 74: ΓKO0.5",
+    }
 
     sossi = _migrate_real_extract(tmp_path / "sossi", "kems-012-sossi-2019.yaml")
     target = [

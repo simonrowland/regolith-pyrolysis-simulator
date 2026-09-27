@@ -137,6 +137,7 @@ class RefusalReason(StrEnum):
     BULK_NOT_LIQUID_COMPOSITION = "bulk_not_liquid_composition"
     OPENIMCC_NOT_IMPORTABLE = "openimcc_not_importable"
     OUTSIDE_SUPPORTED_SPECIES = "outside_supported_species"
+    COEFFICIENT_BASIS_MISMATCH = "coefficient_basis_mismatch"
 
 
 class BenchAbsenceReason(StrEnum):

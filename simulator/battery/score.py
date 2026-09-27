@@ -348,6 +348,7 @@ class EnginePrediction:
     execution: Execution
     value: Decimal | None = None
     unit: str | None = None
+    coefficient_basis: str | None = None
     authority: Authority | None = None
     notices: tuple[Notice, ...] = ()
     coefficient_sources: tuple[str, ...] = ()
@@ -1654,6 +1655,11 @@ def total_pressure_bar_for_score(
 _IMPLIED_ALPHA_SCORING_KIND = "implied_alpha_from_alpha_times_Gamma"
 _IMPLIED_ALPHA_LOW = Decimal("0.07")
 _IMPLIED_ALPHA_HIGH = Decimal("0.3")
+SINGLE_CATION_COEFFICIENT_BASIS = "single_cation"
+_IMPLIED_ALPHA_SINGLE_CATION_FORMULAS = {
+    "Na2O": "NaO0.5",
+    "K2O": "KO0.5",
+}
 
 
 def _implied_alpha_metadata(observation: Observation) -> Mapping[str, object] | None:
@@ -1673,25 +1679,26 @@ def _implied_alpha_activity_observation(observation: Observation) -> Observation
     """Build the engine-facing activity identity for a Zhang bound row.
 
     The source identity stays an evaporation-alpha row.  Only the derived
-    engine request uses the parent oxide activity coefficient; the measured
-    endpoint remains the printed alpha·Gamma product.
+    engine request uses the reported single-cation activity coefficient; the
+    measured endpoint remains the printed alpha·Gamma product.
     """
 
     metadata = _implied_alpha_metadata(observation)
     if metadata is None or not isinstance(observation.identity, Identity):
         return None
     oxide = str(metadata["oxide_formula"])
+    coefficient_formula = _IMPLIED_ALPHA_SINGLE_CATION_FORMULAS.get(oxide, oxide)
     identity = observation.identity
     activity_identity = replace(
         identity,
         quantity=Quantity.ACTIVITY_COEFFICIENT,
-        species=replace(identity.species, formula=oxide),
+        species=replace(identity.species, formula=coefficient_formula),
         per=State.of(PerBasis.DIMENSIONLESS),
         reference_state=State.of(
             StandardState(
                 convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
-                endmember=Species(oxide, Phase.L),
-                component_basis="oxide",
+                endmember=Species(coefficient_formula, Phase.L),
+                component_basis=coefficient_formula,
             )
         ),
         standard_pressure_Pa=State.not_applicable("melt activity coefficient uses its reference state"),
@@ -1705,6 +1712,42 @@ def _implied_alpha_activity_observation(observation: Observation) -> Observation
         subtype=State.not_applicable("melt activity coefficient has no subtype axis"),
     )
     return replace(observation, identity=activity_identity, provenance=None)
+
+
+def _implied_alpha_coefficient_basis_matches(
+    expected: Observation,
+    prediction: EnginePrediction,
+) -> bool:
+    if prediction.coefficient_basis != SINGLE_CATION_COEFFICIENT_BASIS:
+        return False
+    expected_identity = expected.identity
+    actual_identity = prediction.identity
+    if not isinstance(expected_identity, Identity) or not isinstance(
+        actual_identity, Identity
+    ):
+        return False
+    if actual_identity.species.formula != expected_identity.species.formula:
+        return False
+    expected_state = expected_identity.reference_state
+    actual_state = actual_identity.reference_state
+    if (
+        expected_state is None
+        or not expected_state.is_value
+        or not isinstance(expected_state.value, StandardState)
+        or actual_state is None
+        or not actual_state.is_value
+        or not isinstance(actual_state.value, StandardState)
+    ):
+        return False
+    expected_standard = expected_state.value
+    actual_standard = actual_state.value
+    return (
+        actual_standard.convention is expected_standard.convention
+        and actual_standard.endmember.formula == expected_standard.endmember.formula
+        and phase_token(actual_standard.endmember)
+        is phase_token(expected_standard.endmember)
+        and actual_standard.component_basis == expected_standard.component_basis
+    )
 
 
 def _implied_alpha_verdict(value: Decimal) -> str:
@@ -2654,6 +2697,29 @@ def compile_residual(
 
     implied_alpha = implied_alpha_reference is not None
     if implied_alpha:
+        if not _implied_alpha_coefficient_basis_matches(
+            implied_alpha_reference, prediction
+        ):
+            return _refused(
+                RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+                {
+                    "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                    "expected_basis": SINGLE_CATION_COEFFICIENT_BASIS,
+                    "reported_basis": prediction.coefficient_basis,
+                    "expected_formula": (
+                        implied_alpha_reference.identity.species.formula
+                    ),
+                    "reported_formula": (
+                        prediction.identity.species.formula
+                        if isinstance(prediction.identity, Identity)
+                        else None
+                    ),
+                },
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+                source_relation=source_relation,
+                exclusions=("coefficient_basis_match",),
+            )
         measured_product = point_magnitude(reference.value)
         assert measured_product is not None
         if prediction.value <= 0 or not prediction.value.is_finite():

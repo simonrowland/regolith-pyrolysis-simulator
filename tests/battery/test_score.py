@@ -69,6 +69,7 @@ from simulator.battery.score import (
     EligibleConjuncts,
     EnginePrediction,
     ScoreContext,
+    SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
     compile_residual,
     compute_metric,
@@ -388,6 +389,7 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
             coefficient_sources=("nasa-cea-thermo",),
             lineage_complete=True,
             identity=observation.identity,
+            coefficient_basis=SINGLE_CATION_COEFFICIENT_BASIS,
         )
 
     residual, candidate = compile_residual(
@@ -415,6 +417,94 @@ def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
     assert impossible_residual.numeric.verdict == "physically_impossible"
     assert impossible_residual.numeric.value == Decimal("1")
     assert impossible_residual.status is ResidualStatus.MISMATCH
+
+    def outside_band_predict(engine, observation, **_kwargs):
+        return replace(predict(engine, observation), value=Decimal("1e-4"))
+
+    outside_band_residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        predict=outside_band_predict,
+    )
+    assert outside_band_residual.numeric is not None
+    assert outside_band_residual.numeric.verdict == "outside_literature_band"
+    assert outside_band_residual.numeric.value == Decimal("-2")
+    assert outside_band_residual.status is ResidualStatus.NO_BAND
+
+
+@pytest.mark.parametrize("reported_basis", ["parent_oxide", None])
+def test_zhang_alpha_gamma_bound_refuses_parent_oxide_coefficient(
+    reported_basis: str | None,
+) -> None:
+    exp = F.kems_experiment()
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        species=Species("Na", Phase.L),
+        subtype=State.of("langmuir_alpha"),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.not_applicable(
+            "alpha row does not carry activity standard state"
+        ),
+        reservoir=State.of(Species("Na", Phase.G)),
+        sweep_gas=State.of(
+            SweepIdentity(
+                species="N2",
+                flow_sccm=State.of(Decimal("1")),
+                partial_pressure_Pa=State.of(Decimal("1")),
+            )
+        ),
+        exposure=State.of(
+            Exposure(area_m2=State.of(Decimal("1")), duration_s=State.of(Decimal("1")))
+        ),
+    )
+    reference = replace(
+        F.observation(
+            "zhang-parent-gamma",
+            exp.experiment_id,
+            identity,
+            Decimal("1e-6"),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            source_id="work-1",
+        ),
+        provenance={
+            "scoring": {
+                "kind": "implied_alpha_from_alpha_times_Gamma",
+                "oxide_formula": "Na2O",
+            }
+        },
+    )
+    ctx = _context(F.work(), exp, reference)
+
+    def parent_predict(engine, observation, **_kwargs):
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="test:parent-gamma",
+            ),
+            value=Decimal("1e-5"),
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("nasa-cea-thermo",),
+            lineage_complete=True,
+            identity=observation.identity,
+            coefficient_basis=reported_basis,
+        )
+
+    residual, candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        predict=parent_predict,
+    )
+    assert candidate is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
 
 
 def test_derived_oxygen_condition_notice_reaches_residual() -> None:
