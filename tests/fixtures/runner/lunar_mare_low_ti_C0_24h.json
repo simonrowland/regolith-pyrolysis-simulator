@@ -2077,8 +2077,8 @@
       "TiO2_gas": 1.4942044376823886e-09
     },
     "process.overhead_gas": {
-      "Cr": 4.143471292429483e-15,
-      "TiO2_gas": 7.207157229631284e-12
+      "CrO": 6.462348535570529e-27,
+      "Fe": 3.3881317890172014e-21
     },
     "reservoir.fo2_buffer": {},
     "terminal.drain_tap_material": {
@@ -2086,6 +2086,7 @@
       "Ni": 3.5000877707500466
     },
     "terminal.offgas": {
+      "Cr": 4.143471292429483e-15,
       "CrO": 9.557842342269531e-11,
       "Fe": 5.680402646670336e-05,
       "K": 0.0016449229832924159,
@@ -2097,7 +2098,8 @@
       "Na2O_gas": 4.917056491874205e-11,
       "PO2": 2.5525471787232474e-08,
       "SiO": 1.0651841817261077e-07,
-      "SiO2_gas": 6.098567855428604e-09
+      "SiO2_gas": 6.098567855428604e-09,
+      "TiO2_gas": 7.207157229631284e-12
     },
     "terminal.oxygen_melt_offgas_stored": {
       "O2": 0.0170252504730089
@@ -2679,8 +2681,8 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 9.557842342269531e-11,
-            "overhead_terminal_inventory": 4.143471292429483e-15
+            "offgas_vented": 9.558256689398774e-11,
+            "overhead_terminal_inventory": 6.462348535570529e-27
           },
           "destination_fractions": {
             "product_condensed": 4.375201617893865e-10,
@@ -2693,8 +2695,8 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 2.020395273932408e-12,
-            "overhead_terminal_inventory": 8.75872348288946e-17
+            "offgas_vented": 2.020482861167237e-12,
+            "overhead_terminal_inventory": 1.366050827395257e-28
           },
           "attribution_method": "tracked",
           "attribution_method_by_destination": {
@@ -2963,7 +2965,7 @@
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
             "offgas_vented": 5.680402646670336e-05,
-            "overhead_terminal_inventory": 0.0
+            "overhead_terminal_inventory": 3.3881317890172014e-21
           },
           "destination_fractions": {
             "product_condensed": 1.73562363969765e-09,
@@ -2977,13 +2979,14 @@
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
             "offgas_vented": 2.4079500482824732e-08,
-            "overhead_terminal_inventory": 0.0
+            "overhead_terminal_inventory": 1.4362453882971775e-24
           },
           "attribution_method": "tracked",
           "attribution_method_by_destination": {
             "product_condensed": "tracked",
             "melt_retained": "tracked",
-            "offgas_vented": "tracked"
+            "offgas_vented": "tracked",
+            "overhead_terminal_inventory": "tracked"
           },
           "closure_residual_fraction": -1.1102230246251565e-16,
           "closure_residual_mol_atoms": 0.0,
@@ -3772,8 +3775,8 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 1.7044141498172763e-07,
-            "overhead_terminal_inventory": 1.441431445925595e-11
+            "offgas_vented": 1.704558292961869e-07,
+            "overhead_terminal_inventory": 0.0
           },
           "destination_fractions": {
             "product_condensed": 1.0334795384845732e-10,
@@ -3786,16 +3789,15 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 6.414794491441087e-12,
-            "overhead_terminal_inventory": 5.425023313790694e-16
+            "offgas_vented": 6.415336993772466e-12,
+            "overhead_terminal_inventory": 0.0
           },
           "attribution_method": "tracked",
           "attribution_method_by_destination": {
             "product_condensed": "tracked",
             "product_oxygen": "tracked",
             "melt_retained": "tracked",
-            "offgas_vented": "tracked",
-            "overhead_terminal_inventory": "tracked"
+            "offgas_vented": "tracked"
           },
           "closure_residual_fraction": -2.220446049250313e-16,
           "closure_residual_mol_atoms": -3.637978807091713e-12,
@@ -4499,8 +4501,8 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 0.0,
-            "overhead_terminal_inventory": 7.207157229631284e-12
+            "offgas_vented": 7.207157229631284e-12,
+            "overhead_terminal_inventory": 0.0
           },
           "destination_fractions": {
             "product_condensed": 7.745278727256912e-12,
@@ -4513,14 +4515,14 @@
             "charge_unprocessed": 0.0,
             "redox_buffer_retained": 0.0,
             "cleanup_sequestered": 0.0,
-            "offgas_vented": 0.0,
-            "overhead_terminal_inventory": 3.7358637256654006e-14
+            "offgas_vented": 3.7358637256654006e-14,
+            "overhead_terminal_inventory": 0.0
           },
           "attribution_method": "tracked",
           "attribution_method_by_destination": {
             "product_condensed": "tracked",
             "melt_retained": "tracked",
-            "overhead_terminal_inventory": "tracked"
+            "offgas_vented": "tracked"
           },
           "closure_residual_fraction": -1.1102230246251565e-16,
           "closure_residual_mol_atoms": -2.842170943040401e-14,
@@ -5004,7 +5006,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -5160,7 +5162,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -5316,7 +5318,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -5472,7 +5474,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -5628,7 +5630,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -5784,7 +5786,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -5940,7 +5942,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -6096,7 +6098,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -6252,7 +6254,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -6408,7 +6410,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -6564,7 +6566,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -6720,7 +6722,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -6876,7 +6878,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -6934,7 +6936,7 @@
             "retained_charge_unprocessed": 0.0,
             "retained_redox_buffer": 0.0,
             "retained_cleanup_sequestered": 0.0,
-            "retained_overhead_terminal_inventory": 4.143471292429483e-15,
+            "retained_overhead_terminal_inventory": 6.462348535570529e-27,
             "other_product_condensed": 0.0,
             "other_product_tapped": 0.0,
             "other_product_oxygen": 0.0,
@@ -7034,7 +7036,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -7049,8 +7051,8 @@
           "drain_tapped_mol_atoms": 0.0,
           "ideal_train_mol_atoms": 2.079325881817547e-08,
           "ideal_train_fraction": 4.395406446505538e-10,
-          "partition_residual_mol_atoms": 7.105427357601002e-15,
-          "partition_residual_fraction": 1.5019887688541108e-16,
+          "partition_residual_mol_atoms": 0.0,
+          "partition_residual_fraction": 0.0,
           "surface_crossed": 2.079325881817547e-08,
           "drain_tapped": 0.0,
           "retained_melt": 47.30679417728744,
@@ -7063,8 +7065,8 @@
           "retained_redox_buffer_mol_atoms": 0.0,
           "retained_cleanup_sequestered": 0.0,
           "retained_cleanup_sequestered_mol_atoms": 0.0,
-          "retained_overhead_terminal_inventory": 4.143471292429483e-15,
-          "retained_overhead_terminal_inventory_mol_atoms": 4.143471292429483e-15,
+          "retained_overhead_terminal_inventory": 6.462348535570529e-27,
+          "retained_overhead_terminal_inventory_mol_atoms": 6.462348535570529e-27,
           "other_product_condensed": 0.0,
           "other_product_condensed_mol_atoms": 0.0,
           "other_product_tapped": 0.0,
@@ -7190,7 +7192,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -7346,7 +7348,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -7502,7 +7504,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -7658,7 +7660,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -7814,7 +7816,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -7970,7 +7972,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -8026,7 +8028,7 @@
             "retained_charge_unprocessed": 0.0,
             "retained_redox_buffer": 0.0,
             "retained_cleanup_sequestered": 0.0,
-            "retained_overhead_terminal_inventory": 0.0,
+            "retained_overhead_terminal_inventory": 3.3881317890172014e-21,
             "other_product_condensed": 0.0,
             "other_product_tapped": 0.0,
             "other_product_oxygen": 0.0,
@@ -8126,7 +8128,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -8155,8 +8157,8 @@
           "retained_redox_buffer_mol_atoms": 0.0,
           "retained_cleanup_sequestered": 0.0,
           "retained_cleanup_sequestered_mol_atoms": 0.0,
-          "retained_overhead_terminal_inventory": 0.0,
-          "retained_overhead_terminal_inventory_mol_atoms": 0.0,
+          "retained_overhead_terminal_inventory": 3.3881317890172014e-21,
+          "retained_overhead_terminal_inventory_mol_atoms": 3.3881317890172014e-21,
           "other_product_condensed": 0.0,
           "other_product_condensed_mol_atoms": 0.0,
           "other_product_tapped": 0.0,
@@ -8282,7 +8284,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -8438,7 +8440,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -8594,7 +8596,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -8750,7 +8752,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -8906,7 +8908,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -9062,7 +9064,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -9218,7 +9220,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -9374,7 +9376,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -9530,7 +9532,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -9686,7 +9688,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -9842,7 +9844,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -9998,7 +10000,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -10154,7 +10156,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -10310,7 +10312,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -10466,7 +10468,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -10622,7 +10624,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [
                 "alpha_authority_status:analytical_upper_bound"
               ],
@@ -10805,7 +10807,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -10961,7 +10963,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -11117,7 +11119,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -11175,7 +11177,7 @@
             "retained_charge_unprocessed": 0.0,
             "retained_redox_buffer": 0.0,
             "retained_cleanup_sequestered": 0.0,
-            "retained_overhead_terminal_inventory": 1.441431445925595e-11,
+            "retained_overhead_terminal_inventory": 0.0,
             "other_product_condensed": 0.0,
             "other_product_tapped": 0.0,
             "other_product_oxygen": 0.0,
@@ -11275,7 +11277,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [
                 "alpha_authority_status:analytical_upper_bound",
                 "oxygen_reservoir_exchange_authoritative"
@@ -11318,8 +11320,8 @@
           "drain_tapped_mol_atoms": 0.0,
           "ideal_train_mol_atoms": 0.03405341736222244,
           "ideal_train_fraction": 1.2816466827229023e-06,
-          "partition_residual_mol_atoms": 1.0913936421275139e-11,
-          "partition_residual_fraction": 4.1076084261938087e-16,
+          "partition_residual_mol_atoms": -3.637978807091713e-12,
+          "partition_residual_fraction": -1.3692028087312697e-16,
           "surface_crossed": 0.03405341736222244,
           "drain_tapped": 0.0,
           "retained_melt": 26570.016664362975,
@@ -11332,8 +11334,8 @@
           "retained_redox_buffer_mol_atoms": 0.0,
           "retained_cleanup_sequestered": 0.0,
           "retained_cleanup_sequestered_mol_atoms": 0.0,
-          "retained_overhead_terminal_inventory": 1.441431445925595e-11,
-          "retained_overhead_terminal_inventory_mol_atoms": 1.441431445925595e-11,
+          "retained_overhead_terminal_inventory": 0.0,
+          "retained_overhead_terminal_inventory_mol_atoms": 0.0,
           "other_product_condensed": 0.0,
           "other_product_condensed_mol_atoms": 0.0,
           "other_product_tapped": 0.0,
@@ -11459,7 +11461,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -11615,7 +11617,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [
                 "alpha_authority_status:analytical_upper_bound"
               ],
@@ -11782,7 +11784,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -11938,7 +11940,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -12094,7 +12096,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -12250,7 +12252,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -12406,7 +12408,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -12562,7 +12564,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -12718,7 +12720,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -12874,7 +12876,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -13030,7 +13032,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -13186,7 +13188,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -13342,7 +13344,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -13498,7 +13500,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -13654,7 +13656,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -13810,7 +13812,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -13966,7 +13968,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -14022,13 +14024,13 @@
             "retained_charge_unprocessed": 0.0,
             "retained_redox_buffer": 0.0,
             "retained_cleanup_sequestered": 0.0,
-            "retained_overhead_terminal_inventory": 7.207157229631284e-12,
+            "retained_overhead_terminal_inventory": 0.0,
             "other_product_condensed": 0.0,
             "other_product_tapped": 0.0,
             "other_product_oxygen": 0.0,
             "other_cleanup_volatile_product": 0.0,
             "other_wall_deposit": 0.0,
-            "other_offgas_vented": 0.0
+            "other_offgas_vented": 7.207157229631284e-12
           },
           "term_provenance": {
             "retained_melt": {
@@ -14122,7 +14124,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [
                 "alpha_authority_status:analytical_upper_bound"
               ],
@@ -14162,8 +14164,8 @@
           "retained_redox_buffer_mol_atoms": 0.0,
           "retained_cleanup_sequestered": 0.0,
           "retained_cleanup_sequestered_mol_atoms": 0.0,
-          "retained_overhead_terminal_inventory": 7.207157229631284e-12,
-          "retained_overhead_terminal_inventory_mol_atoms": 7.207157229631284e-12,
+          "retained_overhead_terminal_inventory": 0.0,
+          "retained_overhead_terminal_inventory_mol_atoms": 0.0,
           "other_product_condensed": 0.0,
           "other_product_condensed_mol_atoms": 0.0,
           "other_product_tapped": 0.0,
@@ -14174,8 +14176,8 @@
           "other_cleanup_volatile_product_mol_atoms": 0.0,
           "other_wall_deposit": 0.0,
           "other_wall_deposit_mol_atoms": 0.0,
-          "other_offgas_vented": 0.0,
-          "other_offgas_vented_mol_atoms": 0.0
+          "other_offgas_vented": 7.207157229631284e-12,
+          "other_offgas_vented_mol_atoms": 7.207157229631284e-12
         },
         {
           "element": "Tm",
@@ -14289,7 +14291,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -14445,7 +14447,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -14601,7 +14603,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -14757,7 +14759,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -14913,7 +14915,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -15069,7 +15071,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -15225,7 +15227,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -15381,7 +15383,7 @@
             "surface_crossed": {
               "status": "derived",
               "authority": "ledger_derived",
-              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead",
+              "source": "ledger.transitions: evaporate_* debits of process.cleaned_melt, excluding same-transition reservoir.fo2_buffer credits; plus direct reservoir.fo2_buffer-to-overhead oxygen exchange net of feedstock-origin buffer credits returned from overhead; plus feedstock-origin overhead oxygen net of fe_redox_respeciation",
               "flags": [],
               "by_species": {}
             },
@@ -15429,7 +15431,7 @@
       "closure": {
         "limit_fraction": 5e-12,
         "maximum_residual_fraction": 3.727329148587731e-14,
-        "maximum_residual_mol_atoms": 1.0913936421275139e-11,
+        "maximum_residual_mol_atoms": 7.190692485892214e-12,
         "refused_elements": []
       }
     },
@@ -17165,8 +17167,8 @@
         "target": "destination:offgas_vented",
         "element": "Cr",
         "destination": "offgas_vented",
-        "mol_atoms": 9.557842342269531e-11,
-        "fraction_of_feedstock_element": 2.020395273932408e-12,
+        "mol_atoms": 9.558256689398774e-11,
+        "fraction_of_feedstock_element": 2.020482861167237e-12,
         "source_accounts": [
           "terminal.offgas"
         ],
@@ -17177,8 +17179,8 @@
         "target": "destination:overhead_terminal_inventory",
         "element": "Cr",
         "destination": "overhead_terminal_inventory",
-        "mol_atoms": 4.143471292429483e-15,
-        "fraction_of_feedstock_element": 8.75872348288946e-17,
+        "mol_atoms": 6.462348535570529e-27,
+        "fraction_of_feedstock_element": 1.366050827395257e-28,
         "source_accounts": [
           "process.overhead_gas"
         ],
@@ -17289,6 +17291,18 @@
         "fraction_of_feedstock_element": 2.4079500482824732e-08,
         "source_accounts": [
           "terminal.offgas"
+        ],
+        "attribution_method": "tracked"
+      },
+      {
+        "source": "feedstock_element:Fe",
+        "target": "destination:overhead_terminal_inventory",
+        "element": "Fe",
+        "destination": "overhead_terminal_inventory",
+        "mol_atoms": 3.3881317890172014e-21,
+        "fraction_of_feedstock_element": 1.4362453882971775e-24,
+        "source_accounts": [
+          "process.overhead_gas"
         ],
         "attribution_method": "tracked"
       },
@@ -17658,22 +17672,10 @@
         "target": "destination:offgas_vented",
         "element": "O",
         "destination": "offgas_vented",
-        "mol_atoms": 1.7044141498172763e-07,
-        "fraction_of_feedstock_element": 6.414794491441087e-12,
+        "mol_atoms": 1.704558292961869e-07,
+        "fraction_of_feedstock_element": 6.415336993772466e-12,
         "source_accounts": [
           "terminal.offgas"
-        ],
-        "attribution_method": "tracked"
-      },
-      {
-        "source": "feedstock_element:O",
-        "target": "destination:overhead_terminal_inventory",
-        "element": "O",
-        "destination": "overhead_terminal_inventory",
-        "mol_atoms": 1.441431445925595e-11,
-        "fraction_of_feedstock_element": 5.425023313790694e-16,
-        "source_accounts": [
-          "process.overhead_gas"
         ],
         "attribution_method": "tracked"
       },
@@ -17943,13 +17945,13 @@
       },
       {
         "source": "feedstock_element:Ti",
-        "target": "destination:overhead_terminal_inventory",
+        "target": "destination:offgas_vented",
         "element": "Ti",
-        "destination": "overhead_terminal_inventory",
+        "destination": "offgas_vented",
         "mol_atoms": 7.207157229631284e-12,
         "fraction_of_feedstock_element": 3.7358637256654006e-14,
         "source_accounts": [
-          "process.overhead_gas"
+          "terminal.offgas"
         ],
         "attribution_method": "tracked"
       },
@@ -18782,10 +18784,10 @@
         "account": "process.overhead_gas",
         "campaign_scope": "terminal",
         "subdisposition": null,
-        "species": "Cr",
-        "terminal_mol": 4.143471292429483e-15,
-        "terminal_kg": 2.1544434766829264e-16,
-        "origin_scope": "typed_material_origin",
+        "species": "CrO",
+        "terminal_mol": 6.462348535570529e-27,
+        "terminal_kg": 4.394080349109716e-28,
+        "origin_scope": "mixed_typed_and_unattributed_origin",
         "attribution_method": "tracked"
       },
       {
@@ -18793,9 +18795,9 @@
         "account": "process.overhead_gas",
         "campaign_scope": "terminal",
         "subdisposition": null,
-        "species": "TiO2_gas",
-        "terminal_mol": 7.207157229631284e-12,
-        "terminal_kg": 5.755996121445024e-13,
+        "species": "Fe",
+        "terminal_mol": 3.3881317890172014e-21,
+        "terminal_kg": 1.892102197576656e-22,
         "origin_scope": "typed_material_origin",
         "attribution_method": "tracked"
       },
@@ -18947,6 +18949,17 @@
         "account": "terminal.offgas",
         "campaign_scope": "terminal",
         "subdisposition": null,
+        "species": "Cr",
+        "terminal_mol": 4.143471292429483e-15,
+        "terminal_kg": 2.1544434766829264e-16,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
+      },
+      {
+        "destination": "offgas_vented",
+        "account": "terminal.offgas",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
         "species": "CrO",
         "terminal_mol": 9.557842342269531e-11,
         "terminal_kg": 6.498864458468509e-12,
@@ -19073,6 +19086,17 @@
         "terminal_kg": 3.664202524577168e-10,
         "origin_scope": "typed_material_origin",
         "attribution_method": "tracked"
+      },
+      {
+        "destination": "offgas_vented",
+        "account": "terminal.offgas",
+        "campaign_scope": "terminal",
+        "subdisposition": null,
+        "species": "TiO2_gas",
+        "terminal_mol": 7.207157229631284e-12,
+        "terminal_kg": 5.755996121445024e-13,
+        "origin_scope": "typed_material_origin",
+        "attribution_method": "tracked"
       }
     ],
     "reagent_cycle": {
@@ -19084,17 +19108,24 @@
       "basis": "element_mol_atoms",
       "limit_mol_atoms": 4.404668082946444e-05,
       "input_mol_atoms_by_element": {},
-      "terminal_mol_atoms_by_element": {},
+      "terminal_mol_atoms_by_element": {
+        "O": 6.462348535570529e-27
+      },
       "cumulative_mol_atoms_by_element": {
         "O": 1.9766839768851627e-18,
         "Na": 1.7414997395548415e-18,
+        "Si": 6.617848797207695e-24,
         "K": 2.168404344971009e-19,
         "Mn": 5.293955920339377e-23,
         "Fe": 3.3881317890172014e-21,
-        "Cr": 2.0679515313825692e-25,
-        "Si": 6.617444900424222e-24
+        "Ti": 4.0389678347315804e-28,
+        "Cr": 2.0679515313825692e-25
       },
-      "terminal_mol_atoms_by_account": {}
+      "terminal_mol_atoms_by_account": {
+        "process.overhead_gas": {
+          "O": 6.462348535570529e-27
+        }
+      }
     },
     "closure": {
       "limit_fraction": 5e-14,
@@ -19639,7 +19670,7 @@
       },
       "captured_volatiles": {
         "kg_by_species": {
-          "Cr": 1.571484185377753e-10,
+          "Cr": 1.5714863398212297e-10,
           "CrO": 1.2083370483817887e-09,
           "Fe": 3.4008710127765516e-06,
           "K": 0.0001476323310437994,
@@ -19654,9 +19685,9 @@
           "SiO": 4.695757946721374e-09,
           "SiO2": 7.16528138366996e-08,
           "SiO2_gas": 1.054894259002549e-08,
-          "TiO2_gas": 1.1933463741550396e-10
+          "TiO2_gas": 1.1991023702764846e-10
         },
-        "class_total_kg": 0.0016270537410856241
+        "class_total_kg": 0.0016270537416614391
       },
       "process_inventory_spent_reductant": {
         "kg_by_species": {},
@@ -43125,7 +43156,7 @@
     },
     "pipe_m_avg_fallback": {
       "engaged": true,
-      "total_count": 56,
+      "total_count": 59,
       "by_hour": [
         {
           "campaign": "C0",
@@ -43227,6 +43258,24 @@
           "campaign": "C0",
           "hour": 16,
           "campaign_hour": 16,
+          "count": 1
+        },
+        {
+          "campaign": "C0",
+          "hour": 17,
+          "campaign_hour": 17,
+          "count": 1
+        },
+        {
+          "campaign": "C0",
+          "hour": 18,
+          "campaign_hour": 18,
+          "count": 1
+        },
+        {
+          "campaign": "C2A_STAGED",
+          "hour": 22,
+          "campaign_hour": 0,
           "count": 1
         }
       ]
@@ -138938,7 +138987,7 @@
       "hour": 18,
       "campaign": "C0",
       "T_C": 925.0,
-      "P_total_bar": 1.0165955179036952e-12,
+      "P_total_bar": 0.0,
       "pO2_bar": 0.0,
       "mass_balance_pct": 1.1368683772161604e-14,
       "O2_yield_kg_cumulative": 1.2757119301282692e-06,
@@ -149756,7 +149805,7 @@
       "hour": 19,
       "campaign": "C0",
       "T_C": 950.0,
-      "P_total_bar": 4.396297394115901e-12,
+      "P_total_bar": 0.0,
       "pO2_bar": 0.0,
       "mass_balance_pct": 1.1368683772161604e-14,
       "O2_yield_kg_cumulative": 2.728180890982086e-06,
