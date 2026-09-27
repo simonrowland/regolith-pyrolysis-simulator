@@ -456,7 +456,38 @@ def _point_result(monkeypatch, conditions, sample=None):
     source = M.REPO_ROOT / "data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml"
     document = M.load_yaml(source)
     row = deepcopy(document["species"]["CoO"]["observations"][0])
-    document["species"] = {"CoO": {"observations": [row]}}
+    parent_ids = {
+        str(parent)
+        for parent in (row.get("derived_from") or ())
+        if isinstance(parent, str)
+    }
+    assert parent_ids == {"holzheid_1997_equilibrium_free_energy_fits"}
+    retained_species = {"CoO": {"observations": [row]}}
+    # Keep the fit parent in this reduced fixture. Its full source record has
+    # the known missing O'Neill/Barin ancestry; omit its classification here
+    # so this consumer-boundary fixture does not validate that backlog.
+    for formula, body in document["species"].items():
+        if formula == "CoO" or not isinstance(body, dict):
+            continue
+        roots = []
+        for parent in body.get("observations") or ():
+            if (
+                not isinstance(parent, dict)
+                or parent.get("observation_id") not in parent_ids
+            ):
+                continue
+            method_class = (parent.get("values") or {}).get("method_class")
+            if method_class in {"calculated", "author_derived"}:
+                continue
+            root = deepcopy(parent)
+            if root.get("observation_id") == "holzheid_1997_equilibrium_free_energy_fits":
+                root_values = dict(root.get("values") or {})
+                root_values.pop("method_class", None)
+                root["values"] = root_values
+            roots.append(root)
+        if roots:
+            retained_species[formula] = {"observations": roots}
+    document["species"] = retained_species
     if sample is not None:
         experiment = next(e for e in document["experiments"] if e["experiment_id"] == row["experiment"])
         experiment["sample"] = sample

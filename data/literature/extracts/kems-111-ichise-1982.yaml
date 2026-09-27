@@ -354,63 +354,213 @@ species:
           x_Mo: 0.096
           a_Fe: 0.897
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.096']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 2
           x_Mo: 0.154
           a_Fe: 0.81
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.154']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 4
           x_Mo: 0.2
           a_Fe: 0.8
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.2']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 7
           x_Mo: 0.201
           a_Fe: 0.767
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.201']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 1
           x_Mo: 0.24
           a_Fe: 0.692
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.24']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 5
           x_Mo: 0.251
           a_Fe: 0.737
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.251']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 9
           x_Mo: 0.254
           a_Fe: 0.741
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.254']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 3
           x_Mo: 0.3
           a_Fe: 0.69
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.3']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 8
           x_Mo: 0.302
           a_Fe: 0.673
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.302']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Fe-Mo 10
           x_Mo: 0.333
           a_Fe: 0.677
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.333']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 7
           x_Mo: 0.339
           a_Fe: 0.652
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.339']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 2
           x_Mo: 0.348
           a_Fe: 0.652
           phases: Fe liquid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.348']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 10
           x_Mo: 0.434
           a_Fe: 0.621
           phases: Fe liquid solution+σ
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.434']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 11
           x_Mo: 0.434
           a_Fe: 0.656
           phases: Fe liquid solution+σ
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.434']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 13
           x_Mo: 0.434
           a_Fe: 0.528
           a_Fe_as_printed: 0.528*
           phases: Fe liquid solution+σ
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.434']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
           excluded: true
           exclusion_as_printed: not used in the following calculation of a_Fe in the Fe(l)+σ phase region,
             because of its unreasonably low value
@@ -418,34 +568,114 @@ species:
           x_Mo: 0.556
           a_Fe: 0.585
           phases: σ+Mo solid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.556']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 9
           x_Mo: 0.613
           a_Fe: 0.552
           phases: σ+Mo solid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.613']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 12
           x_Mo: 0.666
           a_Fe: 0.526
           phases: σ+Mo solid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.666']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 4
           x_Mo: 0.778
           a_Fe: 0.556
           phases: σ+Mo solid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.778']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 6
           x_Mo: 0.793
           a_Fe: 0.538
           phases: σ+Mo solid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.793']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 3
           x_Mo: 0.842
           a_Fe: 0.518
           phases: Mo solid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.842']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 1
           x_Mo: 0.912
           a_Fe: 0.36
           phases: Mo solid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.912']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
         - 'no': Ag-Fe-Mo 5
           x_Mo: 0.912
           a_Fe: 0.383
           phases: Mo solid solution
+          point_conditions:
+            composition:
+              state: {tag: value, value: {basis: printed_x_Mo_axis, amount_basis: mole_fraction, components: [[Mo, '0.912']]}}
+              locator: {published_page: 555, pdf_page_index: 4, table: '2', note: 'Printed x_Mo axis; no complementary Fe fraction invented.'}
+            total_pressure_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No numeric KEMS cell or chamber pressure is printed.'}
+            fO2_Pa:
+              state: {tag: unknown, reason: not_published}
+              locator: {published_page: 553, pdf_page_index: 2, section: 'II.1 Experimental Apparatus', note: 'No fO2 or pO2 is printed.'}
       uncertainty:
         note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase
           extrapolation; a_Fe=0.551±0.008 (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
@@ -889,6 +1119,7 @@ species:
       - 1823.0
       - 1823.0
       phase: Fe-Mo_alloy
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
