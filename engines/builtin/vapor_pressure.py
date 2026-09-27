@@ -682,11 +682,19 @@ def _build_high_t_melt_activity_authority(
             )
             legacy_activity = None if legacy is None else float(legacy.activity)
             legacy_basis = "constant_gamma" if legacy_activity is not None else None
-        openimcc_activity = float(
-            cleaned.single_cation_activities.get(oxide, 0.0) or 0.0
+        has_openimcc_activity = oxide in cleaned.single_cation_activities
+        openimcc_activity = (
+            float(cleaned.single_cation_activities[oxide])
+            if has_openimcc_activity
+            else None
         )
         ratio_dex = None
-        if legacy_activity is not None and legacy_activity > 0.0 and openimcc_activity > 0.0:
+        if (
+            legacy_activity is not None
+            and legacy_activity > 0.0
+            and openimcc_activity is not None
+            and openimcc_activity > 0.0
+        ):
             ratio_dex = math.log10(openimcc_activity / legacy_activity)
         exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(oxide)
         selected_activity = openimcc_activity
@@ -697,6 +705,18 @@ def _build_high_t_melt_activity_authority(
             selected_activity_basis = legacy_basis or "constant_gamma"
             selected_ratio_dex = 0.0
             base["activities_by_oxide"][oxide] = selected_activity
+            base["authority_exclusions"][oxide] = dict(exclusion)
+        elif not has_openimcc_activity:
+            selected_activity = legacy_activity
+            selected_activity_basis = legacy_basis or "constant_gamma"
+            exclusion = {
+                "authority": selected_activity_basis,
+                "code": "openimcc_parent_absent",
+                "reason": (
+                    f"{oxide} is absent from the cleaned-melt input; "
+                    "openimcc has no activity for this parent"
+                ),
+            }
             base["authority_exclusions"][oxide] = dict(exclusion)
         if selected_ratio_dex is not None:
             max_abs_dex = max(max_abs_dex, abs(selected_ratio_dex))
@@ -812,21 +832,37 @@ def _attach_high_t_activity_provenance(
         provenance["melt_activity_temperature_K"] = authority.get(
             "temperature_K"
         )
+        seam = authority.get("seam", {}).get(parent_oxide, {})
         exclusion = (
-            _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(parent_oxide)
-            if provider == "openimcc"
+            seam.get("authority_exclusion")
+            if provider == "openimcc" and isinstance(seam, Mapping)
             else None
         )
+        if exclusion is None and provider == "openimcc":
+            exclusion = _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS.get(parent_oxide)
         if exclusion is not None:
             provenance["melt_activity_authority"] = exclusion["authority"]
-            provenance["openimcc_authority_excluded_K2O"] = {
-                "authority": exclusion["authority"],
-                "ruling": exclusion["ruling"],
-                "certification": exclusion["tracking_id"],
-                "reason": exclusion["reason"],
-                "citation": exclusion["citation"],
-            }
-            token = "openimcc_authority_excluded_K2O"
+            exclusion_payload = dict(exclusion)
+            provenance["openimcc_authority_exclusion"] = exclusion_payload
+            if exclusion_payload.get("code"):
+                provenance["melt_activity_fallback"] = True
+                provenance["openimcc_refusal"] = {
+                    "code": exclusion_payload["code"],
+                    "reason": exclusion_payload.get("reason"),
+                }
+            if parent_oxide == "K2O":
+                provenance["openimcc_authority_excluded_K2O"] = {
+                    "authority": exclusion["authority"],
+                    "ruling": exclusion["ruling"],
+                    "certification": exclusion["tracking_id"],
+                    "reason": exclusion["reason"],
+                    "citation": exclusion["citation"],
+                }
+            token = (
+                "openimcc_authority_excluded_K2O"
+                if parent_oxide == "K2O"
+                else "openimcc_authority_excluded_parent"
+            )
         elif provider == "openimcc":
             provenance["melt_activity_authority"] = provider
             provenance.update(

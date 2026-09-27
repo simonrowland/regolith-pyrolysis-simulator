@@ -343,11 +343,40 @@ def evaluate_cleaned_melt(
     )
     single_cation = {}
     for oxide in OPENIMCC_PARENT_OXIDES:
-        parent_activity = float(bridge.parent_oxide_activities.get(oxide, 0.0))
+        if oxide not in composition_wt_pct:
+            continue
+        if (
+            oxide not in bridge.parent_oxides
+            or oxide not in bridge.parent_oxide_activities
+        ):
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_result_shape",
+                (
+                    "openimcc result is missing the parent activity for "
+                    f"present oxide {oxide!r}"
+                ),
+            )
+        raw_activity = bridge.parent_oxide_activities[oxide]
+        try:
+            parent_activity = float(raw_activity)
+        except (OverflowError, TypeError, ValueError) as exc:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_result_shape",
+                (
+                    f"openimcc parent activity for {oxide!r} is invalid: "
+                    f"value={raw_activity!r}"
+                ),
+            ) from exc
+        if not math.isfinite(parent_activity) or parent_activity <= 0.0:
+            raise OpenImccCompositionPolicyRefusal(
+                "openimcc_result_shape",
+                (
+                    f"openimcc parent activity for {oxide!r} is invalid: "
+                    f"value={raw_activity!r}; expected a finite positive value"
+                ),
+            )
         cations = float(MELT_OXIDE_CATIONS_PER_FORMULA.get(oxide, 1.0))
-        single_cation[oxide] = (
-            0.0 if parent_activity <= 0.0 else parent_activity ** (1.0 / cations)
-        )
+        single_cation[oxide] = parent_activity ** (1.0 / cations)
     return OpenImccCleanedMeltResult(
         bridge=bridge,
         composition_wt_pct=composition_wt_pct,
