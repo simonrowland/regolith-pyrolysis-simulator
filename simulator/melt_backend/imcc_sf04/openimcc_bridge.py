@@ -55,6 +55,8 @@ OPENIMCC_PARENT_OXIDES = (
     "Al2O3",
     "TiO2",
 )
+_OPENIMCC_CRMN_RELAXED_OXIDES = ("Cr2O3", "MnO")
+_OPENIMCC_CRMN_RELAXED_RULING = "owner 2026-09-27"
 
 # DERIVATION: FeO_total is the FeO-equivalent mass handed to the FeO-only
 # SF04 convention.  wt%(FeO_total) = wt%(FeO) + wt%(Fe2O3) *
@@ -288,13 +290,71 @@ def _cleaned_melt_policy(
                 PROJECTED_BULK_CLASSIFICATION_KEY: classification_record,
             },
         )
-    if classification.verdict == "over_threshold":
+    relaxed_dropped = {
+        name: value
+        for name, value in dropped.items()
+        if name in _OPENIMCC_CRMN_RELAXED_OXIDES
+    }
+    relaxed_notice: dict[str, Any] | None = None
+    threshold_classification = classification
+    if relaxed_dropped:
+        threshold_dropped = {
+            name: value
+            for name, value in dropped.items()
+            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
+        }
+        threshold_dropped_mol_per_kg = {
+            name: value
+            for name, value in dropped_mol_per_kg.items()
+            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
+        }
+        threshold_unavailable_reasons = {
+            name: value
+            for name, value in unavailable_reasons.items()
+            if name not in _OPENIMCC_CRMN_RELAXED_OXIDES
+        }
+        threshold_classification = classify_projected_bulk(
+            threshold_dropped,
+            source_sum_wt_pct=100.0,
+            dropped_component_mol_per_kg=threshold_dropped_mol_per_kg,
+            dropped_component_mol_unavailable_reasons=(
+                threshold_unavailable_reasons
+            ),
+        )
+        classification_record.update(
+            {
+                "projection_verdict": threshold_classification.verdict,
+                "thresholded_dropped_total_wt_pct": (
+                    threshold_classification.dropped_total_wt_pct
+                ),
+                "thresholded_dropped_components": list(
+                    threshold_classification.dropped_components
+                ),
+                "relaxed_dropped_components": list(relaxed_dropped),
+                "relaxed_dropped_component_wt_pct": dict(relaxed_dropped),
+            }
+        )
+        relaxed_notice = {
+            "code": "openimcc_projection_crmn_relaxed",
+            "ruling": _OPENIMCC_CRMN_RELAXED_RULING,
+            "owner_ruling_date": "2026-09-27",
+            "wt_pct": dict(relaxed_dropped),
+            "message": (
+                "Cr2O3 and MnO remain projected from the openimcc input, "
+                "but do not count toward the shared 1.0 wt% gate"
+            ),
+        }
+        classification_record["openimcc_projection_crmn_relaxed"] = dict(
+            relaxed_notice
+        )
+    if threshold_classification.verdict == "over_threshold":
         raise OpenImccCompositionPolicyRefusal(
             "openimcc_projection_over_threshold",
             (
                 "cleaned-melt components outside IMCC parents exceed the "
-                f"{classification.threshold_wt_pct:g} wt% projected-bulk limit: "
-                f"{classification.dropped_total_wt_pct:.12g} wt%"
+                f"{threshold_classification.threshold_wt_pct:g} wt% "
+                "projected-bulk limit: "
+                f"{threshold_classification.dropped_total_wt_pct:.12g} wt%"
             ),
             diagnostics={
                 PROJECTED_BULK_CLASSIFICATION_KEY: classification_record,
@@ -312,6 +372,8 @@ def _cleaned_melt_policy(
                 "components remain visible in the classifier record"
             ),
         }
+    if relaxed_notice is not None:
+        policy["openimcc_projection_crmn_relaxed"] = relaxed_notice
     fe2o3_wt_pct = source_wt_pct.get("Fe2O3", 0.0)
     if fe2o3_wt_pct > 0.0:
         policy["fe2o3_fold"] = {

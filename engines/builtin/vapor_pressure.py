@@ -632,6 +632,13 @@ def _build_high_t_melt_activity_authority(
                 ),
             }
         )
+        relaxed_projection = (
+            classification.get("openimcc_projection_crmn_relaxed")
+            if isinstance(classification, Mapping)
+            else None
+        )
+        if isinstance(relaxed_projection, Mapping):
+            base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
         return base
 
     bridge = cleaned.bridge
@@ -640,6 +647,9 @@ def _build_high_t_melt_activity_authority(
         policy_notices.append(dict(cleaned.policy["notice"]))
     if cleaned.policy.get("fe2o3_fold"):
         policy_notices.append(dict(cleaned.policy["fe2o3_fold"]))
+    relaxed_projection = cleaned.policy.get("openimcc_projection_crmn_relaxed")
+    if isinstance(relaxed_projection, Mapping):
+        policy_notices.append(dict(relaxed_projection))
     base.update(
         {
             "activities_by_oxide": dict(cleaned.single_cation_activities),
@@ -668,6 +678,8 @@ def _build_high_t_melt_activity_authority(
             ),
         }
     )
+    if isinstance(relaxed_projection, Mapping):
+        base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
 
     max_abs_dex = 0.0
     for oxide in _HIGH_T_FLUX_OXIDES:
@@ -913,6 +925,15 @@ def _attach_high_t_activity_provenance(
             provenance["composition_projection_classification"] = dict(
                 classification
             )
+            relaxed_projection = (
+                classification.get("openimcc_projection_crmn_relaxed")
+                if isinstance(classification, Mapping)
+                else None
+            )
+            if isinstance(relaxed_projection, Mapping):
+                provenance["openimcc_projection_crmn_relaxed"] = dict(
+                    relaxed_projection
+                )
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):
             source = f"{source}:{token}"
@@ -1841,6 +1862,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             below_cap_fe_activity=below_cap_fe_activity,
             below_cap_fe_activity_basis=below_cap_fe_activity_basis,
         )
+        # An openimcc activity can move a valid carrier below the numerical
+        # output floor; preserve the carrier so predict-and-flag never drops it.
+        retain_high_t_openimcc_carriers = bool(
+            high_t_activity_authority
+            and high_t_activity_authority.get("provider") == "openimcc"
+        )
         if high_t_activity_authority:
             for notice in high_t_activity_authority.get("notices", ()):
                 warnings.append(
@@ -2127,7 +2154,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "UNCERTIFIED)"
                     )
                 if P_eq_Pa > 0.0 and (
-                    retain_analytical_channel or P_eq_Pa > 1e-15
+                    retain_analytical_channel
+                    or P_eq_Pa > 1e-15
+                    or retain_high_t_openimcc_carriers
                 ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = vapor_pressure_source_label(
@@ -2250,7 +2279,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_liquid_oxide_standard_reaction",
                 )
-                if P_eq_Pa > 1e-15:
+                if P_eq_Pa > 0.0 and (
+                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
                         "builtin_authoritative:"
@@ -2384,7 +2415,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_gas_rail_standard_reaction",
                 )
-                if P_eq_Pa > 1e-15:
+                if P_eq_Pa > 0.0 and (
+                    P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+                ):
                     vapor_pressures[species] = P_eq_Pa
                     source_label = (
                         "builtin_authority_limited:"
@@ -2603,7 +2636,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="P_eq_Pa",
             )
-            if P_eq_Pa > 1e-15:
+            if P_eq_Pa > 0.0 and (
+                P_eq_Pa > 1e-15 or retain_high_t_openimcc_carriers
+            ):
                 vapor_pressures[species] = P_eq_Pa
                 ellingham_limit = ellingham_extrapolations.get(species)
                 fit_extrapolated = (
@@ -3018,7 +3053,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 data.get("retain_analytical_pressure_channel", False)
             )
             if P_eq_Pa > 0.0 and (
-                retain_analytical_channel or P_eq_Pa > 1e-15
+                retain_analytical_channel
+                or P_eq_Pa > 1e-15
+                or retain_high_t_openimcc_carriers
             ):
                 vapor_pressures[name] = P_eq_Pa
                 # Above-band predictions remain diagnostic-limited, including
