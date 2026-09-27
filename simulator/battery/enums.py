@@ -169,6 +169,8 @@ class NoticeKind(StrEnum):
     INPUT_OMITTED = "input_omitted"
     COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
     PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
+    UNVERIFIED_APPARATUS = "unverified_apparatus"
+    COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
 
 
 class ReferenceStateConvention(StrEnum):

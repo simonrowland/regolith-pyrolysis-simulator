@@ -113,6 +113,7 @@ _PRESSURE_BLOCKING_NOTICES = frozenset(
         NoticeKind.FLOOR_INVERSION,
         NoticeKind.FALLBACK,
         NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        NoticeKind.UNVERIFIED_APPARATUS,
     }
 )
 _CERTIFICATION_DOWNGRADE_NOTICES = frozenset(
@@ -1443,6 +1444,10 @@ def validate_residual(
                 gate_reason = gates.reason or RefusalReason.INVALID_SOURCE
                 refusal = residual.refusal
                 primary_check = gates.primary_check
+                apparatus_flagged = any(
+                    notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                    for notice in residual.notices
+                )
                 wrong_shape = (
                     residual.score_eligible
                     or residual.status is not ResidualStatus.REFUSED
@@ -1459,6 +1464,9 @@ def validate_residual(
                     refusal is not None
                     and refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
                 ):
+                    wrong_evidence = False
+                if apparatus_flagged:
+                    wrong_shape = False
                     wrong_evidence = False
                 if wrong_shape or wrong_evidence:
                     issues.append(
@@ -1601,6 +1609,21 @@ def validate_residual(
                             "diagnostic numeric residuals keep score_eligible=false",
                         )
                     )
+            if any(
+                notice.kind
+                in {
+                    NoticeKind.UNVERIFIED_APPARATUS,
+                    NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+                }
+                for notice in residual.notices
+            ):
+                issues.append(
+                    _issue(
+                        f"{path}.score_eligible",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "flagged stratum residuals are diagnostic only and cannot be score_eligible",
+                    )
+                )
     endpoint_notices = union_notices(
         None if reference is None else reference.notices,
         None if candidate is None else candidate.notices,
