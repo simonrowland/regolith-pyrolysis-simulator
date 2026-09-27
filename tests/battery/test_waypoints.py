@@ -1462,6 +1462,33 @@ def test_oxygen_condition_c_co_uses_total_p_when_co_is_the_stated_gas() -> None:
     assert float(result.selected.value.point) == pytest.approx(-11.553088871754722, abs=1e-9)
 
 
+def test_oxygen_condition_c_co_refuses_total_p_for_non_co_sweep() -> None:
+    """A total-pressure Ar sweep is not printed P_CO for a C–CO token."""
+    experiment = replace(
+        factories.kems_experiment(total_P=Decimal("101325")),
+        conditions={"temperature_K": factories.located(Value.point_of("1473.15"))},
+        fO2_control=FO2Control(
+            channel=factories.State.of(FO2Channel.BUFFER),
+            buffer=factories.located("C-CO"),
+        ),
+        pressure_environment=replace(
+            factories.kems_experiment(total_P=Decimal("101325")).pressure_environment,
+            sweep_gas=factories.located(
+                SweepGas(
+                    species="Ar",
+                    flow_sccm=factories.State.unknown("not_published"),
+                    partial_pressure_Pa=factories.State.unknown("not_published"),
+                )
+            ),
+        ),
+    )
+    result = oxygen_condition(experiment, _bench())
+    assert result.selected is None
+    assert result.absence is not None
+    assert result.absence.reason is GapReason.MISSING_EVIDENCE
+    assert not any(route.route == "graphite_c_co_buffer" for route in result.routes)
+
+
 def test_oxygen_condition_c_co_refuses_co_ar_alternatives_without_printed_p() -> None:
     """CO-or-CO/Ar alternatives without a printed P_CO must not pick a pressure."""
     unknown = factories.State.unknown("not_published")
