@@ -103,6 +103,8 @@ from simulator.chemistry.ellingham_thermo import (  # noqa: E402
 from simulator.chemistry.melt_activity import (  # noqa: E402
     ALPHAMELTS_CROSS_CHECK_STATUS,
     MELT_OXIDE_ACTIVITY_LIMITATION,
+    MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE,
+    MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION,
     MELT_OXIDE_ACTIVITY_TIER,
     melt_oxide_activity,
 )
@@ -2320,16 +2322,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 if oxide_activity is None:
                     continue
-                if data.get("source_activity_basis") == "parent_oxide":
-                    a_ox = oxide_activity.thermodynamic_parent_activity()
-                    reported_activity = a_ox
+                source_activity_basis = data.get("source_activity_basis") or (
+                    MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION
+                )
+                if source_activity_basis == MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE:
+                    reported_activity = oxide_activity.activity_on_basis(
+                        MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE
+                    )
+                    a_ox = reported_activity
                 else:
                     # Legacy single-cation reaction fits declare their own
                     # exponent-adjusted compatibility basis.
                     a_ox = oxide_activity.equivalent_parent_activity(
                         activity_exponent
                     )
-                    reported_activity = oxide_activity.activity
+                    reported_activity = oxide_activity.activity_on_basis(
+                        MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION
+                    )
                 if oxide_activity.activity <= 0.0 or (
                     not retain_analytical_channel
                     and oxide_activity.activity <= 1e-10
