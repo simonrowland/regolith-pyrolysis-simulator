@@ -403,7 +403,12 @@ def test_provider_refusal_precedes_missing_speciation(
 
     assert {record.status for record in run.records} == {"out-of-domain"}
     assert {row["provider_status"] for row in run.runtime_rows} == {"refused"}
-    assert refusing_provider.request.control_inputs == {"pO2_bar": 1.0e-8}
+    # b-588 requires the melt/interface rail alongside transport pO2; see the
+    # stack-merge-2 report's reviewed interface split.
+    assert refusing_provider.request.control_inputs == {
+        "pO2_bar": 1.0e-8,
+        "interface_pO2_bar": 1.0e-8,
+    }
 
 
 @pytest.mark.parametrize("provider_status", ["not_converged", "unavailable"])

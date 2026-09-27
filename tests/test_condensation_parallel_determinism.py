@@ -169,6 +169,7 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
     # leg — both legs agree to 1e-12 relative. Area ratio A2/A1 = 4.5/4.0
     # unchanged. The later t-523 correction restores extrapolated inventory
     # debit without changing this coating-conservative continuation or its pin.
+    # t-992 adds Stage-3 wall routing; normalized cold-wall flux remains 0.06274375148239172, see stack-merge-2 report.
     sio_flux_mol_m2_s = 0.06274375148239172
     segment_areas_m2 = {
         "process.wall_deposit_segment_stage_0_to_stage_1": (
@@ -176,6 +177,11 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
         ),
         "process.wall_deposit_segment_stage_1_to_stage_2": (
             math.pi * 0.06**2 * 4.5
+        ),
+        # t-992 routes the configured Stage-3 continuation through a third
+        # wall segment; see docs-private/research/2026-09-26-stack-merge-2/report.md.
+        "process.wall_deposit_segment_stage_2_to_stage_3": (
+            math.pi * 0.06**2 * 6.0
         ),
     }
     expected_sio_kg = {
@@ -193,9 +199,21 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
         "process.condensation_train"
     ).values())
     assert stage_capture_kg > 0.0
-    capture_budget_kg = sum(expected_sio_kg.values())
-    wall_fraction = (capture_budget_kg - stage_capture_kg) / capture_budget_kg
-    expected_sio_kg = {account: kg * wall_fraction for account, kg in expected_sio_kg.items()}
+    # The finite one-kg source budget remains the two-segment baseline; Stage-3
+    # only redistributes its wall share across the three configured areas.
+    capture_budget_kg = sum(
+        expected_sio_kg[account]
+        for account in (
+            "process.wall_deposit_segment_stage_0_to_stage_1",
+            "process.wall_deposit_segment_stage_1_to_stage_2",
+        )
+    )
+    wall_budget_kg = capture_budget_kg - stage_capture_kg
+    total_area_m2 = sum(segment_areas_m2.values())
+    expected_sio_kg = {
+        account: wall_budget_kg * area_m2 / total_area_m2
+        for account, area_m2 in segment_areas_m2.items()
+    }
 
     assert set(attribution) == set(expected_sio_kg)
     for account, sio_kg in expected_sio_kg.items():

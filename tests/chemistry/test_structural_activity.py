@@ -259,7 +259,13 @@ def test_builtin_vapor_pressure_exposes_structural_reference_diagnostic_only(
         temperature_C=1500.0 - 273.15,
         pressure_bar=1e-6,
         fO2_log=-9.0,
-        control_inputs={"pO2_bar": 1e-3, "intrinsic_fO2_log": -9.0},
+        # b-588's interface rail drives melt release; transport pO2 remains
+        # separately visible even when this structural path is diagnostic-only.
+        control_inputs={
+            "pO2_bar": 1e-3,
+            "interface_pO2_bar": 1e-3,
+            "intrinsic_fO2_log": -9.0,
+        },
     )
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
 
@@ -359,7 +365,11 @@ def test_builtin_vapor_pressure_survives_dilute_silica_structural_ood(
         temperature_C=1673.15 - 273.15,
         pressure_bar=1e-6,
         fO2_log=-9.0,
-        control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
+        control_inputs={
+            "pO2_bar": 1e-9,
+            "interface_pO2_bar": 1e-9,
+            "intrinsic_fO2_log": -9.0,
+        },
     )
     result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
     diagnostic = result.diagnostic or {}

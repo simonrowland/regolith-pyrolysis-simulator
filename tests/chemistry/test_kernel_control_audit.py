@@ -320,7 +320,9 @@ def test_vapor_pressure_provider_populates_control_audit(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=1500.0,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        # b-588's melt/interface pO2 is a separate physical control from
+        # transport pO2; this diagnostic fixture pins both to the same value.
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
     assert result.control_audit is not None
     audit = result.control_audit
@@ -434,5 +436,5 @@ def test_kernel_dispatch_raises_when_provider_reports_off_temperature(
             ChemistryIntent.VAPOR_PRESSURE,
             temperature_C=1500.0,
             pressure_bar=1e-6,
-            control_inputs={"pO2_bar": 1e-9},
+            control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
         )

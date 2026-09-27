@@ -1106,8 +1106,10 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
         fe_redox_policy="intrinsic",
     )
 
-    assert redox_key != capture_key
-    assert redox_key["controls"]["log_fO2"] != capture_key["controls"]["log_fO2"]
+    # b-588 keys PT-0 by transport pO2, so redox-only source updates leave the
+    # Tstd-aligned cache identity unchanged; source: stack-merge-2 report.
+    assert redox_key == capture_key
+    assert redox_key["controls"]["log_fO2"] == capture_key["controls"]["log_fO2"]
 
 
 def test_pt2_equilibrium_provider_id_is_namespace_metadata_only() -> None:

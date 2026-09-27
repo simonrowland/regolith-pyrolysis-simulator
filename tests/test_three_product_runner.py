@@ -214,6 +214,7 @@ def test_cli_mass_scales_classification_and_carries_provenance(tmp_path):
     default_output = tmp_path / "default.json"
     one_kg_output = tmp_path / "one-kg.json"
 
+    # b-589 emits this notice only for Stage-0 sulfur; lunar inventory is zero, so it is absent (core.py:11308; newfail-triage.md).
     common_args = [
         "--feedstock", "lunar_mare_low_ti",
         "--campaign", "C2A",
@@ -251,7 +252,7 @@ def test_cli_mass_scales_classification_and_carries_provenance(tmp_path):
     vapor_engine = metadata["engines_used"]["registry"]["vapor_pressure"]
     assert vapor_engine["authoritative"] == "builtin-vapor-pressure"
     assert vapor_engine["shadows"] == ["vaporock"]
-    assert "sulfur_saturation_notice" in metadata
+    assert "sulfur_saturation_notice" not in metadata
     assert one_kg_payload["degraded_path_engagement"][
         "vapour_pressure_extrapolation"
     ]["total_count"] >= 0
