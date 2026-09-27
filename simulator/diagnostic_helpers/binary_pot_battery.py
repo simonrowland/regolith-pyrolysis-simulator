@@ -69,12 +69,12 @@ IMCC_MODEL_IDS: dict[str, str] = {
     "imcc_sf04": "IMCC-SF04",
     "imcc_sf04_ext": "IMCC-SF04-EXT",
 }
-OPENIMCC_MODEL_IDS: dict[str, str] = {"openimcc": "IMCC-SF04"}
-ALL_IMCC_MODEL_IDS: dict[str, str] = {**IMCC_MODEL_IDS, **OPENIMCC_MODEL_IDS}
-IMCC_DATAPACK_RELATIVE: dict[str, str] = {
+IMCC_DATAPACK_LABELS: dict[str, str] = {
     "imcc_sf04": "data/melt_activity/imcc/imcc-sf04-v1.0.2.json",
     "imcc_sf04_ext": "data/melt_activity/imcc/imcc-sf04-ext-v4.json",
 }
+OPENIMCC_MODEL_IDS: dict[str, str] = {"openimcc": "IMCC-SF04"}
+ALL_IMCC_MODEL_IDS: dict[str, str] = {**IMCC_MODEL_IDS, **OPENIMCC_MODEL_IDS}
 MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
 ARM_HEADLINE = "headline"
 ARM_QUALIFICATION = "qualification"
@@ -1361,7 +1361,7 @@ def reclassify_projected_composition_cells(
 
 
 class _ImccBatteryBackend:
-    """Thin MeltBackend-shaped wrapper around ``imcc_sf04.adapter.evaluate``.
+    """Thin MeltBackend-shaped wrapper around ``openimcc.evaluate``.
 
     Not registered in ``simulator.backends``: IMCC is a diagnostic shadow
     and has no ledger authority. The engine arm is the first caller.
@@ -1384,13 +1384,20 @@ class _ImccBatteryBackend:
         }
         self._load()
 
-    def _datapack_path(self) -> Path:
-        return REPO_ROOT / IMCC_DATAPACK_RELATIVE[self.engine_name]
-
     def _load(self) -> None:
-        from simulator.melt_backend.imcc_sf04 import load_datapack
+        import openimcc
+        from importlib import resources
 
-        pack = load_datapack(self._datapack_path())
+        pack_name = (
+            "imcc-sf04-v1.0.2.json"
+            if self.engine_name == "imcc_sf04"
+            else "imcc-sf04-ext-v4.json"
+        )
+        pack_resource = resources.files("openimcc").joinpath(
+            "data", "packs", pack_name
+        )
+        with resources.as_file(pack_resource) as pack_path:
+            pack = openimcc.load_datapack(pack_path)
         self._pack = pack
         self._identity = {
             "name": str(pack.model_id),
@@ -1399,7 +1406,7 @@ class _ImccBatteryBackend:
                 getattr(pack.kernel_datapack, "published_manifest_sha256", "") or ""
             ),
             "model_id": str(pack.model_id),
-            "datapack": str(self._datapack_path().relative_to(REPO_ROOT)),
+                "datapack": IMCC_DATAPACK_LABELS[self.engine_name],
         }
         try:
             from simulator.melt_backend.imcc_sf04.gas import load_gas_datapack
@@ -1422,8 +1429,8 @@ class _ImccBatteryBackend:
     ) -> Any:
         from types import SimpleNamespace
 
-        from simulator.melt_backend.imcc_sf04 import evaluate
-        from simulator.melt_backend.imcc_sf04.kernel import ImccRefusal
+        import openimcc
+        from openimcc.kernel import ImccRefusal
 
         del composition_mol, pressure_bar
         if self._pack is None:
@@ -1436,7 +1443,7 @@ class _ImccBatteryBackend:
         total = sum(composition_wt.values())
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         enable_sp = self.engine_name == "imcc_sf04_ext"
-        result = evaluate(
+        result = openimcc.evaluate(
             composition_wt,
             temperature_K,
             self._pack,
@@ -1556,7 +1563,7 @@ class _OpenImccBatteryBackend:
             raise BinaryPotBatteryError(f"unknown openimcc engine {engine_name!r}")
         self.engine_name = engine_name
         self.model_id = OPENIMCC_MODEL_IDS[engine_name]
-        from simulator.melt_backend.imcc_sf04 import openimcc_bridge
+        from simulator.melt_backend import openimcc_bridge
 
         self._bridge = openimcc_bridge
         self._package = openimcc_bridge._require_openimcc()

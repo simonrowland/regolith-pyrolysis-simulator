@@ -1,4 +1,4 @@
-"""C1 openimcc bridge and vendored-kernel parity checks."""
+"""C1 openimcc bridge and package-kernel parity checks."""
 
 from __future__ import annotations
 
@@ -6,13 +6,14 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from importlib import resources
 from types import SimpleNamespace
 
 import pytest
 
-from simulator.melt_backend.imcc_sf04 import evaluate as vendored_evaluate
-from simulator.melt_backend.imcc_sf04 import load_datapack as vendored_load_datapack
-from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
+from openimcc import evaluate as package_evaluate
+from openimcc import load_datapack as package_load_datapack
+from simulator.melt_backend.openimcc_bridge import (
     OpenImccCompositionPolicyRefusal,
     OpenImccBridgeResult,
     OpenImccUnavailableError,
@@ -24,9 +25,9 @@ from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-VENDORED_PACKS = {
-    "v1.0.2": REPO_ROOT / "data/melt_activity/imcc/imcc-sf04-v1.0.2.json",
-    "ext-v4": REPO_ROOT / "data/melt_activity/imcc/imcc-sf04-ext-v4.json",
+PACKS = {
+    "v1.0.2": None,
+    "ext-v4": "imcc-sf04-ext-v4.json",
 }
 TEMPERATURES_K = (1700.0, 1950.0, 2200.0, 2500.0, 3000.0)
 
@@ -131,7 +132,7 @@ def test_cleaned_melt_omits_absent_parent_activity() -> None:
 def test_cleaned_melt_refuses_missing_present_parent_activity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import simulator.melt_backend.imcc_sf04.openimcc_bridge as bridge
+    import simulator.melt_backend.openimcc_bridge as bridge
 
     monkeypatch.setattr(
         bridge,
@@ -166,7 +167,7 @@ def test_cleaned_melt_refuses_invalid_present_parent_activity(
     monkeypatch: pytest.MonkeyPatch,
     invalid_activity: float,
 ) -> None:
-    import simulator.melt_backend.imcc_sf04.openimcc_bridge as bridge
+    import simulator.melt_backend.openimcc_bridge as bridge
 
     activities = {oxide: 1.0 for oxide in OPENIMCC_PARENT_OXIDES}
     activities["Na2O"] = invalid_activity
@@ -200,7 +201,7 @@ def test_cleaned_melt_refuses_invalid_present_parent_activity(
 
 
 def test_missing_openimcc_is_a_typed_refusal(monkeypatch: pytest.MonkeyPatch) -> None:
-    import simulator.melt_backend.imcc_sf04.openimcc_bridge as bridge
+    import simulator.melt_backend.openimcc_bridge as bridge
 
     monkeypatch.setattr(bridge, "_openimcc", None)
     monkeypatch.setattr(bridge, "_OPENIMCC_IMPORT_ERROR", ModuleNotFoundError("openimcc"))
@@ -229,7 +230,7 @@ class _BlockOpenImcc(importlib.abc.MetaPathFinder):
 
 
 sys.meta_path.insert(0, _BlockOpenImcc())
-from simulator.melt_backend.imcc_sf04.openimcc_bridge import evaluate
+from simulator.melt_backend.openimcc_bridge import evaluate
 
 try:
     evaluate(composition_mol={'SiO2': 1.0}, temperature_K=2200.0)
@@ -284,19 +285,25 @@ def test_bridge_maps_mol_kg_and_returns_labels() -> None:
     assert mol_result.acid_sink_ratio is not None
 
 
-@pytest.mark.parametrize("pack_name", tuple(VENDORED_PACKS))
+@pytest.mark.parametrize("pack_name", tuple(PACKS))
 def test_openimcc_parent_activity_parity(pack_name: str) -> None:
     _openimcc_or_skip()
-    vendored_pack = vendored_load_datapack(VENDORED_PACKS[pack_name])
+    resource_name = PACKS[pack_name]
+    if resource_name is None:
+        pack = package_load_datapack()
+    else:
+        resource = resources.files("openimcc").joinpath("data", "packs", resource_name)
+        with resources.as_file(resource) as path:
+            pack = package_load_datapack(path)
 
     differences: list[str] = []
     for composition_name, (composition, basis_type) in COMPOSITIONS.items():
         for temperature_K in TEMPERATURES_K:
             enable_sp_extension = pack_name == "ext-v4"
-            vendored = vendored_evaluate(
+            package_result = package_evaluate(
                 composition,
                 temperature_K,
-                vendored_pack,
+                pack,
                 basis_type=basis_type,
                 enable_sp_extension=enable_sp_extension,
             )
@@ -309,22 +316,22 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
             else:
                 bridge_kwargs["composition_mol"] = composition
             standalone = bridge_evaluate(**bridge_kwargs)
-            if tuple(vendored.parent_oxides) != tuple(standalone.parent_oxides):
+            if tuple(package_result.parent_oxides) != tuple(standalone.parent_oxides):
                 differences.append(
                     f"{pack_name} {composition_name} {temperature_K:g} K "
-                    f"parent-oxide labels: vendored={tuple(vendored.parent_oxides)!r} "
+                    f"parent-oxide labels: package={tuple(package_result.parent_oxides)!r} "
                     f"bridge={tuple(standalone.parent_oxides)!r}"
                 )
                 continue
-            if set(standalone.parent_oxide_activities) != set(vendored.parent_oxides):
+            if set(standalone.parent_oxide_activities) != set(package_result.parent_oxides):
                 differences.append(
                     f"{pack_name} {composition_name} {temperature_K:g} K "
                     "bridge parent-oxide activity labels do not match"
                 )
                 continue
             for oxide, expected, _ in zip(
-                vendored.parent_oxides,
-                vendored.parent_activity,
+                package_result.parent_oxides,
+                package_result.parent_activity,
                 standalone.parent_oxides,
                 strict=True,
             ):
@@ -335,7 +342,7 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
                 if relative > 1.0e-10:
                     differences.append(
                         f"{pack_name} {composition_name} {temperature_K:g} K "
-                        f"{oxide}: vendored={expected:.17g} "
+                        f"{oxide}: package={expected:.17g} "
                         f"openimcc={actual:.17g} abs={absolute:.3g} "
                         f"rel={relative:.3g}"
                     )

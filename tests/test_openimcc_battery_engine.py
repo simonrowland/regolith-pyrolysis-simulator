@@ -25,7 +25,9 @@ from simulator.battery.score import (
     SCORE_ENGINE_SET,
     candidate_observation,
     composition_wt_pct,
+    load_score_context,
     predict_with_engine,
+    score_store,
 )
 from simulator.battery.records import Composition, Species
 from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -230,7 +232,7 @@ def test_openimcc_ti_gas_matches_direct_calculation() -> None:
         isolated=False,
     )
 
-    from simulator.melt_backend.imcc_sf04 import openimcc_bridge
+    from simulator.melt_backend import openimcc_bridge
 
     wt_pct = composition_wt_pct(composition)
     assert wt_pct is not None
@@ -366,6 +368,33 @@ def test_openimcc_plante_candidates_equal_packaged_hand_values() -> None:
     assert len(deltas) == 162
     assert max(abs(delta) for delta in deltas) <= 1.0e-9
     assert statistics_median(measured_residuals) == pytest.approx(0.093, abs=0.01)
+
+
+def test_plante_candidate_lineage_unchanged_by_kernel_switch() -> None:
+    context = load_score_context()
+    expected = {
+        Engine.IMCC_SF04: (True, "independent"),
+        # Captured on green d9bd25f0b; this remains False/unknown until t-1020.
+        Engine.OPENIMCC: (False, "unknown"),
+    }
+    for engine, lineage in expected.items():
+        residuals, candidates = score_store(
+            context,
+            engines=(engine,),
+            work_id="kems-042-plante-1979",
+        )
+        rows = [
+            (residual, candidates[residual.candidate])
+            for residual in residuals
+            if residual.candidate in candidates
+        ]
+        assert len(rows) == 162
+        assert all(candidate.engine is not None for _, candidate in rows)
+        assert {
+            (candidate.engine.lineage_complete, residual.source_relation.value)
+            for residual, candidate in rows
+            if candidate.engine is not None
+        } == {lineage}
 
 
 def test_openimcc_gas_table_mutation_to_vaporock_breaks_row_equality(monkeypatch) -> None:

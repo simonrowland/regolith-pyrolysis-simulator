@@ -1,8 +1,8 @@
 """Optional bridge from simulator melt compositions to the openimcc package.
 
-This module is diagnostic-only.  It does not register a backend or alter the
-vendored IMCC-SF04 path.  Callers must make ``openimcc`` importable explicitly;
-the bridge never falls back to the vendored kernel when it is absent.
+This module is diagnostic-only. Callers must make ``openimcc`` importable
+explicitly; the bridge never falls back to an in-repository kernel when it is
+absent.
 """
 
 from __future__ import annotations
