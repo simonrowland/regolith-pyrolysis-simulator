@@ -301,6 +301,10 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
         bridge_kwargs["composition_kg" if basis_type == "wt" else "composition_mol"] = composition
         bridge_result = bridge_evaluate(**bridge_kwargs)
         actual = bridge_result.parent_oxide_activities
+        expected_parent_oxides = (
+            "SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2", "Na2O", "K2O"
+        ) + (("S", "P2O5") if pack_name == "ext-v4" else ())
+        assert tuple(bridge_result.parent_oxides) == expected_parent_oxides
         assert {name: float(value).hex() for name, value in actual.items()} == row["activities_hex"]
         expected_labels = row["labels_legacy"]
         labels = bridge_result.labels
@@ -371,13 +375,13 @@ def test_bridge_envelope_matches_green_edge_decisions() -> None:
     )
     assert inside.envelope_status == "inside"
     within_package_slack = bridge_evaluate(
-        composition_mol={"K2O": 0.500004, "SiO2": 0.499996},
+        composition_mol={"K2O": 0.500005, "SiO2": 0.499995},
         temperature_K=1800.0,
     )
     assert within_package_slack.envelope_status == "inside"
     with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError):
         bridge_evaluate(
-            composition_mol={"K2O": 0.50002, "SiO2": 0.49998},
+            composition_mol={"K2O": 0.500006, "SiO2": 0.499994},
             temperature_K=1800.0,
         )
 

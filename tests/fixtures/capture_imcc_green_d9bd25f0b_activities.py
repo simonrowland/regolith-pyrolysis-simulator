@@ -77,6 +77,7 @@ def _capture() -> dict[str, object]:
 if __name__ == "__main__":
     print("# source: green d9bd25f0b vendored IMCC kernel")
     print(
-        "# capture command: see capture_imcc_green_d9bd25f0b_activities.py docstring"
+        "# capture command: see tests/fixtures/"
+        "capture_imcc_green_d9bd25f0b_activities.py docstring"
     )
     print(json.dumps(_capture(), sort_keys=True, separators=(",", ":")))

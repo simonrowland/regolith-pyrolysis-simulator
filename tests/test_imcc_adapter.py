@@ -218,6 +218,45 @@ def test_envelope_precedence_covers_supported_composition_shapes(
         evaluate(composition, 100.0, pack, max_iter=0, **options)
 
 
+@pytest.mark.parametrize("component", ("S", "P2O5"))
+@pytest.mark.parametrize("temperature_K", (100.0, 1800.0))
+def test_core_pack_unsupported_zero_extension_precedes_envelope(
+    component: str, temperature_K: float
+) -> None:
+    pack = load_datapack(DATAPACK_PATH)
+    composition = {"K2O": 0.500002, "SiO2": 0.499998, component: 0.0}
+
+    with pytest.raises(ImccComponentOutsideDomainError) as exc:
+        evaluate(composition, temperature_K, pack)
+
+    assert exc.value.code == "imcc_component_outside_domain"
+    assert component in str(exc.value)
+
+
+@pytest.mark.parametrize("extension_pack", (False, True))
+@pytest.mark.parametrize("temperature_K", (100.0, 1800.0))
+def test_nan_basis_envelope_refusal_precedes_package_validation(
+    extension_pack: bool, temperature_K: float
+) -> None:
+    from importlib.resources import files
+
+    if extension_pack:
+        pack = load_datapack(
+            files("openimcc").joinpath("data", "packs", "imcc-sf04-ext-v4.json")
+        )
+    else:
+        pack = load_datapack(DATAPACK_PATH)
+
+    with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError):
+        evaluate(
+            {"K2O": 0.500002, "SiO2": 0.499998},
+            temperature_K,
+            pack,
+            basis=float("nan"),
+            enable_sp_extension=extension_pack,
+        )
+
+
 @pytest.mark.parametrize("extension_pack", (False, True))
 def test_extension_refusal_precedes_strict_envelope(extension_pack: bool) -> None:
     from importlib.resources import files
@@ -242,6 +281,8 @@ def test_adapter_labels_keep_green_positional_order_and_add_package_labels() -> 
     assert tuple(field.name for field in fields(ImccAdapterLabels))[:4] == (
         "identity", "coverage", "trust", "envelope_status"
     )
+    with pytest.raises(TypeError):
+        ImccAdapterLabels({}, {})
     labels = ImccAdapterLabels(
         {"identity": "value"}, {"coverage": "value"}, "trust", "inside"
     )

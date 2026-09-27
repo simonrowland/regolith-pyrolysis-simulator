@@ -58,8 +58,8 @@ class ImccAdapterLabels:
         self,
         identity: Mapping[str, str],
         coverage: Mapping[str, str],
-        trust: str = "internal-analytical",
-        envelope_status: str = "inside",
+        trust: str,
+        envelope_status: str,
         flags: tuple[str, ...] = (),
         notices: tuple[str, ...] = (),
         acid_sink_ratio: float | None = None,
@@ -81,6 +81,7 @@ def evaluate(*args: Any, **kwargs: Any) -> ImccResult:
     strict_x_me2o: float | None = None
     pack = args[2] if len(args) > 2 else kwargs.get("pack")
     kernel_pack = getattr(pack, "kernel_datapack", pack)
+    pack_parents = getattr(kernel_pack, "parent_oxides", None)
     model_id = getattr(kernel_pack, "model_id", "IMCC-SF04" if pack is None else None)
     pack_identity_is_proven = pack is None or bool(
         getattr(kernel_pack, "identity_is_proven", False)
@@ -121,7 +122,10 @@ def evaluate(*args: Any, **kwargs: Any) -> ImccResult:
     ):
         try:
             if isinstance(composition, Mapping):
-                if set(composition) <= set(_STRICT_ENVELOPE_PARENT_MOLAR_MASSES_G_MOL):
+                supported_parents = set(
+                    pack_parents or _STRICT_ENVELOPE_PARENT_MOLAR_MASSES_G_MOL
+                )
+                if set(composition) <= supported_parents:
                     amounts = np.asarray(
                         [
                             float(composition.get(name, 0.0))
@@ -140,9 +144,12 @@ def evaluate(*args: Any, **kwargs: Any) -> ImccResult:
                 raw_total = float(amounts.sum())
                 declared_basis = kwargs.get("basis")
                 basis_matches = declared_basis is None or (
-                    float(declared_basis) > 0.0
-                    and abs(raw_total - float(declared_basis))
-                    <= 1.0e-6 * float(declared_basis)
+                    np.isnan(float(declared_basis))
+                    or (
+                        float(declared_basis) > 0.0
+                        and abs(raw_total - float(declared_basis))
+                        <= 1.0e-6 * float(declared_basis)
+                    )
                 )
                 if basis_type == "wt":
                     amounts = amounts / np.asarray(
