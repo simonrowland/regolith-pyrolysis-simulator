@@ -12,6 +12,7 @@ from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
 from simulator.accounting.formulas import parse_formula
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
+    DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
     TargetExtractionCompleteness,
     aggregate_extraction_completeness,
     completion_contracts_from_setpoints,
@@ -262,6 +263,38 @@ def test_vapor_contract_uses_narrow_product_accounts_and_includes_wall() -> None
         product_mol + residual_mol + wall_mol
     )
     assert result.completeness_fraction == pytest.approx(expected)
+
+
+def test_vapor_contract_counts_ferric_iron_in_residual_basis() -> None:
+    contract = _contracts_by_id()["C2A_continuous.Fe.vapor"]
+    ferric_kg = 0.001 * MOLAR_MASS["Fe2O3"] / 1000.0
+
+    result = vapor_contract_completeness(
+        contract,
+        _FakeQueries({"process.cleaned_melt": {"Fe2O3": ferric_kg}}),
+    )
+
+    assert result.residual_target_equiv_mol == pytest.approx(
+        2.0 * _mol("Fe2O3", ferric_kg)
+    )
+    assert result.completeness_fraction == pytest.approx(0.0)
+
+
+def test_default_residual_map_counts_ferric_iron() -> None:
+    ferric_kg = 0.001 * MOLAR_MASS["Fe2O3"] / 1000.0
+
+    result = extraction_completeness_by_target(
+        ("Fe",),
+        DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
+        {},
+        {"Fe2O3": ferric_kg},
+        require_residual_species=True,
+    )["Fe"]
+
+    assert result.residual_target_equiv_mol == pytest.approx(
+        2.0 * _mol("Fe2O3", ferric_kg)
+    )
+    assert result.completeness_fraction == pytest.approx(0.0)
 
 
 def test_vapor_contract_clean_provenance_needs_no_reagent_surface() -> None:

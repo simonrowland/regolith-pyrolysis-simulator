@@ -3586,6 +3586,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.condensation_model.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
             overhead_pressure_mbar=overhead_pressure_mbar,
+            live_transport_pressure_mbar=float(transport['pressure_mbar']),
             species_partial_pressures_mbar=species_partial_pressures_mbar,
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             # The upstream vapor is evaluated at the melt-side temperature used

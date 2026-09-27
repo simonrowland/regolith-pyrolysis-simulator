@@ -60,7 +60,10 @@ DEFAULT_RESIDUAL_SPECIES_BY_TARGET: Mapping[str, tuple[str, ...]] = MappingProxy
     # rows keep source/rump coverage via the channel contract, not this table.
 
     "SiO": ("SiO2", "SiO"),
-    "Fe": ("FeO", "Fe"),
+    # Fe target-equivalent mol is n(Fe) + n(FeO) + 2*n(Fe2O3); counting
+    # every ferric/ferrous carrier keeps redox respeciation from changing
+    # extraction completeness after the target is depleted.
+    "Fe": ("FeO", "Fe2O3", "Fe"),
     "CrO2": ("Cr2O3", "CrO2", "Cr"),
     "Mg": ("MgO", "Mg"),
     "Na": ("Na2O", "Na"),

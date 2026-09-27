@@ -514,11 +514,36 @@ def test_c2a_recipe_free_molecular_transport_is_continuous(monkeypatch):
 
     assert document["status"] in {"ok", "partial"}
     assert diagnostic["status"] == "warning"
+    assert diagnostic["overhead_pressure_mbar"] == pytest.approx(1.0e-6)
+    assert diagnostic["regime_factor"] == pytest.approx(
+        condensation_module._knudsen_regime_factor(
+            diagnostic["knudsen_number"]
+        )
+    )
     assert diagnostic["reason"] == "knudsen_outside_viscous_flow"
     assert any(
         segment["regime"] == KnudsenRegime.FREE_MOLECULAR.value
         for segment in diagnostic["segments"]
     )
+
+
+def test_live_transport_pressure_updates_model_knudsen_state():
+    model = CondensationModel(CondensationTrain.create_default())
+
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        live_transport_pressure_mbar=1.0e-6,
+        gas_temperature_C=1500.0,
+        campaign_name="C2A",
+    )
+
+    diagnostic = model.last_knudsen_regime_diagnostic
+    assert model.knudsen_regime is KnudsenRegime.FREE_MOLECULAR
+    assert model.regime_factor == pytest.approx(
+        condensation_module._knudsen_regime_factor(model.knudsen_number)
+    )
+    assert diagnostic["regime"] == model.knudsen_regime.value
+    assert diagnostic["regime_factor"] == pytest.approx(model.regime_factor)
 
 
 def test_direct_condensation_model_with_invalid_kn_refuses_before_routing(
