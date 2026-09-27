@@ -50,7 +50,7 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         )
         for index in range(8)
     )
-    assert [len(item.patch.values) for item in batch] == [61, 67] * 4
+    assert [len(item.patch.values) for item in batch] == [67, 73] * 4
     assert [item.patch.canonical_json() for item in batch] == [
         item.patch.canonical_json() for item in indexed
     ]
@@ -88,12 +88,15 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
     #      derivation -> envelope-minus-1400 derivation (36da8e17)
     #   16. bounds_digest 5a5aba76...ecd9184 -> 9d87f239...df66cccd (derived)
     #   17. payload_digest 77ff7776...d4ab6a0 -> 511c72ec...1dc56c12 (derived)
-    # Restoring the eight numeric bounds recovers the previous digest
+    # 18-19. t-1004 adds the two continuous Stage-3 window coordinates; the
+    # sampler conditions close to open + 50 C while preserving both dimensions.
+    # Restoring the eight numeric bounds and removing those two coordinates
+    # recovers the previous digest
     # 85eb0ad69e593c8b1f6089ad0cc27ad403e81d5e68500109c12daf028a9b3757; no other
     # patch path, mask, subspace digest, or effective pin differs.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "7be3cd4d55c564e60193939571bd7b46e5fd943dc16cd57d4ab113cd32852e18"
+    ).hexdigest() == "1816a55efe2a3ac8fe658e5358c6cc8911eaa5136ddbeb36f287d703d0a91a8b"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -116,14 +119,16 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
         for item in batch
     ]
     # Pin of sample_recipe_candidates(RecipeSchema(), n=8, seed=19, LHC).
-    # Same 17-leaf envelope rebind as the Sobol pin above (8 numeric bounds +
+    # Same envelope rebind as the Sobol pin above, plus the two t-1004
+    # continuous Stage-3 coordinates conditioned to keep close >= open + 50 C
+    # (8 numeric bounds +
     # 7 bounds_source strings + 2 derived digests; c5434d19 furnace high and
     # 36da8e17/b-329 overhead inheritance). Restoring those eight numeric
     # bounds recovers
     # 1983fce535aade41fcf064c3d7ca6fa1552ded02de6bacefac124478d7051cd7.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "b3f1d135216179da94c8e480dc90ba75e764f1fbbedf7c9ecc444976e6ddc3fa"
+    ).hexdigest() == "ad1f2f46dcd697c07dc6b58dd418e49c04638d1c19b914e6659dd9deb02eb048"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():

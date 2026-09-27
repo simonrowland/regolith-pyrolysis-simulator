@@ -46,6 +46,9 @@ from simulator.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
     c2a_staged_stage_order,
     validate_c2a_staged_stage_order,
+    STAGE3_CLOSE_T_C_DEFAULT,
+    STAGE3_OPEN_T_C_DEFAULT,
+    STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C,
     STAGE3_ROUTE_CHOICES,
 )
 from simulator.condensation import _canonical_carrier_gas_key
@@ -89,6 +92,9 @@ C4_PROCESS_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
 C4_PREHEAT_WALL_CLOCK_EXHAUSTED_REFUSAL_REASON = (
     'c4_preheat_wall_clock_exhausted'
 )
+STAGE3_TEMPERATURE_WINDOW_REFUSAL_REASON = (
+    'stage3_temperature_window_invalid'
+)
 
 
 class CampaignPressureSetpointRefusal(ValueError):
@@ -109,6 +115,19 @@ class CampaignPressureSetpointRefusal(ValueError):
         super().__init__(
             f'{self.reason}: {detail}' if detail else self.reason
         )
+
+
+class Stage3TemperatureWindowRefusal(ValueError):
+    """Typed refusal for an invalid Stage-3 temperature release window."""
+
+    reason = STAGE3_TEMPERATURE_WINDOW_REFUSAL_REASON
+    terminal_refusal = True
+
+    def __init__(self, diagnostic: Mapping[str, object]):
+        self.diagnostic = dict(diagnostic)
+        self.diagnostic.setdefault('status', 'refused')
+        self.diagnostic.setdefault('reason', self.reason)
+        super().__init__(f'{self.reason}: {self.diagnostic}')
 
 
 class CampaignHoldTargetRefusal(ValueError):
@@ -385,6 +404,8 @@ class CampaignManager:
     })
     _PHASE_OVERRIDE_FIELDS = {
         CampaignPhase.C2A: frozenset({
+            'stage3_close_T_C',
+            'stage3_open_T_C',
             'threshold_kg_hr',
         }),
         CampaignPhase.C2A_STAGED: frozenset({
@@ -1275,17 +1296,153 @@ class CampaignManager:
             diagnostic['max_hold_adjustment'] = dict(adjustment)
         return atmosphere, diagnostic
 
-    def stage3_route_for(self, melt: MeltState) -> str:
-        """Resolve the configured condenser route for the current phase."""
+    def _stage3_temperature_window_for(
+            self,
+            campaign: CampaignPhase,
+            cfg: Mapping[str, object]) -> tuple[float, float] | None:
+        """Return a validated temperature window for a windowed campaign."""
+
+        overrides = self._campaign_overrides(campaign)
+        window_fields = ('stage3_open_T_C', 'stage3_close_T_C')
+        if (
+            campaign != CampaignPhase.C2A
+            and not any(
+                field in cfg or field in overrides
+                for field in window_fields
+            )
+        ):
+            return None
+
+        config_key = self._campaign_config_key(campaign)
+        values: dict[str, float] = {}
+        # Keep the override keys literal here: _derived_override_field_names()
+        # audits Mapping.get consumers from the source, so dynamic key lookup
+        # would make valid runtime knobs look unknown to that validator.
+        raw_by_field = {
+            'stage3_open_T_C': overrides.get(
+                'stage3_open_T_C',
+                cfg.get('stage3_open_T_C', STAGE3_OPEN_T_C_DEFAULT),
+            ),
+            'stage3_close_T_C': overrides.get(
+                'stage3_close_T_C',
+                cfg.get('stage3_close_T_C', STAGE3_CLOSE_T_C_DEFAULT),
+            ),
+        }
+        for field, raw in raw_by_field.items():
+            diagnostic: dict[str, object] = {
+                'status': 'refused',
+                'reason': STAGE3_TEMPERATURE_WINDOW_REFUSAL_REASON,
+                'campaign': config_key,
+                'field': f'{config_key}.{field}',
+                'furnace_ceiling_T_C': float(self.furnace_max_T_C),
+            }
+            if not is_declared_real_scalar(raw, allow_numeric_str=True):
+                diagnostic['value'] = repr(raw)
+                raise Stage3TemperatureWindowRefusal(diagnostic)
+            try:
+                value = float(raw)
+            except (TypeError, ValueError):
+                diagnostic['value'] = repr(raw)
+                raise Stage3TemperatureWindowRefusal(diagnostic)
+            if (
+                not math.isfinite(value)
+                or value < 0.0
+                or value > self.furnace_max_T_C
+            ):
+                diagnostic['value'] = repr(raw)
+                raise Stage3TemperatureWindowRefusal(diagnostic)
+            values[field] = value
+
+        open_T_C = values['stage3_open_T_C']
+        close_T_C = values['stage3_close_T_C']
+        if open_T_C >= close_T_C:
+            raise Stage3TemperatureWindowRefusal({
+                'status': 'refused',
+                'reason': STAGE3_TEMPERATURE_WINDOW_REFUSAL_REASON,
+                'campaign': config_key,
+                'field': 'stage3_open_T_C/stage3_close_T_C',
+                'open_T_C': open_T_C,
+                'close_T_C': close_T_C,
+                'furnace_ceiling_T_C': float(self.furnace_max_T_C),
+                'detail': 'stage3_open_T_C must be below stage3_close_T_C',
+            })
+        if close_T_C - open_T_C < STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C:
+            raise Stage3TemperatureWindowRefusal({
+                'status': 'refused',
+                'reason': STAGE3_TEMPERATURE_WINDOW_REFUSAL_REASON,
+                'campaign': config_key,
+                'field': 'stage3_open_T_C/stage3_close_T_C',
+                'open_T_C': open_T_C,
+                'close_T_C': close_T_C,
+                'furnace_ceiling_T_C': float(self.furnace_max_T_C),
+                'detail': (
+                    'Stage-3 temperature window must be at least '
+                    f'{STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C:g} C wide'
+                ),
+            })
+        return open_T_C, close_T_C
+
+    def stage3_route_resolution_for(self, melt: MeltState) -> dict[str, object]:
+        """Resolve Stage-3 route and retain the basis used for that decision."""
 
         campaign = getattr(melt, 'campaign', CampaignPhase.IDLE)
         if not isinstance(campaign, CampaignPhase):
             try:
                 campaign = CampaignPhase[str(campaign)]
             except (KeyError, TypeError):
-                return 'through'
+                return {
+                    'stage3_route': 'through',
+                    'route_basis': 'campaign_phase',
+                }
         cfg = self._campaign_config(campaign)
-        raw_route: object | None = cfg.get('stage3_route')
+        # Preserve an explicit legacy route in hand-authored setpoint fixtures
+        # and operator patches. The continuous optimizer vocabulary does not
+        # expose this categorical field; normal C2A setpoints therefore take
+        # the validated temperature-window path below.
+        explicit_route = cfg.get('stage3_route')
+        temperature_window = (
+            None
+            if explicit_route is not None
+            else self._stage3_temperature_window_for(campaign, cfg)
+        )
+        if temperature_window is not None:
+            raw_temperature_C = getattr(melt, 'temperature_C', 0.0)
+            if not is_declared_real_scalar(
+                raw_temperature_C,
+                allow_numeric_str=True,
+            ):
+                raise Stage3TemperatureWindowRefusal({
+                    'status': 'refused',
+                    'reason': STAGE3_TEMPERATURE_WINDOW_REFUSAL_REASON,
+                    'campaign': self._campaign_config_key(campaign),
+                    'field': 'melt.temperature_C',
+                    'value': repr(raw_temperature_C),
+                    'furnace_ceiling_T_C': float(self.furnace_max_T_C),
+                })
+            temperature_C = float(raw_temperature_C)
+            if not math.isfinite(temperature_C):
+                raise Stage3TemperatureWindowRefusal({
+                    'status': 'refused',
+                    'reason': STAGE3_TEMPERATURE_WINDOW_REFUSAL_REASON,
+                    'campaign': self._campaign_config_key(campaign),
+                    'field': 'melt.temperature_C',
+                    'value': repr(raw_temperature_C),
+                    'furnace_ceiling_T_C': float(self.furnace_max_T_C),
+                })
+            open_T_C, close_T_C = temperature_window
+            route = (
+                'through'
+                if open_T_C <= temperature_C < close_T_C
+                else 'divert'
+            )
+            return {
+                'stage3_route': route,
+                'route_basis': 'temperature_window',
+                'stage3_open_T_C': open_T_C,
+                'stage3_close_T_C': close_T_C,
+            }
+
+        raw_route: object | None = explicit_route
         if campaign == CampaignPhase.C2A_STAGED:
             stages = cfg.get('stages')
             if isinstance(stages, list) and stages:
@@ -1321,7 +1478,15 @@ class CampaignManager:
                 f'{self._campaign_config_key(campaign)}.stage3_route must be '
                 f'one of {STAGE3_ROUTE_CHOICES}, got {raw_route!r}'
             )
-        return route
+        return {
+            'stage3_route': route,
+            'route_basis': 'campaign_phase',
+        }
+
+    def stage3_route_for(self, melt: MeltState) -> str:
+        """Resolve the configured condenser route for the current phase."""
+
+        return str(self.stage3_route_resolution_for(melt)['stage3_route'])
 
     def apply_c2a_staged_gas_controls(
             self,
