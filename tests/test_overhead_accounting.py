@@ -6,7 +6,7 @@ import pytest
 import simulator.evaporation as evaporation_module
 from simulator.accounting import AccountingError, MaterialLot
 from simulator.condensation import CondensationRouteResult
-from simulator.core import PyrolysisSimulator
+from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL, PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import (
     Atmosphere,
@@ -1283,6 +1283,52 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
     assert equilibrium.vapor_pressures_Pa.get("SiO", 0.0) > 0.0
 
     sim._headspace_transport_pO2_bar = real_transport
+
+
+def test_stirring_changes_committed_finite_oxygen_transfer():
+    def _probe(radial_stir_factor):
+        sim = _sio_o2_train_sim()
+        sim.melt.temperature_C = 1600.0
+        sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+        sim.melt.p_total_mbar = 100.0
+        sim._overhead_headspace_config["enabled"] = True
+        sim._melt_headspace_composition_mbar = {"N2": 1.0}
+        sim.atom_ledger.load_external_mol(
+            "process.overhead_gas",
+            {"O2": 0.05},
+            source="test finite gas-side oxygen inventory",
+            material_origin="feedstock",
+        )
+        ferric_kg = 100.0
+        sim.inventory.melt_oxide_kg["Fe2O3"] = ferric_kg
+        sim.melt.composition_kg["Fe2O3"] = ferric_kg
+        sim.atom_ledger.load_external_mol(
+            "process.cleaned_melt",
+            {"Fe2O3": ferric_kg / (MOLAR_MASS["Fe2O3"] / 1000.0)},
+            source="test ferric finite-interface inventory",
+            material_origin="feedstock",
+        )
+        sim._melt_redox_ledger_initialized = True
+        sim.melt.stir_state.radial = radial_stir_factor
+        return sim._apply_oxygen_reservoir_exchange()
+
+    low_stir = _probe(0.0)
+    high_stir = _probe(10.0)
+
+    assert low_stir.exchange_direction == "melt_to_headspace"
+    assert high_stir.exchange_direction == "melt_to_headspace"
+    assert low_stir.shadow_oxygen_transfer["gas_side_k_m_s"] != pytest.approx(
+        high_stir.shadow_oxygen_transfer["gas_side_k_m_s"]
+    )
+    assert abs(low_stir.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+    assert abs(high_stir.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+    assert low_stir.exchange_o2_mol != pytest.approx(high_stir.exchange_o2_mol)
+    assert low_stir.shadow_oxygen_transfer["committed_o2_mol"] == pytest.approx(
+        low_stir.exchange_o2_mol
+    )
+    assert high_stir.shadow_oxygen_transfer["committed_o2_mol"] == pytest.approx(
+        high_stir.exchange_o2_mol
+    )
 
 
 def test_evaporation_flux_does_not_reapply_commanded_po2():

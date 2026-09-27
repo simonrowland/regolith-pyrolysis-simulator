@@ -510,9 +510,9 @@ class OxygenReservoirState:
     redox_source_delta_log10_fO2: float = 0.0
     redox_source_refusal_context: Dict[str, Any] = field(default_factory=dict)
     ferric_divergence: Dict[str, Any] = field(default_factory=dict)
-    # Shadow-only finite-driving-force transfer.  This is reported beside the
-    # live RC exchange until the authority-enabling chunk wires it to ledger
-    # movement; diagnostics must not create a second oxygen state.
+    # Finite-driving-force transfer plan and commit receipt. The integrated
+    # amount is the sole passive exchange; this payload keeps its solver
+    # bounds, interface flux, and exact ledger-coupling evidence together.
     shadow_oxygen_transfer: Dict[str, Any] = field(default_factory=dict)
 
 

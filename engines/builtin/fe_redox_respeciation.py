@@ -180,18 +180,31 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                 },
             )
 
-        target_ferric = max(
-            KRESS91_FERRIC_FRACTION_EPSILON,
-            min(
-                1.0 - KRESS91_FERRIC_FRACTION_EPSILON,
-                kress91_fe3_over_sigma_fe(
-                    fO2_log=fO2_log,
-                    mol_fractions=mol_fractions,
-                    T_K=T_K,
-                    pressure_bar=pressure_bar,
+        target_ferric_override = controls.get("target_ferric_fraction")
+        if target_ferric_override is not None:
+            try:
+                target_ferric = float(target_ferric_override)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    "target_ferric_fraction must be numeric"
+                ) from exc
+            if not math.isfinite(target_ferric) or not 0.0 <= target_ferric <= 1.0:
+                raise ValueError(
+                    "target_ferric_fraction must be finite in [0, 1]"
+                )
+        else:
+            target_ferric = max(
+                KRESS91_FERRIC_FRACTION_EPSILON,
+                min(
+                    1.0 - KRESS91_FERRIC_FRACTION_EPSILON,
+                    kress91_fe3_over_sigma_fe(
+                        fO2_log=fO2_log,
+                        mol_fractions=mol_fractions,
+                        T_K=T_K,
+                        pressure_bar=pressure_bar,
+                    ),
                 ),
-            ),
-        )
+            )
         current_ferric = 2.0 * fe2o3_mol / total_fe_mol
         target_fe2o3_mol = 0.5 * target_ferric * total_fe_mol
         delta_fe2o3_mol = target_fe2o3_mol - fe2o3_mol

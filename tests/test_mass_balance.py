@@ -16,6 +16,7 @@ from simulator.account_ids import (
 from simulator.core import (
     FLOW_MASS_ACCOUNTS,
     FLOW_MASS_EXCLUDED_ACCOUNTS,
+    OXYGEN_RESERVOIR_NOOP_MOL,
     PyrolysisSimulator,
 )
 from simulator.evaporation import EvaporationFluxRefusal
@@ -23,10 +24,12 @@ from simulator.mass_balance import MassBalance, ZERO_INPUT_BASIS_BREACH
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_sio_yield_report
 from simulator.state import (
+    Atmosphere,
     CampaignPhase,
     CondensationTrain,
     DecisionType,
     MeltState,
+    MOLAR_MASS,
     ProcessInventory,
 )
 from simulator.transport_constants import (
@@ -186,6 +189,100 @@ def _external_input_mass_kg(sim) -> float:
     return sum(
         lot.total_mass_kg(registry) for lot in sim.atom_ledger.external_loads
     )
+
+
+def _oxygen_exchange_sim(oxide: str):
+    setpoints = _load_data_yaml("setpoints.yaml")
+    setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
+    setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] = True
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        setpoints,
+        {
+            "test_oxide": {
+                "label": "Test oxide",
+                "composition_wt_pct": {oxide: 100.0},
+            }
+        },
+        _load_data_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch("test_oxide", mass_kg=100.0)
+    sim.melt.temperature_C = 1600.0
+    sim._overhead_headspace_config["enabled"] = True
+    sim._melt_headspace_composition_mbar = {"N2": 1.0}
+    sim._melt_redox_ledger_initialized = True
+    sim._sync_oxygen_reservoir_mirror()
+    return sim
+
+
+def test_finite_backpressure_o2_uptake_closes_atoms_and_fe_ledger():
+    sim = _oxygen_exchange_sim("FeO")
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.05},
+        source="test finite backpressure oxygen",
+        material_origin="feedstock",
+    )
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+    transitions_before = len(sim.atom_ledger.transitions)
+    melt_before = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.exchange_direction == "headspace_to_melt"
+    assert reservoir.exchange_o2_mol < -OXYGEN_RESERVOIR_NOOP_MOL
+    assert reservoir.exchange_transition_name == "oxygen_reservoir_exchange"
+    melt_after = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    assert melt_after["FeO"] == pytest.approx(
+        melt_before["FeO"] + 4.0 * reservoir.exchange_o2_mol
+    )
+    assert melt_after["Fe2O3"] == pytest.approx(
+        melt_before.get("Fe2O3", 0.0) - 2.0 * reservoir.exchange_o2_mol
+    )
+    passive = [
+        transition
+        for transition in sim.atom_ledger.transitions[transitions_before:]
+        if transition.name == "oxygen_reservoir_exchange"
+    ]
+    assert len(passive) == 1
+    passive[0].validate_conservation(sim.atom_ledger.registry)
+    drift_after = sim.atom_ledger.element_atom_drift_report()
+    assert drift_after["accepted_transition_residual_mol_atoms"] == pytest.approx(
+        drift_before["accepted_transition_residual_mol_atoms"]
+    )
+    assert drift_after["whole_run_boundary_residual_mol_atoms"] == pytest.approx(
+        drift_before["whole_run_boundary_residual_mol_atoms"]
+    )
+
+
+def test_hard_vacuum_has_zero_passive_exchange_and_preserves_ledger():
+    sim = _oxygen_exchange_sim("Fe2O3")
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 0.0
+    sim.melt.pO2_mbar = 0.0
+    sim._melt_headspace_composition_mbar = {}
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.05},
+        source="test explicit vacuum-side oxygen",
+        material_origin="feedstock",
+    )
+    before = sim.atom_ledger.mol_by_account()
+    transitions_before = len(sim.atom_ledger.transitions)
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.exchange_o2_mol == pytest.approx(0.0)
+    assert reservoir.shadow_oxygen_transfer["status"] == (
+        "hard_vacuum_no_passive_exchange"
+    )
+    assert sim.atom_ledger.mol_by_account() == before
+    assert len(sim.atom_ledger.transitions) == transitions_before
 
 
 def _assert_transitional_evaporation_notice(

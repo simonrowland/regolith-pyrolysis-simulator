@@ -165,32 +165,38 @@ def test_shadow_transfer_is_finite_bounded_and_monotonic_at_tiny_capacity() -> N
     assert _ledger_signature(sim) == before
 
 
-def test_shadow_transfer_leaves_live_ledger_byte_identical_to_live_rc() -> None:
-    shadow_sim = _make_sim()
-    live_only_sim = _make_sim()
-    _configure_shadow_transport(shadow_sim)
-    _configure_shadow_transport(live_only_sim)
+def test_finite_transfer_commits_once_from_integrated_plan() -> None:
+    sim = _make_sim()
+    _configure_shadow_transport(sim)
+    transition_count_before = len(sim.atom_ledger.transitions)
 
-    shadow_sim._apply_oxygen_reservoir_exchange()
-    shadow_payload = dict(
-        shadow_sim.melt.oxygen_reservoir.shadow_oxygen_transfer
-    )
-    shadow_sim._refresh_oxygen_reservoir_without_exchange(
-        exchange_direction="test_refresh_preserves_shadow"
-    )
-    live_only_sim._oxygen_shadow_transfer = lambda **_: {
-        "authority": "diagnostic_only",
-        "status": "disabled_for_parity_test",
-    }
-    live_only_sim._apply_oxygen_reservoir_exchange()
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+    payload = dict(reservoir.shadow_oxygen_transfer)
 
-    assert shadow_sim.melt.oxygen_reservoir.shadow_oxygen_transfer[
-        "authority"
-    ] == "diagnostic_only"
-    assert shadow_sim.melt.oxygen_reservoir.shadow_oxygen_transfer == (
-        shadow_payload
+    assert payload["authority"] == "finite_interface_flux"
+    assert payload["committed_o2_mol"] == pytest.approx(
+        reservoir.exchange_o2_mol
     )
-    assert _ledger_signature(shadow_sim) == _ledger_signature(live_only_sim)
+    assert payload["transfer_o2_mol"] == pytest.approx(
+        reservoir.exchange_o2_mol
+    )
+    assert payload["bounded"] is True
+    assert len(sim.atom_ledger.transitions) >= transition_count_before
+    passive_transitions = [
+        transition
+        for transition in sim.atom_ledger.transitions[transition_count_before:]
+        if transition.name == "oxygen_reservoir_exchange"
+    ]
+    assert len(passive_transitions) == (
+        1
+        if abs(reservoir.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+        else 0
+    )
+
+    sim._refresh_oxygen_reservoir_without_exchange(
+        exchange_direction="test_refresh_preserves_finite_plan"
+    )
+    assert sim.melt.oxygen_reservoir.shadow_oxygen_transfer == payload
 
 
 def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
@@ -1414,8 +1420,11 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     ledger_pO2 = exchange.headspace_ledger_pO2_bar
     transport_pO2 = exchange.headspace_transport_pO2_bar
 
-    assert abs(exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
-    assert exchange_direction
+    # The authority path refuses passive Fe/O2 movement below the liquid
+    # redox gate; it still publishes the same transport observables for the
+    # subsequent source-term bookkeeping.
+    assert exchange_o2_mol == pytest.approx(0.0)
+    assert exchange_direction == "none:not_liquid"
     assert k_O_m_s >= 0.0
     assert tau_hr >= 0.0
 
@@ -2679,7 +2688,7 @@ def test_pn2_sweep_without_o2_does_not_phantom_oxidize_melt() -> None:
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
-    assert reservoir.exchange_direction == "none:headspace_o2_clamped"
+    assert reservoir.exchange_direction == "managed_headspace_to_melt"
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
         sim._melt_fO2_from_ledger()
     )
@@ -2761,6 +2770,7 @@ def test_c2a_staged_po2_hold_uses_managed_exchange_not_direct_refresh(
         "headspace_to_melt",
         "melt_to_headspace",
         "none:below_threshold",
+        "none:not_liquid",
     }
 
 
