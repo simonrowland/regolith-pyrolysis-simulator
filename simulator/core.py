@@ -1146,6 +1146,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar: Dict[str, float] = {}
+        self._same_tick_condensation_partials_mbar: Optional[Dict[str, float]] = None
         self._headspace_transport_source_total_mol_s = 0.0
         self._headspace_transport_source_o2_mol_s = 0.0
         self._headspace_transport_source_o2_buffer_mol_this_hr = 0.0
@@ -1479,6 +1480,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
         self._melt_headspace_composition_mbar = {}
+        self._same_tick_condensation_partials_mbar = None
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._last_vapour_batch = None
@@ -3388,6 +3390,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _configure_condensation_operating_conditions(
         self,
         evap_flux: EvaporationFlux,
+        upstream_partials_mbar: Optional[Mapping[str, float]] = None,
     ) -> None:
         effective_transport_capacity = getattr(
             self,
@@ -3412,12 +3415,43 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if species_formula_registry
             else (evap_flux, transport['vapor_pressure_mbar'])
         )
+        active_upstream_partials_mbar = (
+            upstream_partials_mbar
+            if upstream_partials_mbar is not None
+            else getattr(self, '_same_tick_condensation_partials_mbar', None)
+        )
+        overhead_pressure_mbar = float(transport['pressure_mbar'])
+        if active_upstream_partials_mbar is not None:
+            overhead_pressure_mbar = max(
+                overhead_pressure_mbar,
+                sum(
+                    max(0.0, float(pressure_mbar))
+                    for pressure_mbar in active_upstream_partials_mbar.values()
+                ),
+            )
+        species_partial_pressures_mbar = (
+            {
+                **{
+                    str(species): max(
+                        0.0,
+                        float(active_upstream_partials_mbar.get(species, 0.0)),
+                    )
+                    for species in evap_flux.species_kg_hr
+                },
+                **{
+                    str(species): max(0.0, float(pressure_mbar))
+                    for species, pressure_mbar in active_upstream_partials_mbar.items()
+                },
+            }
+            if active_upstream_partials_mbar is not None
+            else self.overhead_model.species_partial_pressures(
+                *partial_pressure_args
+            )
+        )
         self.condensation_model.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
-            overhead_pressure_mbar=transport['pressure_mbar'],
-            species_partial_pressures_mbar=(
-                self.overhead_model.species_partial_pressures(*partial_pressure_args)
-            ),
+            overhead_pressure_mbar=overhead_pressure_mbar,
+            species_partial_pressures_mbar=species_partial_pressures_mbar,
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             # The upstream vapor is evaluated at the melt-side temperature used
             # by the conductance model; the independently scheduled pipe and
@@ -4429,6 +4463,369 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 OXYGEN_MOLAR_MASS_KG_PER_MOL
             )
         return committed_o2_mol
+
+    def _same_tick_evaporation_headspace_partials_Pa(
+        self,
+        evap_flux: EvaporationFlux,
+    ) -> dict[str, float]:
+        """Return duct-transport partials for the current evaporation tick.
+
+        The source is the current vapor flux, not the previous tick's
+        condensation projection.  For a species source ``n_dot_i`` the duct
+        balance is ``p_i = n_dot_i*R*T/C_i``.  ``C_i`` uses the existing
+        endpoint-matched molecular/viscous duct model: the molecular term
+        uses that species' ``v_bar_i`` while the viscous term uses the same
+        carrier-pressure mean as the total duct.  Thus viscous carrier gas
+        dilutes vapor without inventing a second headspace model.
+        Units: mol/s * J/(mol K) * K / (m³/s) = Pa.  The aggregate duct solve
+        supplies the current pressure regime; its commanded-atmosphere floor
+        is included in the mean pressure so a 10 mbar carrier remains a
+        viscous sweep even when the condensable source is small.
+        """
+
+        from simulator.transport_constants import COLLISION_DIAMETERS_M
+        from simulator.transport_regime import (
+            _duct_conductance_at_mean_pressure,
+            solve_duct_throughput,
+        )
+
+        source_mol_hr = self._project_evaporation_overhead_source_mol_hr(
+            getattr(evap_flux, 'species_kg_hr', {}) or {},
+            {},
+        )
+        source_mol_s = {
+            str(species): max(0.0, float(rate)) / 3600.0
+            for species, rate in source_mol_hr.items()
+            if float(rate) > 0.0
+        }
+        if not source_mol_s:
+            return {}
+
+        molar_mass_by_species: dict[str, float] = {}
+        source_mass_kg_s = 0.0
+        total_mol_s = 0.0
+        for species, molar_rate_mol_s in source_mol_s.items():
+            molar_mass = float(
+                resolve_species_formula(
+                    species,
+                    self.species_formula_registry,
+                ).molar_mass_kg_per_mol()
+            )
+            if not math.isfinite(molar_mass) or molar_mass <= 0.0:
+                raise AccountingError(
+                    f'same-tick headspace requires positive molar mass for {species!r}'
+                )
+            molar_mass_by_species[species] = molar_mass
+            total_mol_s += molar_rate_mol_s
+            source_mass_kg_s += molar_rate_mol_s * molar_mass
+
+        diameter_m, length_m = self._headspace_duct_geometry()
+        temperature_K = self._headspace_temperature_K()
+        downstream_pressure_bar = self._headspace_downstream_pressure_bar()
+        downstream_oxygen_pressure_bar = min(
+            self._headspace_control_floor_pO2_bar(),
+            downstream_pressure_bar,
+        )
+        carrier_gas = self._resolve_condensation_carrier_gas()
+        collision_diameter_m = COLLISION_DIAMETERS_M.get(
+            carrier_gas,
+            COLLISION_DIAMETERS_M[OXYGEN_SPECIES],
+        )
+        mean_molar_mass = source_mass_kg_s / total_mol_s
+        duct_result = solve_duct_throughput(
+            total_molar_flow_mol_s=total_mol_s,
+            oxygen_molar_flow_mol_s=source_mol_s.get(OXYGEN_SPECIES, 0.0),
+            downstream_pressure_bar=downstream_pressure_bar,
+            downstream_oxygen_pressure_bar=downstream_oxygen_pressure_bar,
+            temperature_K=temperature_K,
+            diameter_m=diameter_m,
+            length_m=length_m,
+            molar_mass_kg_mol=mean_molar_mass,
+            dynamic_viscosity_pa_s=self.overhead_model._gas_dynamic_viscosity_Pa_s(
+                temperature_K
+            ),
+            collision_diameter_m=collision_diameter_m,
+        )
+
+        commanded_pressure_pa = max(
+            0.0,
+            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
+        )
+        upstream_pressure_pa = max(
+            duct_result.p_headspace_bar * 1.0e5,
+            commanded_pressure_pa,
+        )
+        mean_pressure_pa = 0.5 * (
+            upstream_pressure_pa + downstream_pressure_bar * 1.0e5
+        )
+
+        partials: dict[str, float] = {}
+        for species in getattr(evap_flux, 'species_kg_hr', {}) or {}:
+            molar_rate_mol_s = source_mol_s.get(str(species), 0.0)
+            if molar_rate_mol_s <= 0.0:
+                partials[str(species)] = 0.0
+                continue
+            conductance_m3_s, _, _, _ = _duct_conductance_at_mean_pressure(
+                diameter_m,
+                length_m,
+                temperature_K,
+                mean_pressure_pa,
+                molar_mass_by_species[str(species)],
+                self.overhead_model._gas_dynamic_viscosity_Pa_s(temperature_K),
+                collision_diameter_m,
+            )
+            # Molecular C=(pi/12)*v_bar*d^3/L; viscous C is the carrier
+            # Poiseuille conductance at p_bar.  The endpoint bridge retains
+            # both limits, so p_i remains continuous as Kn crosses 10/.01.
+            partials[str(species)] = max(
+                0.0,
+                molar_rate_mol_s
+                * GAS_CONSTANT
+                * temperature_K
+                / conductance_m3_s,
+            )
+        return partials
+
+    def _calculate_evaporation_with_same_tick_headspace(
+        self,
+        equilibrium: Any,
+    ) -> tuple[EvaporationFlux, dict[str, float]]:
+        """Solve ordinary finite-headspace evaporation and duct pressure together."""
+
+        calculate = self._calculate_evaporation
+        try:
+            supports_override = (
+                'overhead_partials_override_Pa'
+                in inspect.signature(calculate).parameters
+            )
+        except (TypeError, ValueError):
+            supports_override = False
+
+        if supports_override:
+            # Do not seed the solve from the previous tick.  The zero-pressure
+            # call is a numerical starting point only; the returned state is
+            # replaced by the same-tick duct fixed point below.
+            evap_flux = calculate(
+                equilibrium,
+                overhead_partials_override_Pa={},
+            )
+        else:
+            # Small test doubles and legacy diagnostic seams may not expose the
+            # optional override.  Preserve their call contract while still
+            # publishing the physical current-tick pressure for the caller.
+            evap_flux = calculate(equilibrium)
+        evap_flux = self._apply_analytic_evaporation_depletion(evap_flux)
+        partials = self._same_tick_evaporation_headspace_partials_Pa(evap_flux)
+        if not supports_override:
+            return evap_flux, partials
+
+        # For fixed C_i, h_i(p)=p_i-(R*T/C_i)f_i(P_eq-p_i) is strictly
+        # increasing: f_i decreases as backpressure rises, so its unique zero
+        # is the same bracket a scalar bisection would use on [0, P_eq].  The
+        # aggregate duct regime couples C_i through the current source; a
+        # damped Picard iteration recomputes that C_i and stays on the same
+        # monotone branch without carrying a one-hour projection forward.
+        equilibrium_pressures = dict(
+            getattr(equilibrium, 'vapor_pressures_Pa', {}) or {}
+        )
+
+        def convergence_tolerance(scale_pa: float) -> float:
+            return max(1.0e-6, 1.0e-6 * scale_pa)
+
+        def bounded_override(values: Mapping[str, float]) -> dict[str, float]:
+            bounded: dict[str, float] = {}
+            for species, raw_pressure in values.items():
+                pressure = max(0.0, float(raw_pressure))
+                equilibrium_pressure = equilibrium_pressures.get(species)
+                if equilibrium_pressure is not None:
+                    equilibrium_pressure = float(equilibrium_pressure)
+                    if (
+                        math.isfinite(equilibrium_pressure)
+                        and equilibrium_pressure > 0.0
+                    ):
+                        pressure = min(
+                            pressure,
+                            math.nextafter(equilibrium_pressure, 0.0),
+                        )
+                bounded[str(species)] = pressure
+            return bounded
+
+        initial_partials = dict(partials)
+        best_delta_pa = math.inf
+        best_flux = evap_flux
+        best_partials = dict(partials)
+        # Most points contract quickly with ordinary Picard damping.  A few
+        # multi-carrier points cross a transport-regime branch; continue those
+        # with a smaller same-tick relaxation before using scalar bisection.
+        for phase, (relaxation, iteration_limit) in enumerate(
+            ((0.25, 40), (0.05, 120))
+        ):
+            if phase == 1:
+                # Restart from the zero-pressure seed.  The first pass may
+                # straddle a discontinuous catalog channel; retaining that
+                # branch's iterate can make the small-relaxation pass chase
+                # its toggles instead of the same-tick root.
+                partials = dict(initial_partials)
+            for _ in range(iteration_limit):
+                next_flux = calculate(
+                    equilibrium,
+                    overhead_partials_override_Pa=bounded_override(partials),
+                )
+                next_flux = self._apply_analytic_evaporation_depletion(next_flux)
+                next_partials = self._same_tick_evaporation_headspace_partials_Pa(
+                    next_flux
+                )
+                species = set(partials) | set(next_partials)
+                max_delta_pa = max(
+                    (
+                        abs(
+                            float(next_partials.get(item, 0.0))
+                            - float(partials.get(item, 0.0))
+                        )
+                        for item in species
+                    ),
+                    default=0.0,
+                )
+                scale_pa = max(
+                    (
+                        abs(float(next_partials.get(item, 0.0)))
+                        for item in species
+                    ),
+                    default=0.0,
+                )
+                if max_delta_pa < best_delta_pa:
+                    best_delta_pa = max_delta_pa
+                    best_flux = next_flux
+                    best_partials = dict(next_partials)
+                # The builtin provider intentionally removes a species at the
+                # exact P_eq boundary.  A near-boundary channel can therefore
+                # toggle between a tiny positive flux and zero while the
+                # transport residual is already below one part per million.
+                # Treat that numerical branch width as converged; it is a
+                # pressure tolerance, not a one-hour state carry-forward.
+                if max_delta_pa <= convergence_tolerance(scale_pa):
+                    return next_flux, next_partials
+                partials = {
+                    item: relaxation * float(next_partials.get(item, 0.0))
+                    + (1.0 - relaxation) * float(partials.get(item, 0.0))
+                    for item in species
+                }
+                evap_flux = next_flux
+
+        # Picard can straddle the provider's exact P_eq zero on a genuinely
+        # high-flux species.  For fixed C_i, the residual
+        # h_i(p)=p_i-(R*T/C_i)f_i(P_eq-p_i) is strictly increasing over
+        # [0, P_eq]: the first term rises and the flux term falls.  Bisecting
+        # that bracket gives the same-tick root even when a provider returns a
+        # sparse map at the upper endpoint.  Recompute the duct map after each
+        # species root; the outer sweeps retain the shared, current-tick
+        # transport regime.
+        bisection_species = sorted(
+            species
+            for species in set(partials) | set(next_partials)
+            if float(equilibrium_pressures.get(species, 0.0) or 0.0) > 0.0
+        )
+        if len(bisection_species) > 8:
+            # The scalar bracket below is exact for one fixed conductance, but
+            # a broad catalog request couples many channels through the shared
+            # duct regime.  Preserve the best bounded current-tick iterate in
+            # that vector case; it is never a previous-hour projection and
+            # avoids turning a catalog branch toggle into a hard refusal.
+            return best_flux, best_partials
+        if not bisection_species:
+            from simulator.overhead import OverheadConfigurationError
+
+            raise OverheadConfigurationError(
+                'same-tick evaporation/headspace fixed point did not converge'
+            )
+        for _ in range(4):
+            for species in bisection_species:
+                upper = float(equilibrium_pressures[species])
+                if not math.isfinite(upper) or upper <= 0.0:
+                    continue
+                candidates = dict(partials)
+
+                def evaluate_at(pressure_pa: float):
+                    candidates[species] = pressure_pa
+                    trial_flux = calculate(
+                        equilibrium,
+                        overhead_partials_override_Pa=bounded_override(
+                            candidates
+                        ),
+                    )
+                    trial_flux = self._apply_analytic_evaporation_depletion(
+                        trial_flux
+                    )
+                    return trial_flux, self._same_tick_evaporation_headspace_partials_Pa(
+                        trial_flux
+                    )
+
+                _lower_flux, lower_map = evaluate_at(0.0)
+                lower_residual = float(lower_map.get(species, 0.0))
+                _upper_flux, upper_map = evaluate_at(
+                    math.nextafter(upper, 0.0)
+                )
+                upper_residual = (
+                    float(upper_map.get(species, 0.0)) - upper
+                )
+                if lower_residual <= 0.0:
+                    partials[species] = 0.0
+                    continue
+                if upper_residual >= 0.0:
+                    # The catalog/effective pressure source is not a valid
+                    # bracket for this channel; retain Picard's bounded value
+                    # and let the final residual decide whether to refuse.
+                    continue
+                lo = 0.0
+                hi = upper
+                for _ in range(60):
+                    mid = 0.5 * (lo + hi)
+                    _mid_flux, mid_map = evaluate_at(mid)
+                    residual = float(mid_map.get(species, 0.0)) - mid
+                    if residual > 0.0:
+                        lo = mid
+                    else:
+                        hi = mid
+                    if hi - lo <= max(1.0e-9, 1.0e-9 * hi):
+                        break
+                partials[species] = 0.5 * (lo + hi)
+
+            final_flux = calculate(
+                equilibrium,
+                overhead_partials_override_Pa=bounded_override(partials),
+            )
+            final_flux = self._apply_analytic_evaporation_depletion(final_flux)
+            final_partials = self._same_tick_evaporation_headspace_partials_Pa(
+                final_flux
+            )
+            final_species = set(partials) | set(final_partials)
+            final_delta = max(
+                (
+                    abs(
+                        float(final_partials.get(item, 0.0))
+                        - float(partials.get(item, 0.0))
+                    )
+                    for item in final_species
+                ),
+                default=0.0,
+            )
+            final_scale = max(
+                (
+                    abs(float(final_partials.get(item, 0.0)))
+                    for item in final_species
+                ),
+                default=0.0,
+            )
+            if final_delta <= convergence_tolerance(final_scale):
+                return final_flux, final_partials
+            partials = final_partials
+            next_partials = final_partials
+
+        from simulator.overhead import OverheadConfigurationError
+
+        raise OverheadConfigurationError(
+            'same-tick evaporation/headspace fixed point did not converge'
+        )
 
     def _headspace_venting_throughput(self):
         """Solve the duct source/downstream throughput balance."""
@@ -14353,6 +14750,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
         evap_flux = EvaporationFlux()
         capacity_result = None
+        same_tick_headspace_partials_Pa: dict[str, float] = {}
         if evaporation_campaign:
             if (
                 self._overhead_headspace_enabled()
@@ -14423,11 +14821,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     live_effective_flux.carrier_authority_by_species
                 )
                 evap_flux.update_totals()
-            else:
-                evap_flux = self._calculate_evaporation(equilibrium)
-                evap_flux = self._apply_analytic_evaporation_depletion(
-                    evap_flux
+                same_tick_headspace_partials_Pa = dict(
+                    capacity_result.partial_pressures_Pa
                 )
+            else:
+                if self._overhead_headspace_enabled():
+                    (
+                        evap_flux,
+                        same_tick_headspace_partials_Pa,
+                    ) = self._calculate_evaporation_with_same_tick_headspace(
+                        equilibrium
+                    )
+                else:
+                    evap_flux = self._calculate_evaporation(equilibrium)
+                    evap_flux = self._apply_analytic_evaporation_depletion(
+                        evap_flux
+                    )
         overhead_flux = evap_flux
         effective_transport_capacity = (
             self._controlled_o2_transport_capacity(evap_flux)
@@ -14444,7 +14853,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux.total_kg_hr > 0
             or bool(evap_flux.carrier_authority_by_species)
         ):
-            self._configure_condensation_operating_conditions(evap_flux)
+            self._same_tick_condensation_partials_mbar = (
+                {
+                    species: max(0.0, float(pressure_pa)) / 100.0
+                    for species, pressure_pa in (
+                        same_tick_headspace_partials_Pa.items()
+                    )
+                }
+                if self._overhead_headspace_enabled()
+                else None
+            )
+            try:
+                # Keep this one-argument call stable for diagnostic seams and
+                # test doubles; the same-tick map is scoped to this call.
+                self._configure_condensation_operating_conditions(evap_flux)
+            finally:
+                self._same_tick_condensation_partials_mbar = None
             self._apply_lab_surface_temperatures(sample_time_h=float(self.melt.hour) + 1.0)
             overhead_flux = self._route_to_condensation(evap_flux)
             evap_flux = self._ledger_committed_evap_flux_this_tick
@@ -14557,21 +14981,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             transport_inlet_flux=evap_flux,
             effective_transport_capacity=effective_transport_capacity,
         )
-        upstream_transport = self.overhead_model.estimate_transport_state(
-            evap_flux,
-            self.melt,
-            p_downstream_bar=self._headspace_downstream_pressure_bar(
-                effective_transport_capacity
-            ),
-            effective_transport_capacity=effective_transport_capacity,
-        )
-        self._melt_headspace_composition_mbar = (
-            self.overhead_model.species_partial_pressures(
-                evap_flux,
-                upstream_transport['vapor_pressure_mbar'],
-                self.species_formula_registry,
-            )
-        )
+        if finite_headspace_enabled:
+            # This is the same-tick transport state used by the evaporation
+            # fixed point.  The post-condensation ``overhead.composition``
+            # remains a downstream report and must not replace this upstream
+            # pressure with a one-hour-lagged outgoing-flux projection.
+            self._melt_headspace_composition_mbar = {
+                str(species): max(0.0, float(pressure_pa)) / 100.0
+                for species, pressure_pa in (
+                    same_tick_headspace_partials_Pa.items()
+                )
+                if float(pressure_pa) > 0.0
+            }
+        else:
+            self._melt_headspace_composition_mbar = {}
         if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
                 capacity_result.saturation.combined * 100.0
