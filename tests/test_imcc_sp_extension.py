@@ -8,8 +8,9 @@ import math
 from pathlib import Path
 
 import pytest
+import openimcc
 
-from simulator.melt_backend.imcc_sf04 import (
+from openimcc import (
     ImccCompositionOutsideValidatedEnvelopeError,
     ImccMalformedDatapackError,
     ImccSPComponentRequiresExtensionError,
@@ -17,12 +18,10 @@ from simulator.melt_backend.imcc_sf04 import (
     load_datapack,
 )
 from simulator.melt_backend.sulfliq_matte import FES_MU0_1300K_J_PER_MOL
-from simulator.melt_backend.imcc_sf04.kernel import solve_imcc_sf04
+from openimcc.kernel import solve_imcc_sf04
 
 
-BASE_DATAPACK = Path(
-    "data/melt_activity/imcc/imcc-sf04-v1.0.2.json"
-)
+BASE_DATAPACK = Path(openimcc.__file__).parent / "data/packs/imcc-sf04-v1.0.2.json"
 EXT4 = Path(
     "docs-private/research/2026-08-09-upstream-mission/IMCC-impl/ext4"
 )

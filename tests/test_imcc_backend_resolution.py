@@ -26,7 +26,7 @@ from simulator.melt_backend.imcc_sf04.backend import (
     ImccSf04Backend,
     ImccSf04ExtBackend,
 )
-from simulator.melt_backend.imcc_sf04.kernel import _PUBLISHED_DATAPACK_SHA256
+from openimcc.kernel import _PUBLISHED_DATAPACK_SHA256
 
 
 _POTS_PATH = Path("data/binary_pots.yaml")

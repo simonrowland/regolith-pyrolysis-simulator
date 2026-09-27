@@ -5,11 +5,8 @@ Two things are pinned here:
 1. The CLI contract -- exit 0 solved, exit 2 typed refusal, exit 1 usage error.
    The refusal code matters: a caller scripting against this needs to tell
    "the model declined" apart from "the invocation was wrong".
-2. The MODEL/GLUE split itself. ``adapter.py`` + ``kernel.py`` + ``gas.py`` +
-   ``cli.py`` must not import simulator policy. That is the property that makes
-   the package extractable, and it is invisible to every other test -- nothing
-   fails if someone re-adds a ``simulator.backend_names`` import to the model
-   half, it just quietly re-welds the seam.
+2. The extraction seam: this package contains simulator glue and the legacy
+   JANAF gas layer only. The model API comes from the ``openimcc`` dependency.
 """
 
 from __future__ import annotations
@@ -19,10 +16,11 @@ import json
 from pathlib import Path
 
 import pytest
+import openimcc
 
 from simulator.melt_backend.imcc_sf04 import cli
 
-PACK = Path("data/melt_activity/imcc/imcc-sf04-v1.0.2.json")
+PACK = Path(openimcc.__file__).parent / "data/packs/imcc-sf04-v1.0.2.json"
 
 BASALT = [
     "--oxide", "SiO2=45.4",
@@ -195,18 +193,12 @@ def _simulator_imports(module_path: Path) -> set[str]:
 
 # The model half may depend on its own package and on scalar_boundary -- a
 # 30-line stdlib-only leaf that travels with the package on extraction.
-_MODEL_ALLOWED = {
-    "simulator.melt_backend.imcc_sf04",
-    "simulator.melt_backend.imcc_sf04.adapter",
-    "simulator.melt_backend.imcc_sf04.kernel",
-    "simulator.melt_backend.imcc_sf04.gas",
-    "simulator.scalar_boundary",
-}
+_MODEL_ALLOWED = {"simulator.melt_backend.imcc_sf04.gas"}
 
 _PKG = Path("simulator/melt_backend/imcc_sf04")
 
 
-@pytest.mark.parametrize("module", ["kernel.py", "adapter.py", "gas.py", "cli.py"])
+@pytest.mark.parametrize("module", ["gas.py", "cli.py"])
 def test_model_half_stays_free_of_simulator_policy(module):
     """The extraction seam. If this fails, someone re-welded the model half to
     simulator policy (backend naming, fidelity vocabulary, MeltBackend) and the
@@ -261,9 +253,7 @@ def _glue_reaches(module_path: Path) -> list[str]:
     return reaches
 
 
-@pytest.mark.parametrize(
-    "module", ["kernel.py", "adapter.py", "gas.py", "cli.py", "bench.py"]
-)
+@pytest.mark.parametrize("module", ["gas.py", "cli.py", "bench.py"])
 def test_model_half_does_not_import_the_glue(module):
     """Direction matters: glue -> model is fine, model -> glue would make the
     seam circular and unliftable."""

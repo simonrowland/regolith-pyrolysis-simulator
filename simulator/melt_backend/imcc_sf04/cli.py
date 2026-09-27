@@ -1,9 +1,8 @@
 """Standalone command-line interface to the IMCC-SF04 model.
 
 Input-output only: a datapack plus a composition and a temperature in, melt
-activities out. Deliberately depends on the MODEL half (``adapter`` +
-``kernel``) and never on ``backend.py``, so it travels with the package if the
-model is ever extracted from this repository.
+activities out. The numerical model and datapack loader come from ``openimcc``;
+this module keeps the simulator's command entry point.
 
 Exit codes are part of the contract:
 
@@ -33,15 +32,16 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from importlib import resources
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from simulator.melt_backend.imcc_sf04.adapter import (
+from openimcc import (
     ImccLoadedDatapack,
     evaluate,
     load_datapack,
 )
-from simulator.melt_backend.imcc_sf04.kernel import ImccRefusal
+from openimcc.kernel import ImccRefusal
 
 EXIT_OK = 0
 EXIT_USAGE = 1
@@ -98,6 +98,15 @@ def _pack_metadata(pack: ImccLoadedDatapack) -> dict[str, Any]:
         "extension_species": list(pack.extension_species),
         "reactions": len(pack.kernel_datapack.reactions),
     }
+
+
+def _load_pack(path: str | Path) -> ImccLoadedDatapack:
+    pack_name = Path(path).name
+    if pack_name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}:
+        resource = resources.files("openimcc").joinpath("data", "packs", pack_name)
+        with resources.as_file(resource) as package_path:
+            return load_datapack(package_path)
+    return load_datapack(path)
 
 
 def _result_payload(result: Any) -> dict[str, Any]:
@@ -198,7 +207,7 @@ def _render_solve_text(payload: Mapping[str, Any]) -> str:
 
 
 def _cmd_describe(args: argparse.Namespace) -> int:
-    pack = load_datapack(args.pack)
+    pack = _load_pack(args.pack)
     meta = _pack_metadata(pack)
     if args.json:
         print(json.dumps(meta, indent=2, sort_keys=True))
@@ -227,7 +236,7 @@ def _cmd_describe(args: argparse.Namespace) -> int:
 
 
 def _cmd_validate_pack(args: argparse.Namespace) -> int:
-    load_datapack(args.pack)
+    _load_pack(args.pack)
     payload = {"status": "ok", "pack": str(args.pack)}
     print(json.dumps(payload) if args.json else f"ok: {args.pack} loads and validates")
     return EXIT_OK
@@ -235,7 +244,7 @@ def _cmd_validate_pack(args: argparse.Namespace) -> int:
 
 def _cmd_solve(args: argparse.Namespace) -> int:
     composition = _load_composition(args.composition, args.oxide)
-    pack = load_datapack(args.pack)
+    pack = _load_pack(args.pack)
     result = evaluate(
         composition,
         args.temperature,

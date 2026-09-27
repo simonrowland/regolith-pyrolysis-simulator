@@ -227,6 +227,8 @@ def test_vaporock_1773k_cell_keeps_extrapolated_flag(monkeypatch) -> None:
 
 def test_imcc_temperature_notice_survives_cell_notices() -> None:
     handle = open_battery_engine("imcc_sf04")
+    handle.backend._gas = None
+    handle.backend._gas_error = "test-only unavailable gas tables"
     assert handle.available is True
     hot = _imcc_cell(handle, 800.0)
     warm = _imcc_cell(handle, 1700.0)
@@ -261,6 +263,8 @@ def test_imcc_temperature_notice_survives_cell_notices() -> None:
 
 def test_scoring_envelope_uses_cell_flag() -> None:
     handle = open_battery_engine("imcc_sf04")
+    handle.backend._gas = None
+    handle.backend._gas_error = "test-only unavailable gas tables"
     hot = _imcc_cell(handle, 800.0)
     warm = _imcc_cell(handle, 1700.0)
     hot_pot = _scoring_pot(_mgo_sio2_pot(), 800.0)

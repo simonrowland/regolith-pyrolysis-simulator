@@ -15,7 +15,7 @@ import numpy as np
 import pytest
 
 from simulator.fidelity_vocabulary import backend_name_denies_authority
-from simulator.melt_backend.imcc_sf04 import (
+from openimcc import (
     ImccDatapack,
     ImccComponentOutsideDomainError,
     ImccCompositionIncompleteError,
@@ -28,8 +28,7 @@ from simulator.melt_backend.imcc_sf04 import (
 
 # The raw kernel entry point is deliberately NOT package-exported. Kernel tests
 # import it from the module directly and require unproven packs to stay denied.
-from simulator.melt_backend.imcc_sf04.kernel import solve_imcc_sf04
-from simulator.melt_backend.imcc_sf04.kernel import _active_residual, LOG10
+from openimcc.kernel import solve_imcc_sf04, _active_residual, LOG10
 
 
 # --------------------------------------------------------------------------- #

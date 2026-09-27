@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import openimcc
 
 import simulator.melt_backend.imcc_sf04 as imcc_sf04
 from simulator.backend_names import canonical_backend_name
@@ -31,16 +32,14 @@ from simulator.melt_backend.imcc_sf04 import (
     label_research_datapack,
     load_datapack,
 )
-from simulator.melt_backend.imcc_sf04.kernel import (
+from openimcc.kernel import (
     ImccRefusal,
     _label_loaded_datapack,
     solve_imcc_sf04,
 )
 
 
-DATAPACK_PATH = Path(
-    "data/melt_activity/imcc/imcc-sf04-v1.0.2.json"
-)
+DATAPACK_PATH = Path(openimcc.__file__).parent / "data/packs/imcc-sf04-v1.0.2.json"
 
 
 def _make_uniform_composition(pack: ImccLoadedDatapack) -> dict[str, float]:

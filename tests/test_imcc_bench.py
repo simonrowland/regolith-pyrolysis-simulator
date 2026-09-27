@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 import yaml
+import openimcc
 
 from simulator.melt_backend.imcc_sf04.bench import (
     _single_cation_gas_activities,
@@ -20,7 +21,7 @@ from simulator.melt_backend.imcc_sf04.bench import (
     run_bench,
 )
 
-DATAPACK_PATH = Path("data/melt_activity/imcc/imcc-sf04-v1.0.2.json")
+DATAPACK_PATH = Path(openimcc.__file__).parent / "data/packs/imcc-sf04-v1.0.2.json"
 
 # In-domain CMAS slag, 8-parent IMCC basis (missing parents are zero).
 _CMAS_WT = {
