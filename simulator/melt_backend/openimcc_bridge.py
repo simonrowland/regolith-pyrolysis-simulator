@@ -168,6 +168,29 @@ class OpenImccCleanedMeltResult:
         )
 
 
+def imcc_complex_saturation_notice(
+    flags: tuple[str, ...] | list[str], acid_sink_ratio: float | None
+) -> dict[str, Any] | None:
+    """Map openimcc's acidic-sink exhaustion label to a typed notice."""
+
+    flag = next(
+        (
+            str(item)
+            for item in flags
+            if str(item).startswith("species-coverage-edge")
+        ),
+        None,
+    )
+    if flag is None:
+        return None
+    return {
+        "kind": "imcc_complex_saturation",
+        "flag": flag,
+        "reason": flag,
+        "acid_sink_ratio": acid_sink_ratio,
+    }
+
+
 def _require_openimcc() -> Any:
     if _openimcc is None:
         raise OpenImccUnavailableError(_OPENIMCC_IMPORT_ERROR)

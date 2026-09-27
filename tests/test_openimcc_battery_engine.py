@@ -103,6 +103,37 @@ def test_imcc_battery_emits_notice_for_strict_envelope_edge() -> None:
             assert matching[0]["authority"] == "extrapolated"
 
 
+def test_imcc_battery_surfaces_complex_saturation_notice() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _ImccBatteryBackend,
+        _OpenImccBatteryBackend,
+    )
+
+    for name in ("imcc_sf04", "imcc_sf04_ext", "openimcc"):
+        backend = (
+            _OpenImccBatteryBackend("openimcc")
+            if name == "openimcc"
+            else _ImccBatteryBackend(name)
+        )
+        for x_k2o in (0.50, 0.55):
+            binary_mol = {"K2O": x_k2o, "SiO2": 1.0 - x_k2o}
+            binary_kg = {
+                "K2O": binary_mol["K2O"] * 94.196 / 1000.0,
+                "SiO2": binary_mol["SiO2"] * 60.0843 / 1000.0,
+            }
+            saturated = backend.equilibrate(
+                temperature_C=1800.0 - 273.15,
+                composition_kg=binary_kg,
+                composition_mol=binary_mol,
+            )
+            assert any(
+                row.get("kind") == "imcc_complex_saturation"
+                and row.get("flag", "").startswith("species-coverage-edge")
+                and row.get("acid_sink_ratio") is not None
+                for row in saturated.imcc_notices
+            )
+
+
 @pytest.mark.parametrize(
     "composition_mol",
     [

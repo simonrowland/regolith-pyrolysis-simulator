@@ -1540,6 +1540,16 @@ class _ImccBatteryBackend:
                     "reason": "X_Me2O above the validated 0.5 bound; evaluate(allow_out_of_envelope=True)",
                 }
             )
+        from simulator.melt_backend.openimcc_bridge import (
+            imcc_complex_saturation_notice,
+        )
+
+        saturation_notice = imcc_complex_saturation_notice(
+            tuple(getattr(getattr(result, "labels", None), "flags", ()) or ()),
+            getattr(getattr(result, "labels", None), "acid_sink_ratio", None),
+        )
+        if saturation_notice is not None:
+            notices.append(saturation_notice)
         pressures: dict[str, float] = {}
         gas_error: str | None = None
         if self._gas is None:
@@ -1701,6 +1711,15 @@ class _OpenImccBatteryBackend:
             )
             if outside_domain:
                 authority = AUTHORITY_EXTRAPOLATED
+        from simulator.melt_backend.openimcc_bridge import (
+            imcc_complex_saturation_notice,
+        )
+
+        saturation_notice = imcc_complex_saturation_notice(
+            result.flags, result.acid_sink_ratio
+        )
+        if saturation_notice is not None:
+            notices.append(saturation_notice)
         if result.extrapolated:
             notices.append(
                 {

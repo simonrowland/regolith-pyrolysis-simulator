@@ -386,6 +386,53 @@ def test_bridge_envelope_matches_green_edge_decisions() -> None:
         )
 
 
+def test_species_coverage_edge_flag_contract_and_typed_notice() -> None:
+    _openimcc_or_skip()
+    from simulator.melt_backend.openimcc_bridge import imcc_complex_saturation_notice
+
+    for alkali in ("Na2O", "K2O"):
+        for fraction in (0.50, 0.55):
+            result = bridge_evaluate(
+                composition_mol={alkali: fraction, "SiO2": 1.0 - fraction},
+                temperature_K=1800.0,
+                allow_out_of_envelope=True,
+            )
+            notice = imcc_complex_saturation_notice(
+                result.flags, result.acid_sink_ratio
+            )
+            assert notice is not None
+            assert notice["kind"] == "imcc_complex_saturation"
+            assert notice["flag"].startswith("species-coverage-edge")
+            assert notice["acid_sink_ratio"] == result.acid_sink_ratio
+
+    pinned = bridge_evaluate(
+        composition_mol={"K2O": 0.55, "SiO2": 0.45},
+        temperature_K=1800.0,
+        allow_out_of_envelope=True,
+    )
+    assert any(flag.startswith("species-coverage-edge") for flag in pinned.flags)
+
+    lunar = {
+        "SiO2": 44.5,
+        "TiO2": 1.5,
+        "Al2O3": 13.5,
+        "FeO": 16.5,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 0.4,
+        "K2O": 0.1,
+    }
+    for temperature_K in (1700.0, 2200.0):
+        result = bridge_evaluate(
+            composition_kg=lunar,
+            temperature_K=temperature_K,
+            allow_extrapolation=True,
+        )
+        assert imcc_complex_saturation_notice(
+            result.flags, result.acid_sink_ratio
+        ) is None
+
+
 def test_bridge_extrapolation_and_envelope_flags_are_explicit() -> None:
     openimcc = _openimcc_or_skip()
     with pytest.raises(openimcc.ImccTOutsideDatapackDomainError) as temperature_refusal:
