@@ -502,8 +502,8 @@ def test_typed_refusal_missing_gas_species(gas_pack: ImccGasDatapack) -> None:
 
 def test_gas_layer_uses_imcc_activities() -> None:
     """The gas layer accepts activities produced by the IMCC adapter."""
-    from openimcc import evaluate as evaluate_imcc
     from openimcc import load_datapack as load_imcc_datapack
+    from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
 
     imcc_pack = load_imcc_datapack(
         None

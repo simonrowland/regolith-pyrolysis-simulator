@@ -156,7 +156,11 @@ def _sha256(path: Path) -> str:
 
 
 def _imcc_pack_sha256(path: Path) -> str:
-    if path.name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}:
+    if (
+        not path.is_file()
+        and str(path) == path.name
+        and path.name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}
+    ):
         from importlib import resources
 
         resource = resources.files("openimcc").joinpath("data", "packs", path.name)
@@ -421,7 +425,11 @@ class ImccEngine:
                 "imcc-sf04-v1.0.2.json",
                 "imcc-sf04-ext-v4.json",
             }
-            if pack_name in package_names:
+            if (
+                pack_name in package_names
+                and str(self.pack_path) == pack_name
+                and not self.pack_path.is_file()
+            ):
                 resource = resources.files("openimcc").joinpath(
                     "data", "packs", pack_name
                 )

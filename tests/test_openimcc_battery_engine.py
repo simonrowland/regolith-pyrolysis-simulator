@@ -7,6 +7,7 @@ import math
 import os
 import subprocess
 import sys
+import tempfile
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -25,10 +26,11 @@ from simulator.battery.score import (
     SCORE_ENGINE_SET,
     candidate_observation,
     composition_wt_pct,
-    load_score_context,
+    ScoreContext,
     predict_with_engine,
     score_store,
 )
+from simulator.battery.migrate import load_migrated_store, load_yaml
 from simulator.battery.records import Composition, Species
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
@@ -79,8 +81,96 @@ def _require_ti_gas() -> None:
         pytest.skip("installed openimcc datapack does not contain the Ti gas channel")
 
 
+def test_imcc_battery_emits_notice_for_strict_envelope_edge() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _ImccBatteryBackend
+
+    backend = _ImccBatteryBackend("imcc_sf04")
+    for x_k2o, expects_notice in ((0.500002, True), (0.5, False)):
+        result = backend.equilibrate(
+            temperature_C=1800.0 - 273.15,
+            composition_kg={
+                "K2O": x_k2o * 94.196,
+                "SiO2": (1.0 - x_k2o) * 60.0843,
+            },
+        )
+        notices = result.diagnostics["imcc_notices"]
+        matching = [
+            notice for notice in notices
+            if notice["kind"] == "imcc_composition_outside_validated_envelope"
+        ]
+        assert bool(matching) is expects_notice
+        if matching:
+            assert matching[0]["authority"] == "extrapolated"
+
+
 def _scratch_path() -> Path | None:
     return PLANTE_HAND_ROWS if PLANTE_HAND_ROWS.is_file() else None
+
+
+def _plante_score_context() -> ScoreContext:
+    source_id = "kems-042-plante-1979"
+    work_file = "10.6028_nbs.sp.561v1.yaml"
+    extract_file = f"{source_id}.yaml"
+    coefficient_source_id = "sf04-magma-companion-workbook"
+    coefficient_work_file = "10.1016_j.icarus.2003.08.023.yaml"
+    coefficient_extract_file = f"{coefficient_source_id}.yaml"
+    with tempfile.TemporaryDirectory(prefix="plante-score-context-") as temp_dir:
+        root = Path(temp_dir)
+        for relative, source in (
+            (Path("data/literature/works") / work_file,
+             REPO_ROOT / "data/literature/works" / work_file),
+            (Path("data/literature/extracts-v2") / extract_file,
+             REPO_ROOT / "data/literature/extracts-v2" / extract_file),
+            (Path("data/literature/works") / coefficient_work_file,
+             REPO_ROOT / "data/literature/works" / coefficient_work_file),
+            (Path("data/literature/extracts-v2") / coefficient_extract_file,
+             REPO_ROOT / "data/literature/extracts-v2" / coefficient_extract_file),
+        ):
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.symlink_to(source)
+        works, experiments, observations = load_migrated_store(root)
+    source_doc = load_yaml(REPO_ROOT / "data/literature/extracts" / extract_file)
+    coefficient_doc = load_yaml(
+        REPO_ROOT / "data/literature/extracts" / coefficient_extract_file
+    )
+    origins = {
+        observation_id: extract_file
+        for observation_id in observations
+        if observation_id.startswith(f"{source_id}::")
+    }
+    origins.update(
+        {
+            observation_id: coefficient_extract_file
+            for observation_id in observations
+            if observation_id.startswith(f"{coefficient_source_id}::")
+        }
+    )
+    return ScoreContext(
+        works=works,
+        experiments=experiments,
+        observations=observations,
+        origins=origins,
+        extract_review={
+            source_id: source_doc.get("review_status"),
+            coefficient_source_id: coefficient_doc.get("review_status"),
+        },
+    )
+
+
+def _require_simulator_janaf_gas() -> None:
+    from simulator.melt_backend.imcc_sf04.gas import (
+        DEFAULT_GAS_DATABASE_PATH,
+        load_gas_datapack,
+    )
+
+    try:
+        load_gas_datapack()
+    except Exception as exc:  # noqa: BLE001 - capability probe for optional gas tables
+        pytest.skip(
+            f"simulator VapoRock JANAF gas tables are not resolvable at "
+            f"{DEFAULT_GAS_DATABASE_PATH}: {type(exc).__name__}: {exc}"
+        )
 
 
 def _binary_probe() -> BinaryPot:
@@ -132,9 +222,13 @@ class BlockOpenImcc(importlib.abc.MetaPathFinder):
         return None
 
 sys.meta_path.insert(0, BlockOpenImcc())
+import simulator
+import simulator.backends
+import engines.builtin.vapor_pressure
 from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
-handle = open_battery_engine("openimcc")
-print(json.dumps({"available": handle.available, "reason": handle.unavailable_reason}))
+handles = {name: open_battery_engine(name) for name in ("openimcc", "imcc_sf04", "imcc_sf04_ext")}
+print(json.dumps({name: {"available": handle.available, "reason": handle.unavailable_reason}
+                  for name, handle in handles.items()}))
 '''
     env = {
         "PATH": os.environ.get("PATH", ""),
@@ -151,9 +245,14 @@ print(json.dumps({"available": handle.available, "reason": handle.unavailable_re
     )
     assert completed.returncode == 0, completed.stderr
     payload = json.loads(completed.stdout.strip().splitlines()[-1])
-    assert payload["available"] is False
-    assert "openimcc_not_importable" in payload["reason"]
-    assert "remedy:" in payload["reason"]
+    assert set(payload) == {"openimcc", "imcc_sf04", "imcc_sf04_ext"}
+    reasons = []
+    for entry in payload.values():
+        assert entry["available"] is False
+        assert "openimcc_not_importable" in entry["reason"]
+        assert "remedy:" in entry["reason"]
+        reasons.append(entry["reason"])
+    assert reasons[1:] == reasons[:1] * 2
 
 
 def test_openimcc_unsupported_cr_gas_species_is_typed() -> None:
@@ -371,11 +470,12 @@ def test_openimcc_plante_candidates_equal_packaged_hand_values() -> None:
 
 
 def test_plante_candidate_lineage_unchanged_by_kernel_switch() -> None:
-    context = load_score_context()
+    _require_simulator_janaf_gas()
+    context = _plante_score_context()
     expected = {
         Engine.IMCC_SF04: (True, "independent"),
-        # Captured on green d9bd25f0b; this remains False/unknown until t-1020.
-        Engine.OPENIMCC: (False, "unknown"),
+        # Measured on green 6925ccacd, which adds the t-1020 lineage mapping.
+        Engine.OPENIMCC: (True, "independent"),
     }
     for engine, lineage in expected.items():
         residuals, candidates = score_store(

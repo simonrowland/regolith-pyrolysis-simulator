@@ -34,6 +34,7 @@ from simulator.melt_backend.base import (
 import openimcc
 from openimcc import ImccLoadedDatapack
 from openimcc.kernel import ImccNonconvergenceError, ImccRefusal
+from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
 
 from importlib import resources
 
@@ -161,7 +162,7 @@ class ImccSf04Backend(MeltBackend):
 
         temperature_K = float(temperature_C) + _KELVIN_OFFSET
         try:
-            result = openimcc.evaluate(
+            result = evaluate_imcc(
                 composition,
                 temperature_K,
                 self._pack,

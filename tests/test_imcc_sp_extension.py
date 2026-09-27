@@ -14,9 +14,9 @@ from openimcc import (
     ImccCompositionOutsideValidatedEnvelopeError,
     ImccMalformedDatapackError,
     ImccSPComponentRequiresExtensionError,
-    evaluate,
     load_datapack,
 )
+from simulator.melt_backend.imcc_sf04.adapter import evaluate
 from simulator.melt_backend.sulfliq_matte import FES_MU0_1300K_J_PER_MOL
 from openimcc.kernel import solve_imcc_sf04
 

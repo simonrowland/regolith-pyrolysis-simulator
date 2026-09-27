@@ -164,6 +164,11 @@ def _resolve_path(value: str | Path) -> Path:
     cwd_path = Path.cwd() / path
     if cwd_path.exists():
         return cwd_path.resolve()
+    if str(path) == path.name and path.name in {
+        "imcc-sf04-v1.0.2.json",
+        "imcc-sf04-ext-v4.json",
+    }:
+        return path
     return (_REPO_ROOT / path).resolve()
 
 
@@ -323,7 +328,11 @@ def load_pack(pack_path: Path) -> _PackedEngine:
     ``label_research_datapack`` path as harness ``ImccEngine(published=False)``.
     """
     package_name = pack_path.name
-    if package_name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}:
+    if (
+        not pack_path.is_file()
+        and str(pack_path) == package_name
+        and package_name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}
+    ):
         resource = resources.files("openimcc").joinpath(
             "data", "packs", package_name
         )

@@ -117,6 +117,22 @@ def test_resolve_backend_imcc_names_and_underscores(name: str, cls: type) -> Non
     assert backend.is_available() is True
 
 
+@pytest.mark.parametrize(
+    ("x_k2o", "expected_status"),
+    ((0.500002, "out_of_domain"), (0.5, "ok"), (0.500006, "out_of_domain")),
+)
+def test_backend_uses_strict_composition_envelope(
+    x_k2o: float, expected_status: str
+) -> None:
+    backend = ImccSf04Backend()
+    assert backend.initialize({})
+    result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol={"K2O": x_k2o, "SiO2": 1.0 - x_k2o},
+    )
+    assert result.status == expected_status
+
+
 @pytest.mark.parametrize("name", ["imcc-sf04", "imcc-sf04-ext", "imcc_sf04"])
 def test_resolve_imcc_as_active_is_typed_ineligible_refusal(name: str) -> None:
     with pytest.raises(BackendUnavailableError, match="pending battery qualification") as excinfo:

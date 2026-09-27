@@ -1385,7 +1385,9 @@ class _ImccBatteryBackend:
         self._load()
 
     def _load(self) -> None:
-        import openimcc
+        from simulator.melt_backend.openimcc_bridge import _require_openimcc
+
+        openimcc = _require_openimcc()
         from importlib import resources
 
         pack_name = (
@@ -1443,7 +1445,9 @@ class _ImccBatteryBackend:
         total = sum(composition_wt.values())
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         enable_sp = self.engine_name == "imcc_sf04_ext"
-        result = openimcc.evaluate(
+        from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
+
+        result = evaluate_imcc(
             composition_wt,
             temperature_K,
             self._pack,
@@ -1552,8 +1556,8 @@ class _OpenImccBatteryBackend:
     """Battery-only producer for the optional openimcc package.
 
     The melt rail goes through the C1 bridge.  The vapour rail deliberately
-    calls openimcc's gas layer directly, so it cannot silently inherit the
-    vendored IMCC adapter's VapoRock-backed JANAF tables.
+    calls openimcc's gas layer directly, so it does not use the simulator's
+    VapoRock-backed JANAF tables.
     """
 
     supports_intrinsic_fO2 = False

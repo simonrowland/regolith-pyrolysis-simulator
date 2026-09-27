@@ -102,7 +102,11 @@ def _pack_metadata(pack: ImccLoadedDatapack) -> dict[str, Any]:
 
 def _load_pack(path: str | Path) -> ImccLoadedDatapack:
     pack_name = Path(path).name
-    if pack_name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}:
+    if (
+        not Path(path).is_file()
+        and str(path) == pack_name
+        and pack_name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}
+    ):
         resource = resources.files("openimcc").joinpath("data", "packs", pack_name)
         with resources.as_file(resource) as package_path:
             return load_datapack(package_path)

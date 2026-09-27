@@ -494,7 +494,7 @@ def evaluate(
     is accepted as the external mass projection and is passed to openimcc as a
     ``wt`` composition; absolute mass units cancel in the normalization.  If
     both are supplied, the molar composition takes precedence, matching the
-    vendored MeltBackend adapter.
+    simulator MeltBackend adapter.
 
     ``pack`` accepts ``"v1.0.2"`` or ``"ext-v4"``.  The two extrapolation
     switches are explicit and default to refusal.  Positive ``Fe2O3`` remains
@@ -516,7 +516,9 @@ def evaluate(
         raise TypeError("composition_mol or composition_kg is required")
 
     loaded_pack = _load_pack(pack)
-    result = package.evaluate(
+    from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
+
+    result = evaluate_imcc(
         composition,
         float(temperature_K),
         loaded_pack,

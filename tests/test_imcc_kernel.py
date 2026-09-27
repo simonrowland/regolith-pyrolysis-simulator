@@ -22,9 +22,9 @@ from openimcc import (
     ImccFerricInputUnsupportedError,
     ImccNonconvergenceError,
     ImccTOutsideDatapackDomainError,
-    evaluate,
     label_research_datapack,
 )
+from simulator.melt_backend.imcc_sf04.adapter import evaluate
 
 # The raw kernel entry point is deliberately NOT package-exported. Kernel tests
 # import it from the module directly and require unproven packs to stay denied.
