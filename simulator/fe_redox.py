@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
+from typing import Literal, TypedDict
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 
@@ -46,6 +47,26 @@ KRESS91_FO2_KEY_REFERENCE_T_K = 1673.15
 # it stays below the provider's atom-ledger no-op scale for a depleted melt so
 # a sub-tolerance Fe2O3 transition is not minted solely to satisfy telemetry.
 KRESS91_FERRIC_FRACTION_EPSILON = 1.0e-6 + 1.0e-12
+# The redox-domain notice uses the same certified pO2 interval as the
+# downstream vapor-pressure rails.  Values outside it remain predictions and
+# must carry an extrapolation flag; they are not silently treated as in-band.
+REDOX_CERTIFIED_PO2_BAND_BAR = (1.0e-12, 100.0)
+
+
+class RedoxDomainRecord(TypedDict):
+    """Typed provenance for the fO2 value consumed by downstream chemistry."""
+
+    status: Literal['ok', 'out_of_domain']
+    derived_fO2_log: float
+    equivalent_pO2_bar: float
+    basis: Literal['fe_feo_buffer', 'kress91_inverse']
+    certified_band: dict[str, tuple[float, float]]
+    endpoint_clamped: bool
+    endpoint_epsilon: float
+    endpoint_provenance: str
+    authority: str
+    authority_level: str
+    reason: str
 
 
 def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:

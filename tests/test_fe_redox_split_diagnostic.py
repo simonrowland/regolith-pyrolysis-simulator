@@ -198,6 +198,41 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     )
 
 
+def test_native_fe_coexistence_uses_fe_feo_buffer_domain_record() -> None:
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    _seed_redox_liquidus_curve(sim)
+    sim._melt_redox_ledger_initialized = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.fO2_log = -10.0
+    sim.melt.melt_fO2_log = -10.0
+
+    assert sim._compute_fe_redox_split_diagnostic()["native_fe_saturation"] is True
+    sim._apply_native_fe_saturation_split()
+
+    split = sim._compute_fe_redox_split_diagnostic()
+    domain = split["redox_domain"]
+    assert domain["basis"] == "fe_feo_buffer"
+    assert abs(split["fO2_log"] - split["iw_log"]) <= 2.0
+    assert domain["derived_fO2_log"] == pytest.approx(split["fO2_log"])
+    assert domain["equivalent_pO2_bar"] == pytest.approx(10.0 ** split["fO2_log"])
+    assert domain["endpoint_provenance"]
+    assert domain["endpoint_epsilon"] > 0.0
+
+    source_breakdown = sim._redox_source_breakdown_diagnostic()
+    assert source_breakdown["redox_domain"] == domain
+
+    snapshot = sim._make_snapshot()
+    snapshot.fe_redox_split = split
+    snapshot.redox_source_breakdown = source_breakdown
+    report = build_per_hour_summary(sim, snapshot)
+    assert report["fe_redox_split"]["redox_domain"]["basis"] == (
+        "fe_feo_buffer"
+    )
+    assert report["redox_source_breakdown"]["redox_domain"]["basis"] == (
+        "fe_feo_buffer"
+    )
+
+
 def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
