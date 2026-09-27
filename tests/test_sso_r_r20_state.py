@@ -108,6 +108,91 @@ def _transition_account_o2_equiv_mol(
     )
 
 
+def _ledger_signature(sim: PyrolysisSimulator) -> tuple[Any, Any]:
+    ledger = sim.atom_ledger
+    transitions = tuple(
+        (
+            transition.name,
+            repr(transition.debits),
+            repr(transition.credits),
+            transition.reason,
+        )
+        for transition in ledger.transitions
+    )
+    return ledger.mol_by_account(), transitions
+
+
+def _configure_shadow_transport(sim: PyrolysisSimulator) -> None:
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.p_total_mbar = 100.0
+    sim._overhead_headspace_config["enabled"] = True
+    sim._melt_headspace_composition_mbar = {"N2": 1.0}
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.2, "N2": 0.8},
+        source="test shadow oxygen holdup",
+        material_origin="feedstock",
+    )
+
+
+def test_shadow_transfer_is_finite_bounded_and_monotonic_at_tiny_capacity() -> None:
+    sim = _make_sim()
+    _configure_shadow_transport(sim)
+    before = _ledger_signature(sim)
+
+    short = sim._oxygen_shadow_transfer(
+        dt_s=3600.0,
+        capacity_mol_per_ln_fO2=1.0e-30,
+    )
+    long = sim._oxygen_shadow_transfer(
+        dt_s=36_000.0,
+        capacity_mol_per_ln_fO2=1.0e-30,
+    )
+
+    assert short["authority"] == "diagnostic_only"
+    assert short["status"] == "ok"
+    assert short["substeps"] > 1
+    assert math.isfinite(short["transfer_o2_mol"])
+    assert math.isfinite(long["transfer_o2_mol"])
+    assert short["bounds_mol"]["lower"] <= short["transfer_o2_mol"]
+    assert short["transfer_o2_mol"] <= short["bounds_mol"]["upper"]
+    assert long["bounds_mol"]["lower"] <= long["transfer_o2_mol"]
+    assert long["transfer_o2_mol"] <= long["bounds_mol"]["upper"]
+    assert short["transfer_o2_mol"] * long["transfer_o2_mol"] >= 0.0
+    assert abs(long["transfer_o2_mol"]) >= abs(short["transfer_o2_mol"])
+    assert math.isfinite(short["conductances_mol_m2_s_per_ln"]["effective"])
+    assert _ledger_signature(sim) == before
+
+
+def test_shadow_transfer_leaves_live_ledger_byte_identical_to_live_rc() -> None:
+    shadow_sim = _make_sim()
+    live_only_sim = _make_sim()
+    _configure_shadow_transport(shadow_sim)
+    _configure_shadow_transport(live_only_sim)
+
+    shadow_sim._apply_oxygen_reservoir_exchange()
+    shadow_payload = dict(
+        shadow_sim.melt.oxygen_reservoir.shadow_oxygen_transfer
+    )
+    shadow_sim._refresh_oxygen_reservoir_without_exchange(
+        exchange_direction="test_refresh_preserves_shadow"
+    )
+    live_only_sim._oxygen_shadow_transfer = lambda **_: {
+        "authority": "diagnostic_only",
+        "status": "disabled_for_parity_test",
+    }
+    live_only_sim._apply_oxygen_reservoir_exchange()
+
+    assert shadow_sim.melt.oxygen_reservoir.shadow_oxygen_transfer[
+        "authority"
+    ] == "diagnostic_only"
+    assert shadow_sim.melt.oxygen_reservoir.shadow_oxygen_transfer == (
+        shadow_payload
+    )
+    assert _ledger_signature(shadow_sim) == _ledger_signature(live_only_sim)
+
+
 def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
     monkeypatch,
 ) -> None:
@@ -308,12 +393,25 @@ def test_axial_stirring_shortens_melt_renewal_and_moves_1mbar_interface() -> Non
     sim.melt.p_total_mbar = 1.0
     sim.melt.atmosphere = Atmosphere.PN2_SWEEP
     sim._melt_headspace_composition_mbar = {"N2": 1.0}
+    feo_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
+        "FeO",
+        0.0,
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"Fe2O3": float(feo_mol) / 2.0},
+        source="test interior Fe redox inventory",
+        material_origin="feedstock",
+    )
+    interior_fO2_log = sim._melt_fO2_from_ledger(
+        T_K=sim.melt.temperature_C + 273.15
+    )
 
     def solve(axial_stir: float) -> dict[str, Any]:
         sim.melt.stir_state.axial = axial_stir
         return sim._oxygen_interface_state(
             1.0e-9,
-            intrinsic_fO2_log=-4.0,
+            intrinsic_fO2_log=interior_fO2_log,
         )
 
     quiescent = solve(0.0)
