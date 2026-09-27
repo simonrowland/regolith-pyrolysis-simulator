@@ -309,6 +309,27 @@ def _dropped_account_species(
 # Notice flag / backend_status_reason. Projection payload still uses
 # VapoRock's `input_composition_projected` reason token.
 COMPOSITION_PROJECTED = 'composition_projected'
+MAGEMIN_MODE_VECTOR_MASS_DEFICIT = 'magemin_mode_vector_mass_deficit'
+
+
+class _MAGEMinModeVectorMassDeficit(RuntimeError):
+    """A finite MAGEMin mode row omits part of the input mass."""
+
+    def __init__(
+        self,
+        *,
+        mode_sum: float,
+        parsed_modes: List[Tuple[str, float]],
+    ) -> None:
+        self.mode_sum = float(mode_sum)
+        self.deficit = 1.0 - self.mode_sum
+        self.parsed_modes = tuple(
+            (str(name), float(fraction)) for name, fraction in parsed_modes
+        )
+        super().__init__(
+            'MAGEMin Mode vector must sum to 1.0; '
+            f'got {self.mode_sum:.9g}'
+        )
 
 
 def _as_mapping(value: Any) -> Mapping[str, Any] | None:
@@ -1377,6 +1398,48 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         'backend_status_reason',
                         'clamped_operating_point',
                     )
+        if isinstance(raw, Mapping):
+            mode_deficit = raw.get('mode_vector_mass_deficit')
+            if isinstance(mode_deficit, Mapping):
+                mode_sum = float(mode_deficit['mode_sum'])
+                deficit = float(mode_deficit['deficit'])
+                result_diagnostics.update({
+                    'backend_status': 'out_of_domain',
+                    'backend_status_reason': (
+                        MAGEMIN_MODE_VECTOR_MASS_DEFICIT
+                    ),
+                    'magemin_mode_vector_raw_sum': mode_sum,
+                    'magemin_mode_vector_deficit': deficit,
+                    'magemin_mode_vector_input_components': {
+                        str(name): float(value)
+                        for name, value in sorted(
+                            bulk_projection.composition_wt_pct.items()
+                        )
+                    },
+                    # The compact --Verb=0 row reports phase masses, not
+                    # phase compositions, so component-level absence cannot
+                    # be determined from this output.
+                    'magemin_mode_vector_unrepresented_input_components': None,
+                    'magemin_mode_vector_unrepresented_components_determined': (
+                        False
+                    ),
+                })
+                if 'reported_mode_vector' in mode_deficit:
+                    result_diagnostics['magemin_reported_mode_vector'] = (
+                        mode_deficit['reported_mode_vector']
+                    )
+                message = (
+                    'MAGEMin returned an incomplete Mode vector; '
+                    f'mass deficit={deficit:.9g}'
+                )
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=result_fO2_log,
+                    status='out_of_domain',
+                    warnings=[*all_warnings, message],
+                    diagnostics=result_diagnostics,
+                )
         (
             phases_present,
             phase_masses_kg,
@@ -2103,7 +2166,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         block so ``equilibrate`` can surface it on the
         ``EquilibriumResult``.
 
-        Raises ``RuntimeError`` on a non-zero exit, a timeout, or an
+        Returns a typed mode-deficit marker when a finite mode row omits mass.
+        Raises ``RuntimeError`` on a non-zero exit, a timeout, or other
         unparseable stdout — the explicit fail signal ``equilibrate()``
         converts into an empty result + warning.
         """
@@ -2205,7 +2269,24 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 f'{stderr or "no stderr"}'
             )
 
-        phases = self._parse_subprocess_stdout(completed.stdout or '')
+        try:
+            phases = self._parse_subprocess_stdout(completed.stdout or '')
+        except _MAGEMinModeVectorMassDeficit as exc:
+            return {
+                'mode_vector_mass_deficit': {
+                    'mode_sum': exc.mode_sum,
+                    'deficit': exc.deficit,
+                    'reported_mode_vector': [
+                        {
+                            'phase': name,
+                            'mass_fraction': fraction,
+                        }
+                        for name, fraction in exc.parsed_modes
+                    ],
+                },
+                'buffer_warnings': buffer_warnings,
+                'operating_point_diagnostics': operating_point_diagnostics,
+            }
         if not phases:
             raise RuntimeError(
                 'MAGEMin binary produced no parseable Phase/Mode block'
@@ -2486,6 +2567,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             parsed_modes.append((name, fraction))
         mode_total = sum(fraction for _, fraction in parsed_modes)
         if not math.isclose(mode_total, 1.0, rel_tol=0.0, abs_tol=1.0e-4):
+            if mode_total < 1.0:
+                raise _MAGEMinModeVectorMassDeficit(
+                    mode_sum=mode_total,
+                    parsed_modes=parsed_modes,
+                )
             raise RuntimeError(
                 'MAGEMin Mode vector must sum to 1.0; '
                 f'got {mode_total:.9g}'
