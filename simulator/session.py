@@ -27,6 +27,7 @@ from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
 from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 from simulator.state import (
     DecisionPoint,
     DecisionType,
@@ -206,6 +207,8 @@ class SimSessionConfig:
     reduced_real_cache: Mapping[str, Any] | None = None
     backend_config: Mapping[str, Any] | None = None
     campaigns_elapsed: float = 1.0
+    imcc_activity_shadow: bool = False
+    high_t_melt_activity: str | None = None
 
     def __post_init__(self) -> None:
         # Fold legacy analytical aliases onto the canonical
@@ -219,6 +222,18 @@ class SimSessionConfig:
         )
         object.__setattr__(self, "runtime_campaign_overrides", overrides)
         object.__setattr__(self, "setpoints_overrides", overrides)
+        if not isinstance(self.imcc_activity_shadow, bool):
+            raise TypeError("imcc_activity_shadow must be bool")
+        configured_high_t_activity = (
+            self.high_t_melt_activity
+            if self.high_t_melt_activity is not None
+            else self.setpoints.get("high_t_melt_activity", "openimcc")
+        )
+        object.__setattr__(
+            self,
+            "high_t_melt_activity",
+            normalize_high_t_melt_activity(configured_high_t_activity),
+        )
         track = str(self.track)
         if track not in _ALLOWED_SESSION_TRACKS:
             valid = ", ".join(sorted(_ALLOWED_SESSION_TRACKS))
@@ -379,6 +394,9 @@ class SimSession:
                 ),
             )
         )
+        if config.imcc_activity_shadow:
+            sim._imcc_activity_shadow_enabled = True
+        sim._high_t_melt_activity = config.high_t_melt_activity
         if cached_real_config is not None:
             sim.configure_pt0_determinism_store(
                 build_cached_real_store(cached_real_config)

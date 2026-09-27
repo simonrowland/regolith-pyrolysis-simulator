@@ -72,6 +72,7 @@ from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
 )
+from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 from simulator.core import (
     CampaignPhase,
     DEGRADED_PATH_ENGAGEMENT_KEYS,
@@ -1012,6 +1013,8 @@ class PyrolysisRun:
     # the live values.
     run_metadata_overrides: dict[str, Any] = field(default_factory=dict)
     reduced_real_cache: Mapping[str, Any] | None = None
+    imcc_activity_shadow: bool = False
+    high_t_melt_activity: str | None = None
     strict_result_contract: bool = field(init=False, default=True)
     _target_inventory_by_hour: list[dict[str, Any]] = field(
         default_factory=list, init=False, repr=False
@@ -1037,6 +1040,15 @@ class PyrolysisRun:
         )
         self.runtime_campaign_overrides = overrides
         self.setpoints_overrides = overrides
+        if not isinstance(self.imcc_activity_shadow, bool):
+            raise TypeError("imcc_activity_shadow must be bool")
+        if self.high_t_melt_activity is not None:
+            try:
+                self.high_t_melt_activity = normalize_high_t_melt_activity(
+                    self.high_t_melt_activity
+                )
+            except ValueError as exc:
+                raise RunnerError(str(exc)) from exc
 
     def _enforce_preset_comparison_contract(self) -> None:
         preset = self.run_metadata_overrides.get(PRESET_PROVENANCE_METADATA_KEY)
@@ -1172,6 +1184,17 @@ class PyrolysisRun:
         feedstocks = bundle.feedstocks
         setpoints = copy.deepcopy(bundle.setpoints)
         setpoints = _deep_merge_setpoints(setpoints, self.setpoints_patch)
+        if self.high_t_melt_activity is not None:
+            setpoints = _deep_merge_setpoints(
+                setpoints,
+                {"high_t_melt_activity": self.high_t_melt_activity},
+            )
+        try:
+            high_t_melt_activity = normalize_high_t_melt_activity(
+                setpoints.get("high_t_melt_activity", "openimcc")
+            )
+        except ValueError as exc:
+            raise RunnerError(str(exc)) from exc
         if self.chemistry_kernel:
             try:
                 diagnostic_kernel_config = normalize_chemistry_kernel_config(
@@ -1260,6 +1283,8 @@ class PyrolysisRun:
                 if self.force_builtin_vapor_pressure
                 else None
             ),
+            imcc_activity_shadow=self.imcc_activity_shadow,
+            high_t_melt_activity=high_t_melt_activity,
         )
 
     def _load_config_bundle(self) -> ConfigBundle:
@@ -2736,6 +2761,16 @@ def build_per_hour_summary(
     overlay = dict(getattr(sim, "_last_vapour_batch_flux_overlay", {}) or {})
     if overlay:
         summary["vapour_batch_flux_overlay"] = _json_safe(overlay)
+    imcc_activity_shadow = dict(
+        getattr(snapshot, "imcc_activity_shadow", {}) or {}
+    )
+    if imcc_activity_shadow:
+        summary["imcc_activity_shadow"] = _json_safe(imcc_activity_shadow)
+    high_t_melt_activity = dict(
+        getattr(sim, "_last_high_t_melt_activity", {}) or {}
+    )
+    if high_t_melt_activity:
+        summary["high_t_melt_activity"] = _json_safe(high_t_melt_activity)
     capture_ledger_snapshot(sim, snapshot)
     return _json_safe(summary)
 
@@ -4267,6 +4302,13 @@ def build_sio_yield_report(
         if vaporock_full_speciation:
             diagnostics["vaporock_full_speciation_Pa"] = (
                 vaporock_full_speciation
+            )
+        high_t_melt_activity = dict(
+            vapor_pressure_diagnostic.get("high_t_melt_activity") or {}
+        )
+        if high_t_melt_activity:
+            diagnostics["high_t_melt_activity"] = _json_safe(
+                high_t_melt_activity
             )
         if include_lab_oxygen_diagnostics:
             queries = AccountingQueries(sim)

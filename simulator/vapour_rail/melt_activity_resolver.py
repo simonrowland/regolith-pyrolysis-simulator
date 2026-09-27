@@ -21,6 +21,11 @@ from typing import Any, Final
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.physical_constants import GAS_CONSTANT
+from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_CATIONS_PER_FORMULA,
+    melt_oxide_activity,
+)
+from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.vapour_rail.activity import (
     ActivityAttempt,
     ActivityRefusalCode,
@@ -40,6 +45,20 @@ CRYSTALLINE_TARGET_PRESSURE_BAR: Final[float] = 1.0
 PROVEN_EMPTY_COMPONENT: Final[str] = "proven_empty_component"
 SHADOW_EQUALITY_ABS_TOL_LN: Final[float] = 1.0e-10
 MELT_ACTIVITY_SHADOW_RECORD_LIMIT: Final[int] = 64
+
+IMCC_ACTIVITY_SHADOW_SCHEMA: Final[str] = "imcc_activity_shadow.v1"
+IMCC_ACTIVITY_SHADOW_DOMAIN_K: Final[tuple[float, float]] = (1700.0, 3000.0)
+IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K: Final[float] = VAPOROCK_T_MAX_K
+IMCC_ACTIVITY_SHADOW_FLUX_OXIDES: Final[tuple[str, ...]] = (
+    "Na2O",
+    "K2O",
+    "SiO2",
+    "FeO",
+    "MgO",
+    "CaO",
+    "Al2O3",
+    "TiO2",
+)
 
 SHADOW_COMPARABLE: Final[str] = "comparable"
 SHADOW_NOT_COMPARABLE_YET: Final[str] = "not_comparable_yet"
@@ -314,6 +333,7 @@ class MeltActivityShadow:
     inventory_digest: str
     registry_digest: str
     status: str = "shadow_only_no_behavior_authority"
+    imcc_activity_shadow: Mapping[str, Any] | None = None
     dropped_component_count: int = field(default=0, init=False)
     dropped_comparison_count: int = field(default=0, init=False)
     comparison_summary: Mapping[str, Any] = field(default_factory=dict, init=False)
@@ -420,7 +440,7 @@ class MeltActivityShadow:
         )
 
     def as_mapping(self) -> dict[str, Any]:
-        return {
+        payload = {
             "status": self.status,
             "state_fingerprint": self.state_fingerprint,
             "inventory_digest": self.inventory_digest,
@@ -440,6 +460,9 @@ class MeltActivityShadow:
                 self.dropped_component_count or self.dropped_comparison_count
             ),
         }
+        if self.imcc_activity_shadow is not None:
+            payload["imcc_activity_shadow"] = dict(self.imcc_activity_shadow)
+        return payload
 
 
 def _canonical(value: Any) -> Any:
@@ -2519,6 +2542,228 @@ def _independent_shadow_comparison(
     )
 
 
+def _cleaned_melt_account_mol(
+    ledger_snapshot: Mapping[str, Any],
+) -> dict[str, float]:
+    """Return the cleaned-melt molar account used by the IMCC shadow."""
+
+    if hasattr(ledger_snapshot, "mol_by_account") and not isinstance(
+        ledger_snapshot, Mapping
+    ):
+        raw = ledger_snapshot.mol_by_account("process.cleaned_melt")  # type: ignore[attr-defined]
+    else:
+        raw = ledger_snapshot.get("process.cleaned_melt", {})
+    if not isinstance(raw, Mapping):
+        return {}
+    composition = {str(name): float(value) for name, value in raw.items()}
+    if "FeO_total" in composition and "FeO" not in composition:
+        composition["FeO"] = composition.pop("FeO_total")
+    return composition
+
+
+def _imcc_shadow_rows(
+    composition_mol: Mapping[str, float],
+    *,
+    imcc_activities: Mapping[str, float] | None,
+) -> dict[str, dict[str, Any]]:
+    """Build the fixed eight-oxide comparison table on explicit bases."""
+
+    rows: dict[str, dict[str, Any]] = {}
+    for oxide in IMCC_ACTIVITY_SHADOW_FLUX_OXIDES:
+        constant_gamma_activity: float | None = None
+        constant_gamma_parent_activity: float | None = None
+        constant_gamma_status = "unavailable"
+        constant_gamma_detail: str | None = None
+        try:
+            resolved = melt_oxide_activity(
+                oxide,
+                composition_mol,
+                temperature_K=None,
+            )
+        except (TypeError, ValueError) as exc:
+            resolved = None
+            constant_gamma_status = "refused"
+            constant_gamma_detail = str(exc)
+        if resolved is not None:
+            constant_gamma_activity = float(resolved.activity)
+            constant_gamma_parent_activity = float(
+                resolved.thermodynamic_parent_activity()
+            )
+            constant_gamma_status = "ok"
+
+        imcc_activity: float | None = None
+        if imcc_activities is not None and oxide in imcc_activities:
+            try:
+                candidate = float(imcc_activities[oxide])
+            except (TypeError, ValueError):
+                candidate = float("nan")
+            if math.isfinite(candidate) and candidate >= 0.0:
+                imcc_activity = candidate
+
+        cations = float(MELT_OXIDE_CATIONS_PER_FORMULA.get(oxide, 1.0))
+        imcc_single_cation_activity = (
+            None
+            if imcc_activity is None
+            else imcc_activity ** (1.0 / cations)
+        )
+        ratio = (
+            None
+            if imcc_single_cation_activity is None
+            or constant_gamma_activity is None
+            or constant_gamma_activity <= 0.0
+            else imcc_single_cation_activity / constant_gamma_activity
+        )
+        row: dict[str, Any] = {
+            "imcc_activity": imcc_activity,
+            "imcc_activity_basis": "parent_oxide",
+            "imcc_single_cation_activity": imcc_single_cation_activity,
+            "constant_gamma_activity": constant_gamma_activity,
+            "constant_gamma_activity_basis": "single_cation",
+            "constant_gamma_parent_oxide_activity": constant_gamma_parent_activity,
+            "ratio": ratio,
+            "ratio_basis": "single_cation_imcc_over_constant_gamma",
+            "constant_gamma_status": constant_gamma_status,
+        }
+        if constant_gamma_detail:
+            row["constant_gamma_detail"] = constant_gamma_detail
+        rows[oxide] = row
+    return rows
+
+
+def _imcc_shadow_payload_base(temperature_K: float | None) -> dict[str, Any]:
+    return {
+        "schema": IMCC_ACTIVITY_SHADOW_SCHEMA,
+        "behavior_authority": False,
+        "temperature_K": (
+            None if temperature_K is None else float(temperature_K)
+        ),
+        "imcc_domain_K": list(IMCC_ACTIVITY_SHADOW_DOMAIN_K),
+        "vaporock_cap_K": IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K,
+        "above_vaporock_cap": (
+            None
+            if temperature_K is None
+            else float(temperature_K) > IMCC_ACTIVITY_SHADOW_VAPOROCK_CAP_K
+        ),
+        "flux_oxides": list(IMCC_ACTIVITY_SHADOW_FLUX_OXIDES),
+        "flags": [],
+        "notices": [],
+        "openimcc_version": None,
+        "pack_model_id": None,
+        "pack_version": None,
+        "pack_digest": None,
+        "envelope_status": None,
+        "extrapolated": False,
+        "coverage": {},
+    }
+
+
+def build_imcc_activity_shadow(
+    *,
+    composition_mol: Mapping[str, float],
+    temperature_K: float,
+) -> dict[str, Any]:
+    """Evaluate one diagnostic-only IMCC shadow row without touching flux."""
+
+    try:
+        temperature = float(temperature_K)
+    except (TypeError, ValueError):
+        temperature = None
+    if temperature is not None and not math.isfinite(temperature):
+        temperature = None
+    payload = _imcc_shadow_payload_base(temperature)
+    if temperature is None:
+        payload.update(
+            {
+                "status": "refused",
+                "reason": "invalid IMCC shadow temperature",
+                "reason_code": "imcc_shadow_invalid_temperature",
+                "refusal": {
+                    "code": "imcc_shadow_invalid_temperature",
+                    "type": "ValueError",
+                    "detail": "temperature_K must be finite",
+                },
+            }
+        )
+        payload["activities_by_oxide"] = _imcc_shadow_rows(
+            composition_mol,
+            imcc_activities=None,
+        )
+        return payload
+
+    low, high = IMCC_ACTIVITY_SHADOW_DOMAIN_K
+    if not low <= temperature <= high:
+        payload.update(
+            {
+                "status": "out_of_imcc_domain",
+                "reason": "out of IMCC domain",
+                "reason_code": "imcc_shadow_out_of_domain",
+                "refusal": {
+                    "code": "imcc_shadow_out_of_domain",
+                    "type": "ImccTOutsideDomain",
+                    "detail": (
+                        f"temperature_K={temperature:g} is outside "
+                        f"[{low:g}, {high:g}] K; no extrapolation attempted"
+                    ),
+                },
+            }
+        )
+        payload["activities_by_oxide"] = _imcc_shadow_rows(
+            composition_mol,
+            imcc_activities=None,
+        )
+        return payload
+
+    try:
+        from simulator.melt_backend.imcc_sf04.openimcc_bridge import evaluate
+
+        result = evaluate(
+            composition_mol=composition_mol,
+            temperature_K=temperature,
+            allow_extrapolation=False,
+            allow_out_of_envelope=False,
+        )
+    except Exception as exc:  # noqa: BLE001 - diagnostic shadow is fail-isolated
+        code = str(getattr(exc, "code", "imcc_activity_shadow_refused"))
+        payload.update(
+            {
+                "status": "refused",
+                "reason": "IMCC shadow evaluation refused",
+                "reason_code": code,
+                "refusal": {
+                    "code": code,
+                    "type": type(exc).__name__,
+                    "detail": str(exc),
+                },
+            }
+        )
+        payload["activities_by_oxide"] = _imcc_shadow_rows(
+            composition_mol,
+            imcc_activities=None,
+        )
+        return payload
+
+    payload.update(
+        {
+            "status": "ok",
+            "flags": list(result.flags),
+            "notices": list(result.notices),
+            "openimcc_version": result.openimcc_version,
+            "pack_model_id": result.pack_model_id,
+            "pack_version": result.pack_version,
+            "pack_digest": result.pack_digest,
+            "envelope_status": result.envelope_status,
+            "extrapolated": bool(result.extrapolated),
+            "coverage": dict(result.coverage),
+            "acid_sink_ratio": result.acid_sink_ratio,
+        }
+    )
+    payload["activities_by_oxide"] = _imcc_shadow_rows(
+        composition_mol,
+        imcc_activities=result.parent_oxide_activities,
+    )
+    return payload
+
+
 def build_shadow_for_vapour_batch(
     *,
     rules: Sequence[Any],
@@ -2526,6 +2771,7 @@ def build_shadow_for_vapour_batch(
     state: Any | None,
     registry: MeltActivityRegistry | None = None,
     engine_inputs_by_component: Mapping[str, TierAEngineInput] | None = None,
+    imcc_activity_shadow_enabled: bool = False,
 ) -> MeltActivityShadow:
     """Build one component result per batch without influencing live answers."""
 
@@ -2811,10 +3057,17 @@ def build_shadow_for_vapour_batch(
             pressure_bar=pressure_bar,
         )
     )
+    imcc_activity_shadow = None
+    if imcc_activity_shadow_enabled:
+        imcc_activity_shadow = build_imcc_activity_shadow(
+            composition_mol=_cleaned_melt_account_mol(ledger_snapshot),
+            temperature_K=temperature_K,
+        )
     return MeltActivityShadow(
         results_by_component=results,
         comparisons=tuple(comparisons),
         state_fingerprint=state_fp,
         inventory_digest=inventory_digest,
         registry_digest=resolver.registry.digest,
+        imcc_activity_shadow=imcc_activity_shadow,
     )

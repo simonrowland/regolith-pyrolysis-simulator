@@ -1191,6 +1191,10 @@ class HourSnapshot:
     # Current inject-bakeout cycle number within the C3 phase
 
     # --- Evaporation-plane selectivity diagnostic (SSO-1) ---
+    imcc_activity_shadow: Dict[str, Any] | None = None
+    # Opt-in IMCC activity comparison for the current hour. Diagnostic only;
+    # it never supplies authoritative flux activities.
+
     evap_plane_selectivity: Dict[str, Any] = field(default_factory=dict)
     # Per-tick vapor-flux selectivity surface. Diagnostic only: reports
     # total evolved-vapor flux, per-species flux fractions, and when the
