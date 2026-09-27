@@ -1801,7 +1801,13 @@ def _coerce_lots(lots: Iterable[MaterialLot]) -> tuple[MaterialLot, ...]:
     for lot in lots:
         if not isinstance(lot, MaterialLot):
             raise AccountingError("transition lots must be MaterialLot instances")
-        cleaned = lot.without_empty()
+        # For a mol-native lot, m_i = n_i * M_i.  Applying the display/empty
+        # floor to one positive coproduct changes a balanced transition by
+        # exactly the discarded n_i * M_i, even though the aggregate remains
+        # inside the validation tolerance.  Retain every nonzero lot here;
+        # exact zero is the only empty entry, and validation still owns the
+        # conservation gate.
+        cleaned = lot.without_empty(tolerance_kg=0.0)
         if cleaned.species_kg:
             coerced.append(cleaned)
     return tuple(coerced)

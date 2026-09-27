@@ -191,7 +191,7 @@ def _external_input_mass_kg(sim) -> float:
     )
 
 
-def _oxygen_exchange_sim(oxide: str):
+def _oxygen_exchange_sim(oxide: str, *, mass_kg: float = 100.0):
     setpoints = _load_data_yaml("setpoints.yaml")
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] = True
@@ -208,7 +208,7 @@ def _oxygen_exchange_sim(oxide: str):
         },
         _load_data_yaml("vapor_pressures.yaml"),
     )
-    sim.load_batch("test_oxide", mass_kg=100.0)
+    sim.load_batch("test_oxide", mass_kg=mass_kg)
     sim.melt.temperature_C = 1600.0
     sim._overhead_headspace_config["enabled"] = True
     sim._melt_headspace_composition_mbar = {"N2": 1.0}
@@ -257,6 +257,44 @@ def test_finite_backpressure_o2_uptake_closes_atoms_and_fe_ledger():
     )
     assert drift_after["whole_run_boundary_residual_mol_atoms"] == pytest.approx(
         drift_before["whole_run_boundary_residual_mol_atoms"]
+    )
+
+
+def test_subfloor_fe_redox_o2_credit_closes_transition():
+    sim = _oxygen_exchange_sim("Fe2O3", mass_kg=1.0e-11)
+    before_kg = sim._flow_mass_out_kg()
+
+    diagnostic = sim._apply_fe_redox_respeciation(
+        oxygen_source="fo2_buffer",
+        fO2_log_override=0.0,
+        target_ferric_fraction=0.8,
+        internal_o2_capacity_mol=1.0,
+    )
+
+    transition = sim.atom_ledger.transitions[-1]
+    o2_credit = next(
+        lot.species_kg["O2"]
+        for lot in transition.credits
+        if lot.account == "reservoir.fo2_buffer" and "O2" in lot.species_kg
+    )
+    o2_molar_mass_kg_per_mol = sim.atom_ledger.registry["O2"].molar_mass_kg_per_mol()
+
+    assert diagnostic["o2_credit_mol"] > 0.0
+    assert o2_credit == pytest.approx(
+        diagnostic["o2_credit_mol"] * o2_molar_mass_kg_per_mol,
+        rel=0.0,
+        abs=1.0e-30,
+    )
+    assert 0.0 < o2_credit < sim.atom_ledger.balance_tolerance_kg
+    assert transition.credit_mass_kg(sim.atom_ledger.registry) == pytest.approx(
+        transition.debit_mass_kg(sim.atom_ledger.registry),
+        rel=0.0,
+        abs=1.0e-24,
+    )
+    assert sim._flow_mass_out_kg() == pytest.approx(
+        before_kg,
+        rel=0.0,
+        abs=1.0e-23,
     )
 
 
