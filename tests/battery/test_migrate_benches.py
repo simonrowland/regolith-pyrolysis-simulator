@@ -494,7 +494,7 @@ def test_legacy_equipment_extract_output_has_no_empty_bench_key(tmp_path) -> Non
     # are the behaviour; the digest moves when row identity or bench wiring
     # changes the written tree.
     assert digest.hexdigest() == (
-        "f697c61a4b3e3291f2bebea78565a417f015458c7068d24633786034d3340fe3"
+        "69d1ac13c09d9bcc31ee40032342c3ffe035a5e84aaa656ce729439041ebea6f"
     )
 
 

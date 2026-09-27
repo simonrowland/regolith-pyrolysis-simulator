@@ -526,6 +526,33 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     assert all(p.derivation.output_unit == "Pa" for p in points)
 
 
+@pytest.mark.parametrize("phase", ["", "not_a_phase", "condensed_solid"])
+def test_pressure_phase_provenance_matches_resulting_phase(
+    tmp_path: Path, phase: str
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["phase"] = phase
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith("fixture-source::na_psat")
+    ]
+
+    assert len(points) == 2
+    assert all(
+        "species.phase=gas"
+        not in (point.derivation.relation if point.derivation else "")
+        for point in points
+    )
+    if phase == "condensed_solid":
+        assert all(point.identity.species.phase.value is Phase.CR for point in points)
+    else:
+        assert all(point.identity.species.phase.is_unknown for point in points)
+
+
 def test_series_row_point_conditions_preserve_pressure_interval(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["values"]["series"][0][
@@ -1645,6 +1672,7 @@ def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
     ]
     assert len(unlift) == 1
     assert unlift[0].value.kind.value == "unavailable"
+    assert unlift[0].derivation is None
     assert result.measured.series == 2
     assert result.measured.tabulated_lists == 0
 

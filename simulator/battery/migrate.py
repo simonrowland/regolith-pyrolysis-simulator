@@ -10094,6 +10094,8 @@ class Migrator:
             ):
                 phase = State.of(Phase.G)
                 unmapped_phase = None
+            if not (phase.is_value and phase.value is Phase.G):
+                phase_provenance = None
         if phase_raw is None or phase_raw == "":
             measured.missing_phases += 1
             self.result.add_queue(
@@ -11163,7 +11165,7 @@ class Migrator:
             derivation = _merge_source_conversion_derivation(
                 source_derivation, converted, read_from
             )
-        if phase_provenance is not None:
+        if phase_provenance is not None and emitted.kind is not ValueKind.UNAVAILABLE:
             if derivation is None:
                 derivation = Derivation(
                     relation=phase_provenance,

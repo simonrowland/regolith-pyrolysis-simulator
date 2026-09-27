@@ -369,6 +369,16 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         "derived from quantity=partial_pressure" in relation
         for relation in phase_relations
     ) == 221
+    bulk_band = "two_phase_bulk_composition_not_liquid_composition"
+    assert sum(
+        any(notice.band == bulk_band for notice in observation.notices)
+        for observation in buckets["pending"]
+    ) == 59
+    assert all(
+        any(notice.band == bulk_band for notice in observation.notices)
+        for observation in buckets["pending"]
+        if "s1214_r" in observation.observation_id
+    )
     assert all(o.value.kind is ValueKind.POINT and o.value.point is not None for o in measured)
     assert sum(bool(o.notices) for o in measured) == 221
     factor = Decimal("0.226")
