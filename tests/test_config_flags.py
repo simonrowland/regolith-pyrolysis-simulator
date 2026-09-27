@@ -158,8 +158,22 @@ def test_gas_resistance_lookups_route_through_helper():
         assert 'series_config.get("gas_resistance_enabled", True)' not in text
 
 
+_OXYGEN_EXCHANGE_BASE_CONFIG = {
+    "k_O_ref_m_s": 2.0e-5,
+    "k_O_min_m_s": 5.0e-6,
+    "k_O_max_m_s": 5.0e-5,
+    "T_ref_K": 1773.15,
+    "Ea_J_mol": 150000.0,
+    "effective_melt_depth_m": 0.2,
+}
+
+
 def _oxygen_exchange_k(config: dict, T_K: float = 1800.0) -> tuple[float, str]:
-    sim = SimpleNamespace(_oxygen_exchange_config=lambda: config)
+    declared_config = {**_OXYGEN_EXCHANGE_BASE_CONFIG, **config}
+    sim = SimpleNamespace(
+        _oxygen_exchange_config=lambda: declared_config,
+        _require_oxygen_exchange_config=lambda: declared_config,
+    )
     return PyrolysisSimulator._oxygen_exchange_k_m_s(sim, T_K)
 
 

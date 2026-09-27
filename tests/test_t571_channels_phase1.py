@@ -1037,7 +1037,10 @@ def _provider_and_request(
     intrinsic_fO2_log: float,
     transport_pO2_bar: float,
 ):
-    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from engines.builtin.vapor_pressure import (
+        BuiltinVaporPressureProvider,
+        physical_melt_dissociation_pO2_bar,
+    )
     from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
     from simulator.chemistry.kernel.dto import ProviderAccountView
 
@@ -1067,6 +1070,9 @@ def _provider_and_request(
         pressure_bar=1.0e-6,
         control_inputs={
             "pO2_bar": transport_pO2_bar,
+            "interface_pO2_bar": physical_melt_dissociation_pO2_bar(
+                intrinsic_fO2_log
+            )[0],
             "intrinsic_fO2_log": intrinsic_fO2_log,
         },
     )
@@ -1130,7 +1136,9 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
         legacy_view = vapor_pressure_legacy_view(payload)
         metals = legacy_view["metals"]
         oxides = legacy_view["oxide_vapors"]
-        melt_pO2, _clamped = physical_melt_dissociation_pO2_bar(fO2_log)
+        interface_pO2_bar, _clamped = physical_melt_dissociation_pO2_bar(
+            fO2_log
+        )
 
         def record(species_id, recomputed, label):
             key = (species_id, T_C, fO2_log, transport_pO2)
@@ -1153,7 +1161,7 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                     1e-30, float(row.get("pO2_reference_bar", 1.0) or 1.0)
                 )
                 oxygen = min(
-                    max(melt_pO2, MELT_DISSOCIATION_PO2_MIN_BAR),
+                    max(interface_pO2_bar, MELT_DISSOCIATION_PO2_MIN_BAR),
                     MELT_DISSOCIATION_PO2_MAX_BAR,
                 )
                 legacy = (
@@ -1174,7 +1182,7 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                     1e-30, float(row.get("pO2_reference_bar", 1.0) or 1.0)
                 )
                 oxygen = min(
-                    max(melt_pO2, MELT_DISSOCIATION_PO2_MIN_BAR),
+                    max(interface_pO2_bar, MELT_DISSOCIATION_PO2_MIN_BAR),
                     MELT_DISSOCIATION_PO2_MAX_BAR,
                 )
                 legacy = (
@@ -1201,9 +1209,9 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                     dG * 1000.0 / (PROVIDER_GAS_CONSTANT * T_K)
                 )
                 # Exact pre-migration numerator/root expression.
-                numerator = K_decomp * (a_oxide ** n_ox) / melt_pO2
+                numerator = K_decomp * (a_oxide ** n_ox) / interface_pO2_bar
                 legacy_root = numerator ** (1.0 / n_M)
-                camg_denominators.add(melt_pO2)
+                camg_denominators.add(interface_pO2_bar)
                 emitted_root = float(prov["raw_metal_activity_root"])
                 if emitted_root != legacy_root:
                     mismatches.append(
@@ -1234,11 +1242,11 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                         row.get("pO2_reference_bar", 1.0e-9) or 1.0e-9
                     ),
                 )
-                sio_sqrt_factors.add(math.sqrt(sio_ref / transport_pO2))
+                sio_sqrt_factors.add(math.sqrt(sio_ref / interface_pO2_bar))
                 legacy = (
                     float(prov["P_reference_Antoine_Pa"])
                     * float(prov["activity_factor"])
-                    * math.sqrt(sio_ref / transport_pO2)
+                    * math.sqrt(sio_ref / interface_pO2_bar)
                 )
                 record("SiO", legacy, "sio_sqrt")
 
@@ -1253,15 +1261,14 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
     # values stay inside the b-148 envelope, so the recomputed
     # pre-migration expressions remain the exact legacy forms.
     #
-    # SiO: the sqrt mass action depends ONLY on transport pO2; the main
-    # grid samples it at just 2 distinct factors.  Sweep 8 in-envelope
-    # transport values -> 8 distinct sqrt factors over ~7.5 orders of
-    # magnitude (the request vacuum floor fail-loud rejects transport pO2
-    # below 1e-9 bar, so the sweep starts at the floor).
-    for transport_pO2 in (
-        1.0e-9, 1.0e-7, 1.0e-5, 1.0e-3, 1.0e-1, 1.0, 10.0, 50.0,
-    ):
-        probe_point(1600.0, -9.0, transport_pO2, rails=frozenset({"sio"}))
+        # SiO: the sqrt mass action now uses the universal interface pO2;
+        # sweep the intrinsic endpoint that supplies this direct-provider
+        # fixture's explicit interface rail.
+        for fO2_log in (
+            -45.0, -30.0, -25.0, -20.0, -15.0, -12.0,
+            -9.0, -6.0, -3.0, 0.0, 2.0, 5.0,
+        ):
+            probe_point(1600.0, fO2_log, 1.0e-9, rails=frozenset({"sio"}))
     #
     # Ca/Mg: the Ellingham division depends ONLY on (T, melt pO2); sweep
     # 12 fO2 values covering the clamped-below edge, the exact envelope

@@ -44,6 +44,9 @@ FORMULA_FREE_MOLECULAR_TUBE = "free_molecular_tube_clausing_conductance"
 FORMULA_BESKOK_KARNIADAKIS_CIVAN = (
     "beskok_karniadakis_civan_transitional_conductance"
 )
+FORMULA_KNUDSEN_ENDPOINT_BRIDGE = (
+    "knudsen_endpoint_matched_transitional_conductance"
+)
 FORMULA_SINGLE_SPECIES_MFP = "single_species_hard_sphere_mean_free_path"
 FORMULA_MIXTURE_MFP = "carrier_mixture_hard_sphere_mean_free_path"
 
@@ -166,6 +169,19 @@ class MeanFreePathResult:
     test_species: str
     carriers: tuple[CarrierCollision, ...]
     collision_diameter_source: str
+
+
+@dataclass(frozen=True)
+class DuctThroughputResult:
+    """Steady-state pressure and conductance for one source/duct balance."""
+
+    p_headspace_bar: float
+    p_o2_bar: float
+    conductance_m3_s: float
+    knudsen_number: float
+    regime: KnudsenRegime
+    formula_id: str
+    iterations: int
 
 
 def _refuse(
@@ -831,6 +847,452 @@ def beskok_karniadakis_civan_conductance_m3_s(
     ) * beskok_karniadakis_rarefaction_factor(
         knudsen_number,
         allow_near_viscous_cross_check=allow_near_viscous_cross_check,
+    )
+
+
+def knudsen_endpoint_matched_conductance_m3_s(
+    diameter_m: float,
+    length_m: float,
+    temperature_K: float,
+    mean_pressure_pa: float,
+    molar_mass_kg_mol: float,
+    dynamic_viscosity_pa_s: float,
+    *,
+    knudsen_number: float,
+) -> float:
+    """Bridge molecular and viscous duct conductance over ``.01 <= Kn < 10``.
+
+    Premise: the molecular and compressible-Poiseuille expressions are the
+    declared asymptotes, and no third fit is allowed to change their values at
+    the regime boundaries.  Algebra: interpolate *conductance* linearly on the
+    logarithmic Kn axis, with
+    ``w = ln(10/Kn) / ln(10/.01)``.  Thus ``w=0`` at Kn=10 and ``w=1`` at
+    Kn=.01, so ``C=(1-w) C_molecular + w C_viscous`` has the same one-sided
+    limits as both neighboring branches.  Units remain m³/s.  A conductance
+    bridge is used rather than a pressure jump or a fitted rarefaction factor;
+    it is positive and follows the two declared endpoints monotonically.
+    """
+
+    diameter_m = _require_positive(
+        diameter_m,
+        name="diameter_m",
+        category="invalid_geometry",
+    )
+    length_m = _require_positive(
+        length_m,
+        name="length_m",
+        category="invalid_geometry",
+    )
+    temperature_K = _require_positive(
+        temperature_K,
+        name="temperature_K",
+        category="invalid_temperature",
+    )
+    mean_pressure_pa = _require_positive(
+        mean_pressure_pa,
+        name="mean_pressure_pa",
+        category="invalid_pressure",
+    )
+    molar_mass_kg_mol = _require_positive(
+        molar_mass_kg_mol,
+        name="molar_mass_kg_mol",
+        category="invalid_molar_mass",
+    )
+    dynamic_viscosity_pa_s = _require_positive(
+        dynamic_viscosity_pa_s,
+        name="dynamic_viscosity_pa_s",
+        category="invalid_dynamic_viscosity",
+    )
+    knudsen_number = float(knudsen_number)
+    if not math.isfinite(knudsen_number) or not (
+        VISCOUS_KNUDSEN_MAX <= knudsen_number < FREE_MOLECULAR_KNUDSEN_MIN
+    ):
+        _refuse(
+            "invalid_transitional_knudsen_number",
+            "endpoint-matched bridge requires .01 <= Kn < 10",
+        )
+
+    molecular_conductance = (
+        math.pi
+        / 12.0
+        * mean_molecular_speed_m_s(temperature_K, molar_mass_kg_mol)
+        * diameter_m ** 3
+        / length_m
+    )
+    viscous_conductance = poiseuille_conductance_m3_s(
+        diameter_m,
+        length_m,
+        mean_pressure_pa,
+        dynamic_viscosity_pa_s,
+    )
+    weight = math.log(FREE_MOLECULAR_KNUDSEN_MIN / knudsen_number) / math.log(
+        FREE_MOLECULAR_KNUDSEN_MIN / VISCOUS_KNUDSEN_MAX
+    )
+    return (1.0 - weight) * molecular_conductance + weight * viscous_conductance
+
+
+def _duct_conductance_at_mean_pressure(
+    diameter_m: float,
+    length_m: float,
+    temperature_K: float,
+    mean_pressure_pa: float,
+    molar_mass_kg_mol: float,
+    dynamic_viscosity_pa_s: float,
+    collision_diameter_m: float,
+) -> tuple[float, float, KnudsenRegime, str]:
+    """Return ``(C, Kn, regime, formula)`` at one duct mean pressure."""
+
+    mean_pressure_pa = _require_pressure_allowing_vacuum(
+        mean_pressure_pa,
+        name="mean_pressure_pa",
+        category="invalid_pressure",
+    )
+    temperature_K = _require_positive(
+        temperature_K,
+        name="temperature_K",
+        category="invalid_temperature",
+    )
+    diameter_m = _require_positive(
+        diameter_m,
+        name="diameter_m",
+        category="invalid_geometry",
+    )
+    length_m = _require_positive(
+        length_m,
+        name="length_m",
+        category="invalid_geometry",
+    )
+    molar_mass_kg_mol = _require_positive(
+        molar_mass_kg_mol,
+        name="molar_mass_kg_mol",
+        category="invalid_molar_mass",
+    )
+    dynamic_viscosity_pa_s = _require_positive(
+        dynamic_viscosity_pa_s,
+        name="dynamic_viscosity_pa_s",
+        category="invalid_dynamic_viscosity",
+    )
+    collision_diameter_m = _require_positive(
+        collision_diameter_m,
+        name="collision_diameter_m",
+        category="invalid_collision_diameter",
+    )
+
+    mean_free_path_m = single_species_mean_free_path_m(
+        mean_pressure_pa,
+        temperature_K,
+        collision_diameter_m,
+    )
+    knudsen_number = mean_free_path_m / length_m
+    regime = classify_knudsen_regime(knudsen_number)
+    if regime is KnudsenRegime.FREE_MOLECULAR:
+        # Premise: a long circular molecular-flow tube transmits the aperture
+        # flux with Clausing probability 4d/(3L). Algebra: A=pi*d^2/4,
+        # C=(1/4) A vbar (4d/(3L)) = (pi/12) vbar d^3/L. Units:
+        # m²·m/s = m³/s. Sanity: T=1773.15 K, d=0.12 m, L=1 m and O2
+        # gives approximately 0.49 m³/s. The existing long-tube validator
+        # intentionally requires L/D >= 10; this duct is the specified
+        # L/D=8.33 geometry, so this mandated asymptote is evaluated directly
+        # rather than silently substituting another geometry.
+        conductance_m3_s = (
+            math.pi
+            / 12.0
+            * mean_molecular_speed_m_s(temperature_K, molar_mass_kg_mol)
+            * diameter_m ** 3
+            / length_m
+        )
+        formula_id = FORMULA_FREE_MOLECULAR_TUBE
+    elif regime is KnudsenRegime.VISCOUS:
+        # Premise: isothermal compressible Poiseuille flow integrates to
+        # m_dot = M*pi*d^4*(P1²-P2²)/(256*eta*L*R*T). Algebra:
+        # P1²-P2² = 2*pbar*(P1-P2), so the volumetric conductance against
+        # delta-P at mean pressure pbar is C=pi*d^4*pbar/(128*eta*L).
+        # Units: m^4 Pa/(Pa·s·m) = m³/s. The 128 is therefore the
+        # mean-pressure form of the integrated 256 denominator, not a new
+        # empirical factor.
+        conductance_m3_s = poiseuille_conductance_m3_s(
+            diameter_m,
+            length_m,
+            mean_pressure_pa,
+            dynamic_viscosity_pa_s,
+        )
+        formula_id = "poiseuille_mean_pressure_conductance"
+    else:
+        # Premise: 0.01 <= Kn < 10 is transitional. The endpoint-matched
+        # bridge is continuous with the molecular branch at Kn=10 and with
+        # Poiseuille at Kn=.01; the old BKC multiplier had neither property.
+        conductance_m3_s = knudsen_endpoint_matched_conductance_m3_s(
+            diameter_m,
+            length_m,
+            temperature_K,
+            mean_pressure_pa,
+            molar_mass_kg_mol,
+            dynamic_viscosity_pa_s,
+            knudsen_number=knudsen_number,
+        )
+        formula_id = FORMULA_KNUDSEN_ENDPOINT_BRIDGE
+    return conductance_m3_s, knudsen_number, regime, formula_id
+
+
+def solve_duct_throughput(
+    *,
+    total_molar_flow_mol_s: float,
+    oxygen_molar_flow_mol_s: float,
+    downstream_pressure_bar: float,
+    downstream_oxygen_pressure_bar: float,
+    temperature_K: float,
+    diameter_m: float,
+    length_m: float,
+    molar_mass_kg_mol: float,
+    dynamic_viscosity_pa_s: float,
+    collision_diameter_m: float,
+) -> DuctThroughputResult:
+    """Solve the steady source/duct pressure balance.
+
+    The source balance is ``p_hs = n_dot_total*R*T/C(p_hs) + p_down``;
+    once the total pressure is known, the oxygen partial pressure is
+    ``p_O2 = n_dot_O2*R*T/C + p_O2,down``. The regime boundaries are solved in
+    ascending pressure order; this matters because a global bracket can jump
+    over the low-pressure molecular root when the transitional correlation
+    makes a second mathematical root. Viscous flow is solved in closed form
+    from the mean-pressure Poiseuille law, while transitional flow uses guarded
+    bisection inside its own Kn interval.
+    """
+
+    total_flow = _require_nonnegative(
+        total_molar_flow_mol_s,
+        name="total_molar_flow_mol_s",
+        category="invalid_molar_flow",
+    )
+    oxygen_flow = _require_nonnegative(
+        oxygen_molar_flow_mol_s,
+        name="oxygen_molar_flow_mol_s",
+        category="invalid_molar_flow",
+    )
+    if oxygen_flow > total_flow + 1.0e-15:
+        _refuse(
+            "oxygen_flow_exceeds_total_flow",
+            "oxygen source flow cannot exceed total duct flow",
+        )
+    downstream_pressure_bar = _require_nonnegative(
+        downstream_pressure_bar,
+        name="downstream_pressure_bar",
+        category="invalid_pressure",
+    )
+    downstream_oxygen_pressure_bar = _require_nonnegative(
+        downstream_oxygen_pressure_bar,
+        name="downstream_oxygen_pressure_bar",
+        category="invalid_pressure",
+    )
+    if downstream_oxygen_pressure_bar > downstream_pressure_bar + 1.0e-15:
+        _refuse(
+            "downstream_oxygen_pressure_exceeds_total",
+            "downstream O2 partial pressure cannot exceed downstream total pressure",
+        )
+    temperature_K = _require_positive(
+        temperature_K,
+        name="temperature_K",
+        category="invalid_temperature",
+    )
+    _require_positive(diameter_m, name="diameter_m", category="invalid_geometry")
+    _require_positive(length_m, name="length_m", category="invalid_geometry")
+    _require_positive(
+        molar_mass_kg_mol,
+        name="molar_mass_kg_mol",
+        category="invalid_molar_mass",
+    )
+    _require_positive(
+        dynamic_viscosity_pa_s,
+        name="dynamic_viscosity_pa_s",
+        category="invalid_dynamic_viscosity",
+    )
+    _require_positive(
+        collision_diameter_m,
+        name="collision_diameter_m",
+        category="invalid_collision_diameter",
+    )
+
+    p_downstream_pa = downstream_pressure_bar * 1.0e5
+    source_pressure_work_pa_m3_s = total_flow * GAS_CONSTANT_J_MOL_K * temperature_K
+
+    def conductance_at(p_headspace_pa: float):
+        p_mean_pa = 0.5 * (p_headspace_pa + p_downstream_pa)
+        return _duct_conductance_at_mean_pressure(
+            diameter_m,
+            length_m,
+            temperature_K,
+            p_mean_pa,
+            molar_mass_kg_mol,
+            dynamic_viscosity_pa_s,
+            collision_diameter_m,
+        )
+
+    if total_flow <= 0.0:
+        p_headspace_pa = p_downstream_pa
+        conductance_m3_s, knudsen_number, regime, formula_id = conductance_at(
+            p_headspace_pa
+        )
+        iterations = 0
+    else:
+        def residual(p_headspace_pa: float) -> float:
+            conductance_m3_s, *_ = conductance_at(p_headspace_pa)
+            return (
+                conductance_m3_s * max(0.0, p_headspace_pa - p_downstream_pa)
+                - source_pressure_work_pa_m3_s
+            )
+
+        # Kn = lambda/L and lambda=kT/(sqrt(2)*pi*sigma²*pbar), so the mean
+        # pressures at Kn=10 and Kn=0.01 are known before solving. Mapping
+        # pbar=(p_hs+p_down)/2 gives pressure intervals for the three formulas.
+        # Searching them from low to high selects the physical low-pressure
+        # molecular root for the lunar golden rather than a later transitional
+        # root produced by the correlation's regime switch.
+        pressure_factor = (
+            BOLTZMANN_CONSTANT_J_K * temperature_K
+            / (math.sqrt(2.0) * math.pi * collision_diameter_m ** 2 * length_m)
+        )
+        p_mean_free_molecular_pa = pressure_factor / FREE_MOLECULAR_KNUDSEN_MIN
+        p_mean_viscous_pa = pressure_factor / VISCOUS_KNUDSEN_MAX
+        p_free_boundary_pa = max(
+            p_downstream_pa,
+            2.0 * p_mean_free_molecular_pa - p_downstream_pa,
+        )
+        p_viscous_boundary_pa = max(
+            p_free_boundary_pa,
+            2.0 * p_mean_viscous_pa - p_downstream_pa,
+        )
+        iterations = 0
+        candidate_pa = None
+
+        # Molecular C is pressure-independent. If its direct algebraic root
+        # lies in Kn>=10, it is the desired root and no iteration is needed.
+        molecular_conductance = (
+            math.pi
+            / 12.0
+            * mean_molecular_speed_m_s(temperature_K, molar_mass_kg_mol)
+            * diameter_m ** 3
+            / length_m
+        )
+        molecular_root_pa = p_downstream_pa + (
+            source_pressure_work_pa_m3_s / molecular_conductance
+        )
+        if molecular_root_pa <= p_free_boundary_pa:
+            candidate_pa = molecular_root_pa
+
+        def bracketed_root(
+            lower_pa: float,
+            upper_pa: float,
+        ) -> tuple[float | None, int]:
+            if upper_pa <= lower_pa:
+                return None, 0
+            lower_residual = residual(lower_pa)
+            if lower_residual >= 0.0:
+                return lower_pa, 0
+            upper_residual = residual(upper_pa)
+            if upper_residual < 0.0:
+                return None, 0
+            local_iterations = 0
+            lo = lower_pa
+            hi = upper_pa
+            for local_iterations in range(1, 121):
+                mid = 0.5 * (lo + hi)
+                if residual(mid) >= 0.0:
+                    hi = mid
+                else:
+                    lo = mid
+                if hi - lo <= max(1.0e-12, 1.0e-12 * hi):
+                    break
+            return 0.5 * (lo + hi), local_iterations
+
+        if candidate_pa is None:
+            # Transitional C(Kn) is evaluated self-consistently at the mean
+            # pressure; the bounded interval prevents crossing into molecular
+            # or viscous formulas while bisection is running.
+            candidate_pa, iterations = bracketed_root(
+                p_free_boundary_pa,
+                p_viscous_boundary_pa,
+            )
+
+        if candidate_pa is None:
+            # Viscous Poiseuille: C=A*pbar, A=pi*d^4/(128*eta*L). With
+            # delta=p_hs-p_down and pbar=p_down+delta/2, the balance is
+            # A*(p_down*delta + delta²/2)=n_dot*R*T. The positive quadratic
+            # root is delta=-p_down+sqrt(p_down²+2*n_dot*R*T/A).
+            viscous_A = (
+                math.pi * diameter_m ** 4
+                / (128.0 * dynamic_viscosity_pa_s * length_m)
+            )
+            delta_pa = -p_downstream_pa + math.sqrt(
+                p_downstream_pa ** 2
+                + 2.0 * source_pressure_work_pa_m3_s / viscous_A
+            )
+            viscous_root_pa = p_downstream_pa + delta_pa
+            if viscous_root_pa >= p_viscous_boundary_pa:
+                candidate_pa = viscous_root_pa
+
+        if candidate_pa is None:
+            # At a discontinuous regime boundary the correlation may leave no
+            # sign-changing interval even though a finite throughput root is
+            # available. Expand a high bracket and locate the first sampled
+            # sign change, retaining the low-to-high physical ordering.
+            p_high = max(
+                p_viscous_boundary_pa,
+                p_downstream_pa + 1.0,
+                2.0 * p_downstream_pa + 1.0,
+            )
+            for _ in range(160):
+                if residual(p_high) >= 0.0:
+                    break
+                p_high *= 2.0
+            else:
+                _refuse(
+                    "duct_throughput_bracket_failed",
+                    "could not bracket finite steady-state duct pressure",
+                )
+            previous_pa = p_downstream_pa
+            previous_residual = residual(previous_pa)
+            for index in range(1, 257):
+                fraction = index / 256.0
+                probe_pa = p_downstream_pa + (
+                    p_high - p_downstream_pa
+                ) * fraction
+                probe_residual = residual(probe_pa)
+                if previous_residual < 0.0 <= probe_residual:
+                    candidate_pa, iterations = bracketed_root(
+                        previous_pa,
+                        probe_pa,
+                    )
+                    if candidate_pa is not None:
+                        break
+                previous_pa = probe_pa
+                previous_residual = probe_residual
+            if candidate_pa is None:
+                _refuse(
+                    "duct_throughput_root_failed",
+                    "could not solve the regime-aware duct pressure balance",
+                )
+        p_headspace_pa = candidate_pa
+        conductance_m3_s, knudsen_number, regime, formula_id = conductance_at(
+            p_headspace_pa
+        )
+
+    # The same duct C carries the total gas and the source O2. The downstream
+    # O2 term is a partial pressure, not the total controlled pressure.
+    p_o2_bar = downstream_oxygen_pressure_bar + (
+        oxygen_flow * GAS_CONSTANT_J_MOL_K * temperature_K
+        / conductance_m3_s
+        / 1.0e5
+        if oxygen_flow > 0.0
+        else 0.0
+    )
+    return DuctThroughputResult(
+        p_headspace_bar=p_headspace_pa / 1.0e5,
+        p_o2_bar=max(0.0, p_o2_bar),
+        conductance_m3_s=conductance_m3_s,
+        knudsen_number=knudsen_number,
+        regime=regime,
+        formula_id=formula_id,
+        iterations=iterations,
     )
 
 

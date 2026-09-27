@@ -1549,7 +1549,7 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
     # 2026-08-05 MC-1 trace wiring d1b4f5d adds real lunar S inventory, making
     # SulfSat availability part of the physical bucket. Split only the exact
     # replay key with a vapor-transport control that equilibrium does not consume.
-    replay_sim._vapor_pressure_dispatch_pO2_bar = lambda: 1.0e-8
+    replay_sim._vapor_pressure_transport_pO2_bar = lambda: 1.0e-8
 
     capture_key = capture_store.capture_sequence[-1]["key"]
     replay_key = replay_store._equilibrium_key(replay_sim)

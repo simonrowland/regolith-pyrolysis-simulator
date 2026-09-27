@@ -579,7 +579,10 @@ class KEMSAdapter:
             temperature_C=temperature_K - 273.15,
             pressure_bar=max(exterior_pa / 100000.0, 1e-30),
             fO2_log=math.log10(pO2_bar),
-            control_inputs={"pO2_bar": pO2_bar},
+            control_inputs={
+                "pO2_bar": pO2_bar,
+                "interface_pO2_bar": pO2_bar,
+            },
         )
         result = self._provider.dispatch(request)
         provider_status = str(result.status)

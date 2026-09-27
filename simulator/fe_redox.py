@@ -37,6 +37,15 @@ KRESS91_AITHALA_EXPERIMENTAL_CONFIRMATION_MAX_T_C = 2100.0
 KRESS91_HIGH_UNCERTAINTY_MAX_T_C = 2500.0
 # 1400 C cache-label convention for isochemical redox keys, not new physics.
 KRESS91_FO2_KEY_REFERENCE_T_K = 1673.15
+# Kress91 maps the open interval (0, 1) of Fe3+/sumFe to finite fO2.  Keep
+# the ledger state strictly inside that interval when a feedstock starts with
+# only FeO or an evaporation transition removes the last resolvable FeO/Fe2O3
+# carrier.  This is a state-domain guard, not a pressure or flux clamp.
+# Keep a representable margin above the public 1e-6 endpoint assertion.  The
+# margin matters because a reported diagnostic must be strictly interior, but
+# it stays below the provider's atom-ledger no-op scale for a depleted melt so
+# a sub-tolerance Fe2O3 transition is not minted solely to satisfy telemetry.
+KRESS91_FERRIC_FRACTION_EPSILON = 1.0e-6 + 1.0e-12
 
 
 def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:
@@ -377,14 +386,23 @@ def floor_vacuum_pressure_bar(
 
 def kress91_furnace_activity_pressure_bar(
     *,
+    pressure_bar: float | None = None,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Fixed pressure control for furnace FeO activity in vapor equilibrium."""
+    """Return Kress91's total furnace pressure with a vacuum guard.
 
-    # Kress91 pressure terms are high-pressure redox-split corrections. Neutral
-    # furnace overhead is transport only, so vapor-equilibrium activity must not
-    # read p_total. Coefficient provenance is recorded at the module constants.
-    return floor_vacuum_pressure_bar(0.0, floor_bar=floor_bar)
+    Kress & Carmichael's ``f*P/T`` corrections use total pressure ``P``;
+    this is not an oxygen partial-pressure channel. The floor is therefore
+    applied only when the declared total pressure is finite vacuum. ``None``
+    preserves the legacy direct-call vacuum default for callers that have no
+    furnace pressure declaration.
+    """
+
+    declared_pressure_bar = 0.0 if pressure_bar is None else float(pressure_bar)
+    return floor_vacuum_pressure_bar(
+        declared_pressure_bar,
+        floor_bar=floor_bar,
+    )
 
 
 def feot_equivalent_wt_pct(comp_wt: Mapping[str, float]) -> float:
@@ -640,34 +658,104 @@ def _kress91_fe2o3_over_feo_molar(
         T_K=T_K,
         pressure_bar=pressure_bar,
     )
-    x = mol_fractions
-    p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
     ln_ratio = (
-        # a*ln(fO2) with fO2 = 10**fO2_log, computed as fO2_log*ln(10) directly.
-        # The prior 10.0**fO2_log underflows to 0.0 at extreme-reducing fO2 and
-        # then math.log(0.0) raises a domain error, aborting the provider (BUG-159).
-        # This form is algebraically exact and is the canonical Kress91 a*ln(fO2)
-        # term (the sibling exp() at the return is already domain-clamped).
-        KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
-        + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
-        - 6.675
-        - 2.243 * x.get('Al2O3', 0.0)
-        - 1.828 * x.get('FeOt', 0.0)
-        + 3.201 * x.get('CaO', 0.0)
-        + 5.854 * x.get('Na2O', 0.0)
-        + 6.215 * x.get('K2O', 0.0)
-        + KRESS91_NONLINEAR_COEFFICIENT * (
-            1.0
-            - (KRESS91_NONLINEAR_REFERENCE_T_K / T_K)
-            - math.log(T_K / KRESS91_NONLINEAR_REFERENCE_T_K)
+        _kress91_ln_ratio(
+            fO2_log=float(fO2_log),
+            mol_fractions=mol_fractions,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
         )
-        + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K)
-        + KRESS91_PRESSURE_D_T_COEFFICIENT * (
-            ((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K
-        )
-        + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
     )
     return math.exp(max(-745.0, min(709.0, ln_ratio)))
+
+
+def _kress91_ln_ratio(
+    *,
+    fO2_log: float | None = None,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    """Return Kress91's ln(Fe2O3/FeO), optionally including its fO2 term.
+
+    Keeping this term shared by the forward and inverse relations prevents the
+    ledger-derived state from acquiring a second, slightly different Kress91
+    implementation.  ``pressure_bar`` is furnace total pressure, not oxygen
+    partial pressure.
+    """
+
+    x = mol_fractions
+    p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
+    # Keep the additions left-associated in the same order as the pre-existing
+    # forward expression.  Besides documenting the algebra, this preserves
+    # the published floating-point golden values while the inverse reuses the
+    # exact same coefficient path with fO2_log omitted.
+    ln_ratio = 0.0
+    if fO2_log is not None:
+        ln_ratio = (
+            KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
+        )
+    ln_ratio += KRESS91_INV_T_COEFFICIENT_K / float(T_K)
+    ln_ratio += -6.675
+    ln_ratio += -2.243 * x.get('Al2O3', 0.0)
+    ln_ratio += -1.828 * x.get('FeOt', 0.0)
+    ln_ratio += 3.201 * x.get('CaO', 0.0)
+    ln_ratio += 5.854 * x.get('Na2O', 0.0)
+    ln_ratio += 6.215 * x.get('K2O', 0.0)
+    ln_ratio += KRESS91_NONLINEAR_COEFFICIENT * (
+        1.0
+        - (KRESS91_NONLINEAR_REFERENCE_T_K / T_K)
+        - math.log(T_K / KRESS91_NONLINEAR_REFERENCE_T_K)
+    )
+    ln_ratio += KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K)
+    ln_ratio += KRESS91_PRESSURE_D_T_COEFFICIENT * (
+        ((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K
+    )
+    ln_ratio += KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
+    return ln_ratio
+
+
+def kress91_log_fO2_from_fe3_over_sigma_fe(
+    *,
+    fe3_over_sigma_fe: float,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    """Invert Kress91 to derive log10(fO2/bar) from the Fe ledger ratio.
+
+    Kress91 defines ``r = Fe2O3/FeO`` and ``q = Fe3+/sumFe`` as
+    ``q = 2r/(2r+1)``.  Therefore ``r = q/[2(1-q)]`` and
+    ``log10(fO2) = [ln(r) - b(T,P,X)] / [0.196 ln(10)]`` where ``b`` is the
+    shared non-fO2 term above.  The clamp keeps the derived state finite at
+    ledger endpoints; it does not alter atom counts or create an evaporation
+    flux.  Invalid controls still raise through the same Kress91 validator.
+    """
+
+    _validate_kress91_controls(
+        fO2_log=0.0,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    q = float(fe3_over_sigma_fe)
+    if not math.isfinite(q):
+        raise Kress91InvalidControls(
+            f'Kress91 invalid control fe3_over_sigma_fe: expected finite value, got {fe3_over_sigma_fe!r}'
+        )
+    q = max(
+        KRESS91_FERRIC_FRACTION_EPSILON,
+        min(1.0 - KRESS91_FERRIC_FRACTION_EPSILON, q),
+    )
+    ratio = q / (2.0 * (1.0 - q))
+    ln_ratio = math.log(ratio)
+    return (
+        ln_ratio
+        - _kress91_ln_ratio(
+            mol_fractions=mol_fractions,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )
+    ) / (KRESS91_LN_FO2_COEFFICIENT * math.log(10.0))
 
 
 def kress91_fe3_over_sigma_fe(
@@ -703,10 +791,10 @@ def _kress91_ferrous_feo_activity_raw(
     # Vacuum tolerance — intentional, NOT a missing guard. Direct activity
     # callers may pass pressure_bar == 0.0 at furnace vacuum. Kress91's pressure
     # terms are a high-pressure (GPa) petrologic correction, negligible at
-    # furnace mbar pressures, so a non-positive pressure is floored here rather
-    # than refused. Vapor-equilibrium providers use
-    # kress91_furnace_activity_pressure_bar so neutral overhead p_total never
-    # enters this path. NON-FINITE pressure is deliberately left unfloored
+    # furnace mbar pressures, so a non-positive total pressure is floored here
+    # rather than refused. Vapor-equilibrium providers use
+    # kress91_furnace_activity_pressure_bar with the declared total pressure.
+    # NON-FINITE pressure is deliberately left unfloored
     # (isfinite gate) so NaN/inf still raises through the
     # _validate_kress91_controls chokepoint.
     # kress91_split, by contrast, serves the redox-split path where pressure is a

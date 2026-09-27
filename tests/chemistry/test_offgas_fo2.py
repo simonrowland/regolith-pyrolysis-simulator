@@ -18,8 +18,10 @@ are not equally strong evidence and should not be read as if they were:
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.chemistry.offgas_fo2 import (
     _COUPLE_RECORDS,
@@ -29,12 +31,36 @@ from simulator.chemistry.offgas_fo2 import (
     COMPUTED_NO_RECONCILIATION,
     H2_COUPLE_ONLY,
     WGS_EQUILIBRATED,
+    co2_carrier_buffer_equilibrium,
+    co2_dissociation_log10_K,
     OffgasFO2Unavailable,
     imposed_fo2,
     load_buffer_polynomials,
     shift_extent,
     water_gas_shift_log10_K,
 )
+
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def _raw_janaf_df_g_kj_mol(table_id: str, temperature_K: float) -> float:
+    rows = yaml.safe_load(
+        (
+            ROOT
+            / 'data'
+            / 'literature'
+            / 'compilations'
+            / 'janaf'
+            / 'tables'
+            / f'{table_id}.yaml'
+        ).read_text()
+    )['table']['values']
+    row = next(
+        row for row in rows
+        if float(row['temperature']['value']) == float(temperature_K)
+    )
+    return float(row['formation_gibbs_energy']['value'])
 
 
 @pytest.fixture(scope="module")
@@ -45,6 +71,40 @@ def polys():
 # --------------------------------------------------------------------------
 # PHYSICS -- external references. These can actually fail.
 # --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize('temperature_K', [1500.0, 1800.0])
+def test_co2_buffer_uses_raw_janaf_table_and_pure_co2_limit(polys, temperature_K):
+    """Pure-CO₂ equilibrium matches K computed from independent JANAF rows."""
+
+    R = 8.31446261815324
+    df_g_kj_mol = (
+        2.0 * _raw_janaf_df_g_kj_mol('C-093', temperature_K)
+        + _raw_janaf_df_g_kj_mol('O-029', temperature_K)
+        - 2.0 * _raw_janaf_df_g_kj_mol('C-095', temperature_K)
+    )
+    K_raw = math.exp(-df_g_kj_mol * 1000.0 / (R * temperature_K))
+    assert 10 ** co2_dissociation_log10_K(polys, temperature_K) == pytest.approx(
+        K_raw,
+        rel=1.0e-2,
+    )
+
+    pressure_bar = 0.005
+    expected_p_o2_bar = (K_raw * pressure_bar ** 2 / 4.0) ** (1.0 / 3.0)
+    result = co2_carrier_buffer_equilibrium(
+        pressure_bar,
+        0.0,
+        temperature_K,
+        polys,
+    )
+    assert result.p_o2_bar == pytest.approx(expected_p_o2_bar, rel=2.0e-2)
+    assert result.p_co_bar == pytest.approx(2.0 * result.extent_bar)
+    assert result.p_co2_bar + 2.0 * result.extent_bar == pytest.approx(
+        pressure_bar
+    )
+    assert result.assumption == (
+        'equilibrium_upper_bound_homogeneous_kinetics_unverified'
+    )
 
 
 def test_wgs_constant_matches_textbook_values(polys):

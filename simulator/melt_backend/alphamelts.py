@@ -4916,6 +4916,10 @@ class _MELTSBackendSupport(MeltBackend):
                 # setpoint: the unknown-body model floor until CF-1b supplies
                 # body-aware floors. It must not be derived from melt fO2.
                 'pO2_bar': self._vapor_transport_pO2_bar,
+                # This subprocess projection has no live SSO-R reservoir; its
+                # declared environment boundary is the explicit interface
+                # channel rather than an implicit transport fallback.
+                'interface_pO2_bar': self._vapor_transport_pO2_bar,
                 'intrinsic_fO2_log': eq.fO2_log,
             },
         )

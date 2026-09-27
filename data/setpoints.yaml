@@ -1771,7 +1771,22 @@ mre_stepped_voltage_holds:
 
 
 # ============================================================================
-# 14. OVERHEAD FINITE HEADSPACE (migration toggle)
+# 14. SSO-R HEADSPACE <-> MELT OXYGEN EXCHANGE
+# ============================================================================
+sso_r:
+  oxygen_exchange:
+    # SSO-R melt-side oxygen film, first grounded for Fe redox. The universal
+    # release interface combines this k_O with the existing Sherwood gas film.
+    k_O_ref_m_s: 2.0e-5
+    k_O_min_m_s: 5.0e-6
+    k_O_max_m_s: 5.0e-5
+    T_ref_K: 1773.15
+    Ea_J_mol: 150000.0
+    effective_melt_depth_m: 0.2
+    temperature_dependence_enabled: true
+
+
+# 15. OVERHEAD FINITE HEADSPACE (migration toggle)
 # ============================================================================
 overhead_headspace:
   # 0.5.3 Phase A1 (2026-05-28): default-on global flip. Per docs-private/

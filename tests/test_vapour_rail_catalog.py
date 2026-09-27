@@ -993,6 +993,7 @@ def test_production_p_carriers_share_parent_activity_and_never_sparsify() -> Non
         fO2_log=-9.0,
         control_inputs={
             "pO2_bar": 0.009,
+            "interface_pO2_bar": 0.009,
             "intrinsic_fO2_log": -9.0,
             "process_phase": "stage0",
         },
@@ -1009,13 +1010,13 @@ def test_production_p_carriers_share_parent_activity_and_never_sparsify() -> Non
     catalog = compile_vapour_rail_catalog(
         payload, emit_u0_request_rules=False
     )
-    intrinsic_fO2_bar = diagnostic["source_reaction_fO2_bar"]
+    interface_pO2_bar = diagnostic["interface_pO2_bar"]
     for species in carriers:
         evaluator = catalog.evaluator_for(species)
         expected = evaluator.evaluate(
             1473.15,
             source_activity=activities[species],
-            pO2_bar=intrinsic_fO2_bar,
+            pO2_bar=interface_pO2_bar,
         ).pressure_pa
         assert pressures[species] == pytest.approx(expected, rel=1.0e-12)
         provenance = diagnostic["vapor_pressure_numerator_provenance"][species]
@@ -1297,7 +1298,11 @@ def test_b1_oxide_row_requires_activity_for_condensation_without_antoine() -> No
         temperature_C=826.85,
         pressure_bar=1.0e-6,
         fO2_log=-4.0,
-        control_inputs={"pO2_bar": 1.0e-4, "intrinsic_fO2_log": -4.0},
+        control_inputs={
+            "pO2_bar": 1.0e-4,
+            "interface_pO2_bar": 1.0e-4,
+            "intrinsic_fO2_log": -4.0,
+        },
     )
 
     result = provider.dispatch(request)
@@ -1366,7 +1371,11 @@ def test_metals_projection_reference_evaluation_declares_neutral_inputs() -> Non
         temperature_C=826.85,
         pressure_bar=1.0e-6,
         fO2_log=-4.0,
-        control_inputs={"pO2_bar": 1.0e-4, "intrinsic_fO2_log": -4.0},
+        control_inputs={
+            "pO2_bar": 1.0e-4,
+            "interface_pO2_bar": 1.0e-4,
+            "intrinsic_fO2_log": -4.0,
+        },
     )
 
     result = provider.dispatch(request)
@@ -1688,6 +1697,7 @@ def test_physical_melt_dissociation_pO2_bar_refuses_nan_before_envelope() -> Non
         pressure_bar=1e-9,
         control_inputs={
             "pO2_bar": 1e-9,
+            "interface_pO2_bar": 1e-9,
             "intrinsic_fO2_log": float("nan"),
         },
     )

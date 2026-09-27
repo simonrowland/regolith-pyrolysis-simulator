@@ -22,6 +22,7 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.fe_redox import (
+    KRESS91_FERRIC_FRACTION_EPSILON,
     floor_vacuum_pressure_bar,
     kress91_fe3_over_sigma_fe,
     kress91_temperature_band_case,
@@ -113,7 +114,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         if not math.isfinite(fO2_log):
             raise ValueError(f"fO2_log must be finite, got {request.fO2_log!r}")
         temperature_band = kress91_temperature_band_case(float(request.temperature_C))
-        if not bool(temperature_band.get("authoritative")):
+        if temperature_band.get("case") == "non_finite_temperature":
             return IntentResult(
                 intent=ChemistryIntent.FE_REDOX_RESPECIATION,
                 status="refused",
@@ -180,9 +181,9 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             )
 
         target_ferric = max(
-            0.0,
+            KRESS91_FERRIC_FRACTION_EPSILON,
             min(
-                1.0,
+                1.0 - KRESS91_FERRIC_FRACTION_EPSILON,
                 kress91_fe3_over_sigma_fe(
                     fO2_log=fO2_log,
                     mol_fractions=mol_fractions,
@@ -195,7 +196,16 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         target_fe2o3_mol = 0.5 * target_ferric * total_fe_mol
         delta_fe2o3_mol = target_fe2o3_mol - fe2o3_mol
         diagnostic = {
-            "respeciation_status": "ok",
+            # Finite but out-of-calibration Kress91 is category-3 physics:
+            # predict with the retained relation and flag the authority band.
+            # Only invalid controls refuse.  This keeps the Fe ledger moving
+            # through the 1630-2100 C experimentally confirmed extrapolation
+            # instead of freezing it while the separate fO2 scalar advances.
+            "respeciation_status": (
+                "predicted_extrapolation"
+                if bool(temperature_band.get("extrapolation"))
+                else "ok"
+            ),
             "current_ferric_fraction": current_ferric,
             "target_ferric_fraction": target_ferric,
             "current_feo_mol": feo_mol,
@@ -208,6 +218,23 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             "internal_o2_capacity_mol": internal_o2_capacity_mol,
             "source": str(
                 controls.get("source") or "Kress91 scalar fO2 ledger re-speciation"
+            ),
+            "temperature_band_case": temperature_band.get("case"),
+            "temperature_band_status": temperature_band.get("status"),
+            "temperature_band_source": temperature_band.get("source"),
+            "temperature_band_authoritative": bool(
+                temperature_band.get("authoritative")
+            ),
+            "temperature_band_extrapolation": bool(
+                temperature_band.get("extrapolation")
+            ),
+            "temperature_band_high_uncertainty": bool(
+                temperature_band.get("high_uncertainty")
+            ),
+            "temperature_band_authority": (
+                "extrapolated"
+                if bool(temperature_band.get("extrapolation"))
+                else "authoritative"
             ),
         }
         if abs(delta_fe2o3_mol) <= NOOP_MOL:
@@ -292,7 +319,11 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             o2_debit = o2_debit_mol
             o2_credit = 0.0
             diagnostic.update({
-                "respeciation_status": "partial" if partial else "ok",
+                "respeciation_status": (
+                    "predicted_extrapolation"
+                    if bool(temperature_band.get("extrapolation"))
+                    else ("partial" if partial else "ok")
+                ),
                 "applied_delta_fe2o3_mol": applied_delta_fe2o3_mol,
                 "applied_o2_mol": o2_debit_mol,
                 "required_o2_mol": required_o2_mol,

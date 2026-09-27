@@ -456,11 +456,25 @@ class OxygenReservoirState:
     headspace_ledger_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
     headspace_transport_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
     headspace_control_floor_pO2_bar: float = 0.0
+    # Physical provenance for the transport pO2 consumed by vapor-pressure
+    # readers. These are diagnostics only; the AtomLedger remains authoritative.
+    headspace_pO2_basis: str = "floor"
+    headspace_transport_regime: str = ""
+    headspace_transport_conductance_m3_s: float = 0.0
+    headspace_transport_knudsen: float = 0.0
+    headspace_co2_buffer_assumption: str = ""
+    interface_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
+    interface_pO2_limiting_regime: str = ""
+    interface_gas_side_k_m_s: float = 0.0
     k_O_m_s: float = 0.0
     k_O_source: str = ""
     effective_melt_depth_m: float = 0.0
     tau_hr: float = 0.0
     melt_redox_capacity_mol_per_ln_fO2: float = 0.0
+    redox_buffer_status: str = ""
+    redox_buffer_inventory_mol: float = 0.0
+    redox_buffer_fraction: float | None = None
+    redox_buffer_exhausted: bool = False
     headspace_capacity_mol_per_ln_pO2: float = 0.0
     exchange_o2_mol: float = 0.0
     exchange_o2_kg: float = 0.0

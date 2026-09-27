@@ -133,7 +133,9 @@ def test_kernel_ok_empty_note_on_diagnostic_surface() -> None:
         _silent_zero_notes=[],
         _dispatch_only=_dispatch,
         _record_degraded_path_engagement=lambda *a, **k: None,
+        _vapor_pressure_transport_pO2_bar=lambda: 1e-12,
         _vapor_pressure_dispatch_pO2_bar=lambda: 1e-12,
+        _interface_pO2_bar=lambda: 1e-12,
         _vapor_pressure_dispatch_intrinsic_fO2_log=lambda: None,
         _vacuum_floor_bar=lambda: 1e-12,
     )
@@ -388,6 +390,7 @@ def test_internal_analytical_feo_below_threshold_vs_missing_activity() -> None:
             melt_fO2_log=-9.0,
         ),
         _headspace_transport_pO2_bar=lambda: 1e-12,
+        _interface_pO2_bar=lambda: 1e-12,
         _vacuum_floor_bar=lambda: 1e-12,
         atom_ledger=None,
         _ELLINGHAM_THERMO=EquilibriumMixin._ELLINGHAM_THERMO,

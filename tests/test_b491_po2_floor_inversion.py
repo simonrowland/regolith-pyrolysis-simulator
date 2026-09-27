@@ -8,12 +8,14 @@ from pathlib import Path
 import pytest
 import yaml
 
+import engines.builtin.vapor_pressure as vapor_pressure_module
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
     MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
     MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
     melt_dissociation_pO2_floor_inversion_notice,
     physical_melt_dissociation_pO2_bar,
+    VaporPressurePhysicalPressureCeilingError,
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -49,9 +51,26 @@ def _request(*, pO2_bar: float, intrinsic_fO2_log: float) -> IntentRequest:
         pressure_bar=1e-6,
         control_inputs={
             "pO2_bar": max(pO2_bar, DEFAULT_VACUUM_FLOOR_BAR),
+            # Direct provider tests own both redox channels explicitly.  The
+            # transport rail remains floor-clamped for the floor-inversion
+            # exercise; surface release uses the physical melt/interface rail.
+            "interface_pO2_bar": physical_melt_dissociation_pO2_bar(
+                intrinsic_fO2_log
+            )[0],
             "intrinsic_fO2_log": intrinsic_fO2_log,
             "vacuum_floor_bar": DEFAULT_VACUUM_FLOOR_BAR,
         },
+    )
+
+
+def _allow_floor_diagnostic_without_catalog_refusal(monkeypatch) -> None:
+    # These b-491 tests inspect the floor-inversion diagnostic/provenance.  The
+    # b-162 contract is tested separately below; widening only this provider
+    # module's rail keeps the two assertion sites independent.
+    monkeypatch.setattr(
+        vapor_pressure_module,
+        "CATALOG_PHYSICAL_PRESSURE_CEILING_PA",
+        1.0e99,
     )
 
 
@@ -114,7 +133,8 @@ def test_exact_log10_min_is_a_floor_even_when_not_clamped() -> None:
     assert notice["was_clamped"] is False
 
 
-def test_provider_flags_floor_inversion_and_completes() -> None:
+def test_provider_flags_floor_inversion_and_completes(monkeypatch) -> None:
+    _allow_floor_diagnostic_without_catalog_refusal(monkeypatch)
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
     result = provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0))
     diagnostic = result.diagnostic
@@ -154,7 +174,21 @@ def test_provider_flags_floor_inversion_and_completes() -> None:
     )
 
 
-def test_provider_flags_exact_minus_30_without_clamp_warning() -> None:
+def test_provider_enforces_catalog_ceiling_before_flux() -> None:
+    provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
+
+    with pytest.raises(VaporPressurePhysicalPressureCeilingError) as exc_info:
+        provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0))
+
+    error = exc_info.value
+    assert error.terminal_refusal is True
+    assert error.pressure_Pa > CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+    assert error.ceiling_Pa == CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+    assert error.species
+
+
+def test_provider_flags_exact_minus_30_without_clamp_warning(monkeypatch) -> None:
+    _allow_floor_diagnostic_without_catalog_refusal(monkeypatch)
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
     result = provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-30.0))
     diagnostic = result.diagnostic
@@ -171,9 +205,10 @@ def test_provider_flags_exact_minus_30_without_clamp_warning() -> None:
     assert clamp_warnings == []
 
 
-def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9() -> None:
+def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
     """Hand mass-action: n_Si=-1 → 21 dex; n_Mg_eff=-0.5 → 10.5 dex; n_Na=-0.25 → 5.25 dex."""
 
+    _allow_floor_diagnostic_without_catalog_refusal(monkeypatch)
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
     at_ref = provider.dispatch(
         _request(pO2_bar=1e-9, intrinsic_fO2_log=-9.0)
@@ -189,7 +224,8 @@ def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9() -> None:
     assert at_floor["Na"] / at_ref["Na"] == pytest.approx(10 ** 5.25, rel=1e-6)
 
 
-def _si_floor_notice_from_provider():
+def _si_floor_notice_from_provider(monkeypatch):
+    _allow_floor_diagnostic_without_catalog_refusal(monkeypatch)
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
     result = provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-30.0))
     diagnostic = result.diagnostic
@@ -197,7 +233,7 @@ def _si_floor_notice_from_provider():
     return provider, result, diagnostic, notice
 
 
-def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
+def test_floor_notice_reaches_carrier_extra_and_pareto(monkeypatch) -> None:
     """M04: provider floor reason/band must ride extra.extrapolation_notice."""
 
     from simulator.diagnostics import _attach_pareto_source_notices
@@ -208,7 +244,7 @@ def test_floor_notice_reaches_carrier_extra_and_pareto() -> None:
     )
     from simulator.vapour_rail.request import VapourResolveState
 
-    provider, result, diagnostic, notice = _si_floor_notice_from_provider()
+    provider, result, diagnostic, notice = _si_floor_notice_from_provider(monkeypatch)
     provenance = diagnostic["vapor_pressure_numerator_provenance"]["Si"]
     assert result.status == "ok"
     assert diagnostic["vapor_pressures_Pa"]["Si"] > 0.0
@@ -336,7 +372,7 @@ def test_clean_in_band_timestep_publishes_without_floor_notice() -> None:
     assert not (answer.extra or {}).get("extrapolation_notice")
 
 
-def test_early_floor_notice_survives_clean_timestep_wall_merge() -> None:
+def test_early_floor_notice_survives_clean_timestep_wall_merge(monkeypatch) -> None:
     """M04: worst-severity wall merge keeps the floor reason after a clean hour."""
 
     from types import SimpleNamespace
@@ -347,7 +383,7 @@ def test_early_floor_notice_survives_clean_timestep_wall_merge() -> None:
     )
     from simulator.diagnostics import _attach_pareto_source_notices
 
-    _, _, _, notice = _si_floor_notice_from_provider()
+    _, _, _, notice = _si_floor_notice_from_provider(monkeypatch)
 
     def _carrier(extra=None, *, authoritative: bool):
         record = {

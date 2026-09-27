@@ -130,7 +130,7 @@ def test_oxidizing_respeciation_consumes_explicit_o2_and_matches_kress91(
     assert result.diagnostic["direction"] == "oxidizing"
 
 
-def test_respeciation_provider_refuses_below_authoritative_temperature_band(
+def test_respeciation_provider_predicts_below_authoritative_temperature_band(
     formula_registry,
 ):
     result = BuiltinFeRedoxRespeciationProvider().dispatch(
@@ -145,13 +145,14 @@ def test_respeciation_provider_refuses_below_authoritative_temperature_band(
         )
     )
 
-    assert result.status == "refused"
-    assert result.transition is None
-    assert result.diagnostic["reason"] == (
-        "fe_redox_respeciation_temperature_unauthorized"
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["respeciation_status"] == (
+        "predicted_extrapolation"
     )
     assert result.diagnostic["temperature_band_authoritative"] is False
     assert result.diagnostic["temperature_band_case"] == "below_1200C_extrapolation"
+    assert result.diagnostic["temperature_band_authority"] == "extrapolated"
 
 
 def test_oxidizing_respeciation_can_consume_internal_evaporative_o_carrier(

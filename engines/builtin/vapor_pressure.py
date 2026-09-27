@@ -12,9 +12,10 @@ The provider:
   payload passed at construction time,
 - combines Ellingham oxide-decomposition equilibrium with phase-correct
   reference terms to compute per-species effective equilibrium pressures at the
-  request's ``temperature_C``. Non-FeO metal release reads the independently
-  supplied intrinsic-melt fO2; overhead ``pO2_bar`` remains the gas-side
-  transport/backpressure channel (and the explicit SiO lever). Only
+  request's ``temperature_C``. Every melt-surface release reads the supplied
+  ``interface_pO2_bar``; the independently supplied intrinsic-melt fO2 remains
+  the bulk redox/speciation channel, while ``pO2_bar`` remains the gas-side
+  transport/backpressure diagnostic. Only
   ``pure_component_antoine`` sidecars are used for pure-component reference
   pressures when present; legacy ``antoine`` rows are used only when no
   sidecar exists. ``pseudo_psat_backsolved_from_vaporock`` rows are backsolved
@@ -107,6 +108,7 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     melt_oxide_activity,
 )
 from simulator.physical_constants import (  # noqa: E402
+    CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     MELT_DISSOCIATION_PO2_MAX_BAR,
     MELT_DISSOCIATION_PO2_MIN_BAR,
 )
@@ -323,6 +325,22 @@ class VaporPressureRangeError(VaporPressureComputationError):
     """A requested Antoine pressure lies outside its certified source range."""
 
     terminal_refusal = True
+
+
+class VaporPressurePhysicalPressureCeilingError(VaporPressureComputationError):
+    """Typed refusal when an evaluated species pressure exceeds the catalog rail."""
+
+    terminal_refusal = True
+
+    def __init__(self, species: str, pressure_Pa: float) -> None:
+        self.species = str(species)
+        self.pressure_Pa = float(pressure_Pa)
+        self.ceiling_Pa = float(CATALOG_PHYSICAL_PRESSURE_CEILING_PA)
+        super().__init__(
+            "vapor-pressure physical ceiling exceeded at evaluator output: "
+            f"species={self.species!r} pressure_Pa={self.pressure_Pa!r} "
+            f"ceiling_Pa={self.ceiling_Pa!r}"
+        )
 
 
 class VaporPressureNumericalOverflowError(OverflowError):
@@ -1350,7 +1368,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         from simulator.state import GAS_CONSTANT
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
-            REACTION_PLANE_TRANSPORT_HEADSPACE,
             channel_linear_mass_action_factor,
             o2_potential_from_pO2_bar,
         )
@@ -1381,6 +1398,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         vacuum_floor_bar = resolve_request_vacuum_floor_bar(request)
         transport_pO2_bar = self._resolve_transport_pO2_bar(request)
         controls = request.control_inputs or {}
+        interface_pO2_supplied = (
+            'interface_pO2_bar' in controls
+            and controls.get('interface_pO2_bar') is not None
+        )
+        if not interface_pO2_supplied:
+            raise VaporPressureComputationError(
+                'interface_pO2_bar is required for melt-surface release '
+                'equilibria; transport pO2_bar is not a substitute'
+            )
+        interface_pO2_bar = float(controls['interface_pO2_bar'])
+        if not math.isfinite(interface_pO2_bar) or interface_pO2_bar <= 0.0:
+            raise VaporPressureComputationError(
+                'interface_pO2_bar must be finite and positive'
+            )
         intrinsic_fO2_log_supplied = (
             'intrinsic_fO2_log' in controls
             and controls.get('intrinsic_fO2_log') is not None
@@ -1413,6 +1444,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
         )
         feo_activity_diagnostic = None
+        feo_activity_pressure_bar = None
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import (
                 calphad_ferrous_feo_activity_diagnostic,
@@ -1420,6 +1452,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
 
             feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
+                pressure_bar=float(request.pressure_bar),
                 floor_bar=vacuum_floor_bar,
             )
 
@@ -1661,7 +1694,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # envelope-clamped, receipted) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=interface_pO2_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -1729,7 +1762,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "pressure_rail": "liquid_oxide_standard_reaction",
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "pO2_bar": interface_pO2_bar,
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -1796,7 +1829,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # envelope-clamped, receipted) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=interface_pO2_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -1839,7 +1872,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "oxide_standard_state": "liquid",
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "pO2_bar": interface_pO2_bar,
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -1923,7 +1956,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # envelope-clamped, receipted) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=interface_pO2_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -1978,7 +2011,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "P_standard_Pa": ELLINGHAM_STANDARD_PRESSURE_PA,
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": melt_dissociation_pO2_bar,
+                        "pO2_bar": interface_pO2_bar,
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -2081,27 +2114,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="K_decomp",
             )
-            dissociation_pO2_bar = (
-                transport_pO2_bar
-                if parent_oxide == 'FeO'
-                else melt_dissociation_pO2_bar
-            )
-            if parent_oxide != 'FeO':
-                # t-571: the Ellingham O2 denominator is sourced from the
-                # owner-gated O2 channel potential (melt_interface plane).
-                # In-envelope the factory's envelope clamp is the identity,
-                # so legacy_pO2_bar equals dissociation_pO2_bar bit-for-bit;
-                # out-of-envelope degraded transport fallbacks (>100 bar
-                # without intrinsic fO2) now receive the declared b-148
-                # envelope instead of mass-actioning a float sentinel.
-                # FeO intentionally retains the legacy transport denominator
-                # (Kress91 activity already carries melt redox).
-                dissociation_pO2_bar = o2_potential_from_pO2_bar(
-                    pO2_bar=dissociation_pO2_bar,
-                    temperature_K=T_K,
-                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
-                    pO2_reference_bar=1.0,
-                ).legacy_pO2_bar
+            # Every Ellingham release, including the FeO fallback, sees the
+            # same owner-gated gas/melt interface potential. Bulk intrinsic fO2
+            # remains inside Kress91 speciation above, not this surface rail.
+            dissociation_pO2_bar = o2_potential_from_pO2_bar(
+                pO2_bar=interface_pO2_bar,
+                temperature_K=T_K,
+                reaction_plane=REACTION_PLANE_MELT_INTERFACE,
+                pO2_reference_bar=1.0,
+            ).legacy_pO2_bar
             # Premise: this value is the melt-supported metal source pressure,
             # not the later surface-flux boundary condition. For MgO(l) ->
             # Mg(g) + 1/2 O2, K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The JANAF row
@@ -2116,8 +2137,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # preserving the surface metal-transport path. Pure-MgO congruent
             # co-evolution is a separate reaction-basis validation, not a
             # runtime boundary condition solved by that subtraction.
-            # FeO already carries melt redox through its Kress91 activity and
-            # intentionally retains the legacy transport denominator here.
+            # FeO bulk redox still comes from Kress91 activity; its surface
+            # release denominator is nevertheless the universal interface.
             numerator = _require_finite_vapor_value(
                 K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar,
                 species=species,
@@ -2436,9 +2457,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     source_activity=1.0,
                     pO2_bar=compiled_evaluator.pO2_reference_bar,
                 )
-                evaluator_pO2_bar = transport_pO2_bar
-                if compiled_evaluator.oxygen_fugacity_channel == "intrinsic_melt":
-                    evaluator_pO2_bar = melt_dissociation_pO2_bar
+                evaluator_pO2_bar = interface_pO2_bar
                 evaluation = compiled_evaluator.evaluate(
                     T_K,
                     source_activity=(
@@ -2496,16 +2515,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
-                # t-571: transport-plane O2 through channel #1.  The legacy
-                # form here applied no envelope clamp; the channel factory's
-                # clamp is the identity in-envelope (bit-identical) and now
-                # bounds out-of-envelope transport fallbacks (b-148 physics).
+                # t-571: interface-plane O2 through channel #1. The channel
+                # factory keeps the physical envelope and receipts intact.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=transport_pO2_bar,
+                    pO2_bar=interface_pO2_bar,
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
-                    reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
                 )
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa
@@ -2537,16 +2554,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     ),
                 )
                 # t-571: the sqrt mass action consumes the owner-gated O2
-                # channel potential (transport_headspace plane).  The exact
+                # channel potential (melt_interface plane).  The exact
                 # legacy expression sqrt(p_ref / p) is preserved — only the
                 # scalar source changes (typed, clamped, receipted).  The
                 # envelope clamp is the identity for fail-loud floored
                 # transport pO2 (>= 1e-9 bar); an out-of-envelope explicit
                 # control (>100 bar) now receives the b-148 envelope.
                 sio_o2_potential = o2_potential_from_pO2_bar(
-                    pO2_bar=transport_pO2_bar,
+                    pO2_bar=interface_pO2_bar,
                     temperature_K=T_K,
-                    reaction_plane=REACTION_PLANE_TRANSPORT_HEADSPACE,
+                    reaction_plane=REACTION_PLANE_MELT_INTERFACE,
                     pO2_reference_bar=sio_reference_bar,
                 )
                 mass_action = math.sqrt(
@@ -2599,14 +2616,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     ),
                     "P_reference_Antoine_Pa": P_reference_Pa,
                     "P_eq_Pa": P_eq_Pa,
-                    "pO2_bar": (
-                        evaluator_pO2_bar
-                        if (
-                            compiled_evaluator is not None
-                            and parent_oxide == "P2O5"
-                        )
-                        else transport_pO2_bar
-                    ),
+                    # The evaluator and the analytical SiO continuation both
+                    # consume the same melt-interface oxygen potential. Keep
+                    # provenance on that exact release boundary; transport
+                    # pO2 remains the separate top-level diagnostic above.
+                    "pO2_bar": interface_pO2_bar,
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
@@ -2657,6 +2671,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if key in authority_fields
             }
 
+        # The catalog ceiling is an evaluator output contract.  Enforce it
+        # after every rail has produced its final per-species pressure and
+        # before an IntentResult can expose the mapping to evaporation.  A
+        # ceiling violation is therefore a typed terminal outcome, never a
+        # pressure value that can be interpreted as a Hertz-Knudsen flux.
+        for species, pressure_Pa in sorted(vapor_pressures.items()):
+            pressure = float(pressure_Pa)
+            if pressure > CATALOG_PHYSICAL_PRESSURE_CEILING_PA:
+                raise VaporPressurePhysicalPressureCeilingError(
+                    species,
+                    pressure,
+                )
+
         floor_inversion_notices = _attach_pO2_floor_inversion_notices(
             vapor_pressures=vapor_pressures,
             vapor_pressure_sources=vapor_pressure_sources,
@@ -2693,10 +2720,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 "reference_temperature_K": None,
                 "component_basis": "raoultian_pure_endmember",
             },
-            # Exact intrinsic-melt oxygen channel used above for metal-source
-            # dissociation. Catalog activity evaluation must consume this solve
-            # input, never reconstruct it from a later EquilibriumResult or
-            # substitute transport/headspace pO2.
+            # Exact intrinsic-melt oxygen channel used above for Kress91 bulk
+            # speciation. Surface release uses interface_pO2_bar below.
             "source_reaction_fO2_bar": (
                 melt_dissociation_pO2_bar
                 if intrinsic_fO2_log_supplied
@@ -2709,7 +2734,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if intrinsic_fO2_log_supplied
                 else None
             ),
-            "source_reaction_activity_pressure_bar": float(vacuum_floor_bar),
+            "source_reaction_activity_pressure_bar": float(
+                feo_activity_pressure_bar
+                if feo_activity_pressure_bar is not None
+                else vacuum_floor_bar
+            ),
             "source_reaction_redox_model_id": "REF-001-kress-carmichael-1991",
             "source_reaction_composition_wt_pct": dict(comp_wt),
             "melt_dissociation_pO2_clamped_to_physical_envelope": (
@@ -2717,6 +2746,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             ),
             "pO2_floor_inversion_notices_by_species": floor_inversion_notices,
             "pO2_bar": transport_pO2_bar,
+            "interface_pO2_bar": interface_pO2_bar,
+            "interface_pO2_source": "explicit_sso_r_interface",
             "vacuum_floor_bar": vacuum_floor_bar,
             "extrapolated_beyond_valid_range_K": {
                 **metal_extrapolations,
