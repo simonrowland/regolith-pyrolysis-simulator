@@ -9,6 +9,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+import simulator.core as core_module
 from simulator.core import (
     Atmosphere,
     OxygenInterfaceConfigurationError,
@@ -51,6 +52,52 @@ def _transport_sim() -> PyrolysisSimulator:
         load('vapor_pressures.yaml'),
     )
     sim.load_batch('lunar_mare_low_ti', mass_kg=1000.0)
+    return sim
+
+
+def _trace_fe_transport_sim() -> PyrolysisSimulator:
+    def load(name: str):
+        return yaml.safe_load((ROOT / 'data' / name).read_text())
+
+    setpoints = load('setpoints.yaml')
+    setpoints.setdefault('chemistry_kernel', {})['allow_fallback_vapor'] = True
+    setpoints['chemistry_kernel']['allow_unmeasured_alpha_fallback'] = True
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        setpoints,
+        {
+            'trace_fe': {
+                'label': 'Trace Fe test melt',
+                'composition_wt_pct': {
+                    'SiO2': 99.999998,
+                    'FeO': 1.0e-9,
+                    'Fe2O3': 1.0e-9,
+                },
+            }
+        },
+        load('vapor_pressures.yaml'),
+    )
+    sim.load_batch('trace_fe', mass_kg=1.0)
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 100.0
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim._overhead_headspace_config['enabled'] = True
+    sim._melt_headspace_composition_mbar = {'N2': 1.0}
+    sim._melt_redox_ledger_initialized = True
+    sim._sync_oxygen_reservoir_mirror()
+
+    # This is a committed previous tick, not a new redox input.  It gives the
+    # capacity classifier the physical delta_n_O2 against which C_m is tested.
+    reservoir = sim.melt.oxygen_reservoir
+    reservoir.headspace_transport_pO2_bar = 1.0e-6
+    reservoir.exchange_o2_mol = 1.0e-7
+    reservoir.shadow_oxygen_transfer = {
+        'status': 'ok',
+        'transfer_o2_mol': 1.0e-7,
+        'committed_o2_mol': 1.0e-7,
+    }
     return sim
 
 
@@ -663,6 +710,54 @@ def test_interface_marks_positive_fe_with_zero_capacity_exhausted(monkeypatch):
     assert diagnostic['redox_buffer_status'] == 'exhausted'
     assert diagnostic['redox_buffer_inventory_mol'] > 0.0
     assert diagnostic['redox_buffer_exhausted'] is True
+
+
+def test_trace_fe_follows_interface_without_kress_inversion_or_sio_swing(
+    monkeypatch,
+):
+    sim = _trace_fe_transport_sim()
+    ratios = iter((0.03, 0.9999))
+
+    def changing_ledger_ratio():
+        return next(ratios, 0.9999)
+
+    monkeypatch.setattr(sim, '_ledger_fe3_over_sigma_fe', changing_ledger_ratio)
+
+    def inverse_must_not_run(**_kwargs):
+        pytest.fail('trace Fe redox state must not call Kress91 inverse')
+
+    monkeypatch.setattr(
+        core_module,
+        'kress91_log_fO2_from_fe3_over_sigma_fe',
+        inverse_must_not_run,
+    )
+
+    samples = []
+    for _ in range(2):
+        fO2_log = sim._current_melt_redox_fO2_log()
+        domain = dict(sim._last_redox_domain)
+        interface_pO2_bar = sim._interface_pO2_bar()
+        equilibrium = sim._internal_analytical_equilibrium()
+        samples.append((fO2_log, domain, interface_pO2_bar, float(
+            equilibrium.vapor_pressures_Pa['SiO']
+        )))
+
+    transport_pO2_bar = sim.melt.oxygen_reservoir.headspace_transport_pO2_bar
+    assert transport_pO2_bar == pytest.approx(1.0e-6)
+    assert [sample[0] for sample in samples] == pytest.approx([-6.0, -6.0])
+    assert [sample[2] for sample in samples] == pytest.approx(
+        [transport_pO2_bar, transport_pO2_bar]
+    )
+    assert samples[0][3] == pytest.approx(samples[1][3])
+    for _, domain, _, _ in samples:
+        assert domain['basis'] == 'no_melt_redox_buffer'
+        assert domain['status'] == 'out_of_domain'
+        assert domain['authority'] == 'gas_interface_controlled'
+        assert domain['certified_band']['pO2_bar'] == (1.0e-12, 100.0)
+        assert 'kress91_inverse_not_evaluated' in domain['reason']
+    assert sim._last_oxygen_interface_diagnostic['limiting_regime'] == (
+        'gas_side_redox_buffer_exhausted'
+    )
 
 
 def test_na2o_evaporation_from_fe_free_melt_has_no_direct_redox_source(

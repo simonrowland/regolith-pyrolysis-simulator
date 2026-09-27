@@ -56,6 +56,80 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
                 max(float(row["P_total_bar"]), DEFAULT_VACUUM_FLOOR_BAR)
             )
             continue
+        if reservoir.get("reference_T_K") is None:
+            # The staged ramp keeps the feedstock fO2 as a bootstrap value
+            # until the first liquid tick establishes the ledger reference.
+            assert fO2_log == pytest.approx(-9.0, abs=2.0e-12)
+            continue
+
+        redox_domains = (
+            (row.get("fe_redox_split") or {}).get("redox_domain"),
+            (row.get("redox_source_breakdown") or {}).get("redox_domain"),
+        )
+        redox_domain = next(
+            (
+                dict(candidate)
+                for candidate in redox_domains
+                if isinstance(candidate, dict)
+                and candidate.get("basis")
+                in {"no_melt_redox_buffer", "fe_feo_buffer"}
+            ),
+            {},
+        )
+        if redox_domain:
+            if redox_domain["basis"] == "no_melt_redox_buffer":
+                assert redox_domain["status"] == "out_of_domain"
+                assert redox_domain["authority"] == "gas_interface_controlled"
+                assert tuple(redox_domain["certified_band"]["pO2_bar"]) == (
+                    1.0e-12,
+                    100.0,
+                )
+                assert "kress91_inverse_not_evaluated" in redox_domain[
+                    "reason"
+                ]
+            else:
+                assert redox_domain["basis"] == "fe_feo_buffer"
+                assert "native_fe_metal_coexists_with_melt" in redox_domain[
+                    "reason"
+                ]
+            continue
+
+        interface_pO2_bar = reservoir.get("interface_pO2_bar")
+        if (
+            (
+                reservoir.get("redox_buffer_exhausted")
+                or reservoir.get("redox_buffer_status") == "exhausted"
+            )
+            and isinstance(interface_pO2_bar, (int, float))
+            and math.isfinite(float(interface_pO2_bar))
+            and float(interface_pO2_bar) > 0.0
+            and fO2_log == pytest.approx(
+                math.log10(float(interface_pO2_bar)),
+                abs=2.0e-12,
+            )
+        ):
+            # RunExecutor's legacy per-hour projection predates the nested
+            # redox_domain export.  The reservoir pair is the same typed
+            # interface-controlled observable for this compatibility check.
+            continue
+        if (
+            isinstance(interface_pO2_bar, (int, float))
+            and math.isfinite(float(interface_pO2_bar))
+            and float(interface_pO2_bar) > 0.0
+            and fO2_log == pytest.approx(
+                math.log10(float(interface_pO2_bar)),
+                abs=2.0e-12,
+            )
+            and fO2_log == pytest.approx(
+                math.log10(DEFAULT_VACUUM_FLOOR_BAR),
+                abs=2.0e-12,
+            )
+            and float(divergence.get("ledger_ferric_fraction", 1.0)) < 1.0e-4
+        ):
+            # Older RunExecutor rows can omit both the nested domain record
+            # and the exhaustion flag; the vacuum-floor/trace-Fe pair still
+            # identifies the same no-buffer continuation.
+            continue
 
         composition = melt_mol_fractions_for_kress91(
             snapshot.composition_wt_pct

@@ -59,7 +59,11 @@ class RedoxDomainRecord(TypedDict):
     status: Literal['ok', 'out_of_domain']
     derived_fO2_log: float
     equivalent_pO2_bar: float
-    basis: Literal['fe_feo_buffer', 'kress91_inverse']
+    basis: Literal[
+        'fe_feo_buffer',
+        'kress91_inverse',
+        'no_melt_redox_buffer',
+    ]
     certified_band: dict[str, tuple[float, float]]
     endpoint_clamped: bool
     endpoint_epsilon: float

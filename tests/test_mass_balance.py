@@ -260,6 +260,45 @@ def test_finite_backpressure_o2_uptake_closes_atoms_and_fe_ledger():
     )
 
 
+def test_trace_fe_interface_limit_preserves_atom_closure():
+    sim = _oxygen_exchange_sim("Fe2O3", mass_kg=1.0e-11)
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.p_total_mbar = 100.0
+    sim._melt_headspace_composition_mbar = {"N2": 1.0}
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0e-7, "N2": 1.0e-7},
+        source="test trace Fe interface limit",
+        material_origin="feedstock",
+    )
+    reservoir = sim.melt.oxygen_reservoir
+    reservoir.headspace_transport_pO2_bar = 1.0e-6
+    reservoir.exchange_o2_mol = 1.0e-7
+    reservoir.shadow_oxygen_transfer = {
+        "status": "ok",
+        "transfer_o2_mol": 1.0e-7,
+        "committed_o2_mol": 1.0e-7,
+    }
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+    transitions_before = len(sim.atom_ledger.transitions)
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert sim._last_redox_domain["basis"] == "no_melt_redox_buffer"
+    assert reservoir.shadow_oxygen_transfer["status"] == (
+        "no_melt_redox_buffer"
+    )
+    assert reservoir.exchange_o2_mol == pytest.approx(0.0)
+    assert len(sim.atom_ledger.transitions) == transitions_before
+    drift_after = sim.atom_ledger.element_atom_drift_report()
+    assert drift_after["accepted_transition_residual_mol_atoms"] == pytest.approx(
+        drift_before["accepted_transition_residual_mol_atoms"]
+    )
+    assert drift_after["whole_run_boundary_residual_mol_atoms"] == pytest.approx(
+        drift_before["whole_run_boundary_residual_mol_atoms"]
+    )
+
+
 def test_subfloor_fe_redox_o2_credit_closes_transition():
     sim = _oxygen_exchange_sim("Fe2O3", mass_kg=1.0e-11)
     before_kg = sim._flow_mass_out_kg()
