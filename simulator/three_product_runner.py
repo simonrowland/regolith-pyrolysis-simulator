@@ -31,6 +31,8 @@ from typing import Any, Mapping
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.backends import BackendSelectionPolicy
+from simulator.run_executor import RunExecutor
+from simulator.runner import PyrolysisRun, _positive_mass_kg
 from simulator.session import SimSession, SimSessionConfig
 from simulator.three_product_report import classify_products
 from simulator.three_product_report_markdown import (
@@ -54,6 +56,7 @@ def _build_session(
     feedstock_id: str,
     campaign: str,
     data_dir: Path,
+    mass_kg: float,
     backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
 ) -> SimSession:
     """Build a SimSession with the canonical project setpoints +
@@ -67,8 +70,57 @@ def _build_session(
         campaign=campaign,
         backend_name=backend_name,
         backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
+        mass_kg=mass_kg,
     )
     return SimSession().start(config)
+
+
+def _run_with_provenance(
+    *,
+    feedstock_id: str,
+    campaign: str,
+    hours: int,
+    mass_kg: float,
+    data_dir: Path | None = None,
+    backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    early_tap_mode: bool = False,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Run the classifier and project the canonical runner provenance."""
+    mass_kg = _positive_mass_kg(mass_kg)
+    session = _build_session(
+        feedstock_id=feedstock_id,
+        campaign=campaign,
+        data_dir=data_dir or DEFAULT_DATA_DIR,
+        mass_kg=mass_kg,
+        backend_name=backend_name,
+    )
+    execution = RunExecutor().execute_session(session, hours=int(hours))
+
+    # Keep the three-product runner's data-dir/session path while reusing the
+    # canonical runner's output builder for all provenance and run notices.
+    canonical_run = PyrolysisRun(
+        feedstock_id=feedstock_id,
+        campaign=campaign,
+        hours=hours,
+        mass_kg=mass_kg,
+        backend_name=backend_name,
+    )
+    canonical_document = canonical_run._build_output(execution)
+    session._set_result_document(canonical_document)
+    classification = classify_products(
+        execution.simulator,
+        early_tap_mode=early_tap_mode,
+    )
+    provenance = {
+        "run_metadata": canonical_document["run_metadata"],
+        "vapor_pressure_source_report": canonical_document[
+            "vapor_pressure_source_report"
+        ],
+        "degraded_path_engagement": canonical_document[
+            "degraded_path_engagement"
+        ],
+    }
+    return classification, provenance
 
 
 def run(
@@ -76,6 +128,7 @@ def run(
     feedstock_id: str,
     campaign: str,
     hours: int,
+    mass_kg: float = 1000.0,
     data_dir: Path | None = None,
     backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     early_tap_mode: bool = False,
@@ -90,6 +143,8 @@ def run(
         campaign: Campaign label (e.g. ``"C2A"`` or
             ``"C2A_continuous"``).
         hours: Max simulated hours to advance.
+        mass_kg: Positive feedstock charge mass in kg; defaults to the
+            canonical runner's 1000 kg batch.
         data_dir: Optional override for the data directory; defaults
             to the project's ``data/`` next to ``simulator/``.
         backend_name: Backend to select; ``"internal-analytical"`` is the
@@ -102,18 +157,16 @@ def run(
     Returns:
         The 5-bucket classification dict from ``classify_products``.
     """
-    session = _build_session(
+    classification, _ = _run_with_provenance(
         feedstock_id=feedstock_id,
         campaign=campaign,
-        data_dir=data_dir or DEFAULT_DATA_DIR,
+        hours=hours,
+        mass_kg=mass_kg,
+        data_dir=data_dir,
         backend_name=backend_name,
+        early_tap_mode=early_tap_mode,
     )
-    sim = session.simulator
-    ticks = 0
-    while ticks < hours and not sim.is_complete():
-        sim.step()
-        ticks += 1
-    return classify_products(sim, early_tap_mode=early_tap_mode)
+    return classification
 
 
 def _classification_to_json(
@@ -121,13 +174,17 @@ def _classification_to_json(
     *,
     feedstock_id: str | None = None,
     campaign: str | None = None,
+    mass_kg: float,
+    provenance: Mapping[str, Any],
 ) -> str:
     """Serialize the classification dict as pretty-printed JSON
     with optional metadata header."""
     payload = {
         "feedstock_id": feedstock_id,
         "campaign": campaign,
+        "mass_kg": mass_kg,
         "classification": dict(classification),
+        **dict(provenance),
     }
     return json.dumps(payload, indent=2, sort_keys=True, default=str)
 
@@ -137,6 +194,8 @@ def _emit_report(
     *,
     feedstock_id: str,
     campaign: str,
+    mass_kg: float,
+    provenance: Mapping[str, Any],
     output_format: str,
     output_path: Path | None,
 ) -> str:
@@ -152,11 +211,33 @@ def _emit_report(
                 f"{feedstock_id} / {campaign}"
             ),
         )
+        metadata = provenance["run_metadata"]
+        engines_used = metadata.get("engines_used", {})
+        vapor_engine = engines_used.get("registry", {}).get(
+            "vapor_pressure", {}
+        )
+        shadows = vapor_engine.get("shadows", []) or []
+        extrapolation = provenance["degraded_path_engagement"].get(
+            "vapour_pressure_extrapolation", {}
+        )
+        body += (
+            "\n**Run provenance**: "
+            f"mass_kg={mass_kg:g}; "
+            f"backend={metadata.get('backend', 'unknown')}; "
+            f"backend_status={metadata.get('backend_status', 'unknown')}; "
+            f"backend_authoritative={str(metadata.get('backend_authoritative', False)).lower()}; "
+            f"vapor_pressure_active={vapor_engine.get('authoritative', 'none')}; "
+            f"vapor_pressure_shadows={','.join(map(str, shadows)) or 'none'}; "
+            "vapor_pressure_extrapolated_summaries="
+            f"{int(extrapolation.get('total_count', 0) or 0)}\n"
+        )
     elif output_format == 'json':
         body = _classification_to_json(
             classification,
             feedstock_id=feedstock_id,
             campaign=campaign,
+            mass_kg=mass_kg,
+            provenance=provenance,
         )
     else:
         raise ValueError(
@@ -183,6 +264,8 @@ def _build_argparser() -> argparse.ArgumentParser:
                         help="campaign label (default: C2A)")
     parser.add_argument("--hours", type=int, default=24,
                         help="max simulated hours to advance (default: 24)")
+    parser.add_argument("--mass-kg", type=float, default=1000.0,
+                        help="batch feedstock mass in kg (default: 1000)")
     parser.add_argument("--output", type=Path, default=None,
                         help="output file path; stdout if omitted")
     parser.add_argument("--format", choices=SUPPORTED_FORMATS,
@@ -211,10 +294,11 @@ def _build_argparser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = _build_argparser().parse_args(argv)
-    classification = run(
+    classification, provenance = _run_with_provenance(
         feedstock_id=args.feedstock,
         campaign=args.campaign,
         hours=args.hours,
+        mass_kg=args.mass_kg,
         data_dir=args.data_dir,
         backend_name=args.backend,
         early_tap_mode=args.early_tap,
@@ -223,6 +307,8 @@ def main(argv: list[str] | None = None) -> int:
         classification,
         feedstock_id=args.feedstock,
         campaign=args.campaign,
+        mass_kg=args.mass_kg,
+        provenance=provenance,
         output_format=args.format,
         output_path=args.output,
     )

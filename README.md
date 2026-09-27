@@ -181,6 +181,16 @@ Model-bearing citations are tracked in [`docs/references/`](docs/references/): a
 
 ### Hero run: 1 kg lunar mare to 2200 °C
 
+> **Known defect: most of the extraction reported below is not a physical result.** From about
+> hour 157 (~1780 °C) the melt drifts oxidizing. Its log fO₂ passes the furnace's total pressure at
+> hour 160 (1805 °C), reaches +3.7 at hour 168 and +20 at hour 169, then collapses to about −13,950
+> from hour 170. At that fO₂ the Al, Mg and Ca vapour pressures reach 10⁸–10¹³ Pa, so almost all of the Ca, Al, Ti and Mg that leaves the melt does so in
+> hours 169–173, mostly at hour 171. For scale, at hour 156 (1775 °C), the
+> condensation train holds 0.029 kg of condensate plus 0.009 kg of stored O₂. After hour 176 no further
+> extraction occurs, so the 2200 °C hold adds none. The fix and a corrected re-run are open
+> work. Until then, read the figures below as a record of the defective run, not as the process's
+> predicted yield.
+
 This is the smallest end-to-end demonstration of the product story. The command uses the default
 `furnace_material: zirconia_ysz` hot-wall configuration (catalog ceiling 2200 °C), runs the
 continuous `C2A` campaign long enough to reach that ceiling, and writes the full report to
@@ -236,11 +246,12 @@ The simulated condenser train currently captures only part of this. For example,
 
 ### What this run does NOT yet show
 
-Ca, Al and Ti are predicted to leave the melt essentially completely (100.0% each under the ideal-condenser basis). That erases the
-refractory rump the project expects to keep, and the prediction rests on 20 of 21
-extrapolated vapour-pressure summaries. It is under investigation: treat it as a
-flagged prediction, not a demonstrated result. 38.0% of the feedstock O sits in the
-redox-buffer reservoir. These limitations are tracked as open issues.
+Ca, Al and Ti leave the melt almost entirely in this run (100.0% each under the ideal-condenser basis),
+but that loss comes from the melt-redox runaway described above, not from their vapour pressures.
+It is not evidence against the refractory rump the project expects to keep. The 38.0% of feedstock O
+reported in the redox-buffer reservoir is also a bookkeeping artifact: oxygen released by metal
+evaporation is parked there and never drained, so stored O₂ is understated. These are tracked as
+open issues.
 
 The report status is `partial / pending_decision`: VapoRock was importable on the run machine but was
 not the active engine; the active vapor-pressure source was `builtin-vapor-pressure` with VapoRock as

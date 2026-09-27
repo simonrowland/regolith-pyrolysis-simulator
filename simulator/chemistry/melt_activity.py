@@ -41,6 +41,8 @@ MELT_OXIDE_ACTIVITY_LIMITATION = (
 MELT_OXIDE_ACTIVITY_REFERENCE_STATE = (
     "single_cation_Raoultian_pure_liquid_reference"
 )
+MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION = "single_cation"
+MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE = "parent_oxide"
 # Asserted single-cation mole fraction at which the pure-endmember continuity
 # shell begins. This cutoff is not derived from an error budget, activity
 # tolerance, composition-domain boundary, or literature datum: any blend_start
@@ -235,6 +237,33 @@ class MeltOxideActivity:
     # b-133 P-carrier authority fields (HEAD rail); non-P rows leave defaults.
     valid_range_K: tuple[float, float] | None = None
     authority_status: str = "temperature_not_supplied"
+    activity_basis: str = MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION
+
+    def activity_on_basis(self, basis: str) -> float:
+        """Return this activity on the requested declared carrier basis."""
+
+        if basis not in {
+            MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION,
+            MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE,
+        }:
+            raise ValueError(f"unsupported melt activity basis: {basis!r}")
+        if self.activity_basis not in {
+            MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION,
+            MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE,
+        }:
+            raise ValueError(f"unsupported melt activity basis: {self.activity_basis!r}")
+        if basis == self.activity_basis or self.activity <= 0.0:
+            return self.activity
+
+        cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(self.parent_oxide, 1.0)
+        if self.activity_basis == MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION:
+            # The constant-gamma table uses a single-cation Raoultian
+            # ideal-mixing basis, a(MO0.5)=gamma*X(MO0.5), from Sossi &
+            # Fegley (2018), RMG 84, Table 2 pp. 409-410, Eq. 24-25,
+            # DOI 10.2138/rmg.2018.84.11. For a di-cation parent,
+            # 2 MO0.5(l) = M2O(l), so a(M2O)=a(MO0.5)^2.
+            return self.activity ** float(cations)
+        return self.activity ** (1.0 / float(cations))
 
     def equivalent_parent_activity(self, parent_activity_exponent: float) -> float:
         """Return parent-oxide activity that yields this activity after exponenting."""
@@ -249,10 +278,7 @@ class MeltOxideActivity:
     def thermodynamic_parent_activity(self) -> float:
         """Return activity on the parent-oxide formula basis."""
 
-        cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(self.parent_oxide, 1.0)
-        if self.activity <= 0.0:
-            return 0.0
-        return self.activity ** float(cations)
+        return self.activity_on_basis(MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE)
 
     def provenance(self) -> dict[str, Any]:
         payload: dict[str, Any] = {

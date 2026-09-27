@@ -323,6 +323,127 @@ class AccountingQueries:
             _merge_masses(products, consumed_getter())
         return products
 
+    def _incremental_prefix_state(
+        self,
+        cache_key: str,
+        source: Any,
+    ) -> tuple[dict[str, float], int, dict[str, Any] | None]:
+        """Return a rollback-covered running total and its unread cursor."""
+        record = getattr(self.sim, "record", None)
+        if record is None:
+            return {}, 0, None
+        try:
+            source_length = len(source)
+        except TypeError:
+            return {}, 0, None
+
+        # BatchRecord is included in the core's terminal-refusal snapshot, so
+        # the cursor and totals roll back with the committed history.
+        cache = getattr(record, "_accounting_prefix_cache", None)
+        if not isinstance(cache, dict):
+            cache = {}
+            setattr(record, "_accounting_prefix_cache", cache)
+        state = cache.get(cache_key)
+        if not isinstance(state, dict):
+            state = None
+        count = state.get("count") if state is not None else None
+        totals = state.get("totals") if state is not None else None
+        if (
+            state is None
+            or state.get("source_id") != id(source)
+            or not isinstance(count, int)
+            or count < 0
+            or count > source_length
+            or not isinstance(totals, dict)
+        ):
+            state = {
+                "source_id": id(source),
+                "count": 0,
+                "totals": {},
+            }
+            cache[cache_key] = state
+            count = 0
+            totals = state["totals"]
+        return totals, count, state
+
+    def condensation_train_kg_cumulative(self) -> dict[str, float]:
+        """Return gross stage-condensation additions through the current hour.
+
+        The live ``process.condensation_train`` account is reduced when the
+        C3 shuttle recovers condensate. Snapshot stage-delta projections are
+        retained for every hour, so summing them preserves gross condensed
+        mass without writing another ledger account.
+        """
+        snapshots = getattr(getattr(self.sim, "record", None), "snapshots", ())
+        if not isinstance(snapshots, (list, tuple)):
+            snapshots = tuple(snapshots)
+        totals, start, state = self._incremental_prefix_state(
+            "condensation_train", snapshots
+        )
+        for snapshot in snapshots[start:]:
+            deltas = getattr(snapshot, "condensed_by_stage_species_delta", {})
+            if not isinstance(deltas, Mapping):
+                continue
+            for key, raw_kg in deltas.items():
+                if not isinstance(key, tuple) or len(key) != 2:
+                    continue
+                try:
+                    kg = float(raw_kg)
+                except (TypeError, ValueError):
+                    continue
+                if not math.isfinite(kg) or kg <= 0.0:
+                    continue
+                species = str(key[1])
+                totals[species] = totals.get(species, 0.0) + kg
+        if state is not None:
+            state["count"] = len(snapshots)
+        return {
+            species: float(kg)
+            for species, kg in sorted(totals.items())
+            if kg > 1e-12
+        }
+
+    def recycled_to_reagent_kg_cumulative(self) -> dict[str, float]:
+        """Return cumulative condensate transfers into reagent inventory.
+
+        The transfer includes both the C3 alkali shuttle and C6 Mg recovery;
+        both debit the same condensation-train account.
+        """
+        transitions = getattr(self.ledger, "_transitions", None)
+        if transitions is None:
+            transitions = self.ledger.transitions
+        if not isinstance(transitions, (list, tuple)):
+            transitions = tuple(transitions)
+        totals, start, state = self._incremental_prefix_state(
+            "recycled_to_reagent", transitions
+        )
+        for transition in transitions[start:]:
+            condensate_debits = tuple(
+                lot
+                for lot in transition.debits
+                if lot.account == CONDENSATION_TRAIN_ACCOUNT
+            )
+            if not condensate_debits or not any(
+                lot.account == "process.reagent_inventory"
+                for lot in transition.credits
+            ):
+                continue
+            for lot in condensate_debits:
+                for species, raw_kg in lot.species_kg.items():
+                    try:
+                        kg = float(raw_kg)
+                    except (TypeError, ValueError):
+                        continue
+                    if math.isfinite(kg) and kg > 0.0:
+                        totals[species] = totals.get(species, 0.0) + kg
+        if state is not None:
+            state["count"] = len(transitions)
+        return {
+            species: float(kg)
+            for species, kg in sorted(totals.items())
+            if kg > 1e-12
+        }
+
     def cost_allocation_product_ledger(self) -> dict[str, float]:
         return {
             species: kg

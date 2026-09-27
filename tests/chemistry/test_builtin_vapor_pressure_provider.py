@@ -53,6 +53,8 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry import ellingham_graph
 from simulator.chemistry import melt_activity
 from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE,
+    MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION,
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_IDEAL_ASSERTION_TIER,
     MELT_OXIDE_IDEAL_SOLUTION_MODEL,
@@ -2406,6 +2408,103 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
     assert result.diagnostic["vapor_pressures_Pa"]["SiO"] == pytest.approx(
         expected_p_eq
     )
+
+
+@pytest.mark.parametrize(
+    "species,parent_oxide",
+    [
+        ("K2O_gas", "K2O"),
+        ("K2", "K2O"),
+        ("Na2", "Na2O"),
+        ("Na2O_gas", "Na2O"),
+        ("Mg2", "MgO"),
+    ],
+)
+def test_carrier_activity_matches_declared_parent_basis(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    species,
+    parent_oxide,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    melt_mol = dict(sim.atom_ledger.mol_by_account()["process.cleaned_melt"])
+    T_K = 1949.9
+    pO2_bar = 1.0e-9
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": melt_mol},
+                species_formula_registry=sim.species_formula_registry,
+            ),
+            temperature_C=T_K - 273.15,
+            pressure_bar=1.0e-6,
+            control_inputs={
+                "pO2_bar": pO2_bar,
+                "interface_pO2_bar": pO2_bar,
+                "intrinsic_fO2_log": -9.0,
+            },
+        )
+    )
+
+    oxide_activity = melt_oxide_activity(parent_oxide, melt_mol, temperature_K=T_K)
+    assert oxide_activity is not None
+    evaluator = provider._vapour_rail_catalog.evaluator_for(species)
+    standard_reaction_reference = evaluator.evaluate(
+        T_K,
+        source_activity=1.0,
+        pO2_bar=pO2_bar,
+    ).pressure_pa
+    single_cation_activity = oxide_activity.activity
+    declared_parent_activity = oxide_activity.activity_on_basis(
+        MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE
+    )
+    expected = standard_reaction_reference * declared_parent_activity ** float(
+        evaluator.activity_exponent
+    )
+    actual = result.diagnostic["vapor_pressures_Pa"][species]
+
+    assert actual == pytest.approx(expected)
+    assert result.diagnostic["vapor_pressure_numerator_provenance"][species][
+        "activity_factor"
+    ] == pytest.approx(declared_parent_activity ** float(evaluator.activity_exponent))
+
+    if species == "K2O_gas":
+        current_single_basis = standard_reaction_reference * single_cation_activity
+        overstatement = current_single_basis / expected
+        # This is the measured lunar C0 1949.9 K correction, computed from
+        # the assertion-site activity rather than copied as a pressure golden.
+        assert overstatement == pytest.approx(1.0 / single_cation_activity)
+        assert overstatement == pytest.approx(2.2838723e7, rel=1.0e-7)
+        assert actual == pytest.approx(current_single_basis / overstatement)
+
+
+def test_activity_basis_conversion_passes_through_parent_source():
+    source = melt_oxide_activity("K2O", {"K2O": 0.05, "SiO2": 1.0})
+    assert source is not None
+    parent_activity = source.activity**2
+    already_parent = replace(
+        source,
+        activity=parent_activity,
+        activity_basis=MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE,
+    )
+
+    assert already_parent.activity_on_basis(
+        MELT_OXIDE_ACTIVITY_BASIS_PARENT_OXIDE
+    ) == pytest.approx(parent_activity)
+    assert already_parent.thermodynamic_parent_activity() == pytest.approx(
+        parent_activity
+    )
+    assert already_parent.activity_on_basis(
+        MELT_OXIDE_ACTIVITY_BASIS_SINGLE_CATION
+    ) == pytest.approx(source.activity)
 
 
 def test_al2o_provider_applies_single_cation_activity_square_once(
