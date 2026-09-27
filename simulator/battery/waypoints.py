@@ -1316,9 +1316,9 @@ def _c_co_pressure_Pa(
     """Printed P_CO in Pa, or total P when the paper states CO is the gas.
 
     Prefer a single-species CO sweep (or a mixture with exactly one printed CO
-    component partial pressure). Fall back to pressure_boundary when the C–CO
-    buffer token already asserts that CO is the buffering gas — never invent a
-    mole fraction or pick among CO/Ar alternatives.
+    component partial pressure). Use total pressure only when the sweep
+    explicitly states CO is the sole gas; never invent a mole fraction or pick
+    among CO/Ar alternatives.
     """
     sweep = experiment.pressure_environment.sweep_gas
     if sweep.state.is_value and sweep.state.value.alternatives is None:
@@ -1339,9 +1339,12 @@ def _c_co_pressure_Pa(
                     Value.point_of(printed_co[0].partial_pressure_Pa.value),
                     ("experiment.pressure_environment.sweep_gas",),
                 )
-    boundary = pressure_boundary(experiment, bench, observation).selected
-    if boundary is not None and boundary.value.kind is ValueKind.POINT:
-        return boundary.value, boundary.inputs
+    if sweep.state.is_value and sweep.state.value.alternatives is None:
+        gas = sweep.state.value
+        if gas.species == "CO":
+            boundary = pressure_boundary(experiment, bench, observation).selected
+            if boundary is not None and boundary.value.kind is ValueKind.POINT:
+                return boundary.value, boundary.inputs
     return None
 
 
