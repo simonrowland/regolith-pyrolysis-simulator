@@ -420,8 +420,8 @@ def test_co2_buffer_assumption_is_published_in_headspace_state():
     )
 
 
-def test_interface_po2_uses_two_film_log_series_resistance_and_publishes_regime():
-    """The release boundary is the grounded gas/melt interface, not bulk fO2."""
+def test_interface_po2_uses_finite_two_film_force_and_publishes_regime():
+    """The release boundary uses finite ledger O2 inventory, not a tangent law."""
 
     sim = _transport_sim()
     sim.melt.temperature_C = 1500.0 - 273.15
@@ -443,7 +443,9 @@ def test_interface_po2_uses_two_film_log_series_resistance_and_publishes_regime(
     )
     reservoir = sim.melt.oxygen_reservoir
     reservoir.headspace_transport_pO2_bar = 1.0e-6
-    reservoir.melt_intrinsic_fO2_log = -4.0
+    reservoir.melt_intrinsic_fO2_log = sim._melt_fO2_from_ledger(
+        T_K=sim.melt.temperature_C + 273.15
+    )
 
     interface_pO2_bar = sim._interface_pO2_bar()
     diagnostic = sim._last_oxygen_interface_diagnostic
@@ -459,46 +461,37 @@ def test_interface_po2_uses_two_film_log_series_resistance_and_publishes_regime(
     melt_depth_m = float(
         sim.setpoints['sso_r']['oxygen_exchange']['effective_melt_depth_m']
     )
-    melt_conductance = melt_k * diagnostic[
-        'redox_buffer_capacity_mol_per_ln_fO2'
-    ] / (sim.melt.melt_surface_area_m2 * melt_depth_m)
-    gas_log = math.log(transport_pO2_bar)
-    melt_log = math.log(melt_pO2_bar)
-
-    def flux_residual(interface_log):
-        interface_pressure_bar = math.exp(interface_log)
-        gas_flux = gas_k * gas_pressure_factor * (
-            transport_pO2_bar - interface_pressure_bar
-        )
-        melt_flux = melt_conductance * (interface_log - melt_log)
-        return gas_flux - melt_flux
-
-    lo = min(gas_log, melt_log)
-    hi = max(gas_log, melt_log)
-    lo_residual = flux_residual(lo)
-    for _ in range(160):
-        mid = 0.5 * (lo + hi)
-        mid_residual = flux_residual(mid)
-        if lo_residual * mid_residual <= 0.0:
-            hi = mid
-        else:
-            lo = mid
-            lo_residual = mid_residual
-    expected_bar = math.exp(0.5 * (lo + hi))
     gas_flux = gas_k * gas_pressure_factor * (
         transport_pO2_bar - interface_pO2_bar
     )
-    melt_flux = melt_conductance * (
-        math.log(interface_pO2_bar) - melt_log
+    melt_flux = melt_k * diagnostic['finite_melt_driving_force_mol'] / (
+        sim.melt.melt_surface_area_m2 * melt_depth_m
     )
     assert math.isfinite(gas_k) and gas_k > 0.0
-    assert interface_pO2_bar == pytest.approx(expected_bar, rel=1.0e-10)
-    assert gas_flux == pytest.approx(melt_flux, rel=1.0e-10, abs=2.0e-14)
-    assert diagnostic['interface_flux_mol_m2_s'] == pytest.approx(
-        gas_flux,
-        rel=1.0e-10,
-        abs=2.0e-14,
+    assert diagnostic['finite_melt_driving_force_mol'] == pytest.approx(
+        diagnostic['melt_oxygen_equilibrium_mol']
+        - diagnostic['melt_oxygen_ledger_mol']
     )
+    assert min(transport_pO2_bar, melt_pO2_bar) <= interface_pO2_bar <= max(
+        transport_pO2_bar,
+        melt_pO2_bar,
+    )
+    if diagnostic['interface_root_clamped']:
+        # The fixture is at a native-Fe/FeO ledger endpoint, so its formal
+        # Kress91 equilibrium can sit outside the gas/melt pressure bracket.
+        # The finite root must report that typed diagnostic instead of
+        # inventing a flux continuity point.
+        assert diagnostic['interface_root_residual_mol_m2_s'] != pytest.approx(
+            0.0,
+            abs=2.0e-14,
+        )
+    else:
+        assert gas_flux == pytest.approx(melt_flux, rel=1.0e-10, abs=2.0e-14)
+        assert diagnostic['interface_flux_mol_m2_s'] == pytest.approx(
+            gas_flux,
+            rel=1.0e-10,
+            abs=2.0e-14,
+        )
     assert reservoir.interface_pO2_bar == pytest.approx(interface_pO2_bar)
     assert reservoir.interface_pO2_limiting_regime == diagnostic[
         'limiting_regime'
@@ -507,10 +500,54 @@ def test_interface_po2_uses_two_film_log_series_resistance_and_publishes_regime(
         'gas_side_limited',
         'melt_side_limited',
     }
-    assert min(transport_pO2_bar, melt_pO2_bar) < interface_pO2_bar < max(
-        transport_pO2_bar,
-        melt_pO2_bar,
+
+
+def test_finite_interface_root_conserves_flux_for_interior_inventory():
+    sim = _transport_sim()
+    sim.melt.temperature_C = 1500.0 - 273.15
+    sim.melt.p_total_mbar = 100.0
+    sim._melt_headspace_composition_mbar = {'N2': 1.0}
+    T_K = sim.melt.temperature_C + 273.15
+    comp = sim._melt_oxide_wt_pct()
+    k_m, _, _ = sim._oxygen_exchange_k_m_s(T_K)
+    k_g, _ = sim._oxygen_interface_gas_side_k_m_s(T_K)
+    melt_pO2_bar = sim._oxygen_melt_pO2_bar_for_inventory(
+        n_feo_mol=2.0,
+        n_fe2o3_mol=1.0,
+        T_K=T_K,
+        pressure_bar=0.1,
+        comp=comp,
+        fallback_pO2_bar=1.0e-4,
     )
+    root = sim._oxygen_finite_interface_root(
+        gas_pO2_bar=1.0e-9,
+        melt_pO2_bar=melt_pO2_bar,
+        T_K=T_K,
+        gas_temperature_K=T_K,
+        k_g=k_g,
+        k_m=k_m,
+        surface_area_m2=sim.melt.melt_surface_area_m2,
+        h_eff_m=sim.setpoints['sso_r']['oxygen_exchange'][
+            'effective_melt_depth_m'
+        ],
+        comp=comp,
+        pressure_bar=0.1,
+        n_feo_mol=2.0,
+        n_fe2o3_mol=1.0,
+        capacity_mol_per_ln_fO2=1.0,
+    )
+
+    assert root['interface_root_clamped'] is False
+    assert root['finite_melt_driving_force_mol'] == pytest.approx(
+        root['melt_oxygen_equilibrium_mol']
+        - root['melt_oxygen_ledger_mol']
+    )
+    assert root['gas_flux_mol_m2_s'] == pytest.approx(
+        root['melt_flux_mol_m2_s'],
+        rel=1.0e-10,
+        abs=2.0e-14,
+    )
+    assert math.isfinite(root['interface_flux_mol_m2_s'])
 
 
 @pytest.mark.parametrize('target_fe3_fraction', [1.0e-300, 1.0 - 1.0e-6])
