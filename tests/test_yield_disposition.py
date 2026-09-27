@@ -126,6 +126,23 @@ def test_clean_feedstock_closes_on_element_basis_with_chart_payload() -> None:
     assert si["subdisposition_fractions"]["refractory_rump"] == pytest.approx(0.0)
 
 
+def test_ideal_train_omits_elements_absent_from_feedstock() -> None:
+    feo_kg = resolve_species_formula("FeO", {}).molar_mass_kg_per_mol()
+    ledger = AtomLedger()
+    ledger.load_external(
+        "process.cleaned_melt",
+        {"FeO": feo_kg},
+        source="synthetic FeO feedstock",
+        material_origin="feedstock",
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+    ideal_rows = payload["ideal_train_melt_boundary"]["rows"]
+
+    assert {row["element"] for row in ideal_rows} == {"Fe", "O"}
+    assert all(row["feedstock_input_mol_atoms"] > 0.0 for row in ideal_rows)
+
+
 def test_origin_split_excludes_reagent_atoms_without_scaling_feedstock() -> None:
     ledger = AtomLedger()
     ledger.load_external(

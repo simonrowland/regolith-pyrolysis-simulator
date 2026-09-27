@@ -1833,6 +1833,9 @@ def _build_ideal_train_melt_boundary(
     ]
     for element, denominator_raw in sorted(feedstock_input.items()):
         denominator = float(denominator_raw)
+        # The feedstock input is the publication domain.  Keep this guard for
+        # callers that provide a zero-valued element map directly: an absent
+        # element has no defined ideal fraction and must not become a 0/0 row.
         if denominator <= 0.0:
             continue
         row_refusals: list[dict[str, Any]] = []
