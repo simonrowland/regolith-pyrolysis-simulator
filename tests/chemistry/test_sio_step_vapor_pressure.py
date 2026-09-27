@@ -162,7 +162,12 @@ def test_builtin_sio_suppression_uses_calibrated_reference_not_body_floor():
                 ),
                 temperature_C=1600.0,
                 pressure_bar=1.0e-6,
-                control_inputs={"pO2_bar": 1.0e-6, "body": body},
+                # b-588 two-film split: SiO release is controlled by interface pO2; transport remains separate.
+                control_inputs={
+                    "pO2_bar": 1.0e-6,
+                    "interface_pO2_bar": 1.0e-6,
+                    "body": body,
+                },
             )
         )
         assert result.status == "ok"

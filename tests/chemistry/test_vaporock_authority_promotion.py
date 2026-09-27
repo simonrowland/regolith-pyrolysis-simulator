@@ -166,7 +166,9 @@ def _dispatch_vapor(sim: PyrolysisSimulator):
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=1500.0,
         pressure_bar=1e-6,
-        control_inputs={"pO2_bar": 1e-9},
+        # b-588 two-film split: builtin release uses interface pO2 while the
+        # gas-side transport rail remains pO2_bar; see merge-report.md.
+        control_inputs={"pO2_bar": 1e-9, "interface_pO2_bar": 1e-9},
     )
 
 
