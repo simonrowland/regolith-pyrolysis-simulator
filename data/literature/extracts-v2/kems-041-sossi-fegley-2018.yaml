@@ -2484,8 +2484,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1090.0, 1090.0]; no midpoint invented
+      tag: value
+      value: '1090'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -2510,6 +2510,16 @@ observations:
     table: 1
     note: The metal bearing gases in the saturated vapour over 77 pure oxides
   read_from: pdf:kems-041-sossi-fegley-2018
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1090'
+      locator:
+        page: 405
+        pdf_page_index: 13
+        table: 1
+        note: The metal bearing gases in the saturated vapour over 77 pure oxides
 - observation_id: kems-041-sossi-fegley-2018::sossi_fegley_2018_table1_Sc2O3_speciation
   experiment_id: 10.2138/rmg.2018.84.11::kems-041-sossi-fegley-2018
   identity:

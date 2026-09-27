@@ -8,15 +8,17 @@ from enum import StrEnum
 from collections.abc import Iterator, Mapping
 
 from simulator.accounting.formulas import resolve_species_formula
-from simulator.battery.enums import AmountBasis, MethodToken, ValueKind
+from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import _OXIDE_COMPONENT_KEYS
 from simulator.battery.records import (
     Bench,
+    Composition,
     Derivation,
     Experiment,
     Located,
     Locator,
     Observation,
+    StandardState,
     State,
     ThermalSchedule,
     Value,
@@ -49,6 +51,9 @@ class GapReason(StrEnum):
     BELOW_PRESSURE_FLOOR = "below_pressure_floor"
     OUTSIDE_PRESSURE_REGIME = "outside_pressure_regime"
     SINGLE_SPECIES_CHARGE = "single_species_charge"
+    # The row names a reference the engine does not report. Both conventions
+    # are on the gap. Nothing is converted from one to the other.
+    REFERENCE_STATE_MISMATCH = "reference_state_mismatch"
     # Pure-substance engine-reference tabulation. The generator declares
     # derivation.pure_substance_reference; identity.composition is
     # not_applicable. engine_point reproduces a melt composition at a bench
@@ -170,7 +175,20 @@ ENGINE_POINT_CONSUMERS = (
     "cached-real",
     "imcc_sf04",
     "imcc_sf04_ext",
+    "openimcc",
 )
+# Engines whose equilibrate result fills activity_coefficients.
+# magemin, vaporock, internal-analytical, and cached-real do not.
+MELT_ACTIVITY_ENGINES = (
+    "alphamelts",
+    "thermoengine",
+    "imcc_sf04",
+    "imcc_sf04_ext",
+    "openimcc",
+)
+# Activity and activity coefficient only. Interaction parameters stay on
+# engine_point; they are not this observable.
+MELT_ACTIVITY_OBSERVABLES = frozenset({Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT})
 
 
 def _result(
@@ -882,6 +900,67 @@ def normalized_composition(
     return result
 
 
+def reference_state_is_known(observation: Observation | None) -> bool:
+    """A value reference state. Unknown is not a convention the engines can match."""
+    if observation is None:
+        return False
+    state = observation.identity.reference_state
+    return state is not None and state.is_value
+
+
+def reference_state_value(observation: Observation | None) -> StandardState | None:
+    """The printed standard state, when it is a value. Matching is separate."""
+    if not reference_state_is_known(observation):
+        return None
+    assert observation is not None
+    assert observation.identity.reference_state is not None
+    value = observation.identity.reference_state.value
+    return value if isinstance(value, StandardState) else None
+
+
+def is_melt_activity_observation(observation: Observation | None) -> bool:
+    """True for an activity or activity-coefficient row. Other quantities do not apply."""
+    if observation is None:
+        return False
+    from simulator.battery.identity import quantity_token
+
+    return quantity_token(observation.identity) in MELT_ACTIVITY_OBSERVABLES
+
+
+def identity_composition_waypoint(observation: Observation | None) -> Waypoint | None:
+    """Row identity composition, when it is already a mole map.
+
+    A shared experiment sample is not this row's melt. The identity axis is.
+    Wt% maps stay on the printed-composition route; this route does not
+    reinterpret them.
+    """
+    if observation is None:
+        return None
+    state = observation.identity.composition
+    if state is None or not state.is_value:
+        return None
+    raw = state.value
+    if not isinstance(raw, Composition):
+        return None
+    if raw.amount_basis not in (AmountBasis.MOLE_FRACTION, AmountBasis.MOL_INVENTORY):
+        return None
+    amounts = raw.as_map()
+    if not amounts or any(not amount.is_finite() or amount < 0 for amount in amounts.values()):
+        return None
+    total = sum(amounts.values(), Decimal(0))
+    if total <= 0:
+        return None
+    # n_i/sum(n_j) is dimensionless. A mole-fraction map is already normalized;
+    # dividing again leaves it unchanged when the parts sum to 1.
+    return Waypoint(
+        "normalized_composition",
+        {species: amount / total for species, amount in amounts.items()},
+        "identity_composition",
+        WaypointAuthority.DERIVED,
+        (f"observation[{observation.observation_id}].identity.composition",),
+    )
+
+
 def _dimensions_present(dimensions: Mapping[str, Located[Value]] | None) -> bool:
     if not dimensions:
         return False
@@ -1237,9 +1316,9 @@ def _c_co_pressure_Pa(
     """Printed P_CO in Pa, or total P when the paper states CO is the gas.
 
     Prefer a single-species CO sweep (or a mixture with exactly one printed CO
-    component partial pressure). Fall back to pressure_boundary when the C–CO
-    buffer token already asserts that CO is the buffering gas — never invent a
-    mole fraction or pick among CO/Ar alternatives.
+    component partial pressure). Use total pressure only when the sweep
+    explicitly states CO is the sole gas; never invent a mole fraction or pick
+    among CO/Ar alternatives.
     """
     sweep = experiment.pressure_environment.sweep_gas
     if sweep.state.is_value and sweep.state.value.alternatives is None:
@@ -1260,9 +1339,12 @@ def _c_co_pressure_Pa(
                     Value.point_of(printed_co[0].partial_pressure_Pa.value),
                     ("experiment.pressure_environment.sweep_gas",),
                 )
-    boundary = pressure_boundary(experiment, bench, observation).selected
-    if boundary is not None and boundary.value.kind is ValueKind.POINT:
-        return boundary.value, boundary.inputs
+    if sweep.state.is_value and sweep.state.value.alternatives is None:
+        gas = sweep.state.value
+        if gas.species == "CO":
+            boundary = pressure_boundary(experiment, bench, observation).selected
+            if boundary is not None and boundary.value.kind is ValueKind.POINT:
+                return boundary.value, boundary.inputs
     return None
 
 
@@ -1913,9 +1995,14 @@ def _consumer_constraints(
 def consumer_readiness(experiment: Experiment, bench: Bench, observation: Observation | None = None,
                        *, modelling_inputs=None) -> tuple[ConsumerReadiness, ...]:
     from simulator.battery.consumer_inputs import collect_consumer_inputs
-    from simulator.battery.generators.bench import kems_case, vacuum_pyrolysis_preset, engine_point_requests
+    from simulator.battery.generators.bench import (
+        engine_point_requests,
+        kems_case,
+        melt_activity_requests,
+        vacuum_pyrolysis_preset,
+    )
 
     inputs = collect_consumer_inputs(experiment, bench, observation)
     generated = (kems_case(inputs), vacuum_pyrolysis_preset(inputs, modelling_inputs=modelling_inputs),
-                 *engine_point_requests(inputs))
+                 *engine_point_requests(inputs), *melt_activity_requests(inputs))
     return tuple(item.readiness for item in generated)

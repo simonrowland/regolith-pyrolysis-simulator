@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'assumed_Ca_Mg_interaction_coefficient'; refusing
@@ -47,6 +47,16 @@ observations:
     note: The paper explicitly states that e_Ca^Mg is taken as zero as in prior work.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 87
+        equation: '7'
+        note: The paper explicitly states that e_Ca^Mg is taken as zero as in prior work.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
   identity:
@@ -65,8 +75,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'observed_deoxidation_product_phase_presence';
@@ -92,6 +102,16 @@ observations:
     note: Phase-presence statements are in sections 4.2-4.3 prose; Figure 1 is the separate dissolved Mg/O plot
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 86
+        section: 4.2 Experimental conditions and deoxidation-product composition; 4.3
+        note: Phase-presence statements are in sections 4.2-4.3 prose; Figure 1 is the separate dissolved Mg/O plot
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_equilibrium_time
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
   identity:
@@ -110,8 +130,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_hold_time_after_Al_addition'; refusing
@@ -138,6 +158,16 @@ observations:
     section: 4.1 Equilibrium attainment time
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 86
+        figure: '2'
+        section: 4.1 Equilibrium attainment time
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_fig1_fig2_measured_concentration_plots
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
   identity:
@@ -242,8 +272,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_prior_interaction_coefficients'; refusing
@@ -269,6 +299,16 @@ observations:
     note: Values are attributed in the paper to Mizin et al. and Sponseller and Flinn, not measured in this paper.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 87
+        equation: '7'
+        note: Values are attributed in the paper to Mizin et al. and Sponseller and Flinn, not measured in this paper.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_solid_solution_activity_assumptions
   experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
   identity:
@@ -380,8 +420,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'cross_interaction_coefficients'; refusing to pick
@@ -409,6 +449,17 @@ observations:
       and Eq. 19 print r_O^(Mg,Al) = -150, not gamma.; equations=7-20
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 88
+        figure: '4'
+        note: Values printed as determined at 1873 K from present experimental data and prior deoxidation equilibria; Figure
+          4 and Eq. 19 print r_O^(Mg,Al) = -150, not gamma.; equations=7-20
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   derived_from:
   - itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_spinel_thresholds
@@ -429,8 +480,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_spinel_phase_appearance_thresholds'; refusing
@@ -458,3 +509,14 @@ observations:
     note: Thresholds are printed in text; phase diagrams were not digitised.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 87
+        figure: '3'
+        section: 4.3 Relationship between dolomite composition and deoxidation-product phases
+        note: Thresholds are printed in text; phase diagrams were not digitised.
+        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf

@@ -54,9 +54,6 @@ source_priority:
     # a(Na2O) evidence independent of that fit.
     - ts1985
     - yam1983
-    # 2026-08-27 (transcribe-activity): Plante 1979 K2O-SiO2 Knudsen-MS
-    # a(K2O) vapor-reference from measured P_K. Appended, not promoted.
-    - kems-042-plante-1979
   alpha:
     # Dual-regime Fe: KEMS and Langmuir are different regimes (not ordered as
     # conflicts). Within a single regime, primary measurement wins.
@@ -81,6 +78,9 @@ source_priority:
   partial_pressure:
     - boulliung-2025-mercury-volatile-metals-magmatic
     - 1997jonesthermo
+    # 2026-09-25 (plante1979-canon-0924): Plante's canonical observable is
+    # calibrated K(g) P_K, not a liquid-K2O activity.
+    - kems-042-plante-1979
   mass_loss:
     - engelschion-2020-eac1a-simulant
   heat_capacity_and_heat_content_series:

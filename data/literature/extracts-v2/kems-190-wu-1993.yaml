@@ -2113,8 +2113,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2126,9 +2126,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2154,8 +2200,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2167,9 +2213,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2195,8 +2287,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2208,9 +2300,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2236,8 +2374,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2249,9 +2387,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2277,8 +2461,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2290,9 +2474,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2318,8 +2548,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2331,9 +2561,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2359,8 +2635,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2372,9 +2648,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2399,8 +2721,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2412,9 +2734,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2439,8 +2807,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2452,9 +2820,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2479,8 +2893,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2492,9 +2906,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2519,8 +2979,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2532,9 +2992,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed
@@ -2559,8 +3065,8 @@ observations:
   experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'composition_dependent_solidus_points'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe2SiO4
       phase:
@@ -2572,9 +3078,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: solidus_composition_series
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: temperature_C_as_published, Fe2SiO4_wt_pct_as_published,
+      locator, printed_quote'
     approximate: false
   uncertainty:
     kind: printed

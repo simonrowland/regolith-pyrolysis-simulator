@@ -47,7 +47,10 @@ from itertools import product
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
-from engines.alphamelts.domain import canonical_melt_oxide_activity_name
+from engines.alphamelts.domain import (
+    canonical_melt_oxide_activity_name,
+    canonical_oxide_activity_map,
+)
 from engines.domain_reason import OutOfDomainReason, reason_value
 from engines.engine_commissioning import (
     assess_engine_commissioning,
@@ -2359,18 +2362,7 @@ class _MELTSBackendSupport(MeltBackend):
         return MELTS_OXIDE_ALIASES.get(key.lower())
 
     def _canonical_activity_mapping(self, values: Mapping[str, object]) -> dict:
-        activities: Dict[str, float] = {}
-        for raw_name, raw_value in dict(values or {}).items():
-            oxide = canonical_melt_oxide_activity_name(raw_name)
-            if oxide is None:
-                continue
-            try:
-                value = float(raw_value)
-            except (TypeError, ValueError):
-                continue
-            if value > 0.0 and math.isfinite(value):
-                activities.setdefault(oxide, value)
-        return activities
+        return canonical_oxide_activity_map(values)
 
     def _activity_diagnostic_payload(
         self,
@@ -4498,7 +4490,7 @@ class _MELTSBackendSupport(MeltBackend):
                     for value in raw_coefficients.values()
                 ):
                     row = raw_coefficients
-            mapped = self._activities_from_coefficients(
+            mapped, gammas = self._activities_from_coefficients(
                 row,
                 liquid_composition_wt_pct,
             )
@@ -4506,7 +4498,9 @@ class _MELTSBackendSupport(MeltBackend):
                 return mapped, {
                     'diagnostic_activity_source': (
                         'activity_coefficients_times_oxide_mole_fraction'
-                    )
+                    ),
+                    # gamma, before a = gamma * x. Not a second convention.
+                    'reported_activity_coefficients': gammas,
                 }
 
         activities: Dict[str, float] = {}
@@ -4540,7 +4534,7 @@ class _MELTSBackendSupport(MeltBackend):
         self,
         coefficients: Mapping[str, object],
         liquid_composition_wt_pct: Mapping[str, float],
-    ) -> dict[str, float]:
+    ) -> tuple[dict[str, float], dict[str, float]]:
         mole_amounts: dict[str, float] = {}
         for raw_name, raw_wt_pct in dict(liquid_composition_wt_pct or {}).items():
             oxide = canonical_melt_oxide_activity_name(raw_name)
@@ -4558,9 +4552,10 @@ class _MELTSBackendSupport(MeltBackend):
             mole_amounts[oxide] = wt_pct / molar_mass
         total_moles = sum(mole_amounts.values())
         if total_moles <= 0.0:
-            return {}
+            return {}, {}
 
         activities: dict[str, float] = {}
+        gammas: dict[str, float] = {}
         for raw_name, raw_gamma in dict(coefficients or {}).items():
             oxide = canonical_melt_oxide_activity_name(raw_name)
             if oxide is None or oxide not in mole_amounts:
@@ -4574,8 +4569,9 @@ class _MELTSBackendSupport(MeltBackend):
             # sum(wt_j / M_j). Unit check: gamma and x are dimensionless, so
             # activity is dimensionless. Sanity: gamma=0.5 and x=0.02 gives
             # a=0.01, not the 0.5 value that inflated vapor flux by 50x.
+            gammas[str(raw_name)] = gamma
             activities[str(raw_name)] = gamma * mole_fraction
-        return activities
+        return activities, gammas
 
     def _finite_activity_mapping(self, values: Mapping[str, object]) -> dict:
         activities: Dict[str, float] = {}

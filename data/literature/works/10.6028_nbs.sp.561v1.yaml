@@ -222,6 +222,49 @@ experiments:
         locator:
           page: 271
           section: 3. Procedure
+    calibration:
+      k_1104_microvolts_atm_inverse_K_inverse:
+        state:
+          tag: value
+          value: '0.0000000000196'
+        locator:
+          published_page: 271
+          table: '1'
+          note: Printed mass spectrometer constant k for series 1104
+      k_1110_1115_microvolts_atm_inverse_K_inverse:
+        state:
+          tag: value
+          value: '0.0000000000147'
+        locator:
+          published_page: 271
+          table: '1'
+          note: Printed mass spectrometer constant k for series 1110-1115
+      k_1122_1129_microvolts_atm_inverse_K_inverse:
+        state:
+          tag: value
+          value: '0.0000000000183'
+        locator:
+          published_page: 271
+          table: '1'
+          note: Printed mass spectrometer constant k for series 1122-1129
+      k_1214_microvolts_atm_inverse_K_inverse:
+        state:
+          tag: value
+          value: '0.0000000000175'
+        locator:
+          published_page: 271
+          table: '1'
+          note: Printed mass spectrometer constant k for series 1214; footnote a says average of previous three values
+      method:
+        state:
+          tag: value
+          value: 'Gravimetric weight-loss calibration: each Knudsen-cell removal was weighed, and weight loss with the summed
+            ion-current times square-root temperature data was used to calculate the mass-spectrometer sensitivity constant.'
+        locator:
+          published_page: 271
+          table: '1'
+          section: 3. Procedure
+          note: Printed calibration procedure preceding Table 1
   fO2_control:
     channel:
       tag: value
@@ -233,9 +276,11 @@ experiments:
       locator:
         page: 279
         equation: P_O2 = 0.226 P_K
-        note: Author oxygen is stoichiometric from dissociative vaporization, P_O2 = 0.226 P_K (printed). No commanded buffer
-          or gas mix. Per-row P_O2 is derived from printed P_K × printed ratio and lands on observation point_conditions.fO2_Pa
-          as DERIVED; no single experiment oxygen_partial_pressure_Pa is asserted.
+        note: 'Author oxygen is stoichiometric from dissociative vaporization, P_O2 = 0.226 P_K (printed). No commanded buffer
+          or gas mix. Assumption: congruent vaporization of K2O(l) -> 2K + 1/2 O2, so J_O2 = J_K/4 and P_O2/P_K = (1/4) sqrt(M_O2/M_K)
+          = (1/4) sqrt(32.00/39.10) = 0.2262; Plante prints 0.226. Since P_K ∝ a(K2O)^(1/2) P_O2^(-1/4), a factor-of-two P_O2
+          error moves log P_K by about 0.075 dex. Per-row P_O2 is derived from printed P_K × printed ratio and lands on observation
+          point_conditions.fO2_Pa as DERIVED; no single experiment oxygen_partial_pressure_Pa is asserted.'
   bench_id: 10.6028/nbs.sp.561v1::bench::kems-system
 benches:
 - id: 10.6028/nbs.sp.561v1::bench::kems-system

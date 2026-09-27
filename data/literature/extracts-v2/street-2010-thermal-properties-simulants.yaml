@@ -6,8 +6,8 @@ observations:
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::tga-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'mass_loss'
+      tag: value
+      value: mass_loss_fraction
     species:
       formula: H2O
       phase:
@@ -19,9 +19,56 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'mass_loss'; refusing to pick a number
+    unavailable_reason: 'no mapped mass_loss_fraction field selected; source fields: quantity, method_class, evidence_class,
+      mass_loss_percent, as_printed, quote, feedstock, T_conversion'
     approximate: false
   uncertainty:
     kind: printed
@@ -254,8 +301,8 @@ observations:
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'dta_transition_temperatures'
+      tag: value
+      value: transition_temperature
     species:
       formula: Anorthosite
       phase:
@@ -267,12 +314,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: dta_transition_temperatures
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
     temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
       tag: unknown
-      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: sample, transitions_C_as_printed,
+      note'
     approximate: false
   uncertainty:
     kind: none
@@ -296,8 +386,8 @@ observations:
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'dta_transition_temperatures'
+      tag: value
+      value: transition_temperature
     species:
       formula: Dunitec
       phase:
@@ -309,12 +399,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: dta_transition_temperatures
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
     temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
       tag: unknown
-      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: sample, transitions_C_as_printed,
+      note'
     approximate: false
   uncertainty:
     kind: none
@@ -338,8 +471,8 @@ observations:
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'dta_transition_temperatures'
+      tag: value
+      value: transition_temperature
     species:
       formula: HQ Glass
       phase:
@@ -351,12 +484,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: dta_transition_temperatures
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
     temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
       tag: unknown
-      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: sample, transitions_C_as_printed,
+      note'
     approximate: false
   uncertainty:
     kind: none
@@ -380,8 +556,8 @@ observations:
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'dta_transition_temperatures'
+      tag: value
+      value: transition_temperature
     species:
       formula: JSC-1AFa
       phase:
@@ -393,12 +569,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: dta_transition_temperatures
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
     temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
       tag: unknown
-      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: sample, transitions_C_as_printed,
+      note'
     approximate: false
   uncertainty:
     kind: none
@@ -422,8 +641,8 @@ observations:
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'dta_transition_temperatures'
+      tag: value
+      value: transition_temperature
     species:
       formula: JSC-1AFb
       phase:
@@ -435,12 +654,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: dta_transition_temperatures
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
     temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
       tag: unknown
-      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: sample, transitions_C_as_printed,
+      note'
     approximate: false
   uncertainty:
     kind: none
@@ -464,8 +726,8 @@ observations:
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'dta_transition_temperatures'
+      tag: value
+      value: transition_temperature
     species:
       formula: Norite
       phase:
@@ -477,12 +739,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: dta_transition_temperatures
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
     temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
       tag: unknown
-      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: sample, transitions_C_as_printed,
+      note'
     approximate: false
   uncertainty:
     kind: none
@@ -506,8 +811,8 @@ observations:
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'dta_transition_temperatures'
+      tag: value
+      value: transition_temperature
     species:
       formula: NU-LHT-2M
       phase:
@@ -519,12 +824,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: dta_transition_temperatures
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
     temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
       tag: unknown
-      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped transition_temperature field selected; source fields: sample, transitions_C_as_printed,
+      note'
     approximate: false
   uncertainty:
     kind: none

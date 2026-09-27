@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'crucible_cross_section_as_proxy_free_surface';
@@ -43,6 +43,14 @@ observations:
     paragraph: alumina crucible CP-2 ID 38 mm
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   read_from: unknown:kems-001-homma-1966
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        paragraph: alumina crucible CP-2 ID 38 mm
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
 - observation_id: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep::rows:h=058d7a674444
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:
@@ -1773,8 +1781,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -1809,6 +1817,17 @@ observations:
     note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   read_from: unknown:kems-001-homma-1966
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: PDF pp. 3-4 / printed pp. 517-518
+        table: '2'
+        line_range: 166-168
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
 - observation_id: kems-001-homma-1966::homma_1966_cu_olette_class_fence_b1
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:
@@ -1827,8 +1846,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -1857,6 +1876,14 @@ observations:
     paragraph: Olette relative evaporation coefficient
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   read_from: unknown:kems-001-homma-1966
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        paragraph: Olette relative evaporation coefficient
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
 - observation_id: kems-001-homma-1966::homma_1966_cu_olette_class_fence_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:
@@ -3657,8 +3684,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -3692,6 +3719,15 @@ observations:
     line_range: 162-164
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   read_from: unknown:kems-001-homma-1966
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '1'
+        line_range: 162-164
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
 - observation_id: kems-001-homma-1966::homma_1966_mn_olette_class_fence_b1
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:
@@ -3710,8 +3746,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -3740,6 +3776,14 @@ observations:
     paragraph: Olette relative evaporation coefficient
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   read_from: unknown:kems-001-homma-1966
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        paragraph: Olette relative evaporation coefficient
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
 - observation_id: kems-001-homma-1966::homma_1966_mn_olette_class_fence_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:
@@ -5292,8 +5336,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -5328,6 +5372,17 @@ observations:
     note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   read_from: unknown:kems-001-homma-1966
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: PDF p. 4 / printed p. 518
+        table: '3'
+        line_range: 174-176
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
 - observation_id: kems-001-homma-1966::homma_1966_sn_olette_class_fence_b1
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:
@@ -5346,8 +5401,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -5376,6 +5431,14 @@ observations:
     paragraph: Olette relative evaporation coefficient
     source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
   read_from: unknown:kems-001-homma-1966
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        paragraph: Olette relative evaporation coefficient
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
 - observation_id: kems-001-homma-1966::homma_1966_sn_olette_class_fence_quoted_deep
   experiment_id: 10.2320/jinstmet1952.30.6_515::kems-001-homma-1966
   identity:

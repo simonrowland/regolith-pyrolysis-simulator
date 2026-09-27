@@ -40,107 +40,26 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1122681465573851739507109501'
-          - - CaO
-            - '0.2471019490640973486482319334'
           - - MgO
-            - '0.1793767712903764639477792358'
+            - '0.179376771290376'
           - - SiO2
-            - '0.4612531330881410134532778806'
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
           amount_basis: mole_fraction
       locator:
         published_page: 105
         pdf_page_index: 5
         table: '1'
-        paragraph: Starting
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '19'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '12'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -330,107 +249,26 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1122681465573851739507109501'
-          - - CaO
-            - '0.2471019490640973486482319334'
           - - MgO
-            - '0.1793767712903764639477792358'
+            - '0.179376771290376'
           - - SiO2
-            - '0.4612531330881410134532778806'
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
           amount_basis: mole_fraction
       locator:
         published_page: 105
         pdf_page_index: 5
         table: '1'
-        paragraph: Starting
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '19'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '12'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -610,107 +448,26 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1122681465573851739507109501'
-          - - CaO
-            - '0.2471019490640973486482319334'
           - - MgO
-            - '0.1793767712903764639477792358'
+            - '0.179376771290376'
           - - SiO2
-            - '0.4612531330881410134532778806'
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
           amount_basis: mole_fraction
       locator:
         published_page: 105
         pdf_page_index: 5
         table: '1'
-        paragraph: Starting
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '19'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '12'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -890,107 +647,26 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1122681465573851739507109501'
-          - - CaO
-            - '0.2471019490640973486482319334'
           - - MgO
-            - '0.1793767712903764639477792358'
+            - '0.179376771290376'
           - - SiO2
-            - '0.4612531330881410134532778806'
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
           amount_basis: mole_fraction
       locator:
         published_page: 105
         pdf_page_index: 5
         table: '1'
-        paragraph: Starting
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '19'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '12'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1170,107 +846,26 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1122681465573851739507109501'
-          - - CaO
-            - '0.2471019490640973486482319334'
           - - MgO
-            - '0.1793767712903764639477792358'
+            - '0.179376771290376'
           - - SiO2
-            - '0.4612531330881410134532778806'
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
           amount_basis: mole_fraction
       locator:
         published_page: 105
         pdf_page_index: 5
         table: '1'
-        paragraph: Starting
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '19'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '12'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1450,107 +1045,26 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1122681465573851739507109501'
-          - - CaO
-            - '0.2471019490640973486482319334'
           - - MgO
-            - '0.1793767712903764639477792358'
+            - '0.179376771290376'
           - - SiO2
-            - '0.4612531330881410134532778806'
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
           amount_basis: mole_fraction
       locator:
         published_page: 105
         pdf_page_index: 5
         table: '1'
-        paragraph: Starting
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '19'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '12'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
@@ -1730,107 +1244,26 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.1122681465573851739507109501'
-          - - CaO
-            - '0.2471019490640973486482319334'
           - - MgO
-            - '0.1793767712903764639477792358'
+            - '0.179376771290376'
           - - SiO2
-            - '0.4612531330881410134532778806'
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
           amount_basis: mole_fraction
       locator:
         published_page: 105
         pdf_page_index: 5
         table: '1'
-        paragraph: Starting
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '19'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '12'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '46'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              published_page: 105
-              pdf_page_index: 5
-              table: '1'
-              paragraph: Starting
-              source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:

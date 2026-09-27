@@ -456,7 +456,38 @@ def _point_result(monkeypatch, conditions, sample=None):
     source = M.REPO_ROOT / "data/literature/extracts/holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml"
     document = M.load_yaml(source)
     row = deepcopy(document["species"]["CoO"]["observations"][0])
-    document["species"] = {"CoO": {"observations": [row]}}
+    parent_ids = {
+        str(parent)
+        for parent in (row.get("derived_from") or ())
+        if isinstance(parent, str)
+    }
+    assert parent_ids == {"holzheid_1997_equilibrium_free_energy_fits"}
+    retained_species = {"CoO": {"observations": [row]}}
+    # Keep the fit parent in this reduced fixture. Its full source record has
+    # the known missing O'Neill/Barin ancestry; omit its classification here
+    # so this consumer-boundary fixture does not validate that backlog.
+    for formula, body in document["species"].items():
+        if formula == "CoO" or not isinstance(body, dict):
+            continue
+        roots = []
+        for parent in body.get("observations") or ():
+            if (
+                not isinstance(parent, dict)
+                or parent.get("observation_id") not in parent_ids
+            ):
+                continue
+            method_class = (parent.get("values") or {}).get("method_class")
+            if method_class in {"calculated", "author_derived"}:
+                continue
+            root = deepcopy(parent)
+            if root.get("observation_id") == "holzheid_1997_equilibrium_free_energy_fits":
+                root_values = dict(root.get("values") or {})
+                root_values.pop("method_class", None)
+                root["values"] = root_values
+            roots.append(root)
+        if roots:
+            retained_species[formula] = {"observations": roots}
+    document["species"] = retained_species
     if sample is not None:
         experiment = next(e for e in document["experiments"] if e["experiment_id"] == row["experiment"])
         experiment["sample"] = sample
@@ -512,7 +543,7 @@ def test_row_printed_composition_engine_boundary(monkeypatch, component):
     del conditions["composition"]
     conditions["printed_composition"] = _typed([["SiO2", "60"], [component, "40"]])
     _, requests = _point_result(monkeypatch, conditions)
-    assert len(requests) == 8
+    assert len(requests) == 9
     for request in requests:
         assert (request.payload is not None) == (component in {"MgO", "FeOT"})
         if component == "FeOT":
@@ -547,7 +578,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
             assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
             assert any(path.endswith(f".{component}") for path in waypoint.absence.missing)
         requests = engine_point_requests(inputs)
-    assert len(requests) == 8
+    assert len(requests) == 9
     for request in requests:
         assert (request.payload is not None) == (component == "MgO")
         if component != "MgO":
@@ -565,7 +596,7 @@ def test_row_composition_override_fallback_controls(row_field):
     )
     inputs = _serialized_consumer_inputs(sample, conditions)
     requests = engine_point_requests(inputs)
-    assert len(requests) == 8
+    assert len(requests) == 9
     assert all(request.payload is None and request.readiness.status.value == "gap" for request in requests)
 
 
@@ -592,7 +623,7 @@ def test_duplicate_printed_components_refused_at_all_parsers(monkeypatch, bounda
         else:
             sample["initial_composition"] = canonical
     _, requests = _point_result(monkeypatch, conditions, sample)
-    assert len(requests) == 8
+    assert len(requests) == 9
     assert all(request.payload is None and request.readiness.status.value == "gap" for request in requests)
 
 
@@ -633,7 +664,7 @@ def test_review_printed_composition_matrix(boundary, reason, case, components):
     ) or (
         case == "ambiguous" and not boundary.endswith("with_sample_initial")
     )
-    assert len(requests) == 8
+    assert len(requests) == 9
     assert all((request.payload is not None) == valid for request in requests)
     if valid and case == "ambiguous":
         assert all(
@@ -660,7 +691,7 @@ def test_row_conditions_reach_all_engine_requests(monkeypatch, mode):
     elif mode == "approximate":
         conditions["total_pressure_Pa"]["state"]["value"]["approximate"] = True
     observation, requests = _point_result(monkeypatch, None if mode == "unmodified" else conditions)
-    assert len(requests) == 8
+    assert len(requests) == 9
     if key:
         assert observation.point_conditions[key].state.value.kind.value == mode.split("_")[-1]
     if mode == "approximate":

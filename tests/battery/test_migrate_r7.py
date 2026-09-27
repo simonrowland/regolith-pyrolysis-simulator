@@ -10,12 +10,20 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
+from simulator.battery.enums import (
+    EvidenceClass,
+    NoticeKind,
+    Phase,
+    Quantity,
+    ReferenceStateConvention,
+    ValueKind,
+)
 from simulator.battery.identity import quantity_token
 from simulator.battery.migrate import (
     EXTRACTS_DIR,
     REPO_ROOT,
     _YAML_LOADER,
+    _standard_state_from_extract_text,
     compilation_family_from_store_path,
     iter_observation_store_paths,
     map_quantity,
@@ -23,10 +31,155 @@ from simulator.battery.migrate import (
     select_declared_source,
 )
 from simulator.battery.records import State
+from simulator.battery.validity import underdetermined_apparatus
 from tests.battery.test_migrate import (
-    _copy_compilation_record, _copy_extract, _extract_observation, _write_min_tree,
+    _copy_compilation_record,
+    _copy_extract,
+    _extract_observation,
+    _write_min_tree,
     test_k01_value_constructions_live_inside_the_boundary as boundary_guard,
 )
+
+
+@pytest.mark.parametrize(
+    "raw,formula,phase_raw,expected",
+    [
+        (
+            "Raoultian GaO1.5(l); gamma relative to pure liquid sesquioxide",
+            "Ga",
+            "silicate_melt",
+            ("GaO1.5", Phase.L),
+        ),
+        (
+            "Raoultian InO1.5(l)",
+            "In",
+            "silicate_melt",
+            ("InO1.5", Phase.L),
+        ),
+        (
+            "Raoultian pure liquid Fe",
+            "Fe",
+            "liquid_Fe-Mo",
+            ("Fe", Phase.L),
+        ),
+        (
+            "Raoultian pure liquid Co",
+            "Co",
+            "liquid_Ti-Co",
+            ("Co", Phase.L),
+        ),
+    ],
+)
+def test_h6_extract_activity_reference_state_maps_only_explicit_raoultian(
+    raw, formula, phase_raw, expected
+):
+    state = _standard_state_from_extract_text(raw, formula, phase_raw=phase_raw)
+    assert state is not None
+    assert state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert (state.endmember.formula, state.endmember.phase.value) == (
+        expected[0],
+        expected[1],
+    )
+    assert state.component_basis == expected[0]
+    assert state.component_basis != "raoultian_pure_endmember"
+
+
+@pytest.mark.parametrize(
+    "raw,formula,phase_raw",
+    [
+        (
+            "a(NaBO2)=P/P°(NaBO2,l); not a Raoultian Na2O activity",
+            "Fe",
+            "liquid_alloy",
+        ),
+        (
+            "Raoultian / Henrian as in Fruehan; V2O3-saturated",
+            "Fe",
+            "liquid_alloy",
+        ),
+        ("as in Nesmeyanov; quoted", "Fe", "liquid_alloy"),
+        ("activity coefficient of CrO in silicate melts", "Fe", "liquid_alloy"),
+        ("Raoultian Fe(l) and Fe(s)", "Fe", "liquid_alloy"),
+        ("Raoultian Fe(l) and Co(s)", "Fe", "liquid_alloy"),
+        (
+            "Raoultian log gamma_Si at N_Si=0.5 as cited",
+            "Si",
+            "liquid_alloy",
+        ),
+        (
+            "Raoultian; B ignores dissolved oxygen; T integrates the Ti-Co-O path (eqs 5-6)",
+            "Ti",
+            "liquid_Ti-Co",
+        ),
+    ],
+)
+def test_h6_extract_activity_reference_state_refuses_unresolved_forms(
+    raw, formula, phase_raw
+):
+    assert _standard_state_from_extract_text(
+        raw, formula, phase_raw=phase_raw
+    ) is None
+
+
+def test_h6_migration_attaches_extract_reference_state_to_activity_row(tmp_path):
+    root = _write_min_tree(
+        tmp_path,
+        extract={
+            "schema_version": "literature_extract.v1",
+            "source_id": "fixture-source",
+            "source": {"citation": "Fixture, A. (2026), Test Journal 1:1"},
+            "experiments": [{"experiment_id": "activity-run"}],
+            "species": {
+                "Ga": {
+                    "observations": [
+                        {
+                            "observation_id": "gamma-row",
+                            "experiment": "activity-run",
+                            "type": "activity_coefficient",
+                            "phase": "condensed_liquid",
+                            "standard_state": "Raoultian GaO1.5(l)",
+                            "T_range_K": [1700.0, 1700.0],
+                            "values": {
+                                "quantity": "activity_coefficient",
+                                "gamma": 0.036,
+                                "T_K": 1700.0,
+                            },
+                        }
+                    ]
+                },
+                "Si": {
+                    "observations": [
+                        {
+                            "observation_id": "unspecified-endmember",
+                            "experiment": "activity-run",
+                            "type": "activity_coefficient",
+                            "phase": "liquid_alloy",
+                            "standard_state": (
+                                "Raoultian log gamma_Si at N_Si=0.5 as cited"
+                            ),
+                            "T_range_K": [1873.0, 1873.0],
+                            "values": {
+                                "quantity": "activity_coefficient",
+                                "gamma": 0.468,
+                                "T_K": 1873.0,
+                            },
+                        }
+                    ]
+                },
+            },
+        },
+    )
+    result = migrate(root, write=False)
+    observation = result.observations["fixture-source::gamma-row"]
+    reference_state = observation.identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert reference_state.value.endmember.formula == "GaO1.5"
+    assert reference_state.value.endmember.phase.value is Phase.L
+    assert reference_state.value.component_basis == "GaO1.5"
+    unspecified = result.observations["fixture-source::unspecified-endmember"]
+    assert unspecified.identity.reference_state is not None
+    assert not unspecified.identity.reference_state.is_value
 
 
 _CHEMISTRY_STRING_KEYS = frozenset(
@@ -176,14 +329,104 @@ def test_g1_unmapped_series_does_not_deny_numbers():
 
 
 def test_g2_plante_source_points_and_comparison_fence(tmp_path):
+    """Plante fence is the admission split, not a single p_partial count.
+
+    162 superseded parents, 162 admitted homogeneous successors, and 59
+    superscript-a rows stay pending. Changing the total from 221 to 383
+    does not by itself keep the 59 pending.
+    """
+
     root = _write_min_tree(tmp_path)
     _copy_extract(root, "kems-042-plante-1979.yaml")
     result = migrate(root, write=False)
     measured = [o for o in result.observations.values()
                 if o.source_id == "kems-042-plante-1979" and quantity_token(o.identity) is Quantity.P_PARTIAL]
-    assert len(measured) == 221
-    assert all(o.value.kind is ValueKind.POINT for o in measured)
-    assert sum(bool(o.notices) for o in measured) == 59
+    buckets: dict[str, list] = {}
+    for obs in measured:
+        buckets.setdefault(obs.admission.status.value, []).append(obs)
+    assert set(buckets) == {"admitted", "pending", "superseded"}
+    assert len(buckets["superseded"]) == 162
+    assert len(buckets["admitted"]) == 162
+    assert len(buckets["pending"]) == 59
+    assert len(measured) == 383
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in measured
+    )
+    phase_relations = [
+        observation.derivation.relation
+        for observation in measured
+        if observation.derivation is not None
+    ]
+    assert len(phase_relations) == len(measured)
+    assert all("species.phase=gas " in relation for relation in phase_relations)
+    assert sum(
+        "declared by source standard_state K(g)" in relation
+        for relation in phase_relations
+    ) == 162
+    assert sum(
+        "derived from quantity=partial_pressure" in relation
+        for relation in phase_relations
+    ) == 221
+    bulk_band = "two_phase_bulk_composition_not_liquid_composition"
+    assert sum(
+        any(notice.band == bulk_band for notice in observation.notices)
+        for observation in buckets["pending"]
+    ) == 59
+    assert all(
+        any(notice.band == bulk_band for notice in observation.notices)
+        for observation in buckets["pending"]
+        if "s1214_r" in observation.observation_id
+    )
+    assert all(o.value.kind is ValueKind.POINT and o.value.point is not None for o in measured)
+    assert sum(bool(o.notices) for o in measured) == 221
+    factor = Decimal("0.226")
+    tolerance = Decimal("1e-12")
+    for obs in buckets["admitted"]:
+        composition = obs.identity.composition
+        assert composition is not None and composition.is_value and composition.value is not None
+        assert {oxide for oxide, _amount in composition.value.components} == {"K2O", "SiO2"}
+        assert "s1214" not in obs.observation_id
+        fo2 = obs.identity.fO2_Pa
+        assert fo2 is not None and fo2.is_value and fo2.value is not None
+        assert abs(fo2.value - factor * obs.value.point) <= tolerance
+        composition_condition = (obs.point_conditions or {}).get("composition")
+        assert composition_condition is not None
+        assert composition_condition.inference is not None
+        assert "SiO2_wt_pct=100-K2O_wt_pct" in composition_condition.inference.relation
+        oxygen_condition = (obs.point_conditions or {}).get("fO2_Pa")
+        assert oxygen_condition is not None
+        assert oxygen_condition.inference is not None
+        assert "congruent_vaporization" in oxygen_condition.inference.relation
+        assert any(
+            notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            and "DERIVED condition" in notice.reason
+            for notice in obs.notices
+        )
+        assert obs.derivation is not None
+        assert "P_K = k_K I_K+ T" in obs.derivation.relation
+        assert "sqrt(T)" not in obs.derivation.relation
+    assert len([obs for obs in buckets["pending"] if "s1214" in obs.observation_id]) == 37
+    for obs in buckets["pending"]:
+        assert obs.admission.status.value == "pending"
+        composition = obs.identity.composition
+        assert composition is None or not composition.is_value
+        fo2 = obs.identity.fO2_Pa
+        assert fo2 is None or not fo2.is_value
+    for obs in buckets["superseded"]:
+        assert obs.admission.superseded_by
+        fo2 = obs.identity.fO2_Pa
+        assert fo2 is None or not fo2.is_value
+    parent = result.observations[
+        "kems-042-plante-1979::plante1979_table2_k2o_s1115_003_1404K"
+    ]
+    successor = result.observations[
+        "kems-042-plante-1979::plante1979_table2_s1115_r004_quoted"
+    ]
+    parent_k2o = dict(parent.identity.composition.value.components)["K2O"]
+    successor_k2o = dict(successor.identity.composition.value.components)["K2O"]
+    assert parent_k2o == successor_k2o
     for oid, temperature, pressure in [
         ("plante1979_table2_s1104_r001_quoted", "1302", "6.91e-7"),
         ("plante1979_table2_s1123_r030_quoted", "1356", "2.51e-7"),
@@ -192,6 +435,7 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         source = _extract_observation("kems-042-plante-1979.yaml", oid)
         assert Decimal(str(source["values"]["P_K_atm_as_published"])) == Decimal(pressure)
         assert Decimal(str(source["values"]["T_K_as_published"])) == Decimal(temperature)
+        assert "activity" not in source["values"]
         obs = result.observations[f"kems-042-plante-1979::{oid}"]
         assert quantity_token(obs.identity) is Quantity.P_PARTIAL
         assert obs.value.kind is ValueKind.POINT
@@ -201,7 +445,148 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
             if "s1123" in oid:
                 assert source["values"]["composition_K2O_wt_percent_as_published"] == 21.14
             assert any(source["values"]["reason"] in n.reason for n in obs.notices)
-            assert obs.admission.status.value != "admitted"
+            assert obs.admission.status.value == "pending"
+        else:
+            assert obs.admission.status.value == "admitted"
+            assert obs.identity.fO2_Pa.is_value
+
+
+def test_g2_plante_partial_pressure_identity_axes_are_source_grounded(tmp_path):
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-042-plante-1979.yaml")
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-042-plante-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.admission.status.value == "admitted"
+    ]
+    assert len(rows) == 162
+    for observation in rows:
+        identity = observation.identity
+        reaction = identity.reaction
+        assert reaction is not None and reaction.is_value
+        assert [
+            (term.species.formula, term.species.phase.value, str(term.coefficient))
+            for term in reaction.value.terms
+        ] == [("K", "g", "2"), ("O2", "g", "1/2"), ("K2O", "l", "-1")]
+
+        reference = identity.reference_state
+        assert reference is not None and reference.is_value
+        assert reference.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference.value.endmember.formula == "K"
+        assert reference.value.endmember.phase.value is Phase.G
+        assert reference.value.reference_pressure_bar == Decimal("1")
+
+        reservoir = identity.reservoir
+        assert reservoir is not None and reservoir.is_value
+        assert reservoir.value.formula == "K2O"
+        assert reservoir.value.phase.value is Phase.L
+
+        total = identity.total_pressure_Pa
+        assert total is not None and total.is_value
+        assert total.value == observation.value.point * Decimal("1.2262")
+        point_total = (observation.point_conditions or {}).get("total_pressure_Pa")
+        assert point_total is not None and point_total.state.is_value
+        assert point_total.state.value == total.value
+        assert observation.derivation is not None
+        relation = observation.derivation.relation
+        assert "K2O(l) -> 2 K(g) + 1/2 O2(g)" in relation
+        assert "chamber background (1e-8..1e-7 Torr) not used" in relation
+        assert "K2, KO and O are neglected as minor" in relation
+
+
+def test_g2_partial_pressure_identity_does_not_invent_ungrounded_fields(tmp_path):
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-184-behrens-1979.yaml")
+    result = migrate(root, write=False)
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-184-behrens-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+    ]
+    assert len(rows) == 18
+    assert all(
+        observation.identity.reaction is not None
+        and observation.identity.reaction.is_unknown
+        and observation.identity.reference_state is not None
+        and observation.identity.reference_state.is_unknown
+        and observation.identity.reservoir is not None
+        and observation.identity.reservoir.is_unknown
+        and observation.identity.total_pressure_Pa is not None
+        and observation.identity.total_pressure_Pa.is_unknown
+        for observation in rows
+    )
+    assert {
+        observation.identity.total_pressure_Pa.reason
+        for observation in rows
+    } == {"in_cell_total_pressure_not_derivable"}
+
+
+def test_g2_non_plante_partial_pressure_species_are_gas(tmp_path):
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-184-behrens-1979.yaml")
+    result = migrate(root, write=False)
+    measured = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-184-behrens-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+    ]
+    assert len(measured) == 18
+    assert all(
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.G
+        for observation in measured
+    )
+    assert all(
+        observation.derivation is not None
+        and "species.phase=gas derived from quantity=partial_pressure"
+        in observation.derivation.relation
+        for observation in measured
+    )
+
+
+def test_g2_plante_pressure_rows_lift_page_271_calibration(tmp_path):
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-042-plante-1979.yaml")
+    result = migrate(root, write=False)
+
+    experiment = next(
+        item
+        for item in result.experiments.values()
+        if item.experiment_id.endswith("::experiment::k2o-sio2-effusion-series")
+    )
+    assert experiment.apparatus is not None
+    calibration = experiment.apparatus.calibration
+    assert calibration is not None
+    assert {
+        "k_1104_microvolts_atm_inverse_K_inverse",
+        "k_1110_1115_microvolts_atm_inverse_K_inverse",
+        "k_1122_1129_microvolts_atm_inverse_K_inverse",
+        "k_1214_microvolts_atm_inverse_K_inverse",
+        "method",
+    } <= set(calibration)
+    assert all(item.locator is not None for item in calibration.values())
+    assert all(item.inference is None for item in calibration.values())
+
+    measured = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-042-plante-1979"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and observation.admission.status.value != "superseded"
+    ]
+    assert len(measured) == 221
+    assert {observation.experiment_id for observation in measured} == {
+        experiment.experiment_id
+    }
+    assert all(
+        underdetermined_apparatus(experiment, Quantity.P_PARTIAL).passed
+        for _ in measured
+    )
 
 
 def test_g1_jacobson_keeps_category_and_quantity_reason(tmp_path):

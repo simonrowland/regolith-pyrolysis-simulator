@@ -383,7 +383,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity_ratio
     species:
       formula: Ti
       phase:
@@ -659,14 +659,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0'
+        - - Ti
+          - '1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -750,14 +771,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.1'
+        - - Ti
+          - '0.9'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -841,14 +883,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.2'
+        - - Ti
+          - '0.8'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -932,14 +995,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.3'
+        - - Ti
+          - '0.7'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1023,14 +1107,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.4'
+        - - Ti
+          - '0.6'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1114,14 +1219,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.5'
+        - - Ti
+          - '0.5'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1205,14 +1331,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.6'
+        - - Ti
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1296,14 +1443,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.7'
+        - - Ti
+          - '0.3'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1387,14 +1555,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.8'
+        - - Ti
+          - '0.2'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1478,14 +1667,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.9'
+        - - Ti
+          - '0.1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1569,14 +1779,35 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Co
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Co
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '1'
+        - - Ti
+          - '0'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1661,13 +1892,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0'
+        - - Ti
+          - '1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1750,13 +1988,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.1'
+        - - Ti
+          - '0.9'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1839,13 +2084,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.2'
+        - - Ti
+          - '0.8'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1928,13 +2180,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.3'
+        - - Ti
+          - '0.7'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2017,13 +2276,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.4'
+        - - Ti
+          - '0.6'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2106,13 +2372,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.5'
+        - - Ti
+          - '0.5'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2195,13 +2468,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.6'
+        - - Ti
+          - '0.4'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2284,13 +2564,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.7'
+        - - Ti
+          - '0.3'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2373,13 +2660,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.8'
+        - - Ti
+          - '0.2'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2462,13 +2756,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '0.9'
+        - - Ti
+          - '0.1'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2551,13 +2852,20 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Co
+          - '1'
+        - - Ti
+          - '0'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source

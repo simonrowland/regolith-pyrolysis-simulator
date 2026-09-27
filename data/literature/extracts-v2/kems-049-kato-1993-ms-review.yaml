@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -46,6 +46,16 @@ observations:
     figure: '3'
     note: Belton-Fruehan integration curve Fe-V at 1600 C (Furukawa and Kato)
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 300
+        pdf_page_index: 4
+        figure: '3'
+        note: Belton-Fruehan integration curve Fe-V at 1600 C (Furukawa and Kato)
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig5_fe_p_p_p2_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -64,8 +74,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -90,6 +100,16 @@ observations:
     figure: '5'
     note: Vapor pressures of P, P2 from Fe-P alloys (Yamamoto et al.)
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 304
+        pdf_page_index: 8
+        figure: '5'
+        note: Vapor pressures of P, P2 from Fe-P alloys (Yamamoto et al.)
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig6_fe_mo_ion_intensity_figure_only
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
@@ -240,8 +260,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
     reference_state:
       tag: unknown
       reason: qualifier and_pO2_from_oxide_equilibria does not name a reference_state
@@ -271,6 +291,16 @@ observations:
     section: 2.3 Compatibility of cell material with samples
     note: calculated a_Al in Fe in equilibrium with Al2O3 at the Fe-V example pO2
   read_from: pdf:kems-049-kato-1993-ms-review
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 300
+        pdf_page_index: 4
+        section: 2.3 Compatibility of cell material with samples
+        note: calculated a_Al in Fe in equilibrium with Al2O3 at the Fe-V example pO2
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_al_psat_1873k
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:

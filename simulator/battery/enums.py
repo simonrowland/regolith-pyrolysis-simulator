@@ -38,6 +38,7 @@ class Engine(StrEnum):
     MAGEMIN = "magemin"
     IMCC_SF04 = "imcc_sf04"
     IMCC_SF04_EXT = "imcc_sf04_ext"
+    OPENIMCC = "openimcc"
 
 
 class Rail(StrEnum):
@@ -113,6 +114,7 @@ class RefusalReason(StrEnum):
     METHOD_UNKNOWN = "method_unknown"
     EFFUSION_REGIME_UNVERIFIED = "effusion_regime_unverified"
     BACKGROUND_PRESSURE_HIGH = "background_pressure_high"
+    BACKGROUND_PRESSURE_INTERVAL_STRADDLES = "background_pressure_interval_straddles"
     IDENTITY_MISMATCH = "identity_mismatch"
     IDENTITY_UNKNOWN = "identity_unknown"
     INVALID_IDENTITY = "invalid_identity"
@@ -131,6 +133,9 @@ class RefusalReason(StrEnum):
     RESERVOIR_RULE = "reservoir_rule"
     IDENTITY_INCOMPLETE = "identity_incomplete"
     CONDITIONAL_FIELD = "conditional_field"
+    BULK_NOT_LIQUID_COMPOSITION = "bulk_not_liquid_composition"
+    OPENIMCC_NOT_IMPORTABLE = "openimcc_not_importable"
+    OUTSIDE_SUPPORTED_SPECIES = "outside_supported_species"
 
 
 class BenchAbsenceReason(StrEnum):
@@ -157,6 +162,11 @@ class NoticeKind(StrEnum):
     COMPOSITION_PROJECTED = "composition_projected"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     SOURCE_DISAGREEMENT = "source_disagreement"
+    # An input was left out because this row does not take it. The reason
+    # says which input and why. Not a blocking qualification.
+    INPUT_OMITTED = "input_omitted"
+    COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
+    PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
 
 
 class ReferenceStateConvention(StrEnum):
@@ -327,6 +337,7 @@ class Authority(StrEnum):
 class ResidualStatus(StrEnum):
     MATCH = "match"
     MISMATCH = "mismatch"
+    NO_BAND = "no_band"
     REFUSED = "refused"
 
 

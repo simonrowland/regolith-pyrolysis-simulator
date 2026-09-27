@@ -7,7 +7,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not activity
     species:
       formula: Te
       phase:
@@ -207,8 +207,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+      tag: value
+      value: enthalpy_of_vaporization_2nd_law
     species:
       formula: Te
       phase:
@@ -220,12 +220,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [726.0, 850.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped enthalpy_of_vaporization_2nd_law field selected; source fields: species, present_work_kcal_mol,
+      literature_kcal_mol, literature_refs'
     approximate: false
   uncertainty:
     kind: printed
@@ -251,8 +294,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+      tag: value
+      value: enthalpy_of_vaporization_2nd_law
     species:
       formula: Te
       phase:
@@ -264,12 +307,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [726.0, 850.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped enthalpy_of_vaporization_2nd_law field selected; source fields: species, present_work_kcal_mol,
+      literature_kcal_mol, literature_refs'
     approximate: false
   uncertainty:
     kind: printed
@@ -295,8 +381,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+      tag: value
+      value: enthalpy_of_vaporization_2nd_law
     species:
       formula: Te
       phase:
@@ -308,12 +394,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [726.0, 850.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped enthalpy_of_vaporization_2nd_law field selected; source fields: species, present_work_kcal_mol,
+      literature'
     approximate: false
   uncertainty:
     kind: printed
@@ -339,8 +468,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+      tag: value
+      value: enthalpy_of_vaporization_2nd_law
     species:
       formula: Se
       phase:
@@ -352,12 +481,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [500.0, 800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped enthalpy_of_vaporization_2nd_law field selected; source fields: species, present_work_kcal_mol,
+      literature'
     approximate: false
   uncertainty:
     kind: printed
@@ -383,8 +555,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+      tag: value
+      value: enthalpy_of_vaporization_2nd_law
     species:
       formula: Se
       phase:
@@ -396,12 +568,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [500.0, 800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped enthalpy_of_vaporization_2nd_law field selected; source fields: species, present_work_kcal_mol,
+      literature'
     approximate: false
   uncertainty:
     kind: printed
@@ -427,8 +642,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+      tag: value
+      value: enthalpy_of_vaporization_2nd_law
     species:
       formula: Se
       phase:
@@ -440,12 +655,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [500.0, 800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped enthalpy_of_vaporization_2nd_law field selected; source fields: species, present_work_kcal_mol,
+      literature_kcal_mol, literature_refs'
     approximate: false
   uncertainty:
     kind: printed
@@ -471,8 +729,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+      tag: value
+      value: enthalpy_of_vaporization_2nd_law
     species:
       formula: Se
       phase:
@@ -484,12 +742,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [500.0, 800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped enthalpy_of_vaporization_2nd_law field selected; source fields: species, present_work_kcal_mol,
+      literature'
     approximate: false
   uncertainty:
     kind: printed
@@ -515,8 +816,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.40.9_958::experiment::se-te-kems-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'second_law_enthalpy_of_vaporization'
+      tag: value
+      value: enthalpy_of_vaporization_2nd_law
     species:
       formula: Se
       phase:
@@ -528,12 +829,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [500.0, 800.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile enthalpy_of_vaporization_2nd_law does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped enthalpy_of_vaporization_2nd_law field selected; source fields: species, present_work_kcal_mol,
+      literature'
     approximate: false
   uncertainty:
     kind: printed

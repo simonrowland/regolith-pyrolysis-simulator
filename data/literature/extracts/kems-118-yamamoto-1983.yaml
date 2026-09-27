@@ -806,7 +806,8 @@ experiments:
 species:
   Fe:
     observations:
-    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+    - phase: condensed_liquid
+
       condensed_form: &id001
         state: liquid_alloy
         metastable: false
@@ -868,7 +869,8 @@ species:
           1 mm
       uncertainty:
         note: T fluctuation ±1 C; sample mass, ionizing energy and chamber pressure unstated
-    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -900,7 +902,8 @@ species:
         note: purity as printed
   Sn:
     observations:
-    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -1237,7 +1240,8 @@ species:
           dH_kJ_mol: 0.0
       uncertainty:
         note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
-    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -1501,7 +1505,8 @@ species:
         as_printed: about 1 505 C at N_Sn=0.50
       uncertainty:
         note: printed as about; no numeric ±
-    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002

@@ -43,7 +43,7 @@ observations:
     section: 2.1 Laser melting experiments
     note: Apparatus and run schedule; pressure and imposed flow rate are not printed.; pdf_page=6
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-10::rows:row=arkose-soil-10:h=2b6e9ff1fee0
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-10::T=2073.15:row=arkose-soil-10:h=786299cdca0f
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-10
   identity:
     quantity:
@@ -67,8 +67,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -107,8 +107,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -125,11 +125,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-10
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-11::rows:row=arkose-soil-11:h=5d23aac438e8
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-10
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-10
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-10
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-11::T=2273.15:row=arkose-soil-11:h=70ed6c707a11
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-11
   identity:
     quantity:
@@ -153,8 +185,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2273.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -192,14 +224,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.42'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.04'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-11
+      k: 2
+    value: '0.04'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -211,11 +246,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-11
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-12::rows:row=arkose-soil-12:h=0e3ad5e73a50
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-11
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-11
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-11
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-12::T=2473.15:row=arkose-soil-12:h=393cba57b42f
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-12
   identity:
     quantity:
@@ -239,8 +312,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2473.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -279,8 +352,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -297,11 +370,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-12
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-13::rows:row=arkose-soil-13:h=e8a74eae28f8
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-12
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2200'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-12
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-12
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-13::T=1873.15:row=arkose-soil-13:h=d12f80f8b341
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-13
   identity:
     quantity:
@@ -325,8 +430,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -364,14 +469,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.33'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.03'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-13
+      k: 2
+    value: '0.03'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -383,11 +491,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-13
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-14::rows:row=arkose-soil-14:h=b7af60edbfce
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-13
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-13
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-13
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-14::T=2073.15:row=arkose-soil-14:h=71142aea6d23
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-14
   identity:
     quantity:
@@ -411,8 +557,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -451,8 +597,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -469,11 +615,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-14
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-15::rows:row=arkose-soil-15:h=312e2dbc128f
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-14
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-14
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-14
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-15::T=2273.15:row=arkose-soil-15:h=cf02498663f1
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-15
   identity:
     quantity:
@@ -497,8 +675,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2273.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -536,14 +714,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.22'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.04'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-15
+      k: 2
+    value: '0.04'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -555,11 +736,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-15
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-16::rows:row=arkose-soil-16:h=68f3abb4a2a5
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-15
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-16::T=2473.15:row=arkose-soil-16:h=88b859a07a53
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-16
   identity:
     quantity:
@@ -583,8 +802,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2473.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -623,8 +842,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -641,11 +860,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-16
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-17::rows:row=arkose-soil-17:h=b51f8657af34
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-16
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2200'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-16
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-16
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-17::T=1873.15:row=arkose-soil-17:h=f89304f89986
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-17
   identity:
     quantity:
@@ -669,8 +920,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -708,14 +959,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.36'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.04'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-17
+      k: 2
+    value: '0.04'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -727,11 +981,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-17
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-18::rows:row=arkose-soil-18:h=a0ee9e6d031e
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-17
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-17
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-17
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-18::T=2073.15:row=arkose-soil-18:h=90a384e5ed4c
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-18
   identity:
     quantity:
@@ -755,8 +1047,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -794,14 +1086,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.62'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.04'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-18
+      k: 2
+    value: '0.04'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -813,11 +1108,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-18
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-19::rows:row=arkose-soil-19:h=c52b434ece39
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-18
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-18
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-18
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-19::T=2273.15:row=arkose-soil-19:h=13d201eff678
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-19
   identity:
     quantity:
@@ -841,8 +1174,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2273.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -881,8 +1214,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -899,11 +1232,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-19
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-1::rows:row=arkose-soil-1:h=e5d04dae30cf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-19
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-19
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-19
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-1::T=1873.15:row=arkose-soil-1:h=3a2059df337d
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-1
   identity:
     quantity:
@@ -927,8 +1292,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -966,14 +1331,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.2'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-1
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -985,11 +1353,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-1
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-2::rows:row=arkose-soil-2:h=cde24921d3eb
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-1
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-2::T=2073.15:row=arkose-soil-2:h=6cf0d2f4f665
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-2
   identity:
     quantity:
@@ -1013,8 +1419,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1053,8 +1459,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -1071,11 +1477,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-2
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-3::rows:row=arkose-soil-3:h=86414448804f
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-2
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-3::T=2273.15:row=arkose-soil-3:h=26bd5fcfbfa3
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-3
   identity:
     quantity:
@@ -1099,8 +1537,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2273.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1139,8 +1577,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -1157,11 +1595,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-3
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-5::rows:row=arkose-soil-5:h=e90fb35cdb1b
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-3
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-5::T=1873.15:row=arkose-soil-5:h=3e12957e4066
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-5
   identity:
     quantity:
@@ -1185,8 +1655,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1224,14 +1694,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.95'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-5
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -1243,11 +1716,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-5
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-6::rows:row=arkose-soil-6:h=7a3b327de951
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-5
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-6::T=2073.15:row=arkose-soil-6:h=570a203afa14
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-6
   identity:
     quantity:
@@ -1271,8 +1782,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1311,8 +1822,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -1329,11 +1840,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-6
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-7::rows:row=arkose-soil-7:h=b58f801c1922
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-6
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-6
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-6
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-7::T=2273.15:row=arkose-soil-7:h=a9f0a54dce1b
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-7
   identity:
     quantity:
@@ -1357,8 +1900,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2273.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1397,8 +1940,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -1415,11 +1958,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-7
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-8::rows:row=arkose-soil-8:h=5b3dac698d8e
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-7
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-7
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-7
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-8::T=2473.15:row=arkose-soil-8:h=db83debddcb4
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-8
   identity:
     quantity:
@@ -1443,8 +2018,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2473.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1483,8 +2058,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -1501,11 +2076,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-8
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-9::rows:row=arkose-soil-9:h=838323b86c3d
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2200'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-8
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::arkose-soil-9::T=1873.15:row=arkose-soil-9:h=478107a19eda
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-arkose-soil-9
   identity:
     quantity:
@@ -1529,8 +2136,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1569,8 +2176,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -1587,11 +2194,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Arkose soil-9
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-10::rows:row=rhyolite-soil-10:h=186b608cd58e
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Arkose soil-9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Arkose soil-9
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-10::T=2473.15:row=rhyolite-soil-10:h=85f02a8845ba
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-10
   identity:
     quantity:
@@ -1615,8 +2254,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2473.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1654,14 +2293,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.7'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-10
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -1673,11 +2315,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-10
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-11::rows:row=rhyolite-soil-11:h=5660c7ffebcb
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-10
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2200'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-10
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-10
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-11::T=2273.15:row=rhyolite-soil-11:h=df504bac2026
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-11
   identity:
     quantity:
@@ -1701,8 +2381,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2273.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1740,14 +2420,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.51'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-11
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -1759,11 +2442,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-11
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-12::rows:row=rhyolite-soil-12:h=962b9f22ca42
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-11
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-11
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-11
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-12::T=2473.15:row=rhyolite-soil-12:h=c2ff96a1eca4
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-12
   identity:
     quantity:
@@ -1787,8 +2508,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2473.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1827,8 +2548,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -1845,11 +2566,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-12
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-13::rows:row=rhyolite-soil-13:h=9383c17885f8
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-12
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2200'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-12
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-12
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-13::T=2473.15:row=rhyolite-soil-13:h=497a4822acfe
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-13
   identity:
     quantity:
@@ -1873,8 +2626,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2473.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1912,14 +2665,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.65'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-13
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -1931,11 +2687,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-13
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-15::rows:row=rhyolite-soil-15:h=fe249a4e8e99
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-13
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2200'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-13
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-13
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-15::T=2473.15:row=rhyolite-soil-15:h=60cc4b6d5aeb
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-15
   identity:
     quantity:
@@ -1959,8 +2753,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2473.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -1998,14 +2792,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.49'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-15
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -2017,11 +2814,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-15
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-17::rows:row=rhyolite-soil-17:h=1adc59d1bce6
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2200'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-15
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-17::T=1873.15:row=rhyolite-soil-17:h=1b76518c8bdd
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-17
   identity:
     quantity:
@@ -2045,8 +2880,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2084,14 +2919,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.4'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-17
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -2103,11 +2941,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-17
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-18::rows:row=rhyolite-soil-18:h=3ec23026c619
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-17
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-17
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-17
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-18::T=1873.15:row=rhyolite-soil-18:h=a389d937023c
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-18
   identity:
     quantity:
@@ -2131,8 +3007,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2170,14 +3046,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.42'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-18
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -2189,11 +3068,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-18
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-19::rows:row=rhyolite-soil-19:h=02bd64373d8b
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-18
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-18
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-18
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-19::T=1873.15:row=rhyolite-soil-19:h=09d3124e084e
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-19
   identity:
     quantity:
@@ -2217,8 +3134,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2256,14 +3173,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.57'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-19
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -2275,11 +3195,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-19
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-1::rows:row=rhyolite-soil-1:h=95a88cd3c5ba
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-19
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-19
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-19
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-1::T=2073.15:row=rhyolite-soil-1:h=ba973c26d854
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-1
   identity:
     quantity:
@@ -2303,8 +3261,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2342,14 +3300,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.3'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.03'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-1
+      k: 2
+    value: '0.03'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -2361,11 +3322,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-1
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-20::rows:row=rhyolite-soil-20:h=43d3ec9dfa25
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-1
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-20::T=1873.15:row=rhyolite-soil-20:h=ec7cd35c3d5d
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-20
   identity:
     quantity:
@@ -2389,8 +3388,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2429,8 +3428,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -2447,11 +3446,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-20
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-21::rows:row=rhyolite-soil-21:h=27bc105087bf
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-20
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-20
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-20
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-21::T=1873.15:row=rhyolite-soil-21:h=1705b3895591
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-21
   identity:
     quantity:
@@ -2475,8 +3506,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2515,8 +3546,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -2533,11 +3564,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-21
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-2::rows:row=rhyolite-soil-2:h=9965e766b3dc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-21
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-21
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-21
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-2::T=2073.15:row=rhyolite-soil-2:h=309df621bde0
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-2
   identity:
     quantity:
@@ -2561,8 +3624,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2600,14 +3663,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.26'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-2
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -2619,11 +3685,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-2
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-3::rows:row=rhyolite-soil-3:h=99370990d301
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-2
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-3::T=2073.15:row=rhyolite-soil-3:h=65caa0b8009e
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-3
   identity:
     quantity:
@@ -2647,8 +3751,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2687,8 +3791,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -2705,11 +3809,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-3
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-4::rows:row=rhyolite-soil-4:h=9e301cd155ef
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-3
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-4::T=2073.15:row=rhyolite-soil-4:h=9258dff75527
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-4
   identity:
     quantity:
@@ -2733,8 +3869,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2772,14 +3908,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.54'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-4
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -2791,11 +3930,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-4
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-5::rows:row=rhyolite-soil-5:h=97a245787c4d
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-4
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-5::T=2073.15:row=rhyolite-soil-5:h=7d65041710a9
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-5
   identity:
     quantity:
@@ -2819,8 +3996,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2073.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2858,14 +4035,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.33'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-5
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -2877,11 +4057,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-5
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-6::rows:row=rhyolite-soil-6:h=995dff43e8ea
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-5
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-6::T=2473.15:row=rhyolite-soil-6:h=53b7d1c3f5f2
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-6
   identity:
     quantity:
@@ -2905,8 +4123,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2473.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -2944,14 +4162,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.79'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.03'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-6
+      k: 2
+    value: '0.03'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -2963,11 +4184,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-6
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-7::rows:row=rhyolite-soil-7:h=00a09a8d4e8e
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2473.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-6
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2200'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-6
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-6
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-7::T=2273.15:row=rhyolite-soil-7:h=e8d1579abc41
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-7
   identity:
     quantity:
@@ -2991,8 +4250,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2273.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -3031,8 +4290,8 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, T_C,
+      isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
     kind: printed
@@ -3049,11 +4308,43 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-7
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-8::rows:row=rhyolite-soil-8:h=ef03e1c522fa
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-7
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-7
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-7
+        output_unit: K
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-8::T=2273.15:row=rhyolite-soil-8:h=9c03d9cced03
   experiment_id: 10.1016/j.gca.2019.06.016::experiment::wimpenny-2019-rhyolite-soil-8
   identity:
     quantity:
@@ -3077,8 +4368,8 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '2273.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile isotope_delta does not use standard_pressure_Pa
@@ -3116,14 +4407,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.85'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::rhyolite-soil-8
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3135,11 +4429,49 @@ observations:
   notices: []
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
-    published_page: 34
+    published_page: 33
     table: '1'
     record: Rhyolite soil-8
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::starting-materials::rows:row=arkose-soil:h=16c903db9ff0
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        published_page: 33
+        table: '1'
+        record: Rhyolite soil-8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 33
+              table: '1'
+              record: Rhyolite soil-8
+        output_unit: K
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::starting-materials::rows:row=arkose-soil:h=7fd045a47981
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3202,14 +4534,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.22'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::starting-materials
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3225,7 +4560,13 @@ observations:
     table: '1'
     note: Table 1 heating parameters and Zn isotope ratios; uncertainties are printed 2sigma columns.; pdf_page=35
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::starting-materials::rows:row=rhyolite-soil:h=d0dcaa5cad81
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::starting-materials::rows:row=rhyolite-soil:h=cc2ccd3615c5
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3288,14 +4629,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, diameter_mm, heating_time_s, temperature_C,
-      delta66Zn_permil, delta66Zn_2sigma_permil, Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.28'
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: null cells mean no Zn isotope analysis was reported for that row; they are not zero.
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table1_experimental_zn_rows::starting-materials
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3311,7 +4655,13 @@ observations:
     table: '1'
     note: Table 1 heating parameters and Zn isotope ratios; uncertainties are printed 2sigma columns.; pdf_page=35
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-10:h=493c327f6a1e
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: diameter mm; time s; temperature C; Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-10:h=3c6be45ee076
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3374,12 +4724,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.83'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.03'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.03'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3395,7 +4750,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-11:h=a5622e8f88d9
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-11:h=8452cadd6434
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3458,12 +4819,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.94'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.03'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.03'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3479,7 +4845,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-12:h=0483992d18f0
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-12:h=5c665ea9b203
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3542,12 +4914,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.49'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3563,7 +4940,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-1:h=76b79484c6a4
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-1:h=2ebe50539fd8
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3626,12 +5009,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.26'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.01'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3647,7 +5035,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-2:h=94046008a1cc
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-2:h=b4009ca20584
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3710,12 +5104,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.02'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.12'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.12'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3731,7 +5130,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-3:h=14c7e47cc171
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-3:h=20ad71dd7343
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3794,12 +5199,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.19'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.01'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3815,7 +5225,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-4:h=c7a2d3801d58
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-4:h=6818f8d968dc
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3878,12 +5294,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '2.03'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -3899,7 +5320,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-5:h=d3bbf0393b31
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-5:h=6874ea856bb4
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -3963,7 +5390,7 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil,
       Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
@@ -3983,7 +5410,7 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-6:h=3f168793174f
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-6:h=77dbaa07aa3b
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4046,12 +5473,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '2.04'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.16'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.16'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -4067,7 +5499,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-7:h=cb2fac6a55c0
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-7:h=c0d9f700d055
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4131,7 +5569,7 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil,
       Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
@@ -4151,7 +5589,7 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-8:h=fa809258025c
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-8:h=e89e8696c5e4
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4214,12 +5652,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '1.3'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -4235,7 +5678,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-9:h=2ba76f27c171
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=australite-9:h=960f5a5a85cc
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4299,7 +5748,7 @@ observations:
       reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, isotope_delta_delta66Zn_permil, delta66Zn_2sigma_permil,
       Zn_ppm, Zn_2sigma_ppm'
     approximate: false
   uncertainty:
@@ -4319,7 +5768,7 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-1:h=1df930d10fa5
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-1:h=2a704f6dd8f0
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4382,12 +5831,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.59'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -4403,7 +5857,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-2:h=51ce94134a61
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-2:h=bb04f965db5e
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4466,12 +5926,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.33'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -4487,7 +5952,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-3:h=6eccf05ac6ee
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-3:h=734b1d0e4ca1
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4550,12 +6021,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.47'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -4571,7 +6047,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-4:h=2e5476903e1a
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-4:h=c6334f062669
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4634,12 +6116,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.67'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -4655,7 +6142,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-5:h=a261276ff6fb
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-5:h=8c756b7417b9
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4718,12 +6211,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.4'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -4739,7 +6237,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-6:h=6b2968bf4fd9
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-6:h=63759d56f861
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4802,12 +6306,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.33'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -4823,7 +6332,13 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
-- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-7:h=e55d74a4752a
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
+- observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows::rows:row=fallout-7:h=6b25e3ca5b6b
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:
     quantity:
@@ -4886,12 +6401,17 @@ observations:
       tag: not_applicable
       reason: profile isotope_delta does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped isotope_delta field selected; source fields: sample, delta66Zn_permil, delta66Zn_2sigma_permil,
-      Zn_ppm, Zn_2sigma_ppm'
+    kind: point
+    point: '0.4'
     approximate: false
   uncertainty:
-    kind: none
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_table2_fallout_tektite_zn_rows
+      k: 2
+    value: '0.02'
+    basis: 2sigma
   evidence:
     class:
       tag: value
@@ -4907,6 +6427,12 @@ observations:
     table: '2'
     note: Fallout melt glass, australite tektites, and UCC comparison; measured Zn rows retained here.; pdf_page=36
   read_from: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
+    parameters: []
+    output_unit: Zn ppm; delta66Zn per mil
 - observation_id: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_fractionation_summary
   experiment_id: 10.1016/j.gca.2019.06.016::wimpenny-2019-zn-isotope-evaporation-extreme-t
   identity:

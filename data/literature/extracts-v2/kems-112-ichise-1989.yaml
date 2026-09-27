@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -46,6 +46,16 @@ observations:
     figure: '4'
     note: also Figs 6 and 7
   read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 847
+        pdf_page_index: 5
+        figure: '4'
+        note: also Figs 6 and 7
 - observation_id: kems-112-ichise-1989::ichise_1989_figs_ion_intensity_figure_only
   experiment_id: 10.2355/isijinternational.29.843::experiment::fe-ta-nb-kems-series
   identity:
@@ -166,8 +176,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
@@ -192,6 +202,15 @@ observations:
     pdf_page_index: 2
     section: '2.1'
   read_from: pdf:kems-112-ichise-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: '2.1'
 - observation_id: kems-112-ichise-1989::ichise_1989_quoted_gamma0_literature
   experiment_id: 10.2355/isijinternational.29.843::kems-112-ichise-1989
   identity:
@@ -254,11 +273,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -281,14 +300,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.094'
+        - - Fe
+          - '0.906'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -308,9 +348,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.916'
     approximate: false
   uncertainty:
     kind: printed
@@ -351,11 +390,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -378,14 +417,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.319'
+        - - Fe
+          - '0.681'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -405,9 +465,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.76'
     approximate: false
   uncertainty:
     kind: printed
@@ -448,11 +507,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -475,14 +534,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.153'
+        - - Fe
+          - '0.847'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -502,9 +582,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.811'
     approximate: false
   uncertainty:
     kind: printed
@@ -572,14 +651,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.244'
+        - - Fe
+          - '0.756'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -599,9 +699,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.852'
     approximate: false
   uncertainty:
     kind: printed
@@ -669,14 +768,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.239'
+        - - Fe
+          - '0.761'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -696,9 +816,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.822'
     approximate: false
   uncertainty:
     kind: printed
@@ -766,14 +885,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.255'
+        - - Fe
+          - '0.745'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -793,9 +933,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.797'
     approximate: false
   uncertainty:
     kind: printed
@@ -836,11 +975,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -863,14 +1002,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.156'
+        - - Fe
+          - '0.844'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -890,9 +1050,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.886'
     approximate: false
   uncertainty:
     kind: printed
@@ -933,11 +1092,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -960,14 +1119,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.152'
+        - - Fe
+          - '0.848'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -987,9 +1167,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.846'
     approximate: false
   uncertainty:
     kind: printed
@@ -1057,14 +1236,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.297'
+        - - Fe
+          - '0.703'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1084,9 +1284,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.862'
     approximate: false
   uncertainty:
     kind: printed
@@ -1127,11 +1326,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1154,14 +1353,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.054'
+        - - Fe
+          - '0.946'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1181,9 +1401,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.949'
     approximate: false
   uncertainty:
     kind: printed
@@ -1224,11 +1443,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -1251,14 +1470,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.436'
+        - - Fe
+          - '0.564'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1278,9 +1518,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.42'
     approximate: false
   uncertainty:
     kind: printed
@@ -1321,11 +1560,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -1348,14 +1587,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.606'
+        - - Fe
+          - '0.394'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1375,9 +1635,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.179'
     approximate: false
   uncertainty:
     kind: printed
@@ -1418,11 +1677,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -1445,14 +1704,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.406'
+        - - Fe
+          - '0.594'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1472,9 +1752,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.421'
     approximate: false
   uncertainty:
     kind: printed
@@ -1515,11 +1794,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -1542,14 +1821,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.404'
+        - - Fe
+          - '0.596'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1569,9 +1869,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.412'
     approximate: false
   uncertainty:
     kind: printed
@@ -1612,11 +1911,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -1639,14 +1938,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.444'
+        - - Fe
+          - '0.556'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1666,9 +1986,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.459'
     approximate: false
   uncertainty:
     kind: printed
@@ -1709,11 +2028,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -1736,14 +2055,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.727'
+        - - Fe
+          - '0.273'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1763,9 +2103,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.194'
     approximate: false
   uncertainty:
     kind: printed
@@ -1806,11 +2145,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -1833,14 +2172,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.81'
+        - - Fe
+          - '0.19'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1860,9 +2220,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.109'
     approximate: false
   uncertainty:
     kind: printed
@@ -1903,11 +2262,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -1930,14 +2289,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.775'
+        - - Fe
+          - '0.225'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1957,9 +2337,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.248'
     approximate: false
   uncertainty:
     kind: printed
@@ -2000,11 +2379,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -2027,14 +2406,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.828'
+        - - Fe
+          - '0.172'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2054,9 +2454,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.189'
     approximate: false
   uncertainty:
     kind: printed
@@ -2097,11 +2496,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2124,14 +2523,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Ta
+          - '0.048'
+        - - Fe
+          - '0.952'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2151,9 +2571,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Ta, heat, phase_block, a_Fe, T_rxn_K, T_range_K_as_printed, composition_mol'
+    kind: point
+    point: '0.969'
     approximate: false
   uncertainty:
     kind: printed
@@ -3799,11 +4218,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3826,14 +4245,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.192'
+        - - Fe
+          - '0.808'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3853,9 +4293,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.791'
     approximate: false
   uncertainty:
     kind: printed
@@ -3896,11 +4335,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3923,14 +4362,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.242'
+        - - Fe
+          - '0.758'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3950,9 +4410,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.782'
     approximate: false
   uncertainty:
     kind: printed
@@ -3993,11 +4452,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4020,14 +4479,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.234'
+        - - Fe
+          - '0.766'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4047,9 +4527,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.731'
     approximate: false
   uncertainty:
     kind: printed
@@ -4090,11 +4569,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -4117,14 +4596,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.32'
+        - - Fe
+          - '0.68'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4144,9 +4644,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.545'
     approximate: false
   uncertainty:
     kind: printed
@@ -4187,11 +4686,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4214,14 +4713,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.502'
+        - - Fe
+          - '0.498'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4241,9 +4761,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.34'
     approximate: false
   uncertainty:
     kind: printed
@@ -4311,14 +4830,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.394'
+        - - Fe
+          - '0.606'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4338,9 +4878,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.36'
     approximate: false
   uncertainty:
     kind: printed
@@ -4408,14 +4947,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.388'
+        - - Fe
+          - '0.612'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4435,9 +4995,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.359'
     approximate: false
   uncertainty:
     kind: printed
@@ -4478,11 +5037,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -4505,14 +5064,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.596'
+        - - Fe
+          - '0.404'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4532,9 +5112,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.258'
     approximate: false
   uncertainty:
     kind: printed
@@ -4575,11 +5154,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -4602,14 +5181,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.671'
+        - - Fe
+          - '0.329'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4629,9 +5229,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.203'
     approximate: false
   uncertainty:
     kind: printed
@@ -4672,11 +5271,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -4699,14 +5298,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.76'
+        - - Fe
+          - '0.24'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4726,9 +5346,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.197'
     approximate: false
   uncertainty:
     kind: printed
@@ -4796,14 +5415,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.548'
+        - - Fe
+          - '0.452'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4823,9 +5463,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.276'
     approximate: false
   uncertainty:
     kind: printed
@@ -4866,11 +5505,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
       charge:
         tag: value
         value: 0
@@ -4893,14 +5532,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.856'
+        - - Fe
+          - '0.144'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4920,9 +5580,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.222'
     approximate: false
   uncertainty:
     kind: printed
@@ -4990,14 +5649,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.384'
+        - - Fe
+          - '0.616'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5017,9 +5697,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.367'
     approximate: false
   uncertainty:
     kind: printed
@@ -5087,14 +5766,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.37'
+        - - Fe
+          - '0.63'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5114,9 +5814,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.387'
     approximate: false
   uncertainty:
     kind: printed
@@ -5157,11 +5856,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5184,14 +5883,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.094'
+        - - Fe
+          - '0.906'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5211,9 +5931,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.902'
     approximate: false
   uncertainty:
     kind: printed
@@ -5281,14 +6000,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.298'
+        - - Fe
+          - '0.702'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5308,9 +6048,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.704'
     approximate: false
   uncertainty:
     kind: printed
@@ -5351,11 +6090,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5378,14 +6117,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.091'
+        - - Fe
+          - '0.909'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5405,9 +6165,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.869'
     approximate: false
   uncertainty:
     kind: printed
@@ -5448,11 +6207,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5475,14 +6234,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.144'
+        - - Fe
+          - '0.856'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5502,9 +6282,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.846'
     approximate: false
   uncertainty:
     kind: printed
@@ -5545,11 +6324,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5572,14 +6351,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.139'
+        - - Fe
+          - '0.861'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5599,9 +6399,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.826'
     approximate: false
   uncertainty:
     kind: printed
@@ -5642,11 +6441,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5669,14 +6468,35 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Nb
+          - '0.048'
+        - - Fe
+          - '0.952'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5696,9 +6516,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, T_K, composition_basis,
-      ion_intensity_equation, X_Nb, heat, phase_block, a_Fe, composition_mol'
+    kind: point
+    point: '0.962'
     approximate: false
   uncertainty:
     kind: printed

@@ -332,10 +332,7 @@ fidelity_samples:
       page: 1278
       table: '2'
       note: Table 2 f(FeO) at x(FeO)=0.1 as printed
-  - species: Fe
-    observable: rate_series
-    observation_id: plante_1992_table1_xfeo_0p15
-    field: I_Fe_over_I_Mg
+  - path: species.Fe.observations[plante_1992_table1_xfeo_0p15].values.rows[0].ion_intensity_ratio
     value: 7.04
     locator:
       page: 1278
@@ -551,7 +548,7 @@ species:
       regime: kems_effusion
       units: ion_intensity_ratio_dimensionless
       values:
-        quantity: I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus
+        quantity: ion_intensity_ratio
         T_K: 1973.0
         join: x(MgO)=x(SiO2)
         method_class: measured_direct
@@ -559,8 +556,11 @@ species:
         x_FeO: 0.15
         x_MgO: 0.425
         x_SiO2: 0.425
-        I_Fe_over_I_Mg: 7.04
-        I_Fe_over_I_SiO: 2.33
+        rows:
+        - ion_pair: I(Fe+)/I(Mg+)
+          ion_intensity_ratio: 7.04
+        - ion_pair: I(Fe+)/I(SiO+)
+          ion_intensity_ratio: 2.33
         note: >-
           Absolute partial pressures were not reported. k_i cancelled by the
           ion-ratio Gibbs-Duhem path. Not an evaporation coefficient. x(SiO2)
@@ -604,7 +604,7 @@ species:
       regime: kems_effusion
       units: ion_intensity_ratio_dimensionless
       values:
-        quantity: I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus
+        quantity: ion_intensity_ratio
         T_K: 1973.0
         join: x(MgO)=x(SiO2)
         method_class: measured_direct
@@ -612,8 +612,11 @@ species:
         x_FeO: 0.30
         x_MgO: 0.350
         x_SiO2: 0.350
-        I_Fe_over_I_Mg: 23.61
-        I_Fe_over_I_SiO: 6.5
+        rows:
+        - ion_pair: I(Fe+)/I(Mg+)
+          ion_intensity_ratio: 23.61
+        - ion_pair: I(Fe+)/I(SiO+)
+          ion_intensity_ratio: 6.5
         note: >-
           Absolute partial pressures were not reported. k_i cancelled by the
           ion-ratio Gibbs-Duhem path. Not an evaporation coefficient. x(SiO2)
@@ -657,7 +660,7 @@ species:
       regime: kems_effusion
       units: ion_intensity_ratio_dimensionless
       values:
-        quantity: I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus
+        quantity: ion_intensity_ratio
         T_K: 1973.0
         join: x(MgO)=x(SiO2)
         method_class: measured_direct
@@ -665,8 +668,11 @@ species:
         x_FeO: 0.40
         x_MgO: 0.300
         x_SiO2: 0.300
-        I_Fe_over_I_Mg: 48.41
-        I_Fe_over_I_SiO: 7.83
+        rows:
+        - ion_pair: I(Fe+)/I(Mg+)
+          ion_intensity_ratio: 48.41
+        - ion_pair: I(Fe+)/I(SiO+)
+          ion_intensity_ratio: 7.83
         note: >-
           Absolute partial pressures were not reported. k_i cancelled by the
           ion-ratio Gibbs-Duhem path. Not an evaporation coefficient. x(SiO2)
@@ -710,7 +716,7 @@ species:
       regime: kems_effusion
       units: ion_intensity_ratio_dimensionless
       values:
-        quantity: I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus
+        quantity: ion_intensity_ratio
         T_K: 1973.0
         join: x(MgO)=x(SiO2)
         method_class: measured_direct
@@ -718,8 +724,11 @@ species:
         x_FeO: 0.54
         x_MgO: 0.230
         x_SiO2: 0.230
-        I_Fe_over_I_Mg: 37.2
-        I_Fe_over_I_SiO: 12.04
+        rows:
+        - ion_pair: I(Fe+)/I(Mg+)
+          ion_intensity_ratio: 37.2
+        - ion_pair: I(Fe+)/I(SiO+)
+          ion_intensity_ratio: 12.04
         note: >-
           Absolute partial pressures were not reported. k_i cancelled by the
           ion-ratio Gibbs-Duhem path. Not an evaporation coefficient. x(SiO2)
@@ -763,7 +772,7 @@ species:
       regime: kems_effusion
       units: ion_intensity_ratio_dimensionless
       values:
-        quantity: I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus
+        quantity: ion_intensity_ratio
         T_K: 1973.0
         join: x(MgO)=x(SiO2)
         method_class: measured_direct
@@ -771,8 +780,11 @@ species:
         x_FeO: 0.70
         x_MgO: 0.150
         x_SiO2: 0.150
-        I_Fe_over_I_Mg: 23.29
-        I_Fe_over_I_SiO: 22.85
+        rows:
+        - ion_pair: I(Fe+)/I(Mg+)
+          ion_intensity_ratio: 23.29
+        - ion_pair: I(Fe+)/I(SiO+)
+          ion_intensity_ratio: 22.85
         note: >-
           Absolute partial pressures were not reported. k_i cancelled by the
           ion-ratio Gibbs-Duhem path. Not an evaporation coefficient. x(SiO2)
@@ -816,7 +828,7 @@ species:
       regime: kems_effusion
       units: ion_intensity_ratio_dimensionless
       values:
-        quantity: I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus
+        quantity: ion_intensity_ratio
         T_K: 1973.0
         join: x(MgO)=x(SiO2)
         method_class: measured_direct
@@ -824,8 +836,11 @@ species:
         x_FeO: 0.80
         x_MgO: 0.100
         x_SiO2: 0.100
-        I_Fe_over_I_Mg: 27.11
-        I_Fe_over_I_SiO: 29.05
+        rows:
+        - ion_pair: I(Fe+)/I(Mg+)
+          ion_intensity_ratio: 27.11
+        - ion_pair: I(Fe+)/I(SiO+)
+          ion_intensity_ratio: 29.05
         note: >-
           Absolute partial pressures were not reported. k_i cancelled by the
           ion-ratio Gibbs-Duhem path. Not an evaporation coefficient. x(SiO2)
@@ -869,7 +884,7 @@ species:
       regime: kems_effusion
       units: ion_intensity_ratio_dimensionless
       values:
-        quantity: I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus
+        quantity: ion_intensity_ratio
         T_K: 1973.0
         join: x(MgO)=x(SiO2)
         method_class: measured_direct
@@ -877,8 +892,11 @@ species:
         x_FeO: 0.90
         x_MgO: 0.050
         x_SiO2: 0.050
-        I_Fe_over_I_Mg: 21.64
-        I_Fe_over_I_SiO: 40.3
+        rows:
+        - ion_pair: I(Fe+)/I(Mg+)
+          ion_intensity_ratio: 21.64
+        - ion_pair: I(Fe+)/I(SiO+)
+          ion_intensity_ratio: 40.3
         note: >-
           Absolute partial pressures were not reported. k_i cancelled by the
           ion-ratio Gibbs-Duhem path. Not an evaporation coefficient. x(SiO2)

@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -19,12 +19,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1248.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000363'
     approximate: false
   uncertainty:
     kind: printed
@@ -69,12 +112,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1266.5:row=1:h=4dcd95997d8a
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -86,12 +135,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1266.5'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000000226'
     approximate: false
   uncertainty:
     kind: printed
@@ -136,12 +228,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1334.0:row=1:h=e09ca56e72fe
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -153,12 +251,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1334'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000000299'
     approximate: false
   uncertainty:
     kind: printed
@@ -203,12 +344,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1334.0:row=3:h=4cc46dbe958a
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -220,12 +367,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1334'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00000000692'
     approximate: false
   uncertainty:
     kind: printed
@@ -270,12 +460,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1431.8:row=1:h=5a583bb616d0
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -287,12 +483,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1431.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000000343'
     approximate: false
   uncertainty:
     kind: printed
@@ -337,12 +576,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1445.1:row=2:h=84840b2a9be8
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -354,12 +599,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1445.1'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000182'
     approximate: false
   uncertainty:
     kind: printed
@@ -404,12 +692,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1458.6:row=3:h=e4e4fe3bdf96
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -421,12 +715,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1458.6'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00000000442'
     approximate: false
   uncertainty:
     kind: printed
@@ -471,12 +808,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1479.3:row=1:h=76706652f192
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -488,12 +831,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1479.3'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000000279'
     approximate: false
   uncertainty:
     kind: printed
@@ -538,12 +924,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1530.0:row=1:h=dd8be11ba102
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -555,12 +947,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1530'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000000172'
     approximate: false
   uncertainty:
     kind: printed
@@ -605,12 +1040,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1552.8:row=2:h=f876aef0254a
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -622,12 +1063,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1552.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000363'
     approximate: false
   uncertainty:
     kind: printed
@@ -672,12 +1156,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1568.4:row=1:h=3bfe6e021f0a
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -689,12 +1179,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1568.4'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000832'
     approximate: false
   uncertainty:
     kind: printed
@@ -739,12 +1272,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1576.3:row=2:h=3fd23f609226
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -756,12 +1295,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1576.3'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000316'
     approximate: false
   uncertainty:
     kind: printed
@@ -806,12 +1388,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1596.4:row=1:h=7a75efac0bd8
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -823,12 +1411,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1596.4'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000363'
     approximate: false
   uncertainty:
     kind: printed
@@ -873,12 +1504,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1625.5:row=2:h=f7e376c622bd
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -890,12 +1527,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1625.5'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.000000055'
     approximate: false
   uncertainty:
     kind: printed
@@ -940,12 +1620,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1651.3:row=3:h=d38548088cab
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -957,12 +1643,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1651.3'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00000000692'
     approximate: false
   uncertainty:
     kind: printed
@@ -1007,12 +1736,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1700.7:row=2:h=4dc296ebfe9f
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -1024,12 +1759,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1700.7'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000275'
     approximate: false
   uncertainty:
     kind: printed
@@ -1074,12 +1852,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1700.7:row=3:h=c570c787fc5d
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -1091,12 +1875,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1700.7'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000138'
     approximate: false
   uncertainty:
     kind: printed
@@ -1141,12 +1968,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1773.0:row=3:h=9cc0f1e22a6b
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -1158,12 +1991,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000363'
     approximate: false
   uncertainty:
     kind: printed
@@ -1208,12 +2084,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized::T=1857.4:row=3:h=d750662636ad
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      tag: value
+      value: activity_coefficient
     species:
       formula: K2O
       phase:
@@ -1225,12 +2107,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1857.4'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: apparent gamma(K2O) via eq. (6); authors'' "apparent" (may not be fully
+        equilibrated)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0000000447'
     approximate: false
   uncertainty:
     kind: printed
@@ -1275,12 +2200,18 @@ observations:
         pdf_page_index: 71
         figure: '11'
         note: report figure page after captions; PDF page 71
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters: []
+    output_unit: dimensionless
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'apparent_gamma_K2O'
+      reason: source is an ordering or categorical statement, not an activity coefficient
     species:
       formula: K2O
       phase:
@@ -1345,8 +2276,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1074.0, 1074.0]; no midpoint invented
+      tag: value
+      value: '1074'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1379,6 +2310,15 @@ observations:
     pdf_page_index: 75
     figure: '15'
   read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1074'
+      locator:
+        page: 63
+        pdf_page_index: 75
+        figure: '15'
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_kcl_std_pressure_printed_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -1446,8 +2386,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1074.0, 1074.0]; no midpoint invented
+      tag: value
+      value: '1074'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1481,6 +2421,16 @@ observations:
     figure: '15'
     paragraph: report p. 35-36
   read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1074'
+      locator:
+        page: 63
+        pdf_page_index: 75
+        figure: '15'
+        paragraph: report p. 35-36
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
@@ -1635,8 +2585,8 @@ observations:
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_over_illite'
+      tag: value
+      value: p_partial
     species:
       formula: SiO
       phase:
@@ -1648,15 +2598,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1821.7'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier over_illite does not name a reference_state
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0320187'
     approximate: false
   uncertainty:
     kind: printed
@@ -1699,12 +2688,36 @@ observations:
         published_page: 58
         pdf_page_index: 64
         figure: '4'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000316'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1860.8:h=37b8334fa33d
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_over_illite'
+      tag: value
+      value: p_partial
     species:
       formula: SiO
       phase:
@@ -1716,15 +2729,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1860.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier over_illite does not name a reference_state
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.048939975'
     approximate: false
   uncertainty:
     kind: printed
@@ -1767,12 +2819,36 @@ observations:
         published_page: 58
         pdf_page_index: 64
         figure: '4'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000483'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1868.6:h=8ea25bb94003
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_over_illite'
+      tag: value
+      value: p_partial
     species:
       formula: SiO
       phase:
@@ -1784,15 +2860,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1868.6'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier over_illite does not name a reference_state
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.069002325'
     approximate: false
   uncertainty:
     kind: printed
@@ -1835,12 +2950,36 @@ observations:
         published_page: 58
         pdf_page_index: 64
         figure: '4'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000681'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1911.6:h=d9ef607ec5af
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_over_illite'
+      tag: value
+      value: p_partial
     species:
       formula: SiO
       phase:
@@ -1852,15 +2991,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1911.6'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier over_illite does not name a reference_state
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.12260325'
     approximate: false
   uncertainty:
     kind: printed
@@ -1903,12 +3081,36 @@ observations:
         published_page: 58
         pdf_page_index: 64
         figure: '4'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000121'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1914.8:h=96933736e50e
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_over_illite'
+      tag: value
+      value: p_partial
     species:
       formula: SiO
       phase:
@@ -1920,15 +3122,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1914.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier over_illite does not name a reference_state
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.086835525'
     approximate: false
   uncertainty:
     kind: printed
@@ -1971,12 +3212,36 @@ observations:
         published_page: 58
         pdf_page_index: 64
         figure: '4'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000857'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1946.8:h=865b11871b18
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_over_illite'
+      tag: value
+      value: p_partial
     species:
       formula: SiO
       phase:
@@ -1988,15 +3253,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1946.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier over_illite does not name a reference_state
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.222915'
     approximate: false
   uncertainty:
     kind: printed
@@ -2039,12 +3343,36 @@ observations:
         published_page: 58
         pdf_page_index: 64
         figure: '4'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000022'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 58
+          published_page: 58
+          pdf_page_index: 64
+          figure: '4'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_over_illite'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: SiO
       phase:
@@ -2056,9 +3384,6 @@ observations:
       charge:
         tag: value
         value: 0
-    reference_state:
-      tag: unknown
-      reason: qualifier over_illite does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -2098,7 +3423,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Na
       phase:
@@ -2147,7 +3472,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Na
       phase:
@@ -2197,8 +3522,8 @@ observations:
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+      tag: value
+      value: p_partial
     species:
       formula: Na
       phase:
@@ -2210,12 +3535,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1333.3'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.74279'
     approximate: false
   uncertainty:
     kind: printed
@@ -2258,12 +3625,36 @@ observations:
         published_page: 59
         pdf_page_index: 65
         figure: '5'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000172'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=2db4bdbaa4a6
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+      tag: value
+      value: p_partial
     species:
       formula: Na
       phase:
@@ -2275,12 +3666,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1333.3'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.4286825'
     approximate: false
   uncertainty:
     kind: printed
@@ -2323,12 +3756,36 @@ observations:
         published_page: 59
         pdf_page_index: 65
         figure: '5'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000141'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=5121ebf96a04
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+      tag: value
+      value: p_partial
     species:
       formula: Na
       phase:
@@ -2340,12 +3797,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1333.3'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0368823'
     approximate: false
   uncertainty:
     kind: printed
@@ -2388,12 +3887,36 @@ observations:
         published_page: 59
         pdf_page_index: 65
         figure: '5'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000364'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1428.6:h=8b93bd735499
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+      tag: value
+      value: p_partial
     species:
       formula: Na
       phase:
@@ -2405,12 +3928,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1428.6'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.145908'
     approximate: false
   uncertainty:
     kind: printed
@@ -2453,12 +4018,36 @@ observations:
         published_page: 59
         pdf_page_index: 65
         figure: '5'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000144'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1488.8:h=5f7a8c15c78e
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+      tag: value
+      value: p_partial
     species:
       formula: Na
       phase:
@@ -2470,12 +4059,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1488.8'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.25229925'
     approximate: false
   uncertainty:
     kind: printed
@@ -2518,12 +4149,36 @@ observations:
         published_page: 59
         pdf_page_index: 65
         figure: '5'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000249'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized::T=1493.7:h=31e60450532f
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+      tag: value
+      value: p_partial
     species:
       formula: Na
       phase:
@@ -2535,12 +4190,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1493.7'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '9.6157425'
     approximate: false
   uncertainty:
     kind: printed
@@ -2583,12 +4280,36 @@ observations:
         published_page: 59
         pdf_page_index: 65
         figure: '5'
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-020-hastie-1981-nbsir
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000949'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 59
+          published_page: 59
+          pdf_page_index: 65
+          figure: '5'
+    output_unit: Pa
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'P_Na_over_soda_lime_glass'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Na
       phase:
@@ -3292,8 +5013,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+      tag: value
+      value: '1300'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_P_NaCl_atm'; refusing to pick a number
@@ -3331,6 +5052,17 @@ observations:
     paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
   read_from: unknown:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 11
+        published_page: 11
+        pdf_page_index: 17
+        paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose_quoted_20260906
   experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   identity:

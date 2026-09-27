@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1234.0, 1234.0]; no midpoint invented
+      tag: value
+      value: '1234'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -47,6 +47,17 @@ observations:
     table: '1'
     note: Table 1 Silver, solid; just below mp 1234 plus or minus 3 K; Wessel [1951]
   read_from: pdf:kems-003-pound-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1234'
+      locator:
+        page: 142
+        published_page: 142
+        pdf_page_index: 8
+        table: '1'
+        note: Table 1 Silver, solid; just below mp 1234 plus or minus 3 K; Wessel [1951]
 - observation_id: kems-003-pound-1972::pound_1972_b_mp_alpha_burns
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -71,8 +82,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2403.0, 2403.0]; no midpoint invented
+      tag: value
+      value: '2403'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -137,6 +148,17 @@ observations:
     table: '1'
     note: Table 1 Boron, solid; liquid (also repeated as Table 2 first row)
   read_from: pdf:kems-003-pound-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2403'
+      locator:
+        page: 141
+        published_page: 141
+        pdf_page_index: 7
+        table: '1'
+        note: Table 1 Boron, solid; liquid (also repeated as Table 2 first row)
 - observation_id: kems-003-pound-1972::pound_1972_be_solid_alpha_holden
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -1103,8 +1125,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1500.0, 1500.0]; no midpoint invented
+      tag: value
+      value: '1500'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1130,6 +1152,17 @@ observations:
     table: '3'
     note: Table 3 Platinum condensation; Chupka et al. [1963]; substrate 1500 plus or minus 20 K
   read_from: pdf:kems-003-pound-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 145
+        published_page: 145
+        pdf_page_index: 11
+        table: '3'
+        note: Table 3 Platinum condensation; Chupka et al. [1963]; substrate 1500 plus or minus 20 K
 - observation_id: kems-003-pound-1972::pound_1972_rh_condensation_alpha_chupka_1500k
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -1148,8 +1181,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1500.0, 1500.0]; no midpoint invented
+      tag: value
+      value: '1500'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1175,6 +1208,17 @@ observations:
     table: '3'
     note: Table 3 Rhodium condensation; Chupka et al. [1963]; substrate 1500 plus or minus 20 K
   read_from: pdf:kems-003-pound-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        page: 145
+        published_page: 145
+        pdf_page_index: 11
+        table: '3'
+        note: Table 3 Rhodium condensation; Chupka et al. [1963]; substrate 1500 plus or minus 20 K
 - observation_id: kems-003-pound-1972::pound_1972_w_condensation_alpha_chupka_2200k
   experiment_id: 10.1063/1.3253096::kems-003-pound-1972
   identity:
@@ -1193,8 +1237,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2200.0, 2200.0]; no midpoint invented
+      tag: value
+      value: '2200'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'condensation_coefficient'; refusing to pick a
@@ -1224,3 +1268,14 @@ observations:
     table: '3'
     note: Table 3 Tungsten condensation; Chupka et al. [1963]; substrate 2200 plus or minus 20 K
   read_from: pdf:kems-003-pound-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 146
+        published_page: 146
+        pdf_page_index: 12
+        table: '3'
+        note: Table 3 Tungsten condensation; Chupka et al. [1963]; substrate 2200 plus or minus 20 K

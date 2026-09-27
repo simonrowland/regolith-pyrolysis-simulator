@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphur_distribution_ratio_logLs'; refusing to
@@ -52,6 +52,18 @@ observations:
     equation: '10'
     note: estimated sulphur distribution ratio Ls = (mass%S)/[mass%S]
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 41
+        published_page: 41
+        pdf_page_index: 6
+        figure: '10'
+        equation: '10'
+        note: estimated sulphur distribution ratio Ls = (mass%S)/[mass%S]
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq4_logK3
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:

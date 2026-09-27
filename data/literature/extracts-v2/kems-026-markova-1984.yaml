@@ -140,8 +140,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1773.15, 1773.15]; no midpoint invented
+      tag: value
+      value: '1773.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -165,6 +165,15 @@ observations:
     pdf_page_index: 1
     paragraph: silica is partially in vapor as Mg is completely in melt
   read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        paragraph: silica is partially in vapor as Mg is completely in melt
 - observation_id: kems-026-markova-1984::markova_1984_SiO_dissipation_1500C_reduced_lunar_mass_model
   experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
   identity:
@@ -598,8 +607,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1773.15, 1773.15]; no midpoint invented
+      tag: value
+      value: '1773.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -624,6 +633,16 @@ observations:
     paragraph: If the temperature of the lunar surface (magmatic ocean) and vapor ~1500 C silica is partially in vapor as
       Mg is completely in melt
   read_from: pdf:kems-026-markova-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        paragraph: If the temperature of the lunar surface (magmatic ocean) and vapor ~1500 C silica is partially in vapor
+          as Mg is completely in melt
 - observation_id: kems-026-markova-1984::markova_1984_table1_initial_sample_compositions
   experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
   identity:

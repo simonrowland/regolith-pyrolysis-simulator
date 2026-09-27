@@ -105,8 +105,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -132,6 +132,16 @@ observations:
     figure: '8'
     note: 'Fig. 8 a_Fe; conclusion: Raoultian negative deviation in 0.05 < N_Si < 0.5'
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 492
+        pdf_page_index: 5
+        figure: '8'
+        note: 'Fig. 8 a_Fe; conclusion: Raoultian negative deviation in 0.05 < N_Si < 0.5'
 - observation_id: kems-067-yamada-1980::yamada_1980_fig1_peak_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -150,8 +160,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -176,6 +186,16 @@ observations:
     figure: '1'
     note: Fig. 1. Relation between the measured peak and the reference peak.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 489
+        pdf_page_index: 2
+        figure: '1'
+        note: Fig. 1. Relation between the measured peak and the reference peak.
 - observation_id: kems-067-yamada-1980::yamada_1980_fig2_Si_O_po2_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -194,8 +214,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -220,6 +240,16 @@ observations:
     figure: '2'
     note: Fig. 2. Relation between log P_SiO, log P_Si and log P_O2 in the system Si-O at 1600 C.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 489
+        pdf_page_index: 2
+        figure: '2'
+        note: Fig. 2. Relation between log P_SiO, log P_Si and log P_O2 in the system Si-O at 1600 C.
 - observation_id: kems-067-yamada-1980::yamada_1980_fig3_ISiO_over_ISi_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -238,8 +268,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -264,6 +294,16 @@ observations:
     figure: '3'
     note: Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 490
+        pdf_page_index: 3
+        figure: '3'
+        note: Fig. 3. Relation between log (I+_SiO/I+_Si) and N_Si.
 - observation_id: kems-067-yamada-1980::yamada_1980_fig4_ion_ratio_vs_NSi_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -283,8 +323,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -310,6 +350,17 @@ observations:
     note: Fig. 4. Relation between log (I+_SiO/I+_Si) and N_Si. The numbers indicate the thorium concentration in the specimen
       for the deoxidizer.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 490
+        pdf_page_index: 3
+        figure: '4'
+        note: Fig. 4. Relation between log (I+_SiO/I+_Si) and N_Si. The numbers indicate the thorium concentration in the
+          specimen for the deoxidizer.
 - observation_id: kems-067-yamada-1980::yamada_1980_fig5_gamma_Si_comparison_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -328,8 +379,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -354,6 +405,16 @@ observations:
     figure: '5'
     note: Fig. 5. Activity coefficient of Si for the Fe-Si system at 1600 C.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        figure: '5'
+        note: Fig. 5. Activity coefficient of Si for the Fe-Si system at 1600 C.
 - observation_id: kems-067-yamada-1980::yamada_1980_fig6_integration_curve_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -372,8 +433,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -399,6 +460,16 @@ observations:
     figure: '6'
     note: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        figure: '6'
+        note: Fig. 6. Integration curve for the Fe-Si system at 1600 C.
 - observation_id: kems-067-yamada-1980::yamada_1980_fig7_gamma_Si_this_work_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -417,8 +488,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -444,6 +515,16 @@ observations:
     figure: '7'
     note: Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 492
+        pdf_page_index: 5
+        figure: '7'
+        note: Fig. 7. Activity coefficient of Si for the Fe-Si system at 1600 C.
 - observation_id: kems-067-yamada-1980::yamada_1980_fig8_activities_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -462,8 +543,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -489,6 +570,16 @@ observations:
     figure: '8'
     note: Fig. 8. Activities for the Fe-Si system at 1600 C.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 492
+        pdf_page_index: 5
+        figure: '8'
+        note: Fig. 8. Activities for the Fe-Si system at 1600 C.
 - observation_id: kems-067-yamada-1980::yamada_1980_fig9_ionization_efficiency_figure_only
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -507,8 +598,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -533,6 +624,16 @@ observations:
     figure: '9'
     note: Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        figure: '9'
+        note: Fig. 9. Ionization efficiency curves for I+_SiO and I+_Si.
 - observation_id: kems-067-yamada-1980::yamada_1980_fragmentation_BeO_ThO2_ion_ratios
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -551,8 +652,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_fragment_fraction does not name a reference_state
@@ -582,6 +683,16 @@ observations:
     equation: 12-14
     note: 'BeO-cell and ThO2-cell I+_Fe : I+_Si : I+_SiO; K=0.25%'
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 494
+        pdf_page_index: 7
+        equation: 12-14
+        note: 'BeO-cell and ThO2-cell I+_Fe : I+_Si : I+_SiO; K=0.25%'
 - observation_id: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C::T=1873.15:h=23ca9fda6037
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::fe-si-series
   identity:
@@ -2020,16 +2131,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Si
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Si
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2038,7 +2163,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2111,6 +2236,12 @@ observations:
               section: '3.1'
               note: at N_Si < 0.05, ion current 10^-20 A so P_Si about 10^-9 atm
         output_unit: K
+  derivation:
+    relation: identity.reference_state=ideal-gas Si(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-067-yamada-1980
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5::points:h=1d52cb793043
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -2135,8 +2266,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -2148,7 +2279,7 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2198,6 +2329,16 @@ observations:
     figure: '5'
     note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        figure: '5'
+        note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5::points:h=305add195c9f
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -2222,8 +2363,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -2235,7 +2376,7 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2285,6 +2426,16 @@ observations:
     figure: '5'
     note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        figure: '5'
+        note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5::points:h=9cb2db1b97da
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -2309,8 +2460,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -2322,7 +2473,7 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2372,6 +2523,16 @@ observations:
     figure: '5'
     note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        figure: '5'
+        note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5::points:h=a316f90cd67b
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -2396,8 +2557,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -2409,7 +2570,7 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2459,6 +2620,16 @@ observations:
     figure: '5'
     note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        figure: '5'
+        note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5::points:h=fa9bb85957e6
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -2483,8 +2654,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -2496,7 +2667,7 @@ observations:
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
       tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      reason: source standard_state does not name one reference endmember
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2546,6 +2717,16 @@ observations:
     figure: '5'
     note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 491
+        pdf_page_index: 4
+        figure: '5'
+        note: quoted log gamma_Si at N_Si=0.5 used as Belton-Fruehan integration constant
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::T=1793.15:h=7a713c64c9f1
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -2816,8 +2997,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -2845,6 +3026,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=21cba1c4322c
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -2863,8 +3054,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -2892,6 +3083,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=249bd6a8ff83
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -2910,8 +3111,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -2939,6 +3140,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=4caf493b8969
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -2957,8 +3168,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -2986,6 +3197,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=548bdde75f61
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3004,8 +3225,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3033,6 +3254,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=5c293642f809
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3051,8 +3282,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3080,6 +3311,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=67b03f8a2374
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3098,8 +3339,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3127,6 +3368,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=a6654860a790
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3145,8 +3396,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3174,6 +3425,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=d39d165b250d
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3192,8 +3453,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3221,6 +3482,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=dfb7e64980bc
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3239,8 +3510,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3268,6 +3539,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=e06ada5a9933
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3286,8 +3567,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3315,6 +3596,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=e317766a49be
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3333,8 +3624,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3362,6 +3653,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=e5627223c365
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3380,8 +3681,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3409,6 +3710,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=f463b75aec0f
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3427,8 +3738,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3456,6 +3767,16 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
 - observation_id: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators::points:h=fb4f6f90c18d
   experiment_id: 10.2355/tetsutohagane1955.66.5_488::experiment::cited-results
   identity:
@@ -3474,8 +3795,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
     reference_state:
       tag: unknown
       reason: qualifier and_self_interaction_parameter does not name a reference_state
@@ -3503,3 +3824,13 @@ observations:
     table: '2'
     note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.
   read_from: pdf:kems-067-yamada-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 493
+        pdf_page_index: 6
+        table: '2'
+        note: Table 2. Activity coefficient and interaction parameter of Si in Liquid Fe-Si alloy. This work row stored separately.

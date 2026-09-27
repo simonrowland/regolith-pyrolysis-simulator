@@ -6,8 +6,8 @@ observations:
   experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'evaporation_coefficient_gamma_Si'
+      tag: value
+      value: evaporation_coefficient_alpha
     species:
       formula: Si
       phase:
@@ -19,13 +19,56 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: unknown
-      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'evaporation_coefficient_gamma_Si'; refusing to
-      pick a number
+    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: quantity, method_class, evidence_class,
+      definition_as_printed, gamma_Si_as_printed, gamma_Si, qualifier, temperature_C_as_printed, temperature_K_derived, from_rates_as_printed,
+      comparator_as_printed, note'
     approximate: false
   uncertainty:
     kind: printed
@@ -45,6 +88,14 @@ observations:
     pdf_page_index: 2
     section: The proper way of determining true evaporation coefficients
   read_from: unknown:ta-mendybaev-2020-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        pdf_page_index: 2
+        section: The proper way of determining true evaporation coefficients
 - observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_knudsen_rate_cell
   experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-knudsen-ir-cell-1800C
   identity:
@@ -63,8 +114,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+      tag: value
+      value: '2073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
@@ -88,6 +139,14 @@ observations:
     pdf_page_index: 2
     section: The proper way of determining true evaporation coefficients
   read_from: unknown:ta-mendybaev-2020-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        pdf_page_index: 2
+        section: The proper way of determining true evaporation coefficients
 - observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_langmuir_rate_loop
   experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C
   identity:
@@ -106,8 +165,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+      tag: value
+      value: '2073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
@@ -133,3 +192,13 @@ observations:
     section: The proper way of determining true evaporation coefficients
     note: prose value; Fig. 3 curve not digitized
   read_from: unknown:ta-mendybaev-2020-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        pdf_page_index: 2
+        figure: '3'
+        section: The proper way of determining true evaporation coefficients
+        note: prose value; Fig. 3 curve not digitized

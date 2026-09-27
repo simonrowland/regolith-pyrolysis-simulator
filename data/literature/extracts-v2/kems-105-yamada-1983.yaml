@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -46,6 +46,16 @@ observations:
     section: 10. The Fe-P-Cu and Fe-P-Mn Systems
     note: Measurements tried; ion source contaminated; accurate determinations impossible
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        section: 10. The Fe-P-Cu and Fe-P-Mn Systems
+        note: Measurements tried; ion source contaminated; accurate determinations impossible
 - observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_Al_body_4p0_printed
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -1615,9 +1625,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1642,6 +1649,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=1f851d2c4ade
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -1659,9 +1676,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1686,6 +1700,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=2e0ce165506f
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -1703,9 +1727,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1730,6 +1751,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=4838092db17b
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -1747,9 +1778,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1774,6 +1802,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=4d76f844771d
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -1791,9 +1829,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1818,6 +1853,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=5f0535da911b
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -1835,9 +1880,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1862,6 +1904,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=6f2faf4ccc22
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -1879,9 +1931,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1906,6 +1955,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=85e721620149
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -1923,9 +1982,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1950,6 +2006,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=ae7b0ae6a7c9
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -1967,9 +2033,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1994,6 +2057,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity::rows:h=d7942cbd3fb2
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -2011,9 +2084,6 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2038,6 +2108,16 @@ observations:
     table: '1'
     note: Table 1. Source and purity of metals.
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1. Source and purity of metals.
 - observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=0d2dda43da54
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -2063,7 +2143,7 @@ observations:
       reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2125,6 +2205,16 @@ observations:
     table: '2'
     note: Table 2 comparison rows that are not Present work
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 comparison rows that are not Present work
 - observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=5092ac3a8fd2
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -2150,7 +2240,7 @@ observations:
       reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2212,6 +2302,16 @@ observations:
     table: '2'
     note: Table 2 comparison rows that are not Present work
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 comparison rows that are not Present work
 - observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=5853aa774969
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -2237,7 +2337,7 @@ observations:
       reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2299,6 +2399,16 @@ observations:
     table: '2'
     note: Table 2 comparison rows that are not Present work
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 comparison rows that are not Present work
 - observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=6af031ac0e4e
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -2324,7 +2434,7 @@ observations:
       reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2386,6 +2496,16 @@ observations:
     table: '2'
     note: Table 2 comparison rows that are not Present work
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 comparison rows that are not Present work
 - observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=8ed286fcfb4f
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -2411,7 +2531,7 @@ observations:
       reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2473,6 +2593,16 @@ observations:
     table: '2'
     note: Table 2 comparison rows that are not Present work
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 comparison rows that are not Present work
 - observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients::rows:h=feff7bd123f9
   experiment_id: 10.2355/isijinternational1966.23.51::experiment::fep-i-1wtP-series
   identity:
@@ -2498,7 +2628,7 @@ observations:
       reason: no per mapped from source
     temperature_K:
       tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      reason: no single temperature_K mapped from source
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile interaction_parameter does not use standard_pressure_Pa
@@ -2560,3 +2690,13 @@ observations:
     table: '2'
     note: Table 2 comparison rows that are not Present work
   read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 comparison rows that are not Present work

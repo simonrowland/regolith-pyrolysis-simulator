@@ -50980,8 +50980,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 2000.0]; no midpoint invented
+      tag: value
+      value: '2000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'vaporization_reaction_enthalpies_JANAF'; refusing
@@ -51014,6 +51014,16 @@ observations:
     table: '6'
     note: JANAF 1971 enthalpies for MgO reactions 18-20
   read_from: pdf:kems-015-hashimoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 124
+        pdf_page_index: 14
+        table: '6'
+        note: JANAF 1971 enthalpies for MgO reactions 18-20
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_mgo_vaporization_enthalpies_quoted
   experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
   identity:
@@ -51112,8 +51122,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000.0, 2000.0]; no midpoint invented
+      tag: value
+      value: '2000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'vaporization_reaction_enthalpies_JANAF'; refusing
@@ -51146,6 +51156,16 @@ observations:
     table: '6'
     note: JANAF 1971 enthalpies for SiO2 reactions 13-17
   read_from: pdf:kems-015-hashimoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        published_page: 124
+        pdf_page_index: 14
+        table: '6'
+        note: JANAF 1971 enthalpies for SiO2 reactions 13-17
 - observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_sio2_vaporization_enthalpies_quoted
   experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
   identity:

@@ -42,6 +42,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     SourceRelation,
+    UncertaintyKind,
     VAPORIZATION_ENTHALPIES,
     ValueKind,
 )
@@ -49,6 +50,7 @@ from simulator.battery.identity import (
     Identity,
     IdentityEqualKind,
     identity_equal,
+    profile_for,
     quantity_token,
 )
 from simulator.battery.migrate import (
@@ -77,6 +79,7 @@ from simulator.battery.records import (
     Value,
     Work,
     as_decimal,
+    phase_token,
     union_notices,
 )
 from simulator.battery.validate import (
@@ -98,14 +101,22 @@ SCORE_ENGINE_SET: tuple[Engine, ...] = (
     Engine.MAGEMIN,
     Engine.IMCC_SF04,
     Engine.IMCC_SF04_EXT,
+    Engine.OPENIMCC,
     Engine.INTERNAL_ANALYTICAL,
 )
 MELTS_ENGINES: frozenset[Engine] = frozenset(
     {Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN}
 )
 IMCC_ENGINES: frozenset[Engine] = frozenset(
-    {Engine.IMCC_SF04, Engine.IMCC_SF04_EXT}
+    {Engine.IMCC_SF04, Engine.IMCC_SF04_EXT, Engine.OPENIMCC}
 )
+# These adapters consume the supplied composition as one homogeneous liquid.
+# AlphaMELTS, ThermoEngine, and MAGEMin can resolve a liquid from a bulk input.
+SINGLE_LIQUID_ENGINES: frozenset[Engine] = frozenset(
+    {Engine.VAPOROCK, *IMCC_ENGINES, Engine.INTERNAL_ANALYTICAL}
+)
+TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
+TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
 # Engines that consume the SF04 magma companion workbook. Never score them
 # against those rows (chunk-3 carried ruling).
 SF04_WORKBOOK_SOURCE_ID = "sf04-magma-companion-workbook"
@@ -202,7 +213,12 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
 }
 
 # Sourced decision bands (not pins). Gibbs agreement_bands_kJ_mol from the
-# residual ledger headers. Missing band → decision_rule_missing refusal.
+# residual ledger headers, in kJ/mol. Applied only to formation energies
+# whose stored unit has that dimension (delta_fG, delta_fH). cp and S are
+# J/mol/K, H-H298 is not a formation energy, and log10_Kf is dimensionless:
+# they stay unbanded until a sourced band exists. Missing band, or a band
+# whose dimension differs from the quantity, → decision_rule_missing.
+# A borrowed number is never attached.
 # Searched and not used as decision bands (do not invent a tolerance):
 # - data/vapour_rail_validation_pins.yaml policy.margin_dex 0.01 is a pin /
 #   regression envelope; SCHEMA-PROPOSAL-v2.1 forbids using a pin as the
@@ -237,6 +253,28 @@ THERMOCHEMISTRY_DECISION_BANDS: dict[SourceRelation, DecisionBand] = {
     ),
 }
 
+# Formation Gibbs energies stored in kJ/mol. Not log10_Kf (dimensionless), not
+# cp/S (J/mol/K), not delta_fH or H-H298 (not sourced by this band).
+GIBBS_BAND_QUANTITIES: frozenset[Quantity] = frozenset(
+    {Quantity.DELTA_FG}
+)
+_UNIT_DIMENSION: dict[str, str] = {
+    "kJ_per_declared_mol_basis": "energy_per_mol",
+    "J_per_declared_mol_basis_per_K": "energy_per_mol_per_K",
+    "dimensionless": "dimensionless",
+}
+_SIO_FORMULAS: frozenset[str] = frozenset({"SiO", "SiO2"})
+_ALKALI_FORMULAS: frozenset[str] = frozenset(
+    {"Na", "K", "NaO0.5", "KO0.5", "Na2O", "K2O"}
+)
+_NOT_VAPOUR_QUANTITIES: frozenset[Quantity] = frozenset(
+    {
+        Quantity.ISOTOPE_DELTA,
+        Quantity.ION_INTENSITY_RATIO,
+        Quantity.ION_INTENSITY,
+    }
+)
+
 ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.VAPOROCK: "vaporock",
     Engine.ALPHAMELTS: "alphamelts",
@@ -244,6 +282,7 @@ ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.MAGEMIN: "magemin",
     Engine.IMCC_SF04: "imcc_sf04",
     Engine.IMCC_SF04_EXT: "imcc_sf04_ext",
+    Engine.OPENIMCC: "openimcc",
     Engine.INTERNAL_ANALYTICAL: "internal-analytical",
 }
 ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
@@ -253,6 +292,7 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.MAGEMIN: ("magemin",),
     Engine.IMCC_SF04: ("imcc-sf04-v1.0.2",),
     Engine.IMCC_SF04_EXT: ("imcc-sf04-ext-v4",),
+    Engine.OPENIMCC: ("openimcc-v1.0.2",),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
 # Engine-facing aliases → work/source/table identities in the v2.1 store.
@@ -262,7 +302,12 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
 COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     "vaporock": ("janaf-4th",),
     "antoine_sidecar": ("nist-webbook",),
-    "ellingham": ("janaf-4th",),
+    # JANAF-4th is the refit for the oxide segments that cite Chase.
+    # Zr, Rb, Cs, and P cite NASA CEA thermo.inp. nasa-glenn is that
+    # database; nasa-cea-thermo is the extract it superseded. Pankratz
+    # B677 and B689 are different bulletins from the B672 Mn rows and
+    # are not coefficient sources.
+    "ellingham": ("janaf-4th", "nasa-cea-thermo", "nasa-glenn"),
     "imcc-sf04-v1.0.2": ("sf04-magma-companion-workbook",),
     "imcc-sf04-ext-v4": ("sf04-magma-companion-workbook",),
 }
@@ -303,6 +348,7 @@ class EnginePrediction:
     refusal_reason: RefusalReason | None = None
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
+    version: str | None = None
 
 
 @dataclass(frozen=True)
@@ -334,7 +380,11 @@ class EligibleConjuncts:
 
     def as_mapping(self) -> dict[str, bool]:
         return {
-            "status_match_or_mismatch": self.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH},
+            "status_match_or_mismatch": self.status in {
+                ResidualStatus.MATCH,
+                ResidualStatus.MISMATCH,
+                ResidualStatus.NO_BAND,
+            },
             "finite_numeric_point_endpoints": self.finite_numeric_point_endpoints,
             "valid_metric_domain": self.valid_metric_domain,
             "reference_measured_evidence": self.reference_measured_evidence,
@@ -388,22 +438,63 @@ def parse_species_formula(formula: str) -> tuple[tuple[str, float], ...] | None:
     return formula_composition(formula)
 
 
+def _is_raw_element_label(formula: str) -> bool:
+    """Na, K, Fe. Not an oxide, and not a label the formula parser rejects."""
+
+    parsed = parse_species_formula(formula)
+    if parsed is None or len(parsed) != 1:
+        return False
+    element, count = parsed[0]
+    return element != "O" and count == 1
+
+
 def match_reported_species(
-    formula: str, reported: Mapping[str, float]
+    formula: str,
+    reported: Mapping[str, float],
+    *,
+    oxide_activity: bool = False,
 ) -> tuple[str, float] | None:
+    """Closed-formula match. Oxide activity never accepts a raw element label.
+
+    ``oxide_activity`` compares a parent-oxide formula to the canonical oxide
+    map (``SiO2_Liq`` to ``SiO2``). A vapour row for elemental Na still matches
+    ``Na`` when this flag is false.
+    """
+
     target = parse_species_formula(formula)
     if target is None:
         return None
+    if oxide_activity and _is_raw_element_label(formula):
+        return None
     for name, value in reported.items():
+        if oxide_activity and _is_raw_element_label(str(name)):
+            continue
         parsed = parse_species_formula(str(name))
+        if parsed == target:
+            return str(name), float(value)
+    if not oxide_activity:
+        return None
+    from engines.alphamelts.domain import canonical_oxide_activity_map
+
+    for name, value in canonical_oxide_activity_map(reported).items():
+        parsed = parse_species_formula(name)
         if parsed == target:
             return str(name), float(value)
     return None
 
 
-def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail:
+def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -> Rail | None:
+    """Headline rail, or None when the quantity is not on one.
+
+    Vapour is only p_sat, p_partial, or p_reference (SiO/SiO2 partial
+    pressures stay on SiO_evolution). Isotope ratios, ion ratios, and an
+    unknown quantity do not fall through onto vapour. A non-alkali kinetic
+    quantity (Zn, Cu, Mg evaporation coefficients, and the same else-branch)
+    does not fall through onto SiO_evolution.
+    """
+
     if quantity in _VAPOUR_EQUILIBRIUM:
-        if species_formula in {"SiO", "SiO2"}:
+        if species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
         return Rail.VAPOUR
     if quantity in MELT_ACTIVITY_QUANTITIES:
@@ -423,14 +514,29 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
     }:
         return Rail.PYROLYSIS_YIELD
     if quantity in KINETIC_YIELD_QUANTITIES:
-        if species_formula in {"SiO", "SiO2"}:
+        if species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
-        if species_formula in {"Na", "K", "NaO0.5", "KO0.5", "Na2O", "K2O"}:
+        if species_formula in _ALKALI_FORMULAS:
             return Rail.ALKALI_SHUTTLE
-        return Rail.SIO_EVOLUTION
+        return None
     if quantity is Quantity.TRANSITION_TEMPERATURE:
         return Rail.THERMOCHEMISTRY
-    return Rail.VAPOUR
+    return None
+
+
+def no_headline_rail_reason(
+    quantity: Quantity | None, *, species_formula: str = ""
+) -> str:
+    """Why rail_for_quantity returned None. Not a rail token."""
+
+    del species_formula
+    if quantity is None:
+        return "quantity_unknown"
+    if quantity in _NOT_VAPOUR_QUANTITIES:
+        return "not_a_vapour_quantity"
+    if quantity in KINETIC_YIELD_QUANTITIES:
+        return "non_alkali_kinetic"
+    return f"no_headline_rail:{quantity.value}"
 
 
 def residual_key(
@@ -438,17 +544,19 @@ def residual_key(
     reference_id: str,
     quantity: Quantity | None,
     engine: Engine,
-    rail: Rail,
+    rail: Rail | None,
     temperature_K: Decimal | None = None,
 ) -> str:
     """Stable comparison slot: lineage + quantity + identity T + rail + engine.
 
-    Run/version are excluded (v2.1 pin_key_map).
+    Run/version are excluded (v2.1 pin_key_map). No headline rail is the
+    token ``none``, never a borrowed vapour or SiO label.
     """
 
     q = "quantity_unknown" if quantity is None else quantity.value
     t = "" if temperature_K is None else f":T={_dec_token(temperature_K)}"
-    return f"{reference_id}{t}::{q}::{rail.value}::{engine.value}"
+    rail_token = "none" if rail is None else rail.value
+    return f"{reference_id}{t}::{q}::{rail_token}::{engine.value}"
 
 
 def _dec_token(value: Decimal) -> str:
@@ -765,13 +873,36 @@ def build_conjuncts(
     )
 
 
+def unit_dimension(unit: str) -> str | None:
+    """Physical dimension of a stored unit. Unknown units match nothing."""
+
+    return _UNIT_DIMENSION.get(unit)
+
+
+def band_dimension_matches(quantity: Quantity, band: DecisionBand) -> bool:
+    """True only when the band and the quantity share one dimension.
+
+    kJ/mol does not match J/mol/K or a dimensionless quantity. Scale
+    aliases that are not in ``_UNIT_DIMENSION`` fail closed.
+    """
+
+    quantity_dim = unit_dimension(QUANTITY_UNITS[quantity])
+    band_dim = unit_dimension(band.unit)
+    return quantity_dim is not None and quantity_dim == band_dim
+
+
 def decision_band_for(
     quantity: Quantity | None,
     source_relation: SourceRelation,
 ) -> DecisionBand | None:
-    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO:
-        return THERMOCHEMISTRY_DECISION_BANDS.get(source_relation)
-    return None
+    if quantity not in GIBBS_BAND_QUANTITIES:
+        return None
+    band = THERMOCHEMISTRY_DECISION_BANDS.get(source_relation)
+    if band is None:
+        return None
+    if not band_dimension_matches(quantity, band):
+        return None
+    return band
 
 
 def populate_numeric(
@@ -780,6 +911,7 @@ def populate_numeric(
     candidate: Decimal,
     reference: Decimal,
     source_relation: SourceRelation,
+    metric_uncertainty: Uncertainty | None = None,
 ) -> tuple[ResidualNumeric | None, RefusalReason | None, dict[str, object]]:
     operation = metric_operation(quantity)
     if operation is None:
@@ -795,10 +927,14 @@ def populate_numeric(
             "reference": str(reference),
         }
     band = decision_band_for(quantity, source_relation)
-    if band is None:
+    # Dimension guard. decision_band_for normally filters mismatched bands;
+    # keep this check for callers that replace it in a focused test.
+    if band is not None and not band_dimension_matches(quantity, band):
         return None, RefusalReason.DECISION_RULE_MISSING, {
-            "reason": f"no_sourced_decision_band:{quantity.value}",
+            "reason": f"band_dimension_mismatch:{quantity.value}",
             "quantity": quantity.value,
+            "quantity_unit": QUANTITY_UNITS[quantity],
+            "band_unit": band.unit,
             "operation": operation.value,
         }
     numeric = ResidualNumeric(
@@ -806,11 +942,14 @@ def populate_numeric(
         unit=unit,
         value=value,
         decision_band=band,
+        metric_uncertainty=metric_uncertainty,
     )
     return numeric, None, {}
 
 
 def match_status(numeric: ResidualNumeric) -> ResidualStatus:
+    if numeric.decision_band is None:
+        return ResidualStatus.NO_BAND
     if abs(numeric.value) <= numeric.decision_band.value:
         return ResidualStatus.MATCH
     return ResidualStatus.MISMATCH
@@ -840,7 +979,7 @@ def _row_out_of_certified_band(kind: str, row: Mapping[str, object]) -> bool:
         return True
     if str(row.get("authority") or "") == "extrapolated":
         return True
-    return kind.startswith("imcc_") and (
+    return (kind.startswith("imcc_") or kind.startswith("openimcc_")) and (
         "extrapolated" in kind or "outside" in kind
     )
 
@@ -954,6 +1093,24 @@ def cell_notices(
                     ),
                 )
             )
+        elif kind == "openimcc_notice":
+            notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
+        elif kind in {"openimcc_flag", "openimcc_gas_unavailable"}:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
     status_reason = getattr(cell, "vapor_pressure_backend_status_reason", None)
     backend_status = getattr(cell, "vapor_pressure_backend_status", None)
     if backend_status == AUTHORITY_FALLBACK or (
@@ -981,12 +1138,270 @@ def cell_notices(
     return tuple(notices)
 
 
+# More than one oxidation state in silicate melts over the fO2 range these
+# engines are asked to run. The generator owns the table; scorer and contract
+# use that same mapping so redox admission cannot drift between consumers.
+
+
+def _oxide_lookup_key(name: str) -> str:
+    key = str(name).strip()
+    if key.endswith("_Liq"):
+        key = key[:-4]
+    if key.endswith("*"):
+        key = key[:-1]
+    return key
+
+
+def _elements_of_component(name: str) -> frozenset[str]:
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+
+    key = _oxide_lookup_key(name)
+    canonical = MELTS_OXIDE_ALIASES.get(key.lower())
+    formula = "FeO" if canonical == "FeO_total" else (canonical or key)
+    parsed = formula_composition(formula)
+    if not parsed:
+        return frozenset()
+    return frozenset(element for element, _count in parsed)
+
+
+def _is_multivalent_name(name: str) -> bool:
+    from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
+
+    return any(
+        element in MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name)
+    )
+
+
+def multivalent_components(
+    composition: Composition | None,
+    species: str | None,
+) -> tuple[str, ...]:
+    """Names that hold a multivalent element at a positive amount, plus the species.
+
+    A printed zero does not count, so FeO = 0 cannot hide TiO2.
+    """
+
+    present: list[str] = []
+    if composition is not None:
+        for name, amount in composition.components:
+            if amount > 0 and _is_multivalent_name(str(name)):
+                present.append(str(name))
+    if species and _is_multivalent_name(species) and species not in present:
+        present.append(species)
+    return tuple(sorted(set(present)))
+
+
+def stated_pure_substance_reservoir(identity: Identity) -> tuple[str, str] | None:
+    """Pot formula and phase when the row states a pure condensed reservoir.
+
+    Absent reservoir, an unknown phase, or a gas reservoir is not that
+    statement. p_sat also requires the reservoir formula to be the gas species.
+    """
+
+    reservoir = identity.reservoir
+    if reservoir is None or not reservoir.is_value or reservoir.value is None:
+        return None
+    src = reservoir.value
+    token = phase_token(src)
+    if token not in CONDENSED_PHASES:
+        return None
+    if parse_species_formula(src.formula) is None:
+        return None
+    if quantity_token(identity) is Quantity.P_SAT and src.formula != identity.species.formula:
+        return None
+    return src.formula, token.value
+
+
+def oxygen_is_scorer_input(
+    identity: Identity,
+    composition: Composition | None,
+) -> tuple[bool, str, tuple[str, ...]]:
+    """Whether a missing fO2 must be refused, and the record of why.
+
+    Melt activity takes oxygen only when a multivalent element is present.
+    Every other quantity follows its identity profile: a required fO2 is an
+    input, and a not-applicable fO2 is omitted rather than filled.
+    """
+
+    quantity = quantity_token(identity)
+    redox = multivalent_components(composition, identity.species.formula)
+    if quantity in MELT_ACTIVITY_QUANTITIES:
+        if redox:
+            return True, "melt contains multivalent " + ", ".join(redox), redox
+        from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
+
+        return (
+            False,
+            "melt has no multivalent element "
+            f"({', '.join(MULTIVALENT_MELT_ELEMENTS)}) in the composition or measured species; "
+            "oxygen is not an input and was omitted",
+            (),
+        )
+    if "fO2_Pa" in profile_for(identity).required:
+        qname = quantity.value if quantity is not None else "quantity"
+        return True, f"{qname} requires oxygen", redox
+    qname = quantity.value if quantity is not None else "quantity"
+    return False, f"{qname} does not take oxygen as an input; oxygen was omitted", redox
+
+
+def _unfilled_inputs(identity: Identity) -> dict[str, str]:
+    """Which of the scorer's former fills this identity does not carry."""
+
+    fo2 = identity.fO2_Pa
+    pressure = identity.total_pressure_Pa
+    fo2_missing = not (fo2 is not None and fo2.is_value and fo2.value is not None)
+    pressure_missing = not (
+        pressure is not None and pressure.is_value and pressure.value is not None
+    )
+    out: dict[str, str] = {}
+    if fo2_missing:
+        out["fO2_Pa"] = "missing"
+    if pressure_missing:
+        out["total_pressure_Pa"] = "missing"
+    return out
+
+
+def _input_refusal(
+    *,
+    engine: Engine,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    requested: State[Composition] | None,
+    reason: RefusalReason,
+    detail: dict[str, object],
+    notices: tuple[Notice, ...] = (),
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=reason,
+        refusal_detail=detail,
+        identity=identity,
+        requested_composition=requested,
+    )
+
+
+def melt_quantity_report(
+    quantity: Quantity,
+    activities: Mapping[str, float],
+    coefficients: Mapping[str, float],
+) -> dict[str, float] | None:
+    """Select the engine map that matches the activity quantity."""
+
+    if quantity is Quantity.ACTIVITY:
+        return dict(activities)
+    if quantity is Quantity.ACTIVITY_COEFFICIENT:
+        if not coefficients:
+            return None
+        return dict(coefficients)
+    return None
+
+
+def _activity_contract_refusal(
+    engine: Engine,
+    *,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    requested: State[Composition] | None,
+    generated,
+) -> EnginePrediction:
+    from simulator.battery.waypoints import GapReason
+
+    gaps = () if generated is None else generated.readiness.gaps
+    first = gaps[0] if gaps else None
+    reason_token = first.reason.value if first is not None else "engine_does_not_report_melt_activity"
+    detail: dict[str, object] = {
+        "reason": reason_token,
+        "consumer": "melt_activity",
+        "gaps": [
+            {
+                "waypoint": gap.waypoint,
+                "reason": gap.reason.value,
+                "missing": list(gap.missing),
+            }
+            for gap in gaps
+        ],
+    }
+    if first is not None and first.reason is GapReason.REFERENCE_STATE_MISMATCH and len(first.missing) >= 2:
+        detail["row_convention"] = first.missing[0]
+        detail["engine_convention"] = first.missing[1]
+    refusal = (
+        RefusalReason.UNSUPPORTED
+        if first is None or first.reason is GapReason.REFERENCE_STATE_MISMATCH
+        else RefusalReason.IDENTITY_INCOMPLETE
+    )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=refusal,
+        refusal_detail=detail,
+        identity=identity,
+        requested_composition=requested,
+    )
+
+
+def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
+    return Notice(
+        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin="score:predict_with_engine",
+    )
+
+
+def _omission_notice(quantity: Quantity, reason: str) -> Notice:
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin="score:predict_with_engine",
+    )
+
+
+def total_pressure_bar_for_score(
+    identity: Identity,
+    quantity: Quantity,
+) -> tuple[float, Notice | None, str | None]:
+    """Observation pressure in bar, or the 1e-6 bar assumption with a notice.
+
+    A present but non-finite or negative pressure is invalid. It is not
+    replaced by the assumption.
+    """
+
+    from simulator.diagnostic_helpers.binary_pot_battery import _DEFAULT_PRESSURE_BAR
+
+    state = identity.total_pressure_Pa
+    if state is not None and state.is_value and state.value is not None:
+        pa = state.value if isinstance(state.value, Decimal) else as_decimal(state.value)
+        if not pa.is_finite() or pa < 0:
+            return 0.0, None, "total_pressure_invalid"
+        return float(pa) / 1.0e5, None, None
+    detail = "observation does not carry total_pressure_Pa"
+    if state is not None and state.reason:
+        detail = f"{detail} ({state.tag.value}: {state.reason})"
+    notice = _assumption_notice(
+        quantity,
+        f"{detail}; residual assumes {_DEFAULT_PRESSURE_BAR:g} bar",
+    )
+    return float(_DEFAULT_PRESSURE_BAR), notice, None
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
     *,
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
+    experiment: Experiment | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -995,7 +1410,7 @@ def predict_with_engine(
         ARM_QUALIFICATION,
         MELTS_FAMILY_ENGINES,
         PO2_COMMANDED,
-        PO2_ENGINE_DEFAULT,
+        PO2_NOT_AN_INPUT,
         REFUSAL_ENGINE_CRASH,
         REFUSAL_TIMEOUT,
         REFUSAL_UNAVAILABLE,
@@ -1060,12 +1475,104 @@ def predict_with_engine(
             identity=identity,
         )
 
+    if quantity in MELT_ACTIVITY_QUANTITIES and (
+        identity.composition is None or not identity.composition.is_value
+    ):
+        composition_reason = (
+            "composition is missing"
+            if identity.composition is None
+            else identity.composition.reason or "composition is not a value"
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+            refusal_detail={"reason": "composition_incomplete", "detail": composition_reason},
+            identity=identity,
+            requested_composition=identity.composition,
+        )
+
+    # Formation and pure-standard quantities are not melt activities or
+    # partial pressures. A missing branch used to read those maps and
+    # return the wrong unit. Refuse instead of emitting 0.
+    if quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO:
+        from simulator.battery.compilation_tier import predict_thermo_attempt
+
+        attempt = predict_thermo_attempt(engine, observation)
+        if attempt.value is not None:
+            exec_state = ExecutionState.PRODUCED
+        elif attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE:
+            exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
+        elif attempt.refusal_reason is RefusalReason.UNSUPPORTED:
+            exec_state = ExecutionState.UNSUPPORTED
+        else:
+            exec_state = ExecutionState.NOT_PROBED
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=exec_state, call_evidence=attempt.call_evidence
+            ),
+            value=attempt.value,
+            unit=attempt.unit,
+            authority=attempt.authority,
+            notices=attempt.notices,
+            coefficient_sources=sources,
+            lineage_complete=lineage_complete_for(sources) if attempt.value is not None else False,
+            refusal_reason=attempt.refusal_reason,
+            refusal_detail=attempt.refusal_detail,
+            identity=identity,
+        )
+
     wt: dict[str, float] | None = None
     requested: State[Composition] | None = None
-    if identity.composition is not None and identity.composition.is_value:
-        requested = identity.composition
-        assert identity.composition.value is not None
-        wt = composition_wt_pct(identity.composition.value)
+    input_notices: list[Notice] = []
+    composition_value: Composition | None = None
+    activity_payload: Mapping | None = None
+    if quantity in MELT_ACTIVITY_QUANTITIES and experiment is not None:
+        # Activity rows use the melt-activity contract. A gap is a typed
+        # refusal. No engine fO2 default is an input on this path.
+        from simulator.battery.enums import AmountBasis
+        from simulator.battery.generators.bench import activity_request_for_engine
+        from simulator.battery.records import Composition as OxideComposition
+
+        if experiment is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                refusal_detail={
+                    "reason": "melt_activity_contract_requires_experiment",
+                    "consumer": "melt_activity",
+                },
+                identity=identity,
+            )
+        generated = activity_request_for_engine(experiment, observation, engine.value)
+        if generated is None or generated.payload is None:
+            return _activity_contract_refusal(
+                engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=identity.composition if identity.composition is not None and identity.composition.is_value else None,
+                generated=generated,
+            )
+        activity_payload = generated.payload
+        moles = dict(activity_payload.get("composition_mol") or {})
+        built = OxideComposition(
+            "oxides",
+            tuple((str(name), Decimal(str(amount))) for name, amount in moles.items()),
+            AmountBasis.MOLE_FRACTION,
+        )
+        requested = identity.composition if identity.composition is not None and identity.composition.is_value else State.of(built)
+        composition_value = built
+        wt = composition_wt_pct(built)
         if wt is None:
             return EnginePrediction(
                 engine=engine,
@@ -1078,26 +1585,42 @@ def predict_with_engine(
                 identity=identity,
                 requested_composition=requested,
             )
-    elif quantity in _VAPOUR_EQUILIBRIUM or quantity in FORMATION_QUANTITIES:
-        # Pure-species identity: 100 wt% of the reservoir/species formula.
-        reservoir = identity.reservoir
-        formula_pot = formula
-        if reservoir is not None and reservoir.is_value and reservoir.value is not None:
-            formula_pot = reservoir.value.formula
-        if parse_species_formula(formula_pot) is None:
-            return EnginePrediction(
+    elif identity.composition is not None and identity.composition.is_value:
+        requested = identity.composition
+        assert identity.composition.value is not None
+        composition_value = identity.composition.value
+    elif quantity in _VAPOUR_EQUILIBRIUM:
+        # 100 wt% of a species is the pure substance only when the row says so.
+        stated = stated_pure_substance_reservoir(identity)
+        if stated is None:
+            detail: dict[str, object] = {
+                "reason": "composition_not_stated_pure_reservoir",
+                "quantity": quantity.value,
+                "formula": formula,
+            }
+            unfilled = _unfilled_inputs(identity)
+            if unfilled:
+                detail["also_unfilled"] = unfilled
+            return _input_refusal(
                 engine=engine,
                 channel=channel,
-                execution=Execution(state=ExecutionState.NOT_PROBED),
-                coefficient_sources=sources,
-                lineage_complete=False,
-                refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
-                refusal_detail={"reason": "species_formula_unparsed", "formula": formula_pot},
+                sources=sources,
                 identity=identity,
+                requested=requested,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail=detail,
             )
+        formula_pot, phase_name = stated
         wt = {formula_pot: 100.0}
+        input_notices.append(
+            _omission_notice(
+                quantity,
+                "composition omitted; reservoir states the pure condensed "
+                f"substance {formula_pot} ({phase_name})",
+            )
+        )
 
-    if wt is None:
+    if composition_value is None and wt is None:
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -1109,13 +1632,129 @@ def predict_with_engine(
             identity=identity,
         )
 
+    pressure_bar: float | None = None
+    if activity_payload is None:
+        pressure_bar, pressure_notice, pressure_invalid = total_pressure_bar_for_score(
+            identity, quantity
+        )
+        if pressure_invalid is not None:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.INVALID_IDENTITY,
+                detail={"reason": pressure_invalid, "quantity": quantity.value},
+                notices=tuple(input_notices),
+            )
+        if pressure_notice is not None:
+            input_notices.append(pressure_notice)
+
+    fo2_state = identity.fO2_Pa
+    if activity_payload is not None:
+        # The contract's oxygen point, or none. Never an engine default.
+        if "fO2_log" in activity_payload:
+            po2 = Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=10.0 ** float(activity_payload["fO2_log"]),
+            )
+        else:
+            po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+    else:
+        oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(identity, composition_value)
+        if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
+            # fO2_Pa is fugacity. Commanded pO2_bar = fO2_Pa / 1e5 under the
+            # stated ideal-gas assumption (1 bar = 100000 Pa exactly).
+            po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
+        elif oxygen_required:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail={
+                    "reason": "missing_fO2",
+                    "quantity": quantity.value,
+                    "why": oxygen_why,
+                    "multivalent": list(redox),
+                },
+                notices=tuple(input_notices),
+            )
+        else:
+            po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+            input_notices.append(_omission_notice(quantity, oxygen_why))
+
+    if composition_value is not None:
+        wt = composition_wt_pct(composition_value)
+        if wt is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                notices=tuple(input_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
+                refusal_detail={"reason": "composition_unparsed"},
+                identity=identity,
+                requested_composition=requested,
+            )
+
     handle_map = handles or {}
     handle = handle_map.get(engine.value)
     if handle is None:
         handle = open_battery_engine(engine.value)
     name = str(getattr(handle, "name", engine.value))
+    engine_version: str | None = None
+    if engine is Engine.OPENIMCC:
+        identity_block = getattr(handle, "identity", None) or {}
+        if isinstance(identity_block, Mapping):
+            engine_version = str(identity_block.get("version") or "") or None
+            provenance = (
+                ("openimcc-pack-version", identity_block.get("pack_version")),
+                ("openimcc-pack-digest", identity_block.get("pack_digest")),
+                ("openimcc-gas-table", identity_block.get("gas_table_source")),
+            )
+            sources = tuple(
+                dict.fromkeys(
+                    [
+                        *sources,
+                        *(
+                            f"{label}:{value}"
+                            for label, value in provenance
+                            if value
+                        ),
+                    ]
+                )
+            )
     available = bool(getattr(handle, "available", False))
     if not available:
+        unavailable_reason = str(getattr(handle, "unavailable_reason", None) or "")
+        if engine is Engine.OPENIMCC and "openimcc_not_importable" in unavailable_reason:
+            remedy = unavailable_reason[unavailable_reason.find("remedy:") :]
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.ATTEMPTED_UNAVAILABLE,
+                    call_evidence=f"open_battery_engine:{name}",
+                ),
+                notices=tuple(input_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.OPENIMCC_NOT_IMPORTABLE,
+                refusal_detail={
+                    "reason": RefusalReason.OPENIMCC_NOT_IMPORTABLE.value,
+                    "engine_reason": unavailable_reason,
+                    "remedy": remedy or unavailable_reason,
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -1123,27 +1762,21 @@ def predict_with_engine(
                 state=ExecutionState.ATTEMPTED_UNAVAILABLE,
                 call_evidence=f"open_battery_engine:{name}",
             ),
+            notices=tuple(input_notices),
             coefficient_sources=sources,
             lineage_complete=False,
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
             refusal_detail={
                 "reason": REFUSAL_UNAVAILABLE,
-                "engine_reason": getattr(handle, "unavailable_reason", None),
+                "engine_reason": unavailable_reason,
             },
             identity=identity,
             requested_composition=requested,
+            version=engine_version,
         )
 
-    fo2_state = identity.fO2_Pa
-    if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
-        # fO2_Pa is fugacity. Commanded pO2_bar = fO2_Pa / 1e5 under the
-        # stated ideal-gas assumption (1 bar = 100000 Pa exactly).
-        po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
-    else:
-        po2 = Po2Request(mode=PO2_ENGINE_DEFAULT, po2_bar=None)
-
     qualification = False
-    extra_notices: list[Notice] = []
+    extra_notices: list[Notice] = list(input_notices)
     authority = Authority.BRIDGE
     certified_band = None
     if name in MELTS_FAMILY_ENGINES:
@@ -1166,6 +1799,7 @@ def predict_with_engine(
         qualification=qualification,
         isolated=use_isolated,
         arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+        physical_pressure_bar=pressure_bar,
     )
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
@@ -1177,6 +1811,16 @@ def predict_with_engine(
     )
     if status != "ok":
         typed = str(refusal or status or "unavailable")
+        engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
+        openimcc_outside_species = engine is Engine.OPENIMCC and any(
+            token in f"{typed} {engine_side_reason}"
+            for token in (
+                "imcc_component_outside_domain",
+                "imcc_species_not_found",
+                "imcc_ferric_input_unsupported",
+                "imcc_sp_extension_required",
+            )
+        )
         if typed in {REFUSAL_ENGINE_CRASH, "subprocess_died"} or getattr(cell, "exit_signal", None):
             return EnginePrediction(
                 engine=engine,
@@ -1199,6 +1843,7 @@ def predict_with_engine(
                 },
                 identity=identity,
                 requested_composition=requested,
+                version=engine_version,
             )
         if typed == REFUSAL_TIMEOUT:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
@@ -1206,6 +1851,9 @@ def predict_with_engine(
         elif typed == REFUSAL_UNAVAILABLE:
             exec_state = ExecutionState.ATTEMPTED_UNAVAILABLE
             reason = RefusalReason.ATTEMPTED_UNAVAILABLE
+        elif openimcc_outside_species:
+            exec_state = ExecutionState.UNSUPPORTED
+            reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
         else:
             exec_state = ExecutionState.UNSUPPORTED
             reason = RefusalReason.UNSUPPORTED
@@ -1220,10 +1868,16 @@ def predict_with_engine(
             refusal_reason=reason,
             refusal_detail={
                 "refusal_reason": typed,
-                "engine_reason": getattr(cell, "engine_reason", None),
+                "engine_reason": engine_side_reason,
+                **(
+                    {"reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value}
+                    if openimcc_outside_species
+                    else {}
+                ),
             },
             identity=identity,
             requested_composition=requested,
+            version=engine_version,
         )
 
     activities = dict(getattr(cell, "melt_activities", None) or {})
@@ -1231,7 +1885,27 @@ def predict_with_engine(
     reported: Mapping[str, float]
     unit = QUANTITY_UNITS[quantity]
     if quantity in MELT_ACTIVITY_QUANTITIES:
-        reported = activities
+        coefficients = dict(getattr(cell, "melt_activity_coefficients", None) or {})
+        selected = melt_quantity_report(quantity, activities, coefficients)
+        if selected is None:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.PRODUCED, call_evidence=call_evidence),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "engine_reported_activity_not_coefficient",
+                    "quantity": quantity.value,
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        reported = selected
         unit = "dimensionless"
     elif quantity in _VAPOUR_EQUILIBRIUM:
         reported = pressures
@@ -1239,8 +1913,43 @@ def predict_with_engine(
     else:
         reported = {**activities, **pressures}
 
-    matched = match_reported_species(formula, reported)
-    if matched is None:
+    magnitude: float | None = None
+    converter_reason = ""
+    # The melt-activity gate already required the measured species to equal
+    # the admitted endmember. Compare that exact identity; never substitute a
+    # different species into the residual.
+    compared = formula
+    if quantity is Quantity.ACTIVITY and engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE):
+        # The converter refuses Na2O, CaO, MgO, FeO, and K2O, including a
+        # same-named key. It returns a(SiO2) from SiO2_Liq and a(H2O)
+        # from H2O or H2O_Liq. Element labels are not oxide activities.
+        from engines.alphamelts.domain import melts_endmember_to_parent_oxide_activity
+
+        value, converter_reason = melts_endmember_to_parent_oxide_activity(
+            reported, compared,
+        )
+        magnitude = value
+    else:
+        matched = match_reported_species(
+            compared,
+            reported,
+            oxide_activity=quantity in MELT_ACTIVITY_QUANTITIES,
+        )
+        if matched is not None:
+            _name, magnitude = matched
+    if magnitude is None:
+        detail: dict[str, object] = {
+            "reason": "species_unmatched_in_engine_output",
+            "formula": compared,
+            "reported": sorted(str(name) for name in reported),
+        }
+        if converter_reason:
+            detail["converter"] = converter_reason
+        refusal_reason = RefusalReason.UNSUPPORTED
+        if engine is Engine.OPENIMCC and quantity in _VAPOUR_EQUILIBRIUM:
+            refusal_reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+            detail["reason"] = RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value
+            detail["engine"] = "openimcc gas tables"
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -1250,16 +1959,12 @@ def predict_with_engine(
             coefficient_sources=sources,
             lineage_complete=False,
             certified_band=certified_band,
-            refusal_reason=RefusalReason.UNSUPPORTED,
-            refusal_detail={
-                "reason": "species_unmatched_in_engine_output",
-                "formula": formula,
-                "reported": sorted(reported),
-            },
+            refusal_reason=refusal_reason,
+            refusal_detail=detail,
             identity=identity,
             requested_composition=requested,
+            version=engine_version,
         )
-    _name, magnitude = matched
     if not math.isfinite(magnitude):
         return EnginePrediction(
             engine=engine,
@@ -1273,6 +1978,7 @@ def predict_with_engine(
             refusal_detail={"reason": "nonfinite_engine_value", "value": str(magnitude)},
             identity=identity,
             requested_composition=requested,
+            version=engine_version,
         )
     expanded = expand_coefficient_sources(sources)
     return EnginePrediction(
@@ -1288,6 +1994,7 @@ def predict_with_engine(
         certified_band=certified_band,
         identity=identity,
         requested_composition=requested,
+        version=engine_version,
     )
 
 
@@ -1325,10 +2032,30 @@ def candidate_observation(
             run_id=prediction.execution.call_evidence or f"{prediction.engine.value}:run",
             coefficient_sources=prediction.coefficient_sources or ("unresolved",),
             lineage_complete=prediction.lineage_complete,
+            version=prediction.version,
             requested_composition=prediction.requested_composition,
         ),
         authority=prediction.authority,
         certified_band=prediction.certified_band,
+    )
+
+
+def _is_bulk_not_liquid_composition(observation: Observation) -> bool:
+    """Read the source's two-phase marker; never classify from composition values."""
+
+    identity = observation.identity
+    if isinstance(identity, Identity):
+        phase = identity.species.phase
+        if isinstance(phase, State) and phase.is_unknown:
+            reason = phase.reason or ""
+            if (
+                TWO_PHASE_BULK_COMPOSITION_STATUS in reason
+                or TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER in reason
+            ):
+                return True
+    return any(
+        notice.band == TWO_PHASE_BULK_COMPOSITION_STATUS
+        for notice in observation.notices
     )
 
 
@@ -1347,6 +2074,8 @@ def compile_residual(
     comparison_ids: set[str] | None = None,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
+    lineage_observation_id: str | None = None,
+    table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
 ) -> tuple[Residual, Observation | None]:
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
@@ -1365,7 +2094,9 @@ def compile_residual(
     experiment = context.experiments.get(reference.experiment_id)
     if experiment is not None:
         gates = run_validity_gates(
-            experiment, reference, tables=_gate_tables(reference, context.observations)
+            experiment,
+            reference,
+            tables=_gate_tables(reference, context.observations, table_index),
         )
     else:
         from simulator.battery.validity import GateCheck
@@ -1425,6 +2156,27 @@ def compile_residual(
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
         )
+    if rail is None:
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": no_headline_rail_reason(quantity, species_formula=formula),
+                "quantity": quantity.value,
+                "species_formula": formula,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("status_match_or_mismatch",),
+        )
+    if engine in SINGLE_LIQUID_ENGINES and _is_bulk_not_liquid_composition(reference):
+        return _refused(
+            RefusalReason.BULK_NOT_LIQUID_COMPOSITION,
+            {
+                "reason": RefusalReason.BULK_NOT_LIQUID_COMPOSITION.value,
+                "composition_status": TWO_PHASE_BULK_COMPOSITION_STATUS,
+                "engine": engine.value,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+        )
     if point_magnitude(reference.value) is None:
         reason_token = "value_unknown"
         if reference.value.kind is ValueKind.UNAVAILABLE:
@@ -1452,7 +2204,7 @@ def compile_residual(
 
     if prediction is None:
         predictor = predict or predict_with_engine
-        prediction = predictor(engine, reference, handles=handles)
+        prediction = predictor(engine, reference, handles=handles, experiment=experiment)
 
     notices = union_notices(notices, prediction.notices)
     expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)
@@ -1467,15 +2219,31 @@ def compile_residual(
         coefficient_sources=expanded_sources,
         lineage_complete=lineage_complete,
     )
+    from simulator.battery.compilation_tier import (
+        is_compilation_evidence,
+        uncertainty_text,
+    )
+
+    relation_reference = reference
+    if lineage_observation_id and lineage_observation_id != reference.observation_id:
+        relation_reference = replace(reference, observation_id=lineage_observation_id)
     source_relation = resolve_source_relation(
-        reference,
+        relation_reference,
         prediction.coefficient_sources,
         prediction.lineage_complete,
         works=context.works,
         observations=context.observations,
         experiments=context.experiments,
     )
-    if is_internal_consistency(origin) or is_compilation_source(reference.source_id, origin):
+    compilation = is_compilation_evidence(reference) or is_compilation_source(
+        reference.source_id, origin
+    )
+    # Internal-consistency ledgers are not a scoring tier. Compilations
+    # keep the relation resolve_source_relation returned: INDEPENDENT
+    # stays independent, and SAME_INPUT / TRAINING is the same-source
+    # flag (engine coefficients drawn from this compilation). Evidence
+    # is not restamped and admission is not changed.
+    if is_internal_consistency(origin):
         if source_relation is SourceRelation.INDEPENDENT:
             source_relation = SourceRelation.UNKNOWN
         notices = union_notices(
@@ -1485,6 +2253,25 @@ def compile_residual(
                     kind=NoticeKind.DERIVATION_USES_COMPILATION,
                     affected_quantities=(quantity,),
                     reason=CIRCULARITY_WARNING,
+                    origin=reference.observation_id,
+                ),
+            ),
+        )
+    elif compilation and source_relation in {
+        SourceRelation.SAME_INPUT,
+        SourceRelation.TRAINING,
+    }:
+        notices = union_notices(
+            notices,
+            (
+                Notice(
+                    kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        f"{CIRCULARITY_WARNING} same-source "
+                        f"compilation={reference.source_id} "
+                        f"uncertainty={uncertainty_text(reference.uncertainty)}"
+                    ),
                     origin=reference.observation_id,
                 ),
             ),
@@ -1527,6 +2314,11 @@ def compile_residual(
         candidate=prediction.value,
         reference=ref_point,
         source_relation=source_relation,
+        metric_uncertainty=(
+            reference.uncertainty
+            if reference.uncertainty.kind is UncertaintyKind.PRINTED
+            else None
+        ),
     )
     if numeric is None:
         return _refused(
@@ -1551,7 +2343,7 @@ def compile_residual(
         comparison_ids=comparison_ids,
         notices=notices,
     )
-    if is_internal_consistency(origin) or is_compilation_source(reference.source_id, origin):
+    if is_internal_consistency(origin) or compilation:
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
     if is_sf04_workbook(reference):
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
@@ -1585,10 +2377,11 @@ def _check_refs(gates: GateOutcome, reason: RefusalReason) -> tuple[str, ...]:
 def _gate_tables(
     reference: Observation,
     observations: Mapping[str, Observation],
+    table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
 ) -> tuple[dict, ...]:
     from simulator.battery.validate import _table_payloads
 
-    return _table_payloads(reference, observations)
+    return _table_payloads(reference, observations, table_index)
 
 
 def load_score_context(root: Path | None = None) -> ScoreContext:
@@ -1698,60 +2491,107 @@ def score_store(
     refs.sort(key=lambda o: o.observation_id)
     if limit is not None:
         refs = refs[: int(limit)]
+    from simulator.battery.compilation_tier import (
+        compilation_series_points,
+        is_compilation_evidence,
+    )
+
     comparison_ids = {o.observation_id for o in comparison_candidates(context)}
     residuals: list[Residual] = []
     candidates: dict[str, Observation] = {}
+    # Snapshot. Engine candidates are returned separately and are not
+    # lineage inputs. The work-input index is this snapshot.
     observations = dict(context.observations)
-    live_context = replace(context, observations=observations)
+    origins = dict(context.origins)
+    live_context = replace(context, observations=observations, origins=origins)
     empirical_ids = comparison_ids
+    expanded_refs = [
+        (obs, compilation_series_points(obs, origins.get(obs.observation_id)))
+        for obs in refs
+    ]
     started = time.monotonic()
     last_progress = started
     done = 0
-    total = len(refs) * max(len(engine_set), 1)
-    for obs in refs:
-        origin = context.origins.get(obs.observation_id)
-        diagnostic = (
-            obs.observation_id not in empirical_ids
-            or is_internal_consistency(origin)
-            or is_compilation_source(obs.source_id, origin)
-            or is_sf04_workbook(obs)
+    total = sum(len(points) for _, points in expanded_refs) * max(len(engine_set), 1)
+    from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
+
+    table_index = build_printed_thermo_index(observations)
+    with bound_work_inputs(context.works, observations, context.experiments):
+        for obs, points in expanded_refs:
+            origin = origins.get(obs.observation_id)
+            for point in points:
+                if point.observation_id not in origins:
+                    origins[point.observation_id] = origin or ""
+                point_origin = origins.get(point.observation_id)
+                diagnostic = (
+                    obs.observation_id not in empirical_ids
+                    or is_internal_consistency(point_origin)
+                    or is_compilation_source(point.source_id, point_origin)
+                    or is_compilation_evidence(point)
+                    or is_sf04_workbook(point)
+                )
+                quantity = (
+                    quantity_token(point.identity)
+                    if isinstance(point.identity, Identity)
+                    else None
+                )
+                thermo = quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO
+                compilation_thermo = (
+                    thermo
+                    and (
+                        is_compilation_evidence(point)
+                        or is_compilation_source(point.source_id, point_origin)
+                    )
+                    and not is_internal_consistency(point_origin)
+                    and not is_sf04_workbook(point)
+                )
+                for engine in engine_set:
+                    prediction = None
+                    if diagnostic and predict is None and not compilation_thermo:
+                        prediction = EnginePrediction(
+                            engine=engine,
+                            channel=ENGINE_CHANNELS[engine],
+                            execution=Execution(state=ExecutionState.NOT_PROBED),
+                            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                            lineage_complete=False,
+                            refusal_reason=RefusalReason.UNSUPPORTED,
+                            refusal_detail={"reason": "diagnostic_population"},
+                            identity=point.identity if isinstance(point.identity, Identity) else None,
+                        )
+                    residual, candidate = compile_residual(
+                        point,
+                        engine,
+                        context=live_context,
+                        prediction=prediction,
+                        comparison_ids=comparison_ids,
+                        predict=predict,
+                        handles=handles,
+                        lineage_observation_id=(
+                            obs.observation_id
+                            if point.observation_id != obs.observation_id
+                            else None
+                        ),
+                        table_index=table_index,
+                    )
+                    residuals.append(residual)
+                    if candidate is not None:
+                        candidates[candidate.observation_id] = candidate
+                    done += 1
+                    now = time.monotonic()
+                    if now - last_progress >= 60:
+                        print(
+                            f"score progress {done}/{total} residuals "
+                            f"{int(now - started)}s host={context.hostname}",
+                            flush=True,
+                        )
+                        last_progress = now
+    residuals.sort(
+        key=lambda r: (
+            "" if r.rail is None else r.rail.value,
+            r.reference,
+            r.key,
         )
-        for engine in engine_set:
-            prediction = None
-            if diagnostic and predict is None:
-                prediction = EnginePrediction(
-                    engine=engine,
-                    channel=ENGINE_CHANNELS[engine],
-                    execution=Execution(state=ExecutionState.NOT_PROBED),
-                    coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
-                    lineage_complete=False,
-                    refusal_reason=RefusalReason.UNSUPPORTED,
-                    refusal_detail={"reason": "diagnostic_population"},
-                    identity=obs.identity if isinstance(obs.identity, Identity) else None,
-                )
-            residual, candidate = compile_residual(
-                obs,
-                engine,
-                context=live_context,
-                prediction=prediction,
-                comparison_ids=comparison_ids,
-                predict=predict,
-                handles=handles,
-            )
-            residuals.append(residual)
-            if candidate is not None:
-                candidates[candidate.observation_id] = candidate
-                observations[candidate.observation_id] = candidate
-            done += 1
-            now = time.monotonic()
-            if now - last_progress >= 60:
-                print(
-                    f"score progress {done}/{total} residuals "
-                    f"{int(now - started)}s host={context.hostname}",
-                    flush=True,
-                )
-                last_progress = now
-    residuals.sort(key=lambda r: (r.rail.value, r.reference, r.key))
+    )
     return tuple(residuals), candidates
 
 
@@ -1963,56 +2803,197 @@ def _median_abs(values: Sequence[Decimal]) -> Decimal | None:
     return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
 
 
+def _rms(values: Sequence[Decimal]) -> Decimal | None:
+    if not values:
+        return None
+    return (sum((value * value for value in values), Decimal(0)) / Decimal(len(values))).sqrt()
+
+
+def _measured_residuals(
+    residuals: Sequence[Residual],
+    context: ScoreContext | None,
+) -> list[Residual]:
+    """Drop compilation rows. They have their own table."""
+
+    if context is None:
+        return list(residuals)
+    from simulator.battery.compilation_tier import compilation_row_observation
+
+    return [
+        residual
+        for residual in residuals
+        if compilation_row_observation(
+            residual.reference, context.observations, context.origins
+        )
+        is None
+    ]
+
+
+def _compilation_residuals(
+    residuals: Sequence[Residual],
+    context: ScoreContext | None,
+) -> list[Residual]:
+    if context is None:
+        return []
+    from simulator.battery.compilation_tier import compilation_row_observation
+
+    return [
+        residual
+        for residual in residuals
+        if compilation_row_observation(
+            residual.reference, context.observations, context.origins
+        )
+        is not None
+    ]
+
+
+def _headline_metric_row(
+    rail: str,
+    engine: str,
+    bucket: Sequence[Residual],
+    *,
+    tier: str,
+) -> dict[str, object]:
+    if tier == "measured":
+        scored = [r for r in bucket if r.score_eligible and r.numeric is not None]
+    elif tier == "compilation":
+        scored = [r for r in bucket if r.numeric is not None]
+    else:
+        raise ValueError(f"unknown headline tier {tier!r}")
+    matches = [
+        r
+        for r in scored
+        if r.status is ResidualStatus.MATCH
+    ]
+    banded = [
+        r
+        for r in scored
+        if r.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}
+    ]
+    dex_values = [
+        r.numeric.value
+        for r in scored
+        if r.numeric is not None and r.numeric.operation is MetricOperation.DEX
+    ]
+    median = _median_abs(dex_values)
+    rms = _rms(dex_values)
+    n_scored = len(scored)
+    match_rate: str | float | None
+    if not banded:
+        match_rate = None
+    else:
+        match_rate = len(matches) / len(banded)
+    return {
+        "tier": tier,
+        "rail": rail,
+        "engine": engine,
+        "n": n_scored,
+        "n_candidates": len(bucket),
+        "n_refused": sum(1 for r in bucket if r.status is ResidualStatus.REFUSED),
+        "n_scored": n_scored,
+        "n_match": len(matches),
+        "match_rate": match_rate,
+        "rms_dex": None if rms is None else str(rms),
+        "median_abs_dex": None if median is None else str(median),
+        "n_no_band": sum(1 for r in scored if r.status is ResidualStatus.NO_BAND),
+        "data_scatter_ratio": None,
+    }
+
+
 def headline_rows(
     residuals: Sequence[Residual],
     *,
     context: ScoreContext | None = None,
+    tier: str = "measured",
+    engines: Sequence[Engine] | None = None,
 ) -> list[dict[str, object]]:
-    """Per rail × engine headline. Empirical score_eligible only."""
+    """Per rail × engine headline for one tier.
+
+    Measured rows use ``score_eligible``. Compilation rows use numeric
+    residuals and remain a separate diagnostic tier.
+    """
 
     groups: dict[tuple[str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
-    for residual in residuals:
+    if tier == "measured":
+        tier_residuals = _measured_residuals(residuals, context)
+    elif tier == "compilation":
+        tier_residuals = _compilation_residuals(residuals, context)
+    else:
+        raise ValueError(f"unknown headline tier {tier!r}")
+    for residual in tier_residuals:
+        if residual.rail is None:
+            continue
         engine = _engine_of(residual)
         engines_seen.add(engine)
         groups.setdefault((residual.rail.value, engine), []).append(residual)
+    engine_names = [engine.value for engine in engines or ()]
+    engine_names.extend(name for name in sorted(engines_seen) if name not in engine_names)
     for rail in Rail:
-        for engine in sorted(engines_seen) or [e.value for e in SCORE_ENGINE_SET]:
+        for engine in engine_names or [e.value for e in SCORE_ENGINE_SET]:
             groups.setdefault((rail.value, engine), [])
     rows: list[dict[str, object]] = []
     for (rail, engine), bucket in sorted(groups.items()):
-        scored = [r for r in bucket if r.score_eligible]
-        matches = [r for r in scored if r.status is ResidualStatus.MATCH]
-        dex_values = [
-            r.numeric.value
-            for r in scored
-            if r.numeric is not None and r.numeric.operation is MetricOperation.DEX
-        ]
-        n_scored = len(scored)
-        match_rate: str | float | None
-        if n_scored == 0:
-            match_rate = None
-        else:
-            match_rate = len(matches) / n_scored
-        median = _median_abs(dex_values)
-        rows.append(
-            {
-                "rail": rail,
-                "engine": engine,
-                "n_candidates": len(bucket),
-                "n_refused": sum(1 for r in bucket if r.status is ResidualStatus.REFUSED),
-                "n_scored": n_scored,
-                "n_match": len(matches),
-                "match_rate": match_rate,
-                "median_abs_dex": None if median is None else str(median),
-                "n_eligible_references": sum(
-                    1
-                    for r in bucket
-                    if r.score_eligible or "reference_measured_evidence" not in r.exclusions
-                ),
-            }
+        row = _headline_metric_row(rail, engine, bucket, tier=tier)
+        row["n_eligible_references"] = sum(
+            1
+            for r in bucket
+            if r.score_eligible or "reference_measured_evidence" not in r.exclusions
         )
+        rows.append(row)
     return rows
+
+
+def headline_records(
+    residuals: Sequence[Residual],
+    *,
+    context: ScoreContext | None = None,
+    engines: Sequence[Engine] | None = None,
+) -> list[dict[str, object]]:
+    """Machine-readable measured and compilation accuracy records."""
+
+    return [
+        *headline_rows(residuals, context=context, tier="measured", engines=engines),
+        *headline_rows(residuals, context=context, tier="compilation", engines=engines),
+    ]
+
+
+HEADLINE_SUMMARY_KIND = "battery_headline_summary"
+
+
+def headline_summary_payload(
+    records: Sequence[Mapping[str, object]],
+    *,
+    store_stamp: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    return {
+        "kind": HEADLINE_SUMMARY_KIND,
+        "schema_version": "v1",
+        "store": None if store_stamp is None else dict(store_stamp),
+        "records": [dict(record) for record in records],
+    }
+
+
+def write_headline_summary_json(
+    residuals: Sequence[Residual],
+    path: Path,
+    *,
+    context: ScoreContext,
+    engines: Sequence[Engine],
+    root: Path | None = None,
+) -> None:
+    """Write the tier-separated accuracy ratchet input."""
+
+    stamp = derive_store_stamp(root or REPO_ROOT)
+    payload = headline_summary_payload(
+        headline_records(residuals, context=context, engines=engines),
+        store_stamp=stamp,
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def _short_refusal_token(detail_reason: object) -> str | None:
@@ -2117,6 +3098,64 @@ def _engine_of(residual: Residual) -> str:
     return "unknown"
 
 
+def candidate_rail_census(
+    context: ScoreContext,
+) -> tuple[tuple[dict[str, object], ...], tuple[dict[str, object], ...]]:
+    """Per-rail comparison candidates, admitted split from pending.
+
+    One row per observation. Not multiplied by engines. Quantities with no
+    headline rail are returned in the second tuple, keyed by reason.
+    """
+
+    rail_rows: dict[str, dict[str, object]] = {
+        rail.value: {
+            "rail": rail.value,
+            "candidates": 0,
+            "admitted": 0,
+            "pending": 0,
+            "points": 0,
+        }
+        for rail in Rail
+    }
+    unassigned: dict[str, dict[str, object]] = {}
+    for obs in comparison_candidates(context):
+        identity = obs.identity
+        quantity = quantity_token(identity) if isinstance(identity, Identity) else None
+        formula = identity.species.formula if isinstance(identity, Identity) else ""
+        rail = rail_for_quantity(quantity, species_formula=formula)
+        if rail is None:
+            reason = no_headline_rail_reason(quantity, species_formula=formula)
+            bucket = unassigned.get(reason)
+            if bucket is None:
+                bucket = {
+                    "reason": reason,
+                    "candidates": 0,
+                    "admitted": 0,
+                    "pending": 0,
+                    "points": 0,
+                }
+                unassigned[reason] = bucket
+        else:
+            bucket = rail_rows[rail.value]
+        bucket["candidates"] = int(bucket["candidates"]) + 1
+        if obs.admission.status is AdmissionStatus.ADMITTED:
+            bucket["admitted"] = int(bucket["admitted"]) + 1
+        elif obs.admission.status is AdmissionStatus.PENDING:
+            bucket["pending"] = int(bucket["pending"]) + 1
+        if obs.value.kind is ValueKind.POINT:
+            bucket["points"] = int(bucket["points"]) + 1
+    rails = tuple(rail_rows[rail.value] for rail in Rail)
+    off = tuple(unassigned[key] for key in sorted(unassigned))
+    return rails, off
+
+
+def _census_count_line(row: Mapping[str, object], label: str) -> str:
+    return (
+        f"| {label} | {row['candidates']} | {row['admitted']} | "
+        f"{row['pending']} | {row['points']} |"
+    )
+
+
 def render_score_report(
     residuals: Sequence[Residual],
     *,
@@ -2134,40 +3173,108 @@ def render_score_report(
         "",
         "Generated only. Pins are an independent baseline and are never",
         "re-centred from these residuals. Refusals are diagnostics, never hidden.",
-        "Headline accuracy per rail is the product of score_eligible rows;",
-        "a rail with zero eligible references is reported as zero.",
+        "The measured tier is score_eligible rows; its headline reports n,",
+        "RMS dex, median |dex|, and n no band. The compilation tier is",
+        "beside it and is never added to it. Match rate is banded rows only.",
         "",
         f"Hostname: `{context.hostname}`.",
     ]
     if studio_hostname:
         lines.append(f"Studio hostname: `{studio_hostname}`.")
     lines.extend(["", *format_store_stamp_report_lines(stamp)])
+    lines.extend(["", f"Engines: {', '.join(e.value for e in engines)}."])
+    if not residuals:
+        lines.extend(
+            [
+                "",
+                "No engine residuals were regenerated for this store revision.",
+                "Match rate is blank. score_eligible is 0.",
+                "The live candidate census is the published candidate count.",
+            ]
+        )
+    rail_census, unassigned_census = candidate_rail_census(context)
     lines.extend(
         [
             "",
-            f"Engines: {', '.join(e.value for e in engines)}.",
+            "## Live candidate census",
             "",
-            "## Per rail × engine headline",
+            "Comparison candidates are measured rows admitted or pending.",
+            "Admitted is split from pending. Counts are observations, not",
+            "residuals, so they are not multiplied by the engine set.",
+            "A vapour candidate is only `p_sat`, `p_partial`, or `p_reference`.",
             "",
-            "| rail | engine | n candidates | n refused | n scored | match rate | median abs dex |",
-            "|---|---|---:|---:|---:|---:|---:|",
+            "| rail | candidates | admitted | pending | points |",
+            "|---|---:|---:|---:|---:|",
         ]
     )
-    for row in headline_rows(residuals, context=context):
-        rate = row["match_rate"]
-        rate_s = "—" if rate is None else f"{rate:.3f}"
-        med = row["median_abs_dex"] or "—"
-        lines.append(
-            f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
-            f"{row['n_refused']} | {row['n_scored']} | {rate_s} | {med} |"
-        )
-    lines.extend(["", "## Refusal census", "", "| reason | n |", "|---|---:|"])
-    census = refusal_census(residuals)
-    if not census:
-        lines.append("| (none) | 0 |")
+    for row in rail_census:
+        lines.append(_census_count_line(row, str(row["rail"])))
+    lines.extend(
+        [
+            "",
+            "### No headline rail",
+            "",
+            "These quantities are not vapour candidates and not SiO_evolution",
+            "candidates. The reason is the refusal, not a borrowed rail.",
+            "",
+            "| reason | candidates | admitted | pending | points |",
+            "|---|---:|---:|---:|---:|",
+        ]
+    )
+    if not unassigned_census:
+        lines.append("| (none) | 0 | 0 | 0 | 0 |")
     else:
-        for reason, n in census.items():
-            lines.append(f"| `{reason}` | {n} |")
+        for row in unassigned_census:
+            lines.append(_census_count_line(row, f"`{row['reason']}`"))
+
+    lines.extend(["", "## Measured tier", "", "score_eligible only. Compilation rows are not in this table.", ""])
+    if not residuals:
+        lines.append(
+            "Not regenerated. Match rate is blank. score_eligible is 0."
+        )
+    else:
+        lines.extend(
+            [
+                "| rail | engine | n candidates | n refused | n | RMS dex | median abs dex | n no band | match rate |",
+                "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+            ]
+        )
+        for row in headline_rows(residuals, context=context):
+            rate = row["match_rate"]
+            rate_s = "—" if rate is None else f"{rate:.3f}"
+            rms = row["rms_dex"] or "—"
+            med = row["median_abs_dex"] or "—"
+            lines.append(
+                f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
+                f"{row['n_refused']} | {row['n']} | {rms} | {med} | "
+                f"{row['n_no_band']} | {rate_s} |"
+            )
+    from simulator.battery.compilation_tier import compilation_tier_lines
+
+    lines.extend(
+        ["", *compilation_tier_lines(residuals, context.observations, context.origins)]
+    )
+    lines.extend(["", "## Refusal census", ""])
+    if not residuals:
+        lines.append(
+            "Engine refusals were not regenerated with this census. "
+            "Rows with no headline rail are counted above and are not hidden."
+        )
+    else:
+        lines.extend(
+            [
+                "Measured tier only. Compilation refusals are in the compilation table.",
+                "",
+                "| reason | n |",
+                "|---|---:|",
+            ]
+        )
+        census = refusal_census(_measured_residuals(residuals, context))
+        if not census:
+            lines.append("| (none) | 0 |")
+        else:
+            for reason, n in census.items():
+                lines.append(f"| `{reason}` | {n} |")
     admit = admission_census(residuals, context=context)
     lines.extend(
         [
@@ -2205,30 +3312,43 @@ def render_score_report(
     lines.extend(
         [
             "",
-            "## Internal-consistency / compilation diagnostics",
+            "## Internal-consistency diagnostics",
             "",
             "species_rail_differential_ledger and gibbs_battery_residual_ledger",
-            "are internal-consistency instruments, not scoring ledgers. Compilation",
-            "observations are engine reference inputs. Neither population enters",
-            "the empirical headline. " + CIRCULARITY_WARNING,
+            "are internal-consistency instruments, not scoring ledgers. They do",
+            "not enter either headline tier. Compilation rows are scored in the",
+            "compilation tier above, still COMPILATION_ASSESSED, and never added",
+            "to the measured tier. " + CIRCULARITY_WARNING,
             "",
         ]
     )
+    from simulator.battery.compilation_tier import parent_observation_id, reference_observation
+
     n_diag = sum(
         1
         for r in residuals
         if "reference_measured_evidence" in r.exclusions
-        or is_internal_consistency(context.origins.get(r.reference))
+        or is_internal_consistency(
+            context.origins.get(r.reference)
+            or context.origins.get(parent_observation_id(r.reference))
+        )
         or is_compilation_source(
-            context.observations[r.reference].source_id
-            if r.reference in context.observations
-            else None,
-            context.origins.get(r.reference),
+            (
+                reference_observation(context.observations, r.reference).source_id
+                if reference_observation(context.observations, r.reference) is not None
+                else None
+            ),
+            context.origins.get(r.reference)
+            or context.origins.get(parent_observation_id(r.reference)),
         )
     )
     lines.append(f"Diagnostic residuals in this file: {n_diag}.")
     lines.extend(["", "## Pin failures", ""])
-    if not pin_failures:
+    if not residuals and not pin_failures:
+        lines.append(
+            "Pins were not compared; no residuals ledger was regenerated for this store revision."
+        )
+    elif not pin_failures:
         lines.append("None.")
     else:
         lines.append(f"{len(pin_failures)} pin failures (coverage or outside pin_band). A live residual outside its pin_band is a failure, never a re-centre.")
@@ -2243,7 +3363,11 @@ def render_score_report(
         if len(pin_failures) > 50:
             lines.append(f"| … | {len(pin_failures) - 50} more | | | |")
     lines.extend(["", "## status_diff vs old scorers", ""])
-    if not status_diff:
+    if not residuals and not status_diff:
+        lines.append(
+            "status_diff was not run; no residuals ledger was regenerated for this store revision."
+        )
+    elif not status_diff:
         lines.append("No mapped outcome changes.")
     else:
         lines.append("| old key | old | new | axis |")
@@ -2260,7 +3384,7 @@ def render_score_report(
                 f"Unmapped legacy keys: {len(unmapped_legacy_keys)}. Old ledgers retained.",
             ]
         )
-    else:
+    elif residuals:
         lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
     lines.append("")
     return "\n".join(lines)
@@ -2285,14 +3409,21 @@ def refusal_census_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, i
 def headline_payloads(
     rows: Sequence[Mapping[str, object]],
     engines: Sequence[Engine],
+    *,
+    tier: str = "measured",
 ) -> list[dict[str, object]]:
+    if tier not in {"measured", "compilation"}:
+        raise ValueError(f"unknown headline tier {tier!r}")
     groups: dict[tuple[str, str], list[Mapping[str, object]]] = {}
     engine_names = [e.value for e in engines]
     for rail in Rail:
         for engine in engine_names:
             groups[(rail.value, engine)] = []
     for row in rows:
-        rail = str(row.get("rail") or "")
+        raw_rail = row.get("rail")
+        if not raw_rail:
+            continue
+        rail = str(raw_rail)
         engine = str(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
             or str(row.get("key") or "").rsplit("::", 1)[-1]
@@ -2300,8 +3431,23 @@ def headline_payloads(
         groups.setdefault((rail, engine), []).append(row)
     out: list[dict[str, object]] = []
     for (rail, engine), bucket in sorted(groups.items()):
-        scored = [r for r in bucket if r.get("score_eligible")]
-        matches = [r for r in scored if r.get("status") == ResidualStatus.MATCH.value]
+        if tier == "measured":
+            scored = [
+                r
+                for r in bucket
+                if r.get("score_eligible") and isinstance(r.get("numeric"), Mapping)
+            ]
+        else:
+            scored = [r for r in bucket if isinstance(r.get("numeric"), Mapping)]
+        matches = [
+            r for r in scored if r.get("status") == ResidualStatus.MATCH.value
+        ]
+        banded = [
+            r
+            for r in scored
+            if r.get("status")
+            in {ResidualStatus.MATCH.value, ResidualStatus.MISMATCH.value}
+        ]
         dex_values = []
         for r in scored:
             numeric = r.get("numeric") if isinstance(r.get("numeric"), Mapping) else None
@@ -2311,19 +3457,82 @@ def headline_payloads(
                 except (TypeError, ValueError, ArithmeticError):
                     pass
         n_scored = len(scored)
+        rms = _rms(dex_values)
         out.append(
             {
+                "tier": tier,
                 "rail": rail,
                 "engine": engine,
+                "n": n_scored,
                 "n_candidates": len(bucket),
                 "n_refused": sum(1 for r in bucket if r.get("status") == ResidualStatus.REFUSED.value),
                 "n_scored": n_scored,
                 "n_match": len(matches),
-                "match_rate": None if n_scored == 0 else len(matches) / n_scored,
+                "match_rate": None if not banded else len(matches) / len(banded),
+                "rms_dex": None if rms is None else str(rms),
                 "median_abs_dex": None if not dex_values else str(_median_abs(dex_values)),
+                "n_no_band": sum(
+                    1 for r in scored if r.get("status") == ResidualStatus.NO_BAND.value
+                ),
+                "data_scatter_ratio": None,
             }
         )
     return out
+
+
+def headline_payload_records(
+    rows: Sequence[Mapping[str, object]],
+    *,
+    engines: Sequence[Engine],
+    observations: Mapping[str, Observation] | None = None,
+    origins: Mapping[str, str] | None = None,
+) -> list[dict[str, object]]:
+    """Machine-readable headline records from residual payloads."""
+
+    measured_rows: Sequence[Mapping[str, object]] = rows
+    compilation_rows: Sequence[Mapping[str, object]] = ()
+    if observations is not None:
+        from simulator.battery.compilation_tier import compilation_row_observation
+
+        measured_rows = []
+        compilation_rows = []
+        for row in rows:
+            is_compilation = (
+                compilation_row_observation(
+                    str(row.get("reference") or ""), observations, origins
+                )
+                is not None
+            )
+            (compilation_rows if is_compilation else measured_rows).append(row)
+    return [
+        *headline_payloads(measured_rows, engines, tier="measured"),
+        *headline_payloads(compilation_rows, engines, tier="compilation"),
+    ]
+
+
+def write_headline_summary_from_payloads_json(
+    rows: Sequence[Mapping[str, object]],
+    path: Path,
+    *,
+    engines: Sequence[Engine],
+    observations: Mapping[str, Observation] | None = None,
+    origins: Mapping[str, str] | None = None,
+    store_stamp: Mapping[str, object] | None = None,
+) -> None:
+    payload = headline_summary_payload(
+        headline_payload_records(
+            rows,
+            engines=engines,
+            observations=observations,
+            origins=origins,
+        ),
+        store_stamp=store_stamp,
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def notice_backlog_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, int]:
@@ -2347,14 +3556,36 @@ def render_score_report_from_payloads(
     studio_hostname: str | None = None,
     store_stamp: Mapping[str, object] | None = None,
     mismatch_warning: str | None = None,
+    observations: Mapping[str, Observation] | None = None,
+    origins: Mapping[str, str] | None = None,
 ) -> str:
+    measured_rows: Sequence[Mapping[str, object]] = rows
+    compilation_lines: list[str] = []
+    if observations is not None:
+        from simulator.battery.compilation_tier import (
+            compilation_row_observation,
+            compilation_tier_lines_from_payloads,
+        )
+
+        measured_rows = [
+            row
+            for row in rows
+            if compilation_row_observation(
+                str(row.get("reference") or ""), observations, origins
+            )
+            is None
+        ]
+        compilation_lines = compilation_tier_lines_from_payloads(
+            rows, observations, origins
+        )
     lines: list[str] = [
         "# Battery score report (schema v2.1)",
         "",
         "Generated only. Pins are an independent baseline and are never",
         "re-centred from these residuals. Refusals are diagnostics, never hidden.",
-        "Headline accuracy per rail is the product of score_eligible rows;",
-        "a rail with zero eligible references is reported as zero.",
+        "Headline accuracy per rail reports n, RMS dex, median |dex|, and",
+        "no-band rows. Measured and compilation tiers are separate and never",
+        "summed; match rate is secondary.",
         "",
         f"Hostname: `{hostname}`.",
     ]
@@ -2368,22 +3599,44 @@ def render_score_report_from_payloads(
             "",
             f"Engines: {', '.join(e.value for e in engines)}.",
             "",
-            "## Per rail × engine headline",
+            "## Measured tier" if observations is not None else "## Per rail × engine headline",
             "",
-            "| rail | engine | n candidates | n refused | n scored | match rate | median abs dex |",
-            "|---|---|---:|---:|---:|---:|---:|",
+            *(
+                ["score_eligible only. Compilation rows are not in this table.", ""]
+                if observations is not None
+                else []
+            ),
+            "| rail | engine | n candidates | n refused | n | RMS dex | median abs dex | n no band | match rate |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
-    for row in headline_payloads(rows, engines):
+    for row in headline_payloads(measured_rows, engines):
         rate = row["match_rate"]
         rate_s = "—" if rate is None else f"{rate:.3f}"
+        rms = row["rms_dex"] or "—"
         med = row["median_abs_dex"] or "—"
         lines.append(
             f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
-            f"{row['n_refused']} | {row['n_scored']} | {rate_s} | {med} |"
+            f"{row['n_refused']} | {row['n']} | {rms} | {med} | "
+            f"{row['n_no_band']} | {rate_s} |"
         )
-    lines.extend(["", "## Refusal census", "", "| reason | n |", "|---|---:|"])
-    census = refusal_census_payloads(rows)
+    if compilation_lines:
+        lines.extend(["", *compilation_lines])
+    lines.extend(
+        [
+            "",
+            "## Refusal census",
+            "",
+            *(
+                ["Measured tier only. Compilation refusals are in the compilation table.", ""]
+                if observations is not None
+                else []
+            ),
+            "| reason | n |",
+            "|---|---:|",
+        ]
+    )
+    census = refusal_census_payloads(measured_rows)
     if not census:
         lines.append("| (none) | 0 |")
     else:

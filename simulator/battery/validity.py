@@ -14,14 +14,17 @@ Ambiguity resolutions:
   transport_constants. Kn is the *orifice* (cell-local) number, not chamber
   pressure masquerading as cell pressure. Unknown/missing chamber
   background also fails this gate (v2.1: missing pressure already fails
-  effusion; the background-high gate does not double-count).
+  effusion; the background-high gate does not double-count). A calibrated
+  KEMS pressure comparison with a wholly low typed background interval may
+  proceed without inventing an orifice Kn point; the check carries a flag.
 - Background ≥ 1e-2 Pa fails KEMS *equilibrium* pressure/activity only.
   Millibar bench kinetic experiments are out of this gate's scope.
-- Apparatus determinants are those the actual derivation needs: effusion
-  pressure requires orifice area + Clausing/geometry; Langmuir
-  pressure/alpha requires exposed area. Determinants must be grounded
-  VALUES (unknown calibration fails), physically valid (area > 0,
-  Clausing in (0, 1]), and present for TGA/solar/vacuum kinetic area.
+- Apparatus determinants are those the actual derivation needs: calibrated
+  KEMS p_partial/p_sat requires a grounded calibration but no orifice
+  geometry; absolute-flux effusion and Langmuir pressure/alpha require their
+  respective geometry. Determinants must be grounded VALUES (unknown
+  calibration fails), physically valid (area > 0, Clausing in (0, 1]), and
+  present for TGA/solar/vacuum kinetic area.
   Missing required geometry is ``underdetermined_apparatus``. Unknown
   method is ``method_unknown`` when the quantity class is one the schema
   scopes by method (effusion pressure, Langmuir pressure/alpha,
@@ -35,7 +38,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Sequence
+from typing import Any, Mapping, Sequence
 
 from simulator.battery.enums import (
     MethodToken,
@@ -108,6 +111,36 @@ def _located_decimal(located: Located[Value | Decimal] | None) -> Decimal | None
     return as_decimal(value)
 
 
+def _pressure_bounds(
+    located: Located[Value | Decimal] | None,
+) -> tuple[Decimal | None, Decimal | None, str] | None:
+    """Return inclusive lower/upper bounds without collapsing a range."""
+
+    if located is None or not located.state.is_value or located.state.value is None:
+        return None
+    value = located.state.value
+    if not isinstance(value, Value):
+        point = as_decimal(value)
+        return point, point, "point"
+    if value.kind is ValueKind.POINT and value.point is not None:
+        return value.point, value.point, "point"
+    if value.kind is ValueKind.INTERVAL:
+        if value.interval_low is None or value.interval_high is None:
+            return None
+        low = value.interval_low
+        high = value.interval_high
+        if low > high:
+            return None
+        return low, high, "interval"
+    if value.kind is ValueKind.BOUND and value.bound_value is not None:
+        bound = value.bound_value
+        if value.bound_operator in {"<", "<=", "≤"}:
+            return None, bound, "upper_bound"
+        if value.bound_operator in {">", ">=", "≥"}:
+            return bound, None, "lower_bound"
+    return None
+
+
 def _finite_positive(located: Located[Value | Decimal] | None) -> Decimal | None:
     value = _located_decimal(located)
     if value is None or not value.is_finite() or value <= 0:
@@ -126,7 +159,13 @@ def _calibration_grounded(calibration: object) -> bool:
     for located in calibration.values():
         if not isinstance(located, Located):
             return False
-        if not located.state.is_value or located.state.value is None:
+        if (
+            not located.state.is_value
+            or located.state.value is None
+            or located.locator is None
+            or not located.locator.has_location()
+            or located.inference is not None
+        ):
             return False
     return True
 
@@ -186,6 +225,13 @@ def _is_effusion_pressure(method: MethodToken, quantity: Quantity) -> bool:
     }
 
 
+def _is_kems_calibrated_pressure(method: MethodToken, quantity: Quantity) -> bool:
+    return method is MethodToken.KNUDSEN_EFFUSION and quantity in {
+        Quantity.P_SAT,
+        Quantity.P_PARTIAL,
+    }
+
+
 def _is_langmuir_pressure_or_alpha(method: MethodToken, quantity: Quantity) -> bool:
     return method is MethodToken.LANGMUIR_FREE_EVAPORATION and quantity in {
         Quantity.P_SAT,
@@ -209,6 +255,26 @@ def _is_kinetic_or_yield(quantity: Quantity) -> bool:
         Quantity.CONDENSATE_COMPOSITION,
         Quantity.WALL_DEPOSIT_MASS,
     }
+
+
+def comparison_method_cell_constant_cancels(
+    provenance: Mapping[str, Any] | None,
+) -> bool:
+    """Return true only for grounded same-setup comparison activity evidence."""
+
+    if not isinstance(provenance, Mapping):
+        return False
+    method = provenance.get("comparison_method")
+    cell_constant = provenance.get("common_knudsen_cell_constant")
+    pairing = provenance.get("melt_reference_pairing")
+    return (
+        isinstance(method, Mapping)
+        and method.get("kind") in {"ratio", "comparison_ratio"}
+        and isinstance(cell_constant, Mapping)
+        and cell_constant.get("cancels") is True
+        and isinstance(pairing, Mapping)
+        and pairing.get("kind") in {"same_cell", "same_effective_setup"}
+    )
 
 
 # Quantity classes the schema scopes by method. Unknown method on these
@@ -243,6 +309,8 @@ def _quantity_scopes_apparatus_by_method(quantity: Quantity) -> bool:
 def underdetermined_apparatus(
     experiment: Experiment,
     quantity: Quantity,
+    *,
+    observation: Observation | None = None,
 ) -> GateOutcome:
     """Pressure/flux conversion requires the method's geometry determinants."""
 
@@ -275,8 +343,73 @@ def underdetermined_apparatus(
     method = method_state.value
     geometry = None if experiment.apparatus is None else experiment.apparatus.geometry
     missing: list[str] = []
-    if _is_effusion_pressure(method, quantity):
-        if geometry is None:
+    if _is_kems_calibrated_pressure(method, quantity):
+        # Knudsen-effusion mass spectrometry uses the calibrated pressure
+        # relation P_i = k_i I_i^+ T.  k_i comes from a calibration (for
+        # example, a reference vaporization such as Ag, or a weight-loss
+        # calibration), so this route needs neither orifice area nor a
+        # Clausing factor. Those geometry terms enter only the absolute-flux
+        # Hertz-Knudsen weight-loss route:
+        # p = (dm/dt)/(A W) * sqrt(2 pi R T / M).
+        calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
+        calibrated = _calibration_grounded(calibration)
+        checks.append(
+            GateCheck(
+                "kems_calibration",
+                calibrated,
+                {
+                    "missing": [] if calibrated else ["calibration"],
+                    "method": method.value,
+                    "quantity": quantity.value,
+                    "reason": None
+                    if calibrated
+                    else "KEMS pressure requires a recorded calibration",
+                },
+            )
+        )
+        if not calibrated:
+            return _fail(RefusalReason.UNDERDETERMINED_APPARATUS, checks, "kems_calibration")
+        # A calibrated KEMS pressure does not need geometry when it is absent,
+        # but supplied geometry must still be a usable point. Never let an
+        # interval, bound, or unavailable value masquerade as one.
+        if geometry is not None:
+            if (
+                geometry.orifice_area_m2 is not None
+                and geometry.orifice_area_m2.state.is_value
+                and _finite_positive(geometry.orifice_area_m2) is None
+            ):
+                missing.append("orifice_area_m2")
+            if (
+                geometry.orifice_diameter_m is not None
+                and geometry.orifice_diameter_m.state.is_value
+                and _finite_positive(geometry.orifice_diameter_m) is None
+            ):
+                missing.append("orifice_diameter_m")
+            if (
+                geometry.clausing_factor is not None
+                and geometry.clausing_factor.state.is_value
+                and not _clausing_ok(geometry.clausing_factor)
+            ):
+                missing.append("clausing_factor")
+    elif _is_effusion_pressure(method, quantity):
+        comparison_activity = (
+            quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and observation is not None
+            and comparison_method_cell_constant_cancels(observation.provenance)
+        )
+        if comparison_activity:
+            checks.append(
+                GateCheck(
+                    "comparison_method_cell_constant_cancels",
+                    True,
+                    {
+                        "method": "comparison_ratio",
+                        "pairing": "same_cell_or_same_effective_setup",
+                        "geometry": "not_required_for_normalized_activity",
+                    },
+                )
+            )
+        elif geometry is None:
             missing.extend(["orifice_area_m2", "clausing_factor"])
         else:
             if (
@@ -303,16 +436,17 @@ def underdetermined_apparatus(
             wall = None if experiment.apparatus is None else experiment.apparatus.wall
             if not wall or "temperature_K" not in wall or "material" not in wall:
                 missing.append("wall.temperature_K/material")
-        if geometry is None or (
+        if method is MethodToken.KNUDSEN_EFFUSION:
+            needs_orifice = geometry is None or _finite_positive(geometry.orifice_area_m2) is None
+            if needs_orifice and "orifice_area_m2" not in missing:
+                missing.append("orifice_area_m2")
+        elif geometry is None or (
             _finite_positive(geometry.exposed_area_m2) is None
             and _finite_positive(geometry.orifice_area_m2) is None
         ):
             if method is MethodToken.LANGMUIR_FREE_EVAPORATION:
                 if "exposed_area_m2" not in missing:
                     missing.append("exposed_area_m2")
-            elif method is MethodToken.KNUDSEN_EFFUSION:
-                if "orifice_area_m2" not in missing:
-                    missing.append("orifice_area_m2")
             elif "exposed_area_m2" not in missing:
                 missing.append("exposed_area_m2")
     checks.append(
@@ -333,7 +467,7 @@ def effusion_regime_unverified(
     experiment: Experiment,
     quantity: Quantity,
 ) -> GateOutcome:
-    """KEMS equilibrium pressure/activity: orifice Kn ≥ 10 from cell-local gas."""
+    """Check KEMS regime without inventing a missing orifice Kn point."""
 
     method_state = experiment.method
     checks: list[GateCheck] = []
@@ -349,8 +483,8 @@ def effusion_regime_unverified(
         Quantity.ACTIVITY_COEFFICIENT,
     }:
         return _pass(checks)
-    total = _located_decimal(experiment.pressure_environment.total_pressure_Pa)
-    if total is None:
+    total_bounds = _pressure_bounds(experiment.pressure_environment.total_pressure_Pa)
+    if total_bounds is None:
         checks.append(
             GateCheck(
                 "background_pressure_stated",
@@ -367,6 +501,29 @@ def effusion_regime_unverified(
     kn_located = regime.knudsen_number_orifice
     kn = _located_decimal(kn_located)
     if kn is None:
+        _lower, upper, pressure_kind = total_bounds
+        calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
+        if (
+            _calibration_grounded(calibration)
+            and pressure_kind in {"interval", "upper_bound"}
+            and upper is not None
+            and upper <= KEMS_BACKGROUND_HIGH_PA
+        ):
+            checks.append(
+                GateCheck(
+                    "orifice_knudsen",
+                    True,
+                    {
+                        "reason": (
+                            "orifice Knudsen number not published; calibrated KEMS "
+                            "pressure and a wholly low background interval are retained"
+                        ),
+                        "flag": "orifice_knudsen_not_published",
+                        "background_upper_bound_Pa": str(upper),
+                    },
+                )
+            )
+            return _pass(checks)
         checks.append(
             GateCheck(
                 "orifice_knudsen",
@@ -399,7 +556,7 @@ def background_pressure_high(
     experiment: Experiment,
     quantity: Quantity,
 ) -> GateOutcome:
-    """KEMS equilibrium comparison with background ≥ 1e-2 Pa fails."""
+    """Apply the low-background ceiling to a point or typed pressure range."""
 
     method_state = experiment.method
     checks: list[GateCheck] = []
@@ -416,24 +573,38 @@ def background_pressure_high(
     }:
         # millibar bench kinetic experiments are not this gate
         return _pass(checks)
-    total = _located_decimal(experiment.pressure_environment.total_pressure_Pa)
-    if total is None:
+    bounds = _pressure_bounds(experiment.pressure_environment.total_pressure_Pa)
+    if bounds is None:
         # missing pressure already fails effusion; do not double-count here
         return _pass(checks)
-    ok = total < KEMS_BACKGROUND_HIGH_PA
+    lower, upper, pressure_kind = bounds
+    detail = {
+        "lower_bound_Pa": None if lower is None else str(lower),
+        "upper_bound_Pa": None if upper is None else str(upper),
+        "threshold_Pa": str(KEMS_BACKGROUND_HIGH_PA),
+        "pressure_kind": pressure_kind,
+    }
+    if upper is not None and upper <= KEMS_BACKGROUND_HIGH_PA:
+        if pressure_kind != "point":
+            detail["flag"] = "background_pressure_interval_upper_bound"
+        checks.append(GateCheck("background_pressure", True, detail))
+        return _pass(checks)
+    if lower is not None and lower > KEMS_BACKGROUND_HIGH_PA:
+        checks.append(GateCheck("background_pressure", False, detail))
+        return _fail(RefusalReason.BACKGROUND_PRESSURE_HIGH, checks, "background_pressure")
+    detail["flag"] = "background_pressure_interval_straddles"
     checks.append(
         GateCheck(
             "background_pressure",
-            ok,
-            {
-                "total_pressure_Pa": str(total),
-                "threshold_Pa": str(KEMS_BACKGROUND_HIGH_PA),
-            },
+            False,
+            detail,
         )
     )
-    if not ok:
-        return _fail(RefusalReason.BACKGROUND_PRESSURE_HIGH, checks, "background_pressure")
-    return _pass(checks)
+    return _fail(
+        RefusalReason.BACKGROUND_PRESSURE_INTERVAL_STRADDLES,
+        checks,
+        "background_pressure",
+    )
 
 
 def run_validity_gates(
@@ -477,7 +648,7 @@ def run_validity_gates(
             )
         )
     if quantity is not None:
-        absorb(underdetermined_apparatus(experiment, quantity))
+        absorb(underdetermined_apparatus(experiment, quantity, observation=observation))
         absorb(effusion_regime_unverified(experiment, quantity))
         absorb(background_pressure_high(experiment, quantity))
     if primary is not None:

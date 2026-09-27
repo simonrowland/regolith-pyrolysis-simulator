@@ -108,8 +108,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
@@ -135,6 +135,16 @@ observations:
     note: 'Printed triad: weight loss rates of 1.0 mm samples evaporated at 1800 C, 1700 C and 1600 C are ~1.1x10^-5, ~2x10^-6
       and ~3x10^-7 g/mm^2/min, respectively.'
   read_from: unknown:ta-mendybaev-2002-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        pdf_page_index: 2
+        section: Results and discussion
+        note: 'Printed triad: weight loss rates of 1.0 mm samples evaporated at 1800 C, 1700 C and 1600 C are ~1.1x10^-5,
+          ~2x10^-6 and ~3x10^-7 g/mm^2/min, respectively.'
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
   experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
   identity:
@@ -153,8 +163,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.15, 1973.15]; no midpoint invented
+      tag: value
+      value: '1973.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
@@ -180,6 +190,16 @@ observations:
     note: 'Printed triad: weight loss rates of 1.0 mm samples evaporated at 1800 C, 1700 C and 1600 C are ~1.1x10^-5, ~2x10^-6
       and ~3x10^-7 g/mm^2/min, respectively.'
   read_from: unknown:ta-mendybaev-2002-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973.15'
+      locator:
+        pdf_page_index: 2
+        section: Results and discussion
+        note: 'Printed triad: weight loss rates of 1.0 mm samples evaporated at 1800 C, 1700 C and 1600 C are ~1.1x10^-5,
+          ~2x10^-6 and ~3x10^-7 g/mm^2/min, respectively.'
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
   experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
   identity:
@@ -198,8 +218,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+      tag: value
+      value: '2073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
@@ -224,6 +244,14 @@ observations:
     pdf_page_index: 1
     section: Results and discussion
   read_from: unknown:ta-mendybaev-2002-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        pdf_page_index: 1
+        section: Results and discussion
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_large_loops
   experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
   identity:
@@ -242,8 +270,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2073.15, 2073.15]; no midpoint invented
+      tag: value
+      value: '2073.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'surface_normalized_weight_loss_rate'; refusing
@@ -268,3 +296,12 @@ observations:
     section: Results and discussion
     note: prose average for 2.5, 3.3 and 6.0 mm diameter samples at 1800 C
   read_from: unknown:ta-mendybaev-2002-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        pdf_page_index: 1
+        section: Results and discussion
+        note: prose average for 2.5, 3.3 and 6.0 mm diameter samples at 1800 C

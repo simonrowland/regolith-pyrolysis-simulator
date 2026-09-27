@@ -593,8 +593,8 @@ def test_m06_clamp_emits_floor_inversion_with_original_and_band() -> None:
     assert validate_corpus([w], [exp], [clean]).ok
 
 
-def test_m07_apparatus_rejects_unknown_calibration_and_invalid_geometry() -> None:
-    """Grounded, physically valid determinants; TGA kinetic area is required."""
+def test_m07_apparatus_rejects_unknown_calibration_and_requires_flux_area() -> None:
+    """Calibrated KEMS pressure is geometry-free; flux still needs orifice area."""
 
     from dataclasses import replace
 
@@ -613,10 +613,9 @@ def test_m07_apparatus_rejects_unknown_calibration_and_invalid_geometry() -> Non
     bad_gate = underdetermined_apparatus(bad, Quantity.P_SAT)
     assert bad_gate.passed is False
     assert bad_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    missing = next(c.detail["missing"] for c in bad_gate.checks if c.name == "geometry_determinants")
-    assert "orifice_area_m2" in missing
-    assert "clausing_factor" in missing
-    assert "calibration" in missing
+    assert bad_gate.primary_check == "kems_calibration"
+    check = next(c for c in bad_gate.checks if c.name == "kems_calibration")
+    assert check.detail["missing"] == ["calibration"]
     tga = F.tabulation_experiment(method=MethodToken.TGA)
     tga_gate = underdetermined_apparatus(tga, Quantity.MASS_LOSS_RATE)
     assert tga_gate.passed is False
@@ -1727,6 +1726,56 @@ def test_r03_match_mismatch_requires_numeric() -> None:
     assert validate_corpus([w], [exp], [ref, cand], [control]).ok
 
 
+def test_r03_no_band_requires_numeric_and_forbids_refusal() -> None:
+    from dataclasses import replace
+
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r03-no-band-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r03-no-band-cand", exp.experiment_id, ident, Decimal("0"))
+    missing = F.residual(
+        "r03-no-band-no-numeric",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.NO_BAND,
+        score_eligible=True,
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [missing])
+    assert not report.ok
+    assert any("no_band requires numeric" in i.detail for i in report.issues)
+
+    numeric = F.residual(
+        "r03-no-band-numeric-seed",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    valid = replace(
+        numeric,
+        key="r03-no-band-numeric",
+        status=ResidualStatus.NO_BAND,
+        numeric=replace(numeric.numeric, decision_band=None),
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [valid]).ok
+
+    with_refusal = replace(
+        valid,
+        key="r03-no-band-refusal",
+        refusal=ResidualRefusal(RefusalReason.IDENTITY_MISMATCH, {"fields": ["quantity"]}),
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [with_refusal])
+    assert not report.ok
+    assert any("numeric branch forbids refusal" in i.detail for i in report.issues)
+
+
 def test_r03_score_eligible_requires_measured_evidence() -> None:
     ident = F.o2_identity()
     w = F.work()
@@ -2674,7 +2723,7 @@ def test_sc_f04_omitted_wall_or_reservoir_refuses() -> None:
     assert identity_equal(complete, olivine).kind is IdentityEqualKind.IDENTITY_MISMATCH
     exp = F.kems_experiment(orifice_area=None, clausing=None)
     gate = underdetermined_apparatus(exp, Quantity.P_SAT)
-    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert gate.passed
 
 
 def test_sc_f05_pi_p1_4_hematite_annotations_do_not_compare() -> None:
@@ -3010,7 +3059,7 @@ def test_mf_f01_f02_f03_f05_f06_default_free_validator() -> None:
 
 def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
     exp = F.kems_experiment(orifice_area=None, clausing=Decimal("0.9"))
-    assert underdetermined_apparatus(exp, Quantity.P_SAT).reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert underdetermined_apparatus(exp, Quantity.P_SAT).passed
     complete = F.kems_experiment()
     assert underdetermined_apparatus(complete, Quantity.P_SAT).passed
     assert effusion_regime_unverified(complete, Quantity.P_SAT).passed
@@ -3048,6 +3097,57 @@ def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
     assert run_validity_gates(
         stated, F.observation("kems-stated-bg", stated.experiment_id, ident_psat, Decimal("1"))
     ).passed
+
+
+def test_kems_background_interval_uses_bounds_without_inventing_a_point() -> None:
+    from dataclasses import replace as _replace
+
+    def with_interval(low: str, high: str, *, kn: Decimal | None = Decimal("20")):
+        experiment = F.kems_experiment(kn=kn)
+        pressure = Located(
+            State.of(
+                Value(
+                    ValueKind.INTERVAL,
+                    interval_low=Decimal(low),
+                    interval_high=Decimal(high),
+                )
+            ),
+            locator=F.loc(),
+        )
+        return _replace(
+            experiment,
+            pressure_environment=_replace(
+                experiment.pressure_environment,
+                total_pressure_Pa=pressure,
+            ),
+        )
+
+    safe = background_pressure_high(
+        with_interval("1e-6", "1e-3"), Quantity.P_PARTIAL
+    )
+    assert safe.passed
+    assert safe.checks[0].detail["flag"] == "background_pressure_interval_upper_bound"
+    assert safe.checks[0].detail["upper_bound_Pa"] == "0.001"
+    calibrated_without_kn = with_interval("1e-6", "1e-3", kn=None)
+    regime = effusion_regime_unverified(calibrated_without_kn, Quantity.P_PARTIAL)
+    assert regime.passed
+    assert regime.checks[-1].detail["flag"] == "orifice_knudsen_not_published"
+    partial = _replace(F.psat_identity("K"), quantity=Quantity.P_PARTIAL)
+    assert run_validity_gates(
+        calibrated_without_kn,
+        F.observation("interval-kems", calibrated_without_kn.experiment_id, partial, Decimal("1")),
+    ).passed
+
+    high = background_pressure_high(
+        with_interval("0.02", "0.03"), Quantity.P_PARTIAL
+    )
+    assert high.reason is RefusalReason.BACKGROUND_PRESSURE_HIGH
+
+    straddled = background_pressure_high(
+        with_interval("0.001", "0.02"), Quantity.P_PARTIAL
+    )
+    assert straddled.reason is RefusalReason.BACKGROUND_PRESSURE_INTERVAL_STRADDLES
+    assert straddled.checks[0].detail["flag"] == "background_pressure_interval_straddles"
 
 
 def test_physics_false_refuse_compilation_not_applicable_axes_equal() -> None:

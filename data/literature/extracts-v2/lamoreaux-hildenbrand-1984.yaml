@@ -256,6 +256,18 @@ observations:
     source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
     record: LH84_Na2O_fusion
   read_from: unknown:lamoreaux-hildenbrand-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1405'
+      locator:
+        page: 153
+        published_page: 153
+        table: Table 1
+        note: Na2O Tm = 1405 ± 100 K; ΔfusH/R = 5.7 ± 0.5 kK; footnote c = uncertainty estimated (this work)
+        source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+        record: LH84_Na2O_fusion
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Na2O_l_GEF_segments
   experiment_id: 10.1063/1.555706::lamoreaux-hildenbrand-1984
   identity:
@@ -362,8 +374,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+      tag: value
+      value: '298.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
@@ -391,6 +403,18 @@ observations:
     source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
     record: LH84_Na2O_s_formation
   read_from: unknown:lamoreaux-hildenbrand-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 157
+        published_page: 157
+        table: Table 4
+        note: Na2O(s) ΔfH°298/R = −50.17 ± 0.50 kK; S°298/R = 9.03 ± 0.02; (H°298−H°0)/R = 1.49 kK
+        source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+        record: LH84_Na2O_s_formation
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Na_g_GEF_segments
   experiment_id: 10.1063/1.555706::lamoreaux-hildenbrand-1984
   identity:
@@ -453,8 +477,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+      tag: value
+      value: '298.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
@@ -482,6 +506,18 @@ observations:
     source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
     record: LH84_Na_g_formation
   read_from: unknown:lamoreaux-hildenbrand-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 157
+        published_page: 157
+        table: Table 4
+        note: Na(g) ΔfH°298/R = 12.88 ± 0.05 kK; S°298/R = 18.47 ± 0.00; (H°298−H°0)/R = 0.75 kK
+        source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+        record: LH84_Na_g_formation
 - observation_id: lamoreaux-hildenbrand-1984::LH84_O2_g_GEF_segments
   experiment_id: 10.1063/1.555706::lamoreaux-hildenbrand-1984
   identity:
@@ -544,8 +580,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+      tag: value
+      value: '298.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
@@ -572,6 +608,18 @@ observations:
     source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
     record: LH84_O2_g_formation
   read_from: unknown:lamoreaux-hildenbrand-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 157
+        published_page: 157
+        table: Table 4
+        note: O2(g) ΔfH°298/R = 0; S°298/R = 24.66 ± 0.01; (H°298−H°0)/R = 1.04 kK
+        source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+        record: LH84_O2_g_formation
 - observation_id: lamoreaux-hildenbrand-1984::LH84_Rb2O_g_formation
   experiment_id: 10.1063/1.555706::lamoreaux-hildenbrand-1984
   identity:

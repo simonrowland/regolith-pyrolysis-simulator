@@ -7,7 +7,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not activity
     species:
       formula: Fe
       phase:
@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -46,6 +46,16 @@ observations:
     figure: '3'
     note: Activities of Fe-W alloys at 1873 K; 0.5 and 0.7 mm orifice points
   read_from: pdf:kems-120-ueshima-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 551
+        pdf_page_index: 3
+        figure: '3'
+        note: Activities of Fe-W alloys at 1873 K; 0.5 and 0.7 mm orifice points
 - observation_id: kems-120-ueshima-1984::ueshima_1984_gamma0_W_1873k
   experiment_id: 10.2355/tetsutohagane1955.70.6_549::experiment::fe-w-series
   identity:
@@ -182,7 +192,7 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: 'source standard_state is not typed: as in Nesmeyanov; quoted'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir

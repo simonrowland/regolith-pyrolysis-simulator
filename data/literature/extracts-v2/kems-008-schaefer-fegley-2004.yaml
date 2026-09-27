@@ -574,8 +574,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000, 2000]; no midpoint invented
+      tag: value
+      value: '2000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -637,6 +637,16 @@ observations:
     note: row=2; Al2O3 (s); Krönert and Boehm (1972)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
   read_from: tables:kems-008-schaefer-fegley-2004
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 235
+        table: '10'
+        note: row=2; Al2O3 (s); Krönert and Boehm (1972)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r03_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   identity:
@@ -661,8 +671,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2000, 2000]; no midpoint invented
+      tag: value
+      value: '2000'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -724,6 +734,16 @@ observations:
     note: row=3; Al2O3 (s); Wolff and Alcock (1962)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
   read_from: tables:kems-008-schaefer-fegley-2004
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2000'
+      locator:
+        page: 235
+        table: '10'
+        note: row=3; Al2O3 (s); Wolff and Alcock (1962)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r04_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   identity:
@@ -748,8 +768,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2195, 2195]; no midpoint invented
+      tag: value
+      value: '2195'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -811,6 +831,16 @@ observations:
     note: row=4; Al2O3 (s); Farber et al. (1972)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
   read_from: tables:kems-008-schaefer-fegley-2004
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2195'
+      locator:
+        page: 235
+        table: '10'
+        note: row=4; Al2O3 (s); Farber et al. (1972)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r05_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   identity:
@@ -835,8 +865,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2290, 2290]; no midpoint invented
+      tag: value
+      value: '2290'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -899,6 +929,16 @@ observations:
     note: row=5; Al2O3 (s); Alcock and Peleg (1967)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
   read_from: tables:kems-008-schaefer-fegley-2004
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2290'
+      locator:
+        page: 235
+        table: '10'
+        note: row=5; Al2O3 (s); Alcock and Peleg (1967)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r06_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   identity:
@@ -923,8 +963,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2310, 2310]; no midpoint invented
+      tag: value
+      value: '2310'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -988,6 +1028,16 @@ observations:
     note: row=6; Al2O3 (s); Burns (1966)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
   read_from: tables:kems-008-schaefer-fegley-2004
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2310'
+      locator:
+        page: 235
+        table: '10'
+        note: row=6; Al2O3 (s); Burns (1966)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r07_al2o3
   experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   identity:
@@ -1012,8 +1062,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2310, 2310]; no midpoint invented
+      tag: value
+      value: '2310'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -1075,6 +1125,16 @@ observations:
     note: row=7; Al2O3 (l); Burns (1966)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
   read_from: tables:kems-008-schaefer-fegley-2004
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2310'
+      locator:
+        page: 235
+        table: '10'
+        note: row=7; Al2O3 (l); Burns (1966)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r08_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   identity:
@@ -1099,8 +1159,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1800, 1800]; no midpoint invented
+      tag: value
+      value: '1800'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -1162,6 +1222,16 @@ observations:
     note: row=8; MgO (s); Peleg and Alcock (1974)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
   read_from: tables:kems-008-schaefer-fegley-2004
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 235
+        table: '10'
+        note: row=8; MgO (s); Peleg and Alcock (1974)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r09_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   identity:
@@ -1186,8 +1256,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1900, 1900]; no midpoint invented
+      tag: value
+      value: '1900'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -1249,6 +1319,16 @@ observations:
     note: row=9; MgO (s); Peleg and Alcock (1974)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
   read_from: tables:kems-008-schaefer-fegley-2004
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900'
+      locator:
+        page: 235
+        table: '10'
+        note: row=9; MgO (s); Peleg and Alcock (1974)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r10_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   identity:
@@ -1361,8 +1441,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2273, 2273]; no midpoint invented
+      tag: value
+      value: '2273'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -1424,6 +1504,16 @@ observations:
     note: row=11; MgO (s); Krönert and Boehm (1972)
     source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
   read_from: tables:kems-008-schaefer-fegley-2004
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        page: 235
+        table: '10'
+        note: row=11; MgO (s); Krönert and Boehm (1972)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
 - observation_id: kems-008-schaefer-fegley-2004::sf2004_t10_r12_mgo
   experiment_id: 10.1016/j.icarus.2003.08.023::kems-008-schaefer-fegley-2004
   identity:

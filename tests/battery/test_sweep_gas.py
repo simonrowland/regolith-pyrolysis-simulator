@@ -133,21 +133,44 @@ def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
     assert validate_extract_document(doc) == []
     result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
     # EP split the printed composition/temperature runs into distinct
-    # experiments; select one run while retaining its printed gas alternatives.
+    # experiments; select an activity run and check its printed CO atmosphere.
     experiment = next(e for e in result.experiments.values()
                       if e.experiment_id.endswith("::na2o-sio2-xna2o-0p40-t1100"))
     located = experiment.pressure_environment.sweep_gas
     gas = located.state.value
     assert isinstance(gas, SweepGas)
-    assert gas.species is None and gas.components is None
-    single, mixture = gas.alternatives
-    assert single.species == "CO" and single.components is None
-    assert tuple(c.species for c in mixture.components) == ("CO", "Ar")
-    assert all(c.mole_fraction == State.unknown("not_published") for c in mixture.components)
-    assert located.locator.published_page == 817
-    assert located.locator.pdf_page_index == 3
-    assert located.locator.section == "3.2 Experimental method"
-    assert "Printed as CO or CO-Ar mixture, dried and deoxidized" in located.locator.note
+    assert gas.species == "CO"
+    assert gas.flow_sccm == State.unknown("not_published")
+    assert gas.partial_pressure_Pa == State.of(Decimal("101325"))
+    assert gas.components is None and gas.alternatives is None
+    assert experiment.pressure_environment.total_pressure_Pa.state.value.point == Decimal("101325")
+    assert located.locator.published_page == 816
+    assert located.locator.pdf_page_index == 2
+    assert located.locator.section == "2. Experimental principle"
+    assert "printed P_CO = 1 atm" in located.locator.note
+
+    anchor_experiment = next(e for e in result.experiments.values()
+                             if e.experiment_id.endswith("::na2o-sio2-table1-xna2o-0p50-t1200"))
+    anchor_located = anchor_experiment.pressure_environment.sweep_gas
+    anchor_gas = anchor_located.state.value
+    assert isinstance(anchor_gas, SweepGas)
+    assert anchor_gas.species is None
+    assert anchor_gas.flow_sccm == State.unknown("not_published")
+    assert anchor_gas.partial_pressure_Pa == State.unknown("not_published")
+    assert anchor_gas.alternatives is None
+    assert anchor_gas.components is not None
+    co, ar = anchor_gas.components
+    assert tuple(c.species for c in anchor_gas.components) == ("CO", "Ar")
+    assert co.partial_pressure_Pa == State.of(Decimal("10132.5"))
+    assert co.mole_fraction == State.unknown("not_published")
+    assert co.flow_sccm == State.unknown("not_published")
+    assert ar.mole_fraction == State.unknown("not_published")
+    assert ar.flow_sccm == State.unknown("not_published")
+    assert ar.partial_pressure_Pa == State.unknown("not_published")
+    assert anchor_experiment.pressure_environment.total_pressure_Pa.state == State.unknown("not_published")
+    assert anchor_located.locator.published_page == 817
+    assert anchor_located.locator.pdf_page_index == 3
+    assert anchor_located.locator.table == "1"
     round_tripped = experiment_from_plain(to_plain(experiment))
     assert to_plain(round_tripped.pressure_environment.sweep_gas) == to_plain(located)
     assert not any("sweep_gas" in i.path for i in result.validation.hard_issues)

@@ -114,7 +114,8 @@ fidelity_samples:
 species:
   Fe:
     observations:
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: &id001
         state: liquid_alloy
         metastable: false
@@ -176,7 +177,8 @@ species:
         - sample_surface_area
       uncertainty:
         note: sample mass about 1.7 g; orifice about 0.3 mm; chamber pressure and ionizing energy unstated
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -214,7 +216,8 @@ species:
         note: purity as printed; no numeric uncertainty on the assay figures
   Sn:
     observations:
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -277,7 +280,8 @@ species:
           T_K: 1516.0
       uncertainty:
         note: body prints probable error ±18 C at N_Sn=0.538; other Table 2 rows have no printed ±
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -528,7 +532,8 @@ species:
         - Yamamoto et al.
       uncertainty:
         note: figure-only literature comparison; no numbers off axes
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -560,7 +565,8 @@ species:
         - 0.101
       uncertainty:
         note: figure-only; no tabulated ion-current values
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -584,7 +590,8 @@ species:
         note: breakpoints of these curves are Table 2
       uncertainty:
         note: figure-only; Table 2 already carries the tabulated gap T
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -612,7 +619,8 @@ species:
           this_work_Sn_rich_arrow: 0.653
       uncertainty:
         note: figure-only; open circles are Table 2, not read off axes
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -641,7 +649,8 @@ species:
         - 1200
       uncertainty:
         note: figure-only; two-phase plateau visible at 1200-1400 C
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002
@@ -666,7 +675,8 @@ species:
         - Yamamoto et al.
       uncertainty:
         note: figure-only; Table 3 already carries the tabulated values
-    - phase: liquid_Fe-Sn
+    - phase: condensed_liquid
+
       condensed_form: *id001
       regime: kems_effusion
       equipment: *id002

@@ -60,12 +60,17 @@ BATTERY_ENGINE_NAMES: tuple[str, ...] = (
     "cached-real",
     "imcc_sf04",
     "imcc_sf04_ext",
+    "openimcc",
 )
-IMCC_ENGINE_NAMES: tuple[str, ...] = ("imcc_sf04", "imcc_sf04_ext")
+LEGACY_IMCC_ENGINE_NAMES: tuple[str, ...] = ("imcc_sf04", "imcc_sf04_ext")
+OPENIMCC_ENGINE_NAMES: tuple[str, ...] = ("openimcc",)
+IMCC_ENGINE_NAMES: tuple[str, ...] = (*LEGACY_IMCC_ENGINE_NAMES, *OPENIMCC_ENGINE_NAMES)
 IMCC_MODEL_IDS: dict[str, str] = {
     "imcc_sf04": "IMCC-SF04",
     "imcc_sf04_ext": "IMCC-SF04-EXT",
 }
+OPENIMCC_MODEL_IDS: dict[str, str] = {"openimcc": "IMCC-SF04"}
+ALL_IMCC_MODEL_IDS: dict[str, str] = {**IMCC_MODEL_IDS, **OPENIMCC_MODEL_IDS}
 IMCC_DATAPACK_RELATIVE: dict[str, str] = {
     "imcc_sf04": "data/melt_activity/imcc/imcc-sf04-v1.0.2.json",
     "imcc_sf04_ext": "data/melt_activity/imcc/imcc-sf04-ext-v4.json",
@@ -79,6 +84,9 @@ QUANTITY_PRESSURE = "gas_partial_pressure_Pa"
 
 PO2_ENGINE_DEFAULT = "engine_default"
 PO2_COMMANDED = "commanded"
+# Caller-stated oxygen omission, including condensed activity without a
+# multivalent element, is never rewritten as engine fO2 = -9.
+PO2_NOT_AN_INPUT = "not_an_input"
 
 REFUSAL_OUT_OF_BASIS = "out_of_basis"
 REFUSAL_COMPOSITION_PROJECTED = "composition_projected"
@@ -151,6 +159,7 @@ _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
     "cached-real": 30.0,
     "imcc_sf04": 15.0,
     "imcc_sf04_ext": 15.0,
+    "openimcc": 15.0,
 }
 
 QUALIFICATION_SIO2_SWEEP_WT_PCT: tuple[float, ...] = (
@@ -245,6 +254,9 @@ class EquilibrateCell:
     exit_code: int | None = None
     model_id: str | None = None
     engine_annotation: str | None = None
+    # gamma, where the engine reports it. Activity stays on melt_activities.
+    # a = gamma * x. An empty map is not activity reused as a coefficient.
+    melt_activity_coefficients: dict[str, float] = field(default_factory=dict)
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -258,6 +270,7 @@ class EquilibrateCell:
             "engine_reason": self.engine_reason,
             "engine_annotation": self.engine_annotation,
             "melt_activities": dict(self.melt_activities),
+            "melt_activity_coefficients": dict(self.melt_activity_coefficients),
             "gas_partial_pressures_Pa": dict(self.gas_partial_pressures_Pa),
             "liquid_fraction": self.liquid_fraction,
             "wall_s": self.wall_s,
@@ -311,6 +324,12 @@ class EquilibrateCell:
             gas_partial_pressures_Pa=dict(
                 payload.get("gas_partial_pressures_Pa") or {}
             ),
+            melt_activity_coefficients={
+                str(name): float(value)
+                for name, value in dict(
+                    payload.get("melt_activity_coefficients") or {}
+                ).items()
+            },
             liquid_fraction=_finite_float(payload.get("liquid_fraction")),
             wall_s=float(payload.get("wall_s") or 0.0),
             cpu_s=float(payload.get("cpu_s") or 0.0),
@@ -852,6 +871,29 @@ def extract_reported_quantities(
     return activities, pressures
 
 
+def reported_activity_coefficients(result: Any) -> dict[str, float]:
+    """Gamma, when the engine reported it separately from activity.
+
+    a = gamma * x. The activity field is not reused as gamma.
+    """
+
+    direct = getattr(result, "reported_activity_coefficients", None)
+    nested = None
+    if not isinstance(direct, Mapping) or not direct:
+        diagnostics = getattr(result, "diagnostics", None) or {}
+        if isinstance(diagnostics, Mapping):
+            nested = diagnostics.get("reported_activity_coefficients")
+    source = direct if isinstance(direct, Mapping) and direct else nested
+    gammas: dict[str, float] = {}
+    if not isinstance(source, Mapping):
+        return gammas
+    for name, value in source.items():
+        number = _finite_float(value)
+        if number is not None and number > 0.0:
+            gammas[str(name)] = number
+    return gammas
+
+
 def _plain_data(value: Any) -> Any:
     """JSON-safe copy. Commissioning notices carry tuples; report dumps do not."""
 
@@ -1306,6 +1348,7 @@ def reclassify_projected_composition_cells(
                 engine_status="out_of_domain",
                 engine_reason=note,
                 melt_activities={},
+                melt_activity_coefficients={},
                 gas_partial_pressures_Pa={},
             )
         )
@@ -1404,10 +1447,16 @@ class _ImccBatteryBackend:
             allow_out_of_envelope=True,
         )
         activities: dict[str, float] = {}
-        for name, value in zip(result.parent_oxides, result.parent_activity):
+        gammas: dict[str, float] = {}
+        for name, value, gamma in zip(
+            result.parent_oxides, result.parent_activity, result.parent_gamma
+        ):
             number = _finite_float(value)
             if number is not None and number > 0.0:
                 activities[str(name)] = number
+            gamma_number = _finite_float(gamma)
+            if gamma_number is not None and gamma_number > 0.0:
+                gammas[str(name)] = gamma_number
         notices: list[dict[str, Any]] = []
         if result.extrapolated:
             notices.append(
@@ -1478,11 +1527,223 @@ class _ImccBatteryBackend:
             diagnostics=diagnostics,
             warnings=[],
             activity_coefficients=activities,
+            reported_activity_coefficients=gammas,
             vapor_pressures_Pa=pressures,
             liquid_fraction=1.0,
             phase_assemblage_available=True,
             imcc_notices=notices,
             imcc_model_id=identity.get("model_id") or self.model_id,
+        )
+
+
+# ---------------------------------------------------------------------------
+# openimcc battery adapter
+# ---------------------------------------------------------------------------
+
+
+class _OpenImccBatteryBackend:
+    """Battery-only producer for the optional openimcc package.
+
+    The melt rail goes through the C1 bridge.  The vapour rail deliberately
+    calls openimcc's gas layer directly, so it cannot silently inherit the
+    vendored IMCC adapter's VapoRock-backed JANAF tables.
+    """
+
+    supports_intrinsic_fO2 = False
+
+    def __init__(self, engine_name: str) -> None:
+        if engine_name not in OPENIMCC_MODEL_IDS:
+            raise BinaryPotBatteryError(f"unknown openimcc engine {engine_name!r}")
+        self.engine_name = engine_name
+        self.model_id = OPENIMCC_MODEL_IDS[engine_name]
+        from simulator.melt_backend.imcc_sf04 import openimcc_bridge
+
+        self._bridge = openimcc_bridge
+        self._package = openimcc_bridge._require_openimcc()
+        self._pack_name = "v1.0.2"
+        self._pack = openimcc_bridge._load_pack(self._pack_name)
+        self._gas: Any = None
+        self._gas_error: str | None = None
+        self._identity: dict[str, str] = {
+            "name": self.model_id,
+            "model_id": self.model_id,
+            "version": str(getattr(self._package, "__version__", "0+unknown")),
+            "pack": self._pack_name,
+            "pack_version": str(getattr(self._pack, "version", self._pack_name)),
+            "pack_digest": str(openimcc_bridge._pack_digest(self._pack)),
+            "gas_table_source": "",
+            "gas_condensate_source": "",
+        }
+        self._load_gas()
+
+    def _load_gas(self) -> None:
+        try:
+            from openimcc import load_gas_datapack
+
+            self._gas = load_gas_datapack()
+            self._identity["gas_table_source"] = str(self._gas.gas_path)
+            self._identity["gas_condensate_source"] = str(self._gas.oxide_path)
+            self._gas_error = None
+        except Exception as exc:  # noqa: BLE001 - melt rail remains usable
+            self._gas = None
+            self._gas_error = f"{type(exc).__name__}: {exc}"
+            self._identity["gas_table_source"] = f"unavailable:{self._gas_error}"
+
+    def equilibrate(
+        self,
+        temperature_C: float,
+        composition_kg: Mapping[str, float] | None = None,
+        fO2_log: float | None = None,
+        pressure_bar: float = 1.0e-6,
+        *,
+        composition_mol: Mapping[str, float] | None = None,
+        **_unused: object,
+    ) -> Any:
+        from types import SimpleNamespace
+
+        del pressure_bar
+        temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        bridge_kwargs: dict[str, Any] = {
+            "temperature_K": temperature_K,
+            "pack": self._pack_name,
+            "allow_extrapolation": True,
+            "allow_out_of_envelope": True,
+        }
+        if composition_kg is not None:
+            # The battery's accepted hand ledger is wt%-based.  Keep this
+            # path aligned with the legacy adapter and the standalone hand
+            # calculation; the bridge normalizes absolute mass internally.
+            bridge_kwargs["composition_kg"] = composition_kg
+        else:
+            bridge_kwargs["composition_mol"] = composition_mol
+        result = self._bridge.evaluate(**bridge_kwargs)
+        self._identity["pack_version"] = result.pack_version
+        self._identity["pack_digest"] = result.pack_digest
+
+        notices: list[dict[str, Any]] = []
+        authority: str | None = None
+        outside_domain = bool(
+            result.extrapolated or result.envelope_status != "inside"
+        )
+        for flag in result.flags:
+            notices.append(
+                {
+                    "kind": "openimcc_flag",
+                    "authority": AUTHORITY_EXTRAPOLATED if outside_domain else None,
+                    "reason": str(flag),
+                }
+            )
+            if outside_domain:
+                authority = AUTHORITY_EXTRAPOLATED
+        if result.extrapolated:
+            notices.append(
+                {
+                    "kind": "openimcc_temperature_extrapolated",
+                    "authority": AUTHORITY_EXTRAPOLATED,
+                    "reason": "T outside openimcc datapack domain; evaluate(allow_extrapolation=True)",
+                }
+            )
+            authority = AUTHORITY_EXTRAPOLATED
+        if result.envelope_status != "inside":
+            notices.append(
+                {
+                    "kind": "openimcc_composition_outside_validated_envelope",
+                    "authority": AUTHORITY_EXTRAPOLATED,
+                    "reason": "X_Me2O outside openimcc validated envelope; evaluate(allow_out_of_envelope=True)",
+                }
+            )
+            authority = AUTHORITY_EXTRAPOLATED
+        for notice in result.notices:
+            notices.append(
+                {
+                    "kind": "openimcc_notice",
+                    "authority": None,
+                    "reason": str(notice),
+                }
+            )
+
+        pressures: dict[str, float] = {}
+        vapor_sources: dict[str, str] = {}
+        gas_diagnostics: dict[str, Any] = {}
+        if fO2_log is not None:
+            if self._gas is None:
+                notices.append(
+                    {
+                        "kind": "openimcc_gas_unavailable",
+                        "authority": None,
+                        "reason": self._gas_error or "openimcc gas datapack unavailable",
+                    }
+                )
+            else:
+                from openimcc import evaluate_gas
+
+                fo2_bar = 10.0 ** float(fO2_log)
+                gas_result = evaluate_gas(
+                    result.parent_oxide_activities,
+                    temperature_K,
+                    fo2_bar,
+                    self._gas,
+                    parent_oxides=result.parent_oxides,
+                    allow_extrapolation=True,
+                )
+                gas_diagnostics = {
+                    "domain_flags": dict(gas_result.domain_flags),
+                    "provenance_class": dict(gas_result.provenance_class),
+                }
+                for name, value in dict(gas_result).items():
+                    number = _finite_float(value)
+                    if number is None or number <= 0.0:
+                        continue
+                    pressures[str(name)] = number * PA_PER_BAR
+                    vapor_sources[str(name)] = (
+                        f"openimcc:{self._gas.gas_path}:"
+                        f"{gas_result.provenance_class.get(name, 'unknown')}"
+                    )
+                for name, flag in gas_result.domain_flags.items():
+                    if flag:
+                        notices.append(
+                            {
+                                "kind": "openimcc_gas_flag",
+                                "authority": AUTHORITY_EXTRAPOLATED,
+                                "species": str(name),
+                                "reason": str(flag),
+                            }
+                        )
+                        authority = AUTHORITY_EXTRAPOLATED
+
+        provenance = {
+            "package_version": result.openimcc_version,
+            "pack": result.pack_version,
+            "pack_digest": result.pack_digest,
+            "gas_table_source": self._identity.get("gas_table_source", ""),
+            "gas_condensate_source": self._identity.get(
+                "gas_condensate_source", ""
+            ),
+        }
+        diagnostics = {
+            "imcc_model_id": result.pack_model_id,
+            "imcc_datapack_version": result.pack_version,
+            "imcc_notices": notices,
+            "authority": authority,
+            "openimcc_provenance": provenance,
+            "openimcc_gas": gas_diagnostics,
+            "vapor_pressure_backend_status": "openimcc",
+            "authoritative_for_requested_vapor_pressure": True,
+        }
+        return SimpleNamespace(
+            status="ok",
+            diagnostics=diagnostics,
+            warnings=[],
+            activity_coefficients=dict(result.parent_oxide_activities),
+            reported_activity_coefficients={},
+            vapor_pressures_Pa=pressures,
+            vapor_pressures_source=vapor_sources,
+            vapor_pressure_backend_status="openimcc",
+            authoritative_for_requested_vapor_pressure=True,
+            liquid_fraction=1.0,
+            phase_assemblage_available=True,
+            imcc_notices=notices,
+            imcc_model_id=result.pack_model_id,
         )
 
 
@@ -1757,6 +2018,11 @@ def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
         temperature_K=float(payload["temperature_K"]),
         po2=po2,
         timeout_s=_finite_float(payload.get("timeout_s")),
+        physical_pressure_bar=(
+            None
+            if payload.get("physical_pressure_bar") is None
+            else float(payload["physical_pressure_bar"])
+        ),
         qualification=bool(payload.get("qualification")),
         isolated=False,
         arm=str(payload.get("arm") or ARM_HEADLINE),
@@ -1836,7 +2102,7 @@ def _crash_cell_from_returncode(
         certified_band=None if certified_band is None else dict(certified_band),
         exit_signal=exit_signal,
         exit_code=exit_code,
-        model_id=IMCC_MODEL_IDS.get(handle.name),
+        model_id=ALL_IMCC_MODEL_IDS.get(handle.name),
     )
 
 
@@ -1853,6 +2119,7 @@ def _run_cell_in_subprocess(
     authority: str | None,
     certified_band: Mapping[str, Any] | None,
     simulate_crash: str | None = None,
+    physical_pressure_bar: float | None = None,
 ) -> EquilibrateCell:
     hostname = _hostname()
     wall0 = time.perf_counter()
@@ -1870,6 +2137,8 @@ def _run_cell_in_subprocess(
         "arm": arm,
         "simulate_crash": simulate_crash,
     }
+    if physical_pressure_bar is not None:
+        payload["physical_pressure_bar"] = float(physical_pressure_bar)
     env = dict(os.environ)
     env.setdefault("PYTHONPATH", str(REPO_ROOT))
     pythonpath = env.get("PYTHONPATH") or ""
@@ -2011,7 +2280,9 @@ def _open_resolved_backend(name: str) -> Any:
     from simulator.melt_backend.magemin import MAGEMinBackend
     from simulator.vapour_rail.calibration import open_warm_vaporock_backend
 
-    if name in IMCC_ENGINE_NAMES:
+    if name in OPENIMCC_ENGINE_NAMES:
+        return _OpenImccBatteryBackend(name)
+    if name in LEGACY_IMCC_ENGINE_NAMES:
         return _ImccBatteryBackend(name)
     if name == "vaporock":
         return open_warm_vaporock_backend(warm_pool_size=1)
@@ -2109,6 +2380,8 @@ def _fo2_log_for_request(handle: EngineHandle, request: Po2Request) -> float | N
     if request.mode == PO2_COMMANDED:
         assert request.po2_bar is not None
         return math.log10(float(request.po2_bar))
+    if request.mode == PO2_NOT_AN_INPUT:
+        return None
     if handle.supports_intrinsic_fo2:
         return None
     return _DEFAULT_FO2_LOG
@@ -2144,6 +2417,7 @@ def equilibrate_cell(
     isolated: bool | None = None,
     arm: str | None = None,
     simulate_crash: str | None = None,
+    physical_pressure_bar: float | None = None,
 ) -> EquilibrateCell:
     """One pot × engine × T × pO2 call. Refusals are rows, never exceptions."""
 
@@ -2174,7 +2448,7 @@ def equilibrate_cell(
             notices=[*notices, *extra_notices],
             authority=kwargs.pop("authority", None) or authority,
             certified_band=kwargs.pop("certified_band", None) or certified_band,
-            model_id=kwargs.pop("model_id", None) or IMCC_MODEL_IDS.get(handle.name),
+            model_id=kwargs.pop("model_id", None) or ALL_IMCC_MODEL_IDS.get(handle.name),
             **kwargs,
         )
 
@@ -2198,6 +2472,7 @@ def equilibrate_cell(
             authority=authority,
             certified_band=certified_band,
             simulate_crash=simulate_crash,
+            physical_pressure_bar=physical_pressure_bar,
         )
 
     if not handle.available or handle.backend is None:
@@ -2217,7 +2492,10 @@ def equilibrate_cell(
     composition_kg, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
-    physical_pressure_bar = _DEFAULT_PRESSURE_BAR
+    if physical_pressure_bar is None:
+        physical_pressure_bar = _DEFAULT_PRESSURE_BAR
+    else:
+        physical_pressure_bar = float(physical_pressure_bar)
     pressure_bar = physical_pressure_bar
     if handle.name == "alphamelts":
         from simulator.alphamelts_reference_pressure import (
@@ -2269,6 +2547,7 @@ def equilibrate_cell(
             engine_reason = f"{gate_name}"
             engine_annotation = None
         activities, pressures = extract_reported_quantities(result)
+        coefficients = reported_activity_coefficients(result)
         vapor_authority = extract_vapor_authority(result)
         flag_notices, flag_authority, flag_band = engine_flags_from_result(result)
         crash_diag = diagnostics.get("subprocess_failure") or {}
@@ -2285,6 +2564,7 @@ def equilibrate_cell(
             engine_reason=engine_reason,
             engine_annotation=engine_annotation,
             melt_activities=activities,
+            melt_activity_coefficients=coefficients,
             gas_partial_pressures_Pa=pressures,
             liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),
             vapor_pressures_source=dict(vapor_authority["vapor_pressures_source"]),

@@ -1501,8 +1501,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1723.15, 1723.15]; no midpoint invented
+      tag: value
+      value: '1723.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -1564,6 +1564,15 @@ observations:
       lineage; rail sidecar vapour_rail_langmuir_anchors.yaml::fedkin_2006_k_silicate_vacuum_langmuir
     record: fedkin_2006_yu_k_vacuum_langmuir
   read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        note: Fedkin et al. (2006) GCA 70:206-223 models Yu et al. (2003) GCA 67:773-786; tabulated with uncertainty also
+          by Richter lineage; rail sidecar vapour_rail_langmuir_anchors.yaml::fedkin_2006_k_silicate_vacuum_langmuir
+        record: fedkin_2006_yu_k_vacuum_langmuir
 - observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir
   experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
   identity:
@@ -1588,8 +1597,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1723.15, 1723.15]; no midpoint invented
+      tag: value
+      value: '1723.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -1652,3 +1661,12 @@ observations:
       & Wang, J. (2003) Geochim. Cosmochim. Acta 67:773-786
     record: fedkin_2006_yu_na_vacuum_langmuir
   read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        note: Fedkin et al. (2006) GCA 70:206-223 pp. 213-214; primary experiment Yu, Y., Hewins, R. H., Alexander, C. M.
+          O'D. & Wang, J. (2003) Geochim. Cosmochim. Acta 67:773-786
+        record: fedkin_2006_yu_na_vacuum_langmuir

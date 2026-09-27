@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1234.9, 1234.9]; no midpoint invented
+      tag: value
+      value: '1234.9'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'Tm_minus_Tb_temperature_correction'; refusing
@@ -48,6 +48,16 @@ observations:
     table: I
     note: Table I. Values for Temperature Correction. Ag Tm=1234.9 K
   read_from: pdf:kems-198-ichise-ueshima-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1234.9'
+      locator:
+        published_page: 299
+        pdf_page_index: 5
+        table: I
+        note: Table I. Values for Temperature Correction. Ag Tm=1234.9 K
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_agmn_15p6at_solidus_liquidus_prose
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -200,8 +210,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1667.0, 1667.0]; no midpoint invented
+      tag: value
+      value: '1667'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'TA4_minus_Tb_temperature_correction'; refusing
@@ -228,6 +238,16 @@ observations:
     table: I
     note: Table I. Fe TA4=1667 K temperature correction
   read_from: pdf:kems-198-ichise-ueshima-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1667'
+      locator:
+        published_page: 299
+        pdf_page_index: 5
+        table: I
+        note: Table I. Fe TA4=1667 K temperature correction
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_fig2_ionization_efficiency_figure_only
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
@@ -277,7 +297,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'ion_intensity_vs_time_heating'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity
     species:
       formula: Mn
       phase:
@@ -324,7 +344,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'ion_intensity_vs_time_cooling'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity
     species:
       formula: Mn
       phase:
@@ -371,7 +391,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'ion_intensity_monovariant_solidus_liquidus'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity
     species:
       formula: Mn
       phase:
@@ -567,8 +587,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1800.0, 1800.0]; no midpoint invented
+      tag: value
+      value: '1800'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_temperature_sensitivity'; refusing to
@@ -595,6 +615,16 @@ observations:
     table: IV
     note: Table IV. Comparison of Sensitivity of Temperature Measurement (at 1800K)
   read_from: pdf:kems-198-ichise-ueshima-1989
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        published_page: 305
+        pdf_page_index: 11
+        table: IV
+        note: Table IV. Comparison of Sensitivity of Temperature Measurement (at 1800K)
 - observation_id: kems-198-ichise-ueshima-1989::ichise_1989_table5_quoted_invariants::rows:h=0ed3ad1a0012
   experiment_id: 10.5702/massspec.37.295::kems-198-ichise-ueshima-1989
   identity:
