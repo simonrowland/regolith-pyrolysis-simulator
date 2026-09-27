@@ -36,7 +36,7 @@ benches:
 experiments:
 - experiment_id: sio-film-measurement-series
   bench_id: wetzel-uhv-film-apparatus
-  method: knudsen_effusion
+  method: solid_SiO_growth_coefficient
   locator: {page: 2, section: '2.1', note: 'Source describes a measurement series, not one physical film or one thermal configuration'}
   sample:
     printed_composition:
@@ -169,7 +169,7 @@ species:
         line_range: 49-53
       phase: solid_SiO_source
       standard_state: UHV film-growth apparatus (not Motzfeldt melt α geometry)
-      regime: kems_effusion
+      regime: solid_SiO_growth_coefficient
       units: as published
       values:
         quantity: Ta_Knudsen_source_for_SiO_film_deposition

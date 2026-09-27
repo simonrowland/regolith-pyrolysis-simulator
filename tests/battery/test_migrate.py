@@ -21,19 +21,24 @@ from simulator.battery.enums import (
     BenchIdentityBasis,
     AssetRole,
     EvidenceClass,
+    Engine,
+    ExecutionState,
     FO2Channel,
     IdentityEqualKind,
     MethodToken,
+    MEASURED_EVIDENCE,
     NoticeKind,
     Phase,
     Polymorph,
     Quantity,
     Rail,
+    ReferenceStateConvention,
     RefusalReason,
     StateTag,
     ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
+from simulator.battery.score import predict_with_engine
 from simulator.battery.migrate import (
     REPO_ROOT,
     DuplicateContextIdError,
@@ -56,6 +61,10 @@ from simulator.battery.migrate import (
     load_migrated_context,
     map_phase,
     map_quantity,
+    parse_quantity_suffix,
+    split_qualified_quantity,
+    QUANTITY_ALIASES,
+    _HISTORICAL_PREFIX_STEMS,
     compilation_quantity_from_record,
     choose_read_from,
     is_compilation_record_path,
@@ -66,6 +75,9 @@ from simulator.battery.migrate import (
     group_queue_entries,
     migrate,
     migration_queue_document,
+    reference_state_from_extract,
+    _mole_fraction_composition_from_values,
+    _standard_state_from_plain,
     lift_vaporization_reaction_from_ledger_note,
     pressure_from_equipment,
     resolve_equipment_context,
@@ -158,6 +170,50 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
         yaml.safe_dump(doc, sort_keys=False), encoding="utf-8"
     )
     return root
+
+
+def _migrate_real_extract(tmp_path: Path, name: str):
+    src = REPO_ROOT / "data" / "literature" / "extracts" / name
+    doc = yaml.safe_load(src.read_text(encoding="utf-8"))
+    assert isinstance(doc, dict)
+    root = tmp_path / "tree"
+    extracts = root / "data" / "literature" / "extracts"
+    extracts.mkdir(parents=True)
+    (root / "data" / "literature" / "compilations").mkdir(parents=True)
+    source = doc.get("source") if isinstance(doc.get("source"), dict) else {}
+    index = {
+        "schema_version": "literature_index.v1",
+        "sources": [
+            {
+                "source_id": doc.get("source_id") or src.stem,
+                "citation": source.get("citation") or src.stem,
+                "doi": source.get("doi"),
+            }
+        ],
+    }
+    (root / "data" / "literature" / "INDEX.yaml").write_text(
+        yaml.safe_dump(index, sort_keys=False),
+        encoding="utf-8",
+    )
+    (extracts / name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+    return migrate(root, write=False)
+
+
+def _extract_observations(name: str) -> list[dict]:
+    src = REPO_ROOT / "data" / "literature" / "extracts" / name
+    doc = yaml.safe_load(src.read_text(encoding="utf-8"))
+    found: list[dict] = []
+    species = doc.get("species") if isinstance(doc, dict) else None
+    if not isinstance(species, dict):
+        return found
+    for block in species.values():
+        rows = block.get("observations") if isinstance(block, dict) else None
+        if not isinstance(rows, list):
+            continue
+        for row in rows:
+            if isinstance(row, dict):
+                found.append(row)
+    return found
 
 
 def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -463,8 +519,38 @@ def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     values = sorted(p.value.point for p in points)
     assert values[0] == atm_to_pa("1")
     assert values[1] == atm_to_pa("2")
-    assert all(p.derivation is not None and p.derivation.relation == "atm_to_Pa" for p in points)
+    assert all(
+        p.derivation is not None and "atm_to_Pa" in p.derivation.relation
+        for p in points
+    )
     assert all(p.derivation.output_unit == "Pa" for p in points)
+
+
+@pytest.mark.parametrize("phase", ["", "not_a_phase", "condensed_solid"])
+def test_pressure_phase_provenance_matches_resulting_phase(
+    tmp_path: Path, phase: str
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["phase"] = phase
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith("fixture-source::na_psat")
+    ]
+
+    assert len(points) == 2
+    assert all(
+        "species.phase=gas"
+        not in (point.derivation.relation if point.derivation else "")
+        for point in points
+    )
+    if phase == "condensed_solid":
+        assert all(point.identity.species.phase.value is Phase.CR for point in points)
+    else:
+        assert all(point.identity.species.phase.is_unknown for point in points)
 
 
 def test_series_row_point_conditions_preserve_pressure_interval(tmp_path: Path) -> None:
@@ -1268,7 +1354,10 @@ def test_calculated_series_conversion_is_not_author_derivation(tmp_path: Path) -
 
     assert len(points) == 1
     assert points[0].derivation is not None
-    assert points[0].derivation.relation == "atm_to_Pa"
+    assert points[0].derivation.relation == (
+        "atm_to_Pa; species.phase=gas derived from quantity=p_sat "
+        "(p_sat identity names the gas species)"
+    )
     assert points[0].evidence.class_.is_unknown
 
 
@@ -1568,7 +1657,14 @@ def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
         if "behrens_p_atm" in o.observation_id
     ]
     assert len(atm_points) == 2
-    assert all(p.derivation is not None and p.derivation.relation == "atm_to_Pa" for p in atm_points)
+    assert all(
+        p.derivation is not None
+        and p.derivation.relation == (
+            "atm_to_Pa; species.phase=gas derived from quantity=p_sat "
+            "(p_sat identity names the gas species)"
+        )
+        for p in atm_points
+    )
     unlift = [
         o
         for o in result.observations.values()
@@ -1576,6 +1672,7 @@ def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
     ]
     assert len(unlift) == 1
     assert unlift[0].value.kind.value == "unavailable"
+    assert unlift[0].derivation is None
     assert result.measured.series == 2
     assert result.measured.tabulated_lists == 0
 
@@ -1859,7 +1956,14 @@ def test_h01_explicit_T_K_pressure_atm_still_converts(tmp_path: Path) -> None:
         {float(p.identity.temperature_K.value) for p in points} == {1200.0, 1300.0}
     )
     assert all(p.value.kind is ValueKind.POINT for p in points)
-    assert all(p.derivation is not None and p.derivation.relation == "atm_to_Pa" for p in points)
+    assert all(
+        p.derivation is not None
+        and p.derivation.relation == (
+            "atm_to_Pa; species.phase=gas derived from quantity=p_sat "
+            "(p_sat identity names the gas species)"
+        )
+        for p in points
+    )
 
 
 def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Path) -> None:
@@ -2530,7 +2634,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     #   ta-shirai-2000-lpsc evaporation_coefficient_alpha +6
     #   kems-005-fedkin-2006 evaporation_coefficient_alpha +12
     # p_partial 69->75, evaporation_coefficient_alpha 12->30, n_numeric 274->298.
-    assert census.get("p_partial") == 75
+    # The lunar DeMaria 1973 merge adds its 61 Table I p_partial cells as
+    # run-labelled series: p_partial 75->136 and n_numeric 356->417.
+    assert census.get("p_partial") == 136
     assert census.get("p_sat") == 21
     assert census.get("evaporation_coefficient_alpha") == 30
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
@@ -2549,7 +2655,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("ueshima-1982-fe-mo-thermal") == {
         "transition_temperature": 58
     }
-    assert n_numeric == 389, (n_numeric, census, n_unavailable)
+    assert n_numeric == 450, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
@@ -2560,6 +2666,86 @@ def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
     )
     assert selection.amount == as_decimal("4.6e-06")
     assert selection.field_name == "evaporation_rate_1200C"
+
+
+def test_equal_temperature_range_is_a_point_but_true_range_is_not() -> None:
+    point = select_declared_source(
+        "temperature_K", None, {"T_range_K": [1673.15, 1673.15]}
+    )
+    assert point.value.kind is ValueKind.POINT
+    assert point.amount == as_decimal("1673.15")
+    assert point.field_name == "T_range_K"
+
+    interval = select_declared_source(
+        "temperature_K", None, {"T_range_K": [1300, 1800]}
+    )
+    assert interval.value.kind is ValueKind.UNAVAILABLE
+    assert interval.condition_ranges == (("T_range_K", as_decimal("1300"), as_decimal("1800")),)
+    assert "temperature domain" in (interval.reason or "")
+
+
+@pytest.mark.parametrize(
+    "extra, expected",
+    [
+        ({"X_Na2O_as_published": 0.4}, {"Na2O": as_decimal("0.4"), "SiO2": as_decimal("0.6")}),
+        (
+            {"composition_mol": {"SiO2": 0.79, "Na2O": 0.07, "B2O3": 0.10, "Al2O3": 0.03, "minor constituents": 0.01}},
+            {"SiO2": as_decimal("0.79"), "Na2O": as_decimal("0.07"), "B2O3": as_decimal("0.10"), "Al2O3": as_decimal("0.03")},
+        ),
+    ],
+)
+def test_printed_mole_fraction_composition_maps_without_wt_conversion(
+    tmp_path: Path, extra: dict, expected: dict
+) -> None:
+    values = {
+        "quantity": "activity",
+        "activity": 0.2,
+        "method_class": "measured_direct",
+        **extra,
+    }
+    root = _write_min_tree(
+        tmp_path,
+        _scalar_extract(
+            quantity="activity",
+            units="dimensionless",
+            values=values,
+            obs_type="activity_coefficient",
+        ),
+    )
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert obs.identity.composition is not None
+    if "minor constituents" in extra.get("composition_mol", {}):
+        assert obs.identity.composition.is_unknown
+        assert "partial_composition" in (obs.identity.composition.reason or "")
+        assert any(
+            "minor constituents" in (entry.why or "")
+            and "composition" in (entry.axes or [])
+            for entry in result.queue
+        )
+    else:
+        assert obs.identity.composition.is_value
+        assert obs.identity.composition.value.as_map() == expected
+
+
+def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "ta-dacko-conradt-low-p-transpiration.yaml"
+    )
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if "table2_activity_" in obs.observation_id
+    ]
+    assert len(rows) == 6
+    for obs in rows:
+        composition = obs.identity.composition
+        assert composition is not None and composition.is_unknown
+        assert "partial_composition" in (composition.reason or "")
+        prediction = predict_with_engine(Engine.IMCC_SF04, obs)
+        assert prediction.execution.state is ExecutionState.NOT_PROBED
+        assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+        assert prediction.requested_composition == composition
 
 
 def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> None:
@@ -3290,6 +3476,271 @@ def test_l01_map_quantity_direct_witnesses() -> None:
     assert reason and "not_hkl" in reason or "Olette" in (reason or "") or "outside" in (reason or "")
 
 
+@pytest.mark.parametrize(
+    ("alias", "expected"),
+    [
+        ("pure_vapor_pressure", Quantity.P_SAT),
+        ("partial_pressure_overlay_figure_only", Quantity.P_PARTIAL),
+        ("partial_pressure_O2", Quantity.P_PARTIAL),
+        ("partial_pressure_CsBO2", Quantity.P_PARTIAL),
+        ("partial_pressure_LiBO2", Quantity.P_PARTIAL),
+        ("partial_pressure_NaBO2", Quantity.P_PARTIAL),
+        ("partial_pressure_Mg", Quantity.P_PARTIAL),
+        ("partial_pressure_O", Quantity.P_PARTIAL),
+        ("partial_pressure_SiO", Quantity.P_PARTIAL),
+        ("partial_pressure_over_illite", Quantity.P_PARTIAL),
+        ("partial_pressure_series", Quantity.P_PARTIAL),
+        ("partial_pressure_vs_setpoint_T", Quantity.P_PARTIAL),
+        ("P_Na_over_soda_lime_glass", Quantity.P_PARTIAL),
+        ("undetected_radionuclide_partial_pressure_limit", Quantity.P_PARTIAL),
+        ("undetected_radionuclide_simulant_partial_pressure", Quantity.P_PARTIAL),
+        ("raoultian_activity", Quantity.ACTIVITY),
+        ("apparent_gamma_K2O", Quantity.ACTIVITY_COEFFICIENT),
+        ("henrian_activity_coefficient", Quantity.ACTIVITY_COEFFICIENT),
+        ("evaporation_coefficient_gamma_Si", Quantity.EVAPORATION_COEFFICIENT_ALPHA),
+        ("mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("total_integrated_mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("total_gas_evolution_mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("isothermal_hold_mass_loss", Quantity.MASS_LOSS_FRACTION),
+        ("water_released_during_drying", Quantity.MASS_LOSS_FRACTION),
+        ("dta_transition_temperatures", Quantity.TRANSITION_TEMPERATURE),
+        ("invariant_transformation_temperature", Quantity.TRANSITION_TEMPERATURE),
+        ("invariant_transformation_temperature_range", Quantity.TRANSITION_TEMPERATURE),
+        ("pure_Fe_melting_onset", Quantity.TRANSITION_TEMPERATURE),
+        ("solidus", Quantity.TRANSITION_TEMPERATURE),
+        ("composition_dependent_solidus_points", Quantity.TRANSITION_TEMPERATURE),
+        ("miscibility_gap_temperature", Quantity.TRANSITION_TEMPERATURE),
+        ("measured_KEMS_ion_intensities", Quantity.ION_INTENSITY),
+        ("ion_count_rate", Quantity.ION_INTENSITY),
+        ("ion_intensity_isotherm", Quantity.ION_INTENSITY),
+        ("ion_intensity_arrest_curve", Quantity.ION_INTENSITY),
+        ("ion_intensity_monovariant_solidus_liquidus", Quantity.ION_INTENSITY),
+        ("ion_intensity_vs_time_cooling", Quantity.ION_INTENSITY),
+        ("ion_intensity_vs_time_heating", Quantity.ION_INTENSITY),
+        ("I_T_vs_time_figure_only", Quantity.ION_INTENSITY),
+        ("I+_Al / I+_Fe vs chamber voltage", Quantity.ION_INTENSITY_RATIO),
+        ("ion_current_ratio_vs_time", Quantity.ION_INTENSITY_RATIO),
+        ("ion_current_ratio_vs_T", Quantity.ION_INTENSITY_RATIO),
+        ("ion_intensity_ratio_Mg_Fe_figure_only", Quantity.ION_INTENSITY_RATIO),
+        (
+            "Fig. 1. Experimental values of the ion current ratio for the Fe-Ti system",
+            Quantity.ION_INTENSITY_RATIO,
+        ),
+        (
+            "Fig. 3. Experimental values of the ion current ratio for the Fe-S system",
+            Quantity.ION_INTENSITY_RATIO,
+        ),
+        ("Fig. 3. Temperature dependence of the ion current ratio", Quantity.ION_INTENSITY_RATIO),
+        ("Fig. 4. Ion current ratios for the Fe-P system at 1600 C", Quantity.ION_INTENSITY_RATIO),
+        ("Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.", Quantity.ION_INTENSITY_RATIO),
+        ("second_law_enthalpy_of_vaporization", Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW),
+    ],
+)
+def test_l02_empirical_quantity_aliases_are_closed(alias: str, expected: Quantity) -> None:
+    assert QUANTITY_ALIASES[alias] is expected
+
+
+def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
+    cases = [
+        (
+            "pure_vapor_pressure",
+            {"quantity": "pure_vapor_pressure", "points": [{"T_K": 1400, "p_atm": 1.0}]},
+            None,
+            Quantity.P_SAT,
+        ),
+        (
+            "raoultian_activity",
+            {"quantity": "raoultian_activity", "activity": 0.2},
+            "dimensionless",
+            Quantity.ACTIVITY,
+        ),
+        (
+            "solidus",
+            {"quantity": "solidus", "T_K": 2050},
+            "K",
+            Quantity.TRANSITION_TEMPERATURE,
+        ),
+        (
+            "ion_count_rate",
+            {"quantity": "ion_count_rate", "count_rate": 12.0},
+            "counts/s",
+            Quantity.ION_INTENSITY,
+        ),
+        (
+            "second_law_enthalpy_of_vaporization",
+            {"quantity": "second_law_enthalpy_of_vaporization", "value": 42.0},
+            "kcal/mol",
+            Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW,
+        ),
+    ]
+    for alias, values, units, expected in cases:
+        state, reason = map_quantity(None, values, units=units)
+        assert state.is_value and state.value is expected, (alias, state, reason)
+
+
+_BLOCKED_QUANTITY_ALIASES = (
+    "ion_current",
+    "henrian_activity",
+    "relative_ion_intensity",
+    "partial_pressure_figure_only",
+)
+
+_QUANTITY_FIELD_RE = re.compile(
+    r"(?m)(?:^|\s)quantity:\s*(?:\"([^\"]+)\"|'([^']+)'|([^\"'\n#,}]+))"
+)
+
+
+def _quantity_token(raw: str) -> Quantity | None:
+    state, _reason = map_quantity(None, {"quantity": raw})
+    if state.is_value:
+        return state.value
+    return None
+
+
+def _alias_extends_shorter(alias: str) -> bool:
+    return any(
+        other != alias and alias.startswith(other + "_") for other in QUANTITY_ALIASES
+    )
+
+
+def _parse_pair(raw: str) -> tuple[tuple[Quantity | None, str | None], Quantity | None]:
+    return split_qualified_quantity(raw), _quantity_token(raw)
+
+
+def test_l02_blocked_quantity_aliases_are_absent() -> None:
+    """Wrong observables stay unmapped. Henrian activity is not Raoultian activity."""
+
+    for alias in _BLOCKED_QUANTITY_ALIASES:
+        assert alias not in QUANTITY_ALIASES
+        state, reason = map_quantity(None, {"quantity": alias})
+        assert not state.is_value, (alias, state, reason)
+        assert reason and alias in reason
+
+
+def test_l02_alias_prefix_does_not_retarget_closed_names() -> None:
+    """A label must not change how a longer closed quantity or alias parses.
+
+    A species-formula suffix from a stem that is not itself `shorter_formula`
+    may still split (`partial_pressure` + `NaBO2`). A bare remainder
+    (`fraction`, `rate`, `ratio`, `fit`, `coefficient`) may not.
+    """
+
+    protected = [quantity.value for quantity in Quantity] + list(QUANTITY_ALIASES)
+    for alias in list(QUANTITY_ALIASES):
+        victims = [name for name in protected if name != alias and name.startswith(alias + "_")]
+        saved = QUANTITY_ALIASES.pop(alias)
+        try:
+            without = {name: _parse_pair(name) for name in victims}
+        finally:
+            QUANTITY_ALIASES[alias] = saved
+        for name, baseline in without.items():
+            suffix = name[len(alias) + 1 :]
+            got = _parse_pair(name)
+            formula, derivation, _reference = parse_quantity_suffix(suffix)
+            assert got[1] == baseline[1], (alias, name, got, baseline)
+            if formula is None and derivation is None:
+                assert got[0] == baseline[0], (alias, name, got, baseline)
+            elif _alias_extends_shorter(alias):
+                assert got[0] == baseline[0], (alias, name, got, baseline)
+
+
+def _extract_quantity_strings() -> set[str]:
+    found: set[str] = set()
+    root = REPO_ROOT / "data" / "literature" / "extracts"
+    for path in root.iterdir():
+        if path.suffix != ".yaml":
+            continue
+        text = path.read_text(encoding="utf-8")
+        for match in _QUANTITY_FIELD_RE.finditer(text):
+            raw = next(group for group in match.groups() if group)
+            found.add(raw.strip())
+    return found
+
+
+def test_l02_alias_prefix_does_not_retarget_extract_quantity_strings() -> None:
+    """No alias changes the parse of another quantity string in the extracts.
+
+    Historical stems may still prefix an unqualified string that is not itself
+    a closed quantity or alias (`partial_pressure_atomic_oxygen`). They may
+    not change a string that is already a closed name.
+    """
+
+    strings = _extract_quantity_strings()
+    assert strings
+    protected = {quantity.value for quantity in Quantity} | set(QUANTITY_ALIASES)
+    for alias in list(QUANTITY_ALIASES):
+        victims = [raw for raw in strings if raw.startswith(alias + "_")]
+        saved = QUANTITY_ALIASES.pop(alias)
+        try:
+            without = {raw: _parse_pair(raw) for raw in victims}
+        finally:
+            QUANTITY_ALIASES[alias] = saved
+        extends = _alias_extends_shorter(alias)
+        for raw, baseline in without.items():
+            suffix = raw[len(alias) + 1 :]
+            got = _parse_pair(raw)
+            formula, derivation, _reference = parse_quantity_suffix(suffix)
+            cuts_closed = raw in protected or any(
+                name != alias and name.startswith(alias + "_") and raw.startswith(name + "_")
+                for name in protected
+            )
+            if formula is None and derivation is None:
+                if cuts_closed or alias not in _HISTORICAL_PREFIX_STEMS:
+                    assert got == baseline, (alias, raw, got, baseline)
+            elif extends:
+                assert got == baseline, (alias, raw, got, baseline)
+            else:
+                assert got[1] == baseline[1], (alias, raw, got, baseline)
+
+
+def test_l02_reviewed_prefix_collisions_keep_the_unaliased_parse() -> None:
+    assert split_qualified_quantity("activity_CsBO2") == (Quantity.ACTIVITY, "CsBO2")
+    assert split_qualified_quantity("mass_loss_fraction") == (None, None)
+    assert split_qualified_quantity("mass_loss_rate") == (None, None)
+    assert _quantity_token("mass_loss_fraction") is Quantity.MASS_LOSS_FRACTION
+    assert _quantity_token("mass_loss_rate") is Quantity.MASS_LOSS_RATE
+    assert split_qualified_quantity("ion_current_ratio") == (None, None)
+    assert _quantity_token("ion_current_ratio") is Quantity.ION_INTENSITY_RATIO
+    assert split_qualified_quantity("henrian_activity_coefficient") == (None, None)
+    assert split_qualified_quantity("partial_pressure_NaBO2_fit") == (
+        Quantity.P_PARTIAL,
+        "NaBO2_fit",
+    )
+    assert split_qualified_quantity("partial_pressure_LiBO2_fit") == (
+        Quantity.P_PARTIAL,
+        "LiBO2_fit",
+    )
+    assert split_qualified_quantity("partial_pressure_CsBO2_fit") == (
+        Quantity.P_PARTIAL,
+        "CsBO2_fit",
+    )
+    assert split_qualified_quantity("partial_pressure_NaBO2") == (
+        Quantity.P_PARTIAL,
+        "NaBO2",
+    )
+    assert _quantity_token("partial_pressure_NaBO2") is Quantity.P_PARTIAL
+    assert _quantity_token("mass_loss") is Quantity.MASS_LOSS_FRACTION
+    assert split_qualified_quantity("pure_vapor_pressure_fit") == (None, None)
+    assert split_qualified_quantity("raoultian_activity_coefficient") == (None, None)
+    assert split_qualified_quantity("relative_ion_intensity_comparison") == (None, None)
+    for label in (
+        "mass_loss",
+        "pure_vapor_pressure",
+        "partial_pressure_NaBO2",
+        "partial_pressure_LiBO2",
+        "partial_pressure_CsBO2",
+        "raoultian_activity",
+        "solidus",
+        "henrian_activity",
+        "ion_current",
+        "relative_ion_intensity",
+        "partial_pressure_figure_only",
+        "second_law_enthalpy_of_vaporization",
+        "invariant_transformation_temperature",
+    ):
+        assert label not in _HISTORICAL_PREFIX_STEMS
+
+
 _TYPE_CONTRADICTIONS = [
     ("ames-walsh-white-1967.yaml", "Ames67_EuO_dissociation"),
     ("ames-walsh-white-1967.yaml", "Ames67_YbO_dissociation"),
@@ -3494,6 +3945,268 @@ def test_l05g1a_qualified_activity_token_lifts_activity(tmp_path: Path) -> None:
     assert obs.value.kind is ValueKind.POINT
     assert obs.value.point == as_decimal("4e-06")
     assert obs.identity.species.formula == "CsBO2"
+
+
+def test_activity_standard_state_source_prose_lifts_typed_reference(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="activity_from_table2_AT_B",
+        units="dimensionless",
+        values={
+            "quantity": "activity_from_table2_AT_B",
+            "activity": 0.12,
+            "method_class": "measured_direct",
+        },
+        obs_type="activity_coefficient",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["phase"] = "condensed_liquid"
+    row["standard_state"] = (
+        "raoultian_pure_endmember; pure liquid Na2O endmember=Na2O"
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    reference_state = obs.identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert reference_state.value.endmember.formula == "Na2O"
+    assert reference_state.value.endmember.phase.value is Phase.L
+    assert reference_state.value.reference_pressure_bar is None
+
+
+def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() -> None:
+    feo = reference_state_from_extract(
+        "raoultian_pure_endmember; pure liquid FeO endmember=FeO. "
+        "The pure condensed solid/liquid activity is unity.",
+        species_formula="Fe",
+        values={},
+    )
+    assert feo is not None and feo.is_value
+    assert feo.value.endmember.formula == "FeO"
+    assert feo.value.endmember.phase.is_value
+    assert feo.value.endmember.phase.value is Phase.L
+    assert feo.value.reference_pressure_bar is None
+
+    ichise = reference_state_from_extract(
+        "Fe(l)=Fe (in alloy), Raoultian liquid Fe; "
+        "Mo(s)=Mo (in alloy), Raoultian solid Mo",
+        species_formula="Fe",
+        values={},
+    )
+    assert ichise is not None and ichise.is_value
+    assert ichise.value.endmember.formula == "Fe"
+    assert ichise.value.endmember.phase.value is Phase.L
+
+    ueshima = reference_state_from_extract(
+        "a_Fe liquid Fe; a_W solid W",
+        species_formula="Fe",
+        values={},
+    )
+    assert ueshima is not None and ueshima.is_value
+    assert ueshima.value.endmember.formula == "Fe"
+    assert ueshima.value.endmember.phase.value is Phase.L
+
+    ambiguous = reference_state_from_extract(
+        "Fe(l)=Fe (in alloy), Raoultian liquid Fe; "
+        "Mo(s)=Mo (in alloy), Raoultian solid Mo",
+        species_formula="not-either",
+        values={},
+    )
+    assert ambiguous is not None and ambiguous.is_unknown
+
+    sossi = reference_state_from_extract(
+        "raoultian_pure_endmember; pure liquid oxide at the temperature and "
+        "pressure of interest; endmember=NaO0.5; the coefficient is the "
+        "Henry/infinite-dilution limit",
+        species_formula="Na",
+        values={},
+    )
+    assert sossi is not None and sossi.is_value
+    assert sossi.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert sossi.value.endmember.formula == "NaO0.5"
+    assert sossi.value.endmember.phase.value is Phase.L
+    assert sossi.value.reference_pressure_bar is None
+    plain = to_plain(sossi.value)
+    assert isinstance(plain, dict)
+    assert "reference_pressure_bar" not in plain
+    assert _standard_state_from_plain(plain).reference_pressure_bar is None
+
+    printed_bar = reference_state_from_extract(
+        "pure liquid Na2O at 1 bar endmember=Na2O",
+        species_formula="Na2O",
+        values={},
+    )
+    assert printed_bar is not None and printed_bar.is_value
+    assert printed_bar.value.reference_pressure_bar == as_decimal("1")
+
+    sodium = reference_state_from_extract(
+        "γ°_Na is the infinite-dilution (Henry) coefficient in Pb such that "
+        "Raoultian a_Na = γ°_Na · X_Na. "
+        "「a_Na: ラウール基準のナトリウムの活量」.",
+        species_formula="Na",
+        values={},
+    )
+    assert sodium is not None and sodium.is_value
+    assert sodium.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert sodium.value.endmember.formula == "Na"
+
+    henry = reference_state_from_extract(
+        "infinite-dilution activity coefficient of Al in liquid Fe",
+        species_formula="Al",
+        values={},
+    )
+    assert henry is not None and henry.is_value
+    assert henry.value.convention is ReferenceStateConvention.HENRIAN_LIQUID
+    assert henry.value.endmember.phase.value is Phase.L
+
+
+def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> None:
+    furukawa = next(
+        row
+        for row in _extract_observations("kems-119-furukawa-1975.yaml")
+        if row.get("observation_id") == "furukawa_1975_quoted_fruehan_gamma_v"
+    )
+    mixed = reference_state_from_extract(
+        furukawa["standard_state"],
+        species_formula="V",
+        values=furukawa["values"],
+    )
+    assert mixed is not None and mixed.is_unknown
+
+    plante = next(
+        row
+        for row in _extract_observations("kems-027-plante-hastie-1983.yaml")
+        if row.get("observation_id") == "plante_hastie_1983_nabo2_activity_approx"
+    )
+    negated = reference_state_from_extract(
+        plante["standard_state"],
+        species_formula="NaBO2",
+        values=plante["values"],
+    )
+    assert negated is not None and negated.is_unknown
+
+
+def test_demaria_fe_rows_do_not_print_a_reference_state(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
+    expected = {
+        "demaria_1971_fe_lunar_basalt_kems_main_cell",
+        "demaria_1971_fe_activity_multi_rotating_cell",
+    }
+    loaded = {
+        obs.observation_id.split("::", 1)[1]: obs
+        for obs in result.observations.values()
+        if obs.observation_id.split("::", 1)[-1] in expected
+    }
+    assert set(loaded) == expected
+    for obs in loaded.values():
+        reference = obs.identity.reference_state
+        assert reference is not None and reference.is_unknown
+
+
+def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:
+    from simulator.battery.score import ScoreContext, comparison_candidates
+
+    result = _migrate_real_extract(tmp_path, "kems-ms2000-044.yaml")
+    r2 = [
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith("_class_quote_r2")
+        and "sio2_activity" in obs.observation_id
+    ]
+    assert len(r2) == 24
+    r2_ids = {obs.observation_id for obs in r2}
+    for obs in r2:
+        evidence = obs.evidence.class_
+        assert obs.evidence.original_method_class == "derived"
+        assert not (evidence.is_value and evidence.value in MEASURED_EVIDENCE)
+        reference = obs.identity.reference_state
+        assert reference is not None and reference.is_value
+        assert reference.value.endmember.formula == "SiO2"
+        assert reference.value.endmember.phase.value is Phase.L
+        assert reference.value.reference_pressure_bar is None
+    superseded = [
+        obs
+        for obs in result.observations.values()
+        if obs.admission.superseded_by in r2_ids
+    ]
+    assert len(superseded) == 24
+    for obs in superseded:
+        assert obs.admission.status is AdmissionStatus.SUPERSEDED
+        assert obs.evidence.class_.is_value
+        assert obs.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    candidates = comparison_candidates(
+        ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+        )
+    )
+    candidate_ids = {obs.observation_id for obs in candidates}
+    assert r2_ids.isdisjoint(candidate_ids)
+    assert {obs.observation_id for obs in superseded}.isdisjoint(candidate_ids)
+
+
+def test_unprinted_temperature_envelopes_are_not_loaded(tmp_path: Path) -> None:
+    arxiv_rows = _extract_observations("arxiv-1902-05005.yaml")
+    table2 = next(
+        row
+        for row in arxiv_rows
+        if row.get("observation_id") == "sossi_fegley_2018_table2_activity_coefficients"
+    )
+    assert "T_range_K" not in table2
+    assert "standard_state" not in table2
+    arxiv = _migrate_real_extract(tmp_path, "arxiv-1902-05005.yaml")
+    loaded = next(
+        obs
+        for obs in arxiv.observations.values()
+        if "sossi_fegley_2018_table2_activity_coefficients" in obs.observation_id
+    )
+    reference = loaded.identity.reference_state
+    assert reference is None or not reference.is_value or (
+        reference.value.endmember.formula not in {"FeO", "FeO."}
+    )
+    temperature = loaded.identity.temperature_K
+    if temperature is not None and temperature.is_unknown:
+        assert "1573" not in (temperature.reason or "")
+        assert "1923" not in (temperature.reason or "")
+
+    demaria_rows = _extract_observations("kems-022-demaria-1971.yaml")
+    rotating = next(
+        row
+        for row in demaria_rows
+        if row.get("observation_id") == "demaria_1971_fe_activity_multi_rotating_cell"
+    )
+    assert "T_range_K" not in rotating
+
+
+def test_ts1985_printed_binary_complement_is_not_a_float_residue() -> None:
+    rows = [
+        row
+        for row in _extract_observations("ts1985.yaml")
+        if isinstance(row.get("values"), dict)
+        and row["values"].get("X_Na2O_as_published") == 0.55
+    ]
+    assert len(rows) == 3
+    for row in rows:
+        composition, _omitted = _mole_fraction_composition_from_values(row["values"])
+        assert composition is not None
+        assert composition.as_map() == {
+            "Na2O": as_decimal("0.55"),
+            "SiO2": as_decimal("0.45"),
+        }
+
+
+def test_dacko_minor_constituents_are_omitted_from_activity_composition() -> None:
+    rows = [
+        row
+        for row in _extract_observations("ta-dacko-conradt-low-p-transpiration.yaml")
+        if str(row.get("observation_id") or "").startswith("dacko_2004_table2_activity_")
+    ]
+    assert len(rows) == 6
+    for row in rows:
+        composition, omitted = _mole_fraction_composition_from_values(row["values"])
+        assert composition is None
+        assert "minor constituents" in omitted
 
 
 def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -> None:
@@ -5355,6 +6068,8 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
         "behrens-rosenblatt-1972::NIST_BR72_arsenolite_As4O6"
     ]
     assert quantity_token(br72_obs.identity) is Quantity.P_SAT
+    assert br72_obs.identity.species.phase.value is Phase.G
+    assert br72_obs.identity.species.polymorph.is_not_applicable
     assert br72_obs.value.kind is ValueKind.UNAVAILABLE
     assert "log10(P_bar) = A" in (br72_obs.value.unavailable_reason or "")
 

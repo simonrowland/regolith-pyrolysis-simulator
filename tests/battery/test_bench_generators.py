@@ -17,7 +17,8 @@ from simulator.battery.records import (
 )
 from simulator.battery.waypoints import (
     charge_moles_by_species, oxygen_condition, consumer_readiness,
-    WaypointAuthority, ReadinessStatus, GapReason, UnknownCompositionRelationError,
+    ENGINE_POINT_CONSUMERS, WaypointAuthority, ReadinessStatus, GapReason,
+    UnknownCompositionRelationError,
 )
 from tests.battery import factories as f
 
@@ -97,7 +98,7 @@ def test_uncontrolled_oxygen_refuses_every_engine():
     experiment, bench, observation = case(oxygen=False)
     assert oxygen_condition(experiment, bench, observation).selected is None
     results = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
-    assert len(results) == 8
+    assert len(results) == len(ENGINE_POINT_CONSUMERS)
     assert all(result.payload is None for result in results)
     assert all(any(gap.waypoint == "oxygen_condition" for gap in result.readiness.gaps) for result in results)
 
@@ -317,7 +318,7 @@ def test_engine_inputs_all_eight_and_provenance():
     inputs = collect_consumer_inputs(experiment, bench, observation)
     results = engine_point_requests(inputs)
     assert {item.payload["engine"] for item in results} == {
-        "internal-analytical", "alphamelts", "thermoengine", "vaporock", "magemin", "cached-real", "imcc_sf04", "imcc_sf04_ext"}
+        "internal-analytical", "alphamelts", "thermoengine", "vaporock", "magemin", "cached-real", "imcc_sf04", "imcc_sf04_ext", "openimcc"}
     for result in results:
         assert result.payload["temperature_C"] == 1126.85
         assert result.payload["pressure_bar"] == 1e-5
@@ -634,7 +635,7 @@ def test_cli_generates_schema_inputs_with_numeric_json(tmp_path, monkeypatch, co
     monkeypatch.setattr(cli, "_apparatus_references", lambda root, works: {})
     assert cli.main(["--consumer", consumer, "--source", "work-1", "--output", str(tmp_path)]) == 0
     summary = json.loads((tmp_path / "summary.json").read_text())
-    assert summary["counts"]["generated"] == (1 if consumer == "kems" else 8)
+    assert summary["counts"]["generated"] == (1 if consumer == "kems" else len(ENGINE_POINT_CONSUMERS))
     payload = json.loads((tmp_path / "00000000.json").read_text())
     if consumer == "kems":
         from simulator.diagnostic_helpers.kems import validate_kems_case

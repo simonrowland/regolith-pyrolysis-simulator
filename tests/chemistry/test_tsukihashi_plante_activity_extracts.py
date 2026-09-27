@@ -1,12 +1,14 @@
-"""Transcription pins for Tsukihashi & Sano 1985 and Plante 1979 activity rows.
+"""Transcription pins for Tsukihashi & Sano 1985 and Plante 1979.
 
-Quote the source table for spot-check; require the six-criterion payload
-(numeric value, T, composition, pO2, silicate-melt class, liquid_melt form).
-Do not tune residuals — a large residual is a battery result.
+Tsukihashi rows carry the six-criterion activity payload. Plante stores
+printed K(g) partial pressure. Equation (7)'s vapour-referenced A is not
+a(K2O) and is not stored. Do not tune residuals — a large residual is a
+battery result.
 """
 
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -80,31 +82,92 @@ def test_tsukihashi_sio2_gibbs_duhem_start_quoted() -> None:
     assert obs["values"]["composition_mol"] == {"Na2O": 0.5, "SiO2": 0.5}
 
 
+def _wt(amount: object) -> Decimal:
+    return Decimal(str(amount))
+
+
 def test_plante_table2_series1104_first_row_quoted() -> None:
-    """Table 2 p.276 Series 1104: T=1302 K, 43.94 wt% K2O, P_K=6.91E-7 atm."""
+    """Table 2 p.276 Series 1104: T=1302 K, 43.94 wt% K2O, P_K=6.91E-7 atm.
+
+    The admitted successor is the quoted row. A is not stored.
+    """
 
     doc = _load(PLANTE)
-    obs = _obs_by_id(doc, "plante1979_table2_k2o_s1104_000_1302K")
-    _six_criteria(obs)
+    obs = _obs_by_id(doc, "plante1979_table2_s1104_r001_quoted")
     values = obs["values"]
+    assert "activity" not in values
+    assert values["admission_status"] == "admitted"
     assert values["P_K_atm_as_published"] == pytest.approx(6.91e-7)
-    assert values["composition_wt_pct"]["K2O"] == pytest.approx(43.94)
+    assert values["T_K_as_published"] == pytest.approx(1302.0)
+    assert _wt(values["composition_wt_pct"]["K2O"]) == Decimal("43.94")
+    assert _wt(values["composition_wt_pct"]["SiO2"]) == Decimal("56.06")
     assert values["po2_over_pK_as_published"] == pytest.approx(0.226)
-    p_k = 6.91e-7
-    activity = (p_k ** 2) * ((0.226 * p_k) ** 0.5)
-    assert values["activity"] == pytest.approx(activity, rel=1e-9)
+    assert "SiO2 is derived, not printed" in values["composition_derivation"]
+    relation = obs["derivation"]["relation"]
+    assert "P_K = k_K I_K+ T" in relation
+    assert "sqrt(T)" not in relation
+    assert obs["quote"] == "1302 | 43.94 | 6.91E-7"
+    assert "superscript a" not in obs["quote_normalization"]
+    parent = _obs_by_id(doc, "plante1979_table2_k2o_s1104_000_1302K")
+    assert "activity" not in parent["values"]
+    assert obs["supersedes"] == parent["observation_id"]
+    assert "pending" in parent["condensed_form"]["note"]
+    assert "omitted" not in parent["condensed_form"]["note"]
 
 
-def test_plante_omits_two_phase_and_series_1214() -> None:
+def test_plante_superscript_a_rows_stay_pending() -> None:
+    """162 superseded parents, 162 admitted successors, 59 superscript-a pending."""
+
     doc = _load(PLANTE)
-    ids = [
-        obs["observation_id"]
-        for obs in doc["species"]["K2O"]["observations"]
-    ]
-    assert not any("s1214" in i for i in ids)
-    assert len(ids) == 162
-    for obs in doc["species"]["K2O"]["observations"]:
-        _six_criteria(obs)
+    k2o = doc["species"]["K2O"]["observations"]
+    k_rows = doc["species"]["K"]["observations"]
+    assert len(k2o) == 162
+    assert not any("s1214" in obs["observation_id"] for obs in k2o)
+    assert len(k_rows) == 221
+    admitted = [obs for obs in k_rows if obs["values"]["admission_status"] == "admitted"]
+    pending = [obs for obs in k_rows if obs["values"]["admission_status"] == "pending"]
+    assert len(admitted) == 162
+    assert len(pending) == 59
+    assert len([obs for obs in pending if "s1214" in obs["observation_id"]]) == 37
+    for obs in k2o:
+        assert "activity" not in obs["values"]
+        note = obs["condensed_form"]["note"]
+        assert "pending" in note
+        assert "omitted" not in note
+    for obs in admitted:
+        values = obs["values"]
+        assert "activity" not in values
+        comp = values["composition_wt_pct"]
+        assert _wt(comp["SiO2"]) == Decimal("100") - _wt(comp["K2O"])
+        assert "SiO2 is derived, not printed" in values["composition_derivation"]
+        assert "superscript a" not in obs["quote_normalization"]
+        assert not obs["quote"].split("|", 1)[0].strip().endswith("a")
+        assert "sqrt(T)" not in obs["derivation"]["relation"]
+        printed = obs["numeric_provenance"]["printed_fields"]
+        assert "composition use the quoted" not in printed
+        assert "not a printed Table 2 cell" in printed
+    for obs in pending:
+        values = obs["values"]
+        assert values["admission_status"] == "pending"
+        assert values["two_phase_marker"] == "a"
+        assert "composition_wt_pct" not in values
+        assert "activity" not in values
+        assert obs["quote"].split("|", 1)[0].strip().endswith("a")
+        assert "superscript a" in obs["quote_normalization"]
+
+
+def test_plante_superseded_parent_1404_matches_printed_cell() -> None:
+    """Printed Table 2 series 1115 at 1404 K is 34.34 wt% K2O."""
+
+    doc = _load(PLANTE)
+    parent = _obs_by_id(doc, "plante1979_table2_k2o_s1115_003_1404K")
+    successor = _obs_by_id(doc, "plante1979_table2_s1115_r004_quoted")
+    assert _wt(parent["values"]["composition_wt_pct"]["K2O"]) == Decimal("34.34")
+    assert _wt(parent["values"]["composition_wt_pct"]["SiO2"]) == Decimal("65.66")
+    assert _wt(successor["values"]["composition_wt_pct"]["K2O"]) == Decimal("34.34")
+    assert _wt(successor["values"]["composition_wt_pct"]["SiO2"]) == Decimal("65.66")
+    assert successor["quote"] == "1404 | 34.34 | 1.53E-6"
+    assert "34.35" not in parent["locator"]["note"]
 
 
 def test_new_activity_rows_are_not_missing_numeric() -> None:

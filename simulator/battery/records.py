@@ -375,7 +375,8 @@ class StandardState:
     convention: ReferenceStateConvention
     endmember: Species
     component_basis: str
-    reference_pressure_bar: Decimal
+    # Absent when the source does not print a number. Never a default of 1 bar.
+    reference_pressure_bar: Decimal | None = None
 
     def __post_init__(self) -> None:
         if not self.component_basis:
@@ -385,9 +386,10 @@ class StandardState:
                 "single_cation_oxide is a component_id, never a convention "
                 "or component_basis token"
             )
-        object.__setattr__(
-            self, "reference_pressure_bar", as_decimal(self.reference_pressure_bar)
-        )
+        if self.reference_pressure_bar is not None:
+            object.__setattr__(
+                self, "reference_pressure_bar", as_decimal(self.reference_pressure_bar)
+            )
 
 
 @dataclass(frozen=True)
@@ -1054,6 +1056,7 @@ class Observation:
     engine: EngineTrace | None = None
     authority: Authority | None = None
     certified_band: Mapping[str, tuple[Decimal, Decimal]] | None = None
+    provenance: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if not self.observation_id:
@@ -1102,7 +1105,7 @@ class ResidualNumeric:
     operation: MetricOperation
     unit: str
     value: Decimal
-    decision_band: DecisionBand
+    decision_band: DecisionBand | None
     metric_uncertainty: Uncertainty | None = None
 
     def __post_init__(self) -> None:
@@ -1123,7 +1126,7 @@ class Residual:
     key: str
     reference: str
     execution: Execution
-    rail: Rail
+    rail: Rail | None
     status: ResidualStatus
     source_relation: SourceRelation
     score_eligible: bool

@@ -88,6 +88,7 @@ def test_engine_enum_is_closed_and_includes_imcc_sf04() -> None:
         "magemin",
         "imcc_sf04",
         "imcc_sf04_ext",
+        "openimcc",
     }
     import ast
     from pathlib import Path

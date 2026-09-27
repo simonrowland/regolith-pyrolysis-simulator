@@ -478,7 +478,7 @@ def test_battery_engine_names_match_backends_py_surface() -> None:
         "magemin",
         "cached-real",
     )
-    assert BATTERY_ENGINE_NAMES[-2:] == IMCC_ENGINE_NAMES
+    assert BATTERY_ENGINE_NAMES[-len(IMCC_ENGINE_NAMES):] == IMCC_ENGINE_NAMES
     assert IMCC_MODEL_IDS["imcc_sf04"] == "IMCC-SF04"
     assert IMCC_MODEL_IDS["imcc_sf04_ext"] == "IMCC-SF04-EXT"
 

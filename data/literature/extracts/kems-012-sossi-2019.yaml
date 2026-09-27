@@ -5610,7 +5610,9 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: >-
+        raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of
+        interest; endmember=NaO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -5838,7 +5840,12 @@ species:
       supersedes: sossi_2019_na_table4_gamma_this_work
       type: activity_coefficient
       class: model
+      T_range_K: [1673.15, 1673.15]
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: >-
+        raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of
+        interest; endmember=NaO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9,
+        eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -6075,7 +6082,9 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: >-
+        raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of
+        interest; endmember=KO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -6282,7 +6291,12 @@ species:
       supersedes: sossi_2019_k_table4_gamma_this_work
       type: activity_coefficient
       class: model
+      T_range_K: [1673.15, 1673.15]
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: >-
+        raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of
+        interest; endmember=KO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9,
+        eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -18095,7 +18109,7 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=LiO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -18278,6 +18292,7 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=LiO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -18463,7 +18478,7 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=RbO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -18639,6 +18654,7 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=RbO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -18851,7 +18867,7 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CuO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -19046,6 +19062,7 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CuO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -19272,7 +19289,7 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=AgO0.5; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -19356,6 +19373,7 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=AgO0.5; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -19502,7 +19520,7 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=ZnO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -19690,6 +19708,7 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=ZnO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -19918,7 +19937,7 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=GeO2; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -20105,6 +20124,7 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=GeO2; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -20319,7 +20339,7 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CdO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -20402,6 +20422,7 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=CdO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
@@ -20996,7 +21017,7 @@ species:
         transition_context:
           liquidus_K: 1573.0
           source_locator: Sossi-2019 ferrobasalt FCMAS liquidus ~1573 K (OCR section 4.0 line 202; audit 2026-08-09)
-      standard_state: open 1-bar furnace; γ_i^∞ = K*/K with authors-adopted α_e=1 (eq. 6)
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=PbO; γ_i^∞ = K*/K with authors-adopted α_e=1 (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       uncertainty:
@@ -21205,6 +21226,7 @@ species:
       type: activity_coefficient
       class: model
       phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest; endmember=PbO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
       regime: open_furnace_apparent
       units: dimensionless γ as published
       locator:
