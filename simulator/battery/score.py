@@ -2284,6 +2284,7 @@ def predict_with_engine(
     pressures = dict(getattr(cell, "gas_partial_pressures_Pa", None) or {})
     reported: Mapping[str, float]
     unit = QUANTITY_UNITS[quantity]
+    coefficient_basis: str | None = None
     if quantity in MELT_ACTIVITY_QUANTITIES:
         coefficients = dict(getattr(cell, "melt_activity_coefficients", None) or {})
         selected = melt_quantity_report(quantity, activities, coefficients)
@@ -2305,6 +2306,78 @@ def predict_with_engine(
                 requested_composition=requested,
                 version=engine_version,
             )
+        if quantity is Quantity.ACTIVITY_COEFFICIENT:
+            details = getattr(cell, "melt_activity_coefficient_details", None)
+            detail = details.get(formula) if isinstance(details, Mapping) else None
+            reported_basis = (
+                detail.get("coefficient_basis")
+                if isinstance(detail, Mapping)
+                else None
+            )
+            reported_standard_state = (
+                detail.get("standard_state") if isinstance(detail, Mapping) else None
+            )
+            reference_state = identity.reference_state
+            expected_standard_state = (
+                reference_state.value
+                if reference_state is not None
+                and reference_state.is_value
+                and isinstance(reference_state.value, StandardState)
+                else None
+            )
+            expected_phase = (
+                phase_token(expected_standard_state.endmember)
+                if expected_standard_state is not None
+                else None
+            )
+            if (
+                not isinstance(reported_basis, str)
+                or expected_standard_state is None
+                or expected_phase is None
+                or not isinstance(reported_standard_state, Mapping)
+                or reported_standard_state.get("convention")
+                != expected_standard_state.convention.value
+                or reported_standard_state.get("phase") != expected_phase.value
+                or reported_standard_state.get("component_basis")
+                != expected_standard_state.component_basis
+            ):
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(
+                        state=ExecutionState.PRODUCED,
+                        call_evidence=call_evidence,
+                    ),
+                    authority=Authority.REFUSED,
+                    notices=notices,
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    refusal_reason=RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+                    refusal_detail={
+                        "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
+                        "formula": formula,
+                        "reported_basis": reported_basis,
+                        "reported_standard_state": (
+                            dict(reported_standard_state)
+                            if isinstance(reported_standard_state, Mapping)
+                            else None
+                        ),
+                        "expected_standard_state": (
+                            {
+                                "convention": expected_standard_state.convention.value,
+                                "phase": expected_phase.value,
+                                "component_basis": expected_standard_state.component_basis,
+                            }
+                            if expected_standard_state is not None
+                            and expected_phase is not None
+                            else None
+                        ),
+                    },
+                    identity=identity,
+                    requested_composition=requested,
+                    version=engine_version,
+                )
+            coefficient_basis = reported_basis
         reported = selected
         unit = "dimensionless"
     elif quantity in _VAPOUR_EQUILIBRIUM:
@@ -2392,6 +2465,7 @@ def predict_with_engine(
         coefficient_sources=expanded,
         lineage_complete=lineage_complete_for(sources),
         certified_band=certified_band,
+        coefficient_basis=coefficient_basis,
         identity=identity,
         requested_composition=requested,
         version=engine_version,

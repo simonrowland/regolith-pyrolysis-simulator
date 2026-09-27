@@ -16,22 +16,28 @@ import pytest
 
 from simulator.battery.enums import (
     AmountBasis,
+    Authority,
     Engine,
     Phase,
+    PerBasis,
     Quantity,
     RefusalReason,
+    ResidualStatus,
 )
+from simulator.battery.identity import Exposure, SweepIdentity
 from simulator.battery.score import (
     ENGINE_CHANNELS,
     SCORE_ENGINE_SET,
     candidate_observation,
+    compile_residual,
     composition_wt_pct,
+    _implied_alpha_activity_observation,
     ScoreContext,
     predict_with_engine,
     score_store,
 )
 from simulator.battery.migrate import load_migrated_store, load_yaml
-from simulator.battery.records import Composition, Species
+from simulator.battery.records import Composition, Species, State
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     BinaryPot,
@@ -239,6 +245,153 @@ def _binary_probe() -> BinaryPot:
         why="focused openimcc producer test",
         composition_wt_pct={"K2O": 43.94, "SiO2": 56.06},
     )
+
+
+def _zhang_k_case(tmp_path: Path, temperature: str):
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migration = _migrate_real_extract(tmp_path, "kems-006-zhang-2021.yaml")
+    reference = next(
+        observation
+        for observation in migration.observations.values()
+        if "table4_K_evaporation_coefficients" in observation.observation_id
+        and str(observation.identity.temperature_K.value) == temperature
+    )
+    # The source row leaves these kinetic axes unknown. Supply explicit test
+    # inputs for identity matching and the real IMCC request; keep its value,
+    # provenance, composition, and experiment unchanged.
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            subtype=State.of("langmuir_alpha"),
+            per=State.of(PerBasis.DIMENSIONLESS),
+            reservoir=State.of(Species("K", Phase.G)),
+            fO2_Pa=State.of(Decimal("1e-4")),
+            total_pressure_Pa=State.of(Decimal("0.1")),
+            sweep_gas=State.of(
+                SweepIdentity(
+                    species="N2",
+                    flow_sccm=State.of(Decimal("1")),
+                    partial_pressure_Pa=State.of(Decimal("1")),
+                )
+            ),
+            exposure=State.of(
+                Exposure(
+                    area_m2=State.of(Decimal("1")),
+                    duration_s=State.of(Decimal("1")),
+                )
+            ),
+        ),
+    )
+    request = _implied_alpha_activity_observation(reference)
+    assert request is not None
+    assert request.identity is not None
+    context = ScoreContext(
+        works=migration.works,
+        experiments=migration.experiments,
+        observations=migration.observations,
+        extract_review={"kems-006-zhang-2021": "draft"},
+        hostname="test",
+    )
+    return context, reference, request
+
+
+@pytest.mark.parametrize(
+    ("temperature", "expected_gamma", "expected_alpha"),
+    [
+        ("1473.15", 3.49e-9, 20.0),
+        ("1673.15", 2.45e-8, 45.0),
+    ],
+)
+def test_openimcc_zhang_implied_alpha_uses_coefficient_details(
+    tmp_path: Path,
+    temperature: str,
+    expected_gamma: float,
+    expected_alpha: float,
+) -> None:
+    _require_openimcc()
+    context, reference, request = _zhang_k_case(tmp_path, temperature)
+    handle = open_battery_engine("openimcc")
+    assert handle.available, handle.unavailable_reason
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        request,
+        handles={"openimcc": handle},
+        isolated=False,
+    )
+    assert float(prediction.value) == pytest.approx(expected_gamma, rel=1e-2)
+    assert prediction.coefficient_basis == "single_cation"
+    assert prediction.authority is Authority.EXTRAPOLATED
+
+    residual, candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=prediction,
+    )
+    assert candidate is not None
+    assert candidate.authority is Authority.EXTRAPOLATED
+    assert residual.status is ResidualStatus.MISMATCH
+    assert residual.numeric is not None
+    assert residual.numeric.verdict == "physically_impossible"
+    assert float(10 ** float(residual.numeric.value)) == pytest.approx(
+        expected_alpha, rel=0.03
+    )
+
+
+@pytest.mark.parametrize("details_mode", ["absent", "parent_oxide", "wrong_state"])
+def test_openimcc_zhang_implied_alpha_refuses_bad_coefficient_details(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    details_mode: str,
+) -> None:
+    _require_openimcc()
+    context, reference, request = _zhang_k_case(tmp_path, "1673.15")
+    handle = open_battery_engine("openimcc")
+
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    real_equilibrate_cell = binary_pot_battery.equilibrate_cell
+
+    def altered_equilibrate_cell(*args, **kwargs):
+        cell = real_equilibrate_cell(*args, **kwargs)
+        details = dict(cell.melt_activity_coefficient_details)
+        if details_mode == "absent":
+            details.pop("KO0.5", None)
+        elif details_mode == "parent_oxide":
+            details["KO0.5"] = {
+                **details["KO0.5"],
+                "coefficient_basis": "parent_oxide",
+            }
+        else:
+            details["KO0.5"] = {
+                **details["KO0.5"],
+                "standard_state": {
+                    **details["KO0.5"]["standard_state"],
+                    "phase": "cr",
+                },
+            }
+        return replace(cell, melt_activity_coefficient_details=details)
+
+    monkeypatch.setattr(binary_pot_battery, "equilibrate_cell", altered_equilibrate_cell)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        request,
+        handles={"openimcc": handle},
+        isolated=False,
+    )
+    residual, candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=prediction,
+    )
+    assert candidate is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
 
 
 def test_openimcc_engine_is_registered() -> None:
