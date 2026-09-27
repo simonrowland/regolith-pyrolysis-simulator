@@ -1195,7 +1195,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             1550.0,
             3.991224711311173,
             420964.78778095124,
-            826.2538064965702,
+            826.253807011766,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

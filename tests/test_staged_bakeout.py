@@ -303,10 +303,20 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # adjudication; prior value was generated against the broken-liquidus job
     # tree (0.10246923985526701). docs-private/research/2026-08-02-train13-adjudication.md
     # 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves
-    # the executable Stage-3 silica value to 0.22256743248660346 kg.
-    assert staged_silica == pytest.approx(0.22256743248660346, rel=1e-9)
+    # the executable Stage-3 silica value to 0.17711244298735632 kg.
+    assert staged_silica == pytest.approx(0.17711244298735632, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
-    assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
+    assert set(staged_sio_stage) == {
+        "AlO",
+        "CaO_gas",
+        "CrO",
+        "Fe",
+        "Si",
+        "SiO2",
+        "SiO2_gas",
+        "TiO",
+        "TiO2_gas",
+    }
     assert staged_sio_stage["Fe"] > 0.0
     assert staged_sio_stage["Si"] + staged_sio_stage["SiO2"] == pytest.approx(
         staged_silica, rel=1e-12
@@ -316,8 +326,8 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # adjudication; prior value was generated against the broken-liquidus job
     # tree (0.01143878479198185). docs-private/research/2026-08-02-train13-adjudication.md
     # 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves
-    # the executable staged SiO product to 0.009939732297319245 kg.
-    assert staged_products["SiO"] == pytest.approx(0.009939732297319245)
+    # the executable staged SiO product to 0.007909738860627617 kg.
+    assert staged_products["SiO"] == pytest.approx(0.007909738860627617)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():

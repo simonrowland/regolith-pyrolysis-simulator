@@ -104,45 +104,6 @@
       }
     },
     "kernel_commit_sha": "goal-18-fixture",
-    "flag_backlog": {
-      "count": 2,
-      "by_species": {
-        "FeO_association_gas": 2
-      },
-      "by_reason": {
-        "vapor_pressure_physical_pressure_ceiling": 2
-      },
-      "entries": [
-        {
-          "hour": 11,
-          "species": "FeO_association_gas",
-          "status": "refused",
-          "flux_status": "refused",
-          "reason": "vapor_pressure_physical_pressure_ceiling",
-          "pressure_Pa": 20699453099.94968,
-          "ceiling_Pa": 1000000000.0,
-          "flagged": true,
-          "backlog": true,
-          "measured_zero": false,
-          "ledger_moved_mol": 0.0,
-          "mass_moved_mol": 0.0
-        },
-        {
-          "hour": 12,
-          "species": "FeO_association_gas",
-          "status": "refused",
-          "flux_status": "refused",
-          "reason": "vapor_pressure_physical_pressure_ceiling",
-          "pressure_Pa": 8444567599.677524,
-          "ceiling_Pa": 1000000000.0,
-          "flagged": true,
-          "backlog": true,
-          "measured_zero": false,
-          "ledger_moved_mol": 0.0,
-          "mass_moved_mol": 0.0
-        }
-      ]
-    },
     "campaigns_elapsed": 0.6,
     "backend_status": "unavailable",
     "backend_authoritative": false,
@@ -5229,6 +5190,7 @@
       "AlO2": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
       "Ca2": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
       "CaO_gas": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
+      "FeO_association_gas": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K:vapor_pressure_physical_pressure_ceiling",
       "Mg2": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
       "MgO_gas": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
       "Na2": "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K",
@@ -5242,14 +5204,18 @@
     "summary": {
       "builtin_authoritative:standard_reaction_term:extrapolated_beyond_valid_range_K": {
         "count": 1,
-        "percentage": 5.882353
+        "percentage": 5.555556
       },
       "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K": {
         "count": 16,
-        "percentage": 94.117647
+        "percentage": 88.888889
+      },
+      "builtin_extrapolation_limited:standard_reaction_term:extrapolated_beyond_valid_range_K:vapor_pressure_physical_pressure_ceiling": {
+        "count": 1,
+        "percentage": 5.555556
       }
     },
-    "total_species": 17,
+    "total_species": 18,
     "vapor_pressure_backend_status": "",
     "vapor_pressure_backend_status_summary": {},
     "vapor_pressure_backend_status_reason": "",
@@ -6414,7 +6380,35 @@
             "alpha_inventory_policy": "diagnostic_only_no_inventory_debit",
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "status": "out_of_domain",
+              "output_status": "status_bearing",
+              "flux_status": "predicted",
+              "availability": "available",
+              "reason": "vapor_pressure_physical_pressure_ceiling",
+              "original_reason": "vapor_pressure_physical_pressure_ceiling",
+              "species": "FeO_association_gas",
+              "pressure_Pa": 8444567599.677524,
+              "ceiling_Pa": 1000000000.0,
+              "authority_level": "extrapolated",
+              "certified_band": {
+                "pressure_Pa": [
+                  0.0,
+                  1000000000.0
+                ],
+                "pO2_bar": [
+                  1e-12,
+                  100.0
+                ]
+              },
+              "pO2_bar_used": 0.0015,
+              "flagged": true,
+              "backlog": true,
+              "measured_zero": false,
+              "ledger_moved_mol": null,
+              "mass_moved_mol": null
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
@@ -7739,9 +7733,11 @@
       "missing_effective_pressure_species": [],
       "catalog_continuation_flux_species": [],
       "effective_pressure_species_not_batch_active": [
+        "FeO_association_gas",
         "NiO_gas"
       ],
       "demoted_effective_pressure_species": [
+        "FeO_association_gas",
         "NiO_gas"
       ],
       "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
@@ -9084,7 +9080,35 @@
               "alpha_inventory_policy": "diagnostic_only_no_inventory_debit",
               "out_of_range": true,
               "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
-              "status": "out_of_range_conservative_continuation"
+              "status": "out_of_range_conservative_continuation",
+              "extrapolation_notice": {
+                "status": "out_of_domain",
+                "output_status": "status_bearing",
+                "flux_status": "predicted",
+                "availability": "available",
+                "reason": "vapor_pressure_physical_pressure_ceiling",
+                "original_reason": "vapor_pressure_physical_pressure_ceiling",
+                "species": "FeO_association_gas",
+                "pressure_Pa": 8444567599.677524,
+                "ceiling_Pa": 1000000000.0,
+                "authority_level": "extrapolated",
+                "certified_band": {
+                  "pressure_Pa": [
+                    0.0,
+                    1000000000.0
+                  ],
+                  "pO2_bar": [
+                    1e-12,
+                    100.0
+                  ]
+                },
+                "pO2_bar_used": 0.0015,
+                "flagged": true,
+                "backlog": true,
+                "measured_zero": false,
+                "ledger_moved_mol": null,
+                "mass_moved_mol": null
+              }
             },
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
@@ -11556,7 +11580,35 @@
               "alpha_inventory_policy": "diagnostic_only_no_inventory_debit",
               "out_of_range": true,
               "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
-              "status": "out_of_range_conservative_continuation"
+              "status": "out_of_range_conservative_continuation",
+              "extrapolation_notice": {
+                "status": "out_of_domain",
+                "output_status": "status_bearing",
+                "flux_status": "predicted",
+                "availability": "available",
+                "reason": "vapor_pressure_physical_pressure_ceiling",
+                "original_reason": "vapor_pressure_physical_pressure_ceiling",
+                "species": "FeO_association_gas",
+                "pressure_Pa": 8444567599.677524,
+                "ceiling_Pa": 1000000000.0,
+                "authority_level": "extrapolated",
+                "certified_band": {
+                  "pressure_Pa": [
+                    0.0,
+                    1000000000.0
+                  ],
+                  "pO2_bar": [
+                    1e-12,
+                    100.0
+                  ]
+                },
+                "pO2_bar_used": 0.0015,
+                "flagged": true,
+                "backlog": true,
+                "measured_zero": false,
+                "ledger_moved_mol": null,
+                "mass_moved_mol": null
+              }
             },
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
@@ -14323,7 +14375,35 @@
             "alpha_inventory_policy": "diagnostic_only_no_inventory_debit",
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
-            "status": "out_of_range_conservative_continuation"
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "status": "out_of_domain",
+              "output_status": "status_bearing",
+              "flux_status": "predicted",
+              "availability": "available",
+              "reason": "vapor_pressure_physical_pressure_ceiling",
+              "original_reason": "vapor_pressure_physical_pressure_ceiling",
+              "species": "FeO_association_gas",
+              "pressure_Pa": 8444567599.677524,
+              "ceiling_Pa": 1000000000.0,
+              "authority_level": "extrapolated",
+              "certified_band": {
+                "pressure_Pa": [
+                  0.0,
+                  1000000000.0
+                ],
+                "pO2_bar": [
+                  1e-12,
+                  100.0
+                ]
+              },
+              "pO2_bar_used": 0.0015,
+              "flagged": true,
+              "backlog": true,
+              "measured_zero": false,
+              "ledger_moved_mol": null,
+              "mass_moved_mol": null
+            }
           },
           "out_of_range": true,
           "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
@@ -19325,21 +19405,6 @@
         "source_hour": 11,
         "source_campaign_hour": 11
       },
-      "vapor_pressure_refusals": {
-        "FeO_association_gas": {
-          "status": "refused",
-          "flux_status": "refused",
-          "reason": "vapor_pressure_physical_pressure_ceiling",
-          "species": "FeO_association_gas",
-          "pressure_Pa": 20699453099.94968,
-          "ceiling_Pa": 1000000000.0,
-          "flagged": true,
-          "backlog": true,
-          "measured_zero": false,
-          "ledger_moved_mol": 0.0,
-          "mass_moved_mol": 0.0
-        }
-      },
       "fe_redox_split": {
         "authoritative": false,
         "diagnostic_only": true,
@@ -20602,7 +20667,35 @@
               "alpha_inventory_policy": "diagnostic_only_no_inventory_debit",
               "out_of_range": true,
               "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
-              "status": "out_of_range_conservative_continuation"
+              "status": "out_of_range_conservative_continuation",
+              "extrapolation_notice": {
+                "status": "out_of_domain",
+                "output_status": "status_bearing",
+                "flux_status": "predicted",
+                "availability": "available",
+                "reason": "vapor_pressure_physical_pressure_ceiling",
+                "original_reason": "vapor_pressure_physical_pressure_ceiling",
+                "species": "FeO_association_gas",
+                "pressure_Pa": 20699453099.94968,
+                "ceiling_Pa": 1000000000.0,
+                "authority_level": "extrapolated",
+                "certified_band": {
+                  "pressure_Pa": [
+                    0.0,
+                    1000000000.0
+                  ],
+                  "pO2_bar": [
+                    1e-12,
+                    100.0
+                  ]
+                },
+                "pO2_bar_used": 0.0015,
+                "flagged": true,
+                "backlog": true,
+                "measured_zero": false,
+                "ledger_moved_mol": null,
+                "mass_moved_mol": null
+              }
             },
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
@@ -21890,7 +21983,37 @@
           "n_flux_active": 16,
           "n_flux_dormant_by_epoch": 5,
           "flux_activation_epoch": "pre_rg_legacy_live",
-          "n_solve_bundles": 5
+          "n_solve_bundles": 5,
+          "extrapolation_notices_by_species": {
+            "FeO_association_gas": {
+              "status": "out_of_domain",
+              "output_status": "status_bearing",
+              "flux_status": "predicted",
+              "availability": "available",
+              "reason": "vapor_pressure_physical_pressure_ceiling",
+              "original_reason": "vapor_pressure_physical_pressure_ceiling",
+              "species": "FeO_association_gas",
+              "pressure_Pa": 20699453099.94968,
+              "ceiling_Pa": 1000000000.0,
+              "authority_level": "extrapolated",
+              "certified_band": {
+                "pressure_Pa": [
+                  0.0,
+                  1000000000.0
+                ],
+                "pO2_bar": [
+                  1e-12,
+                  100.0
+                ]
+              },
+              "pO2_bar_used": 0.0015,
+              "flagged": true,
+              "backlog": true,
+              "measured_zero": false,
+              "ledger_moved_mol": null,
+              "mass_moved_mol": null
+            }
+          }
         }
       },
       "vapour_batch_flux_overlay": {
@@ -21948,9 +22071,11 @@
         "missing_effective_pressure_species": [],
         "catalog_continuation_flux_species": [],
         "effective_pressure_species_not_batch_active": [
+          "FeO_association_gas",
           "NiO_gas"
         ],
         "demoted_effective_pressure_species": [
+          "FeO_association_gas",
           "NiO_gas"
         ],
         "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
@@ -22228,21 +22353,6 @@
         "source_campaign": "C2B",
         "source_hour": 12,
         "source_campaign_hour": 12
-      },
-      "vapor_pressure_refusals": {
-        "FeO_association_gas": {
-          "status": "refused",
-          "flux_status": "refused",
-          "reason": "vapor_pressure_physical_pressure_ceiling",
-          "species": "FeO_association_gas",
-          "pressure_Pa": 8444567599.677524,
-          "ceiling_Pa": 1000000000.0,
-          "flagged": true,
-          "backlog": true,
-          "measured_zero": false,
-          "ledger_moved_mol": 0.0,
-          "mass_moved_mol": 0.0
-        }
       },
       "fe_redox_split": {
         "authoritative": false,
@@ -23506,7 +23616,35 @@
               "alpha_inventory_policy": "diagnostic_only_no_inventory_debit",
               "out_of_range": true,
               "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
-              "status": "out_of_range_conservative_continuation"
+              "status": "out_of_range_conservative_continuation",
+              "extrapolation_notice": {
+                "status": "out_of_domain",
+                "output_status": "status_bearing",
+                "flux_status": "predicted",
+                "availability": "available",
+                "reason": "vapor_pressure_physical_pressure_ceiling",
+                "original_reason": "vapor_pressure_physical_pressure_ceiling",
+                "species": "FeO_association_gas",
+                "pressure_Pa": 8444567599.677524,
+                "ceiling_Pa": 1000000000.0,
+                "authority_level": "extrapolated",
+                "certified_band": {
+                  "pressure_Pa": [
+                    0.0,
+                    1000000000.0
+                  ],
+                  "pO2_bar": [
+                    1e-12,
+                    100.0
+                  ]
+                },
+                "pO2_bar_used": 0.0015,
+                "flagged": true,
+                "backlog": true,
+                "measured_zero": false,
+                "ledger_moved_mol": null,
+                "mass_moved_mol": null
+              }
             },
             "out_of_range": true,
             "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
@@ -24794,7 +24932,37 @@
           "n_flux_active": 16,
           "n_flux_dormant_by_epoch": 5,
           "flux_activation_epoch": "pre_rg_legacy_live",
-          "n_solve_bundles": 5
+          "n_solve_bundles": 5,
+          "extrapolation_notices_by_species": {
+            "FeO_association_gas": {
+              "status": "out_of_domain",
+              "output_status": "status_bearing",
+              "flux_status": "predicted",
+              "availability": "available",
+              "reason": "vapor_pressure_physical_pressure_ceiling",
+              "original_reason": "vapor_pressure_physical_pressure_ceiling",
+              "species": "FeO_association_gas",
+              "pressure_Pa": 8444567599.677524,
+              "ceiling_Pa": 1000000000.0,
+              "authority_level": "extrapolated",
+              "certified_band": {
+                "pressure_Pa": [
+                  0.0,
+                  1000000000.0
+                ],
+                "pO2_bar": [
+                  1e-12,
+                  100.0
+                ]
+              },
+              "pO2_bar_used": 0.0015,
+              "flagged": true,
+              "backlog": true,
+              "measured_zero": false,
+              "ledger_moved_mol": null,
+              "mass_moved_mol": null
+            }
+          }
         }
       },
       "vapour_batch_flux_overlay": {
@@ -24852,9 +25020,11 @@
         "missing_effective_pressure_species": [],
         "catalog_continuation_flux_species": [],
         "effective_pressure_species_not_batch_active": [
+          "FeO_association_gas",
           "NiO_gas"
         ],
         "demoted_effective_pressure_species": [
+          "FeO_association_gas",
           "NiO_gas"
         ],
         "selection_source": "equilibrium_backend_effective_pressure_pre_rg",
