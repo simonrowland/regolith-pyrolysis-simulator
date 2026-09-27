@@ -111,7 +111,10 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     melt_oxide_activity,
     normalize_high_t_melt_activity,
 )
-from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K  # noqa: E402
+from simulator.melt_backend.vaporock import (  # noqa: E402
+    VAPOROCK_T_MAX_K,
+    VAPOROCK_T_MIN_K,
+)
 from simulator.physical_constants import (  # noqa: E402
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     MELT_DISSOCIATION_PO2_MAX_BAR,
@@ -554,6 +557,10 @@ _HIGH_T_FLUX_OXIDES: tuple[str, ...] = (
     "TiO2",
 )
 _HIGH_T_ACTIVITY_SEAM_LIMIT_DEX = 0.1
+_HIGH_T_ACTIVITY_FALLBACK_NOTICE_CODE = "openimcc_fallback_out_of_domain"
+_HIGH_T_ACTIVITY_CONTINUITY_RULE = (
+    "constant_gamma_latched_after_first_openimcc_failure"
+)
 _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS: dict[str, dict[str, str]] = {
     "K2O": {
         "authority": "constant_gamma",
@@ -598,7 +605,17 @@ def _build_high_t_melt_activity_authority(
     mode = normalize_high_t_melt_activity(
         controls.get("high_t_melt_activity", "openimcc")
     )
-    if temperature_K <= VAPOROCK_T_MAX_K or mode != "openimcc":
+    raw_latched_fallback = controls.get(
+        "high_t_melt_activity_latched_fallback"
+    )
+    latched_fallback = (
+        dict(raw_latched_fallback)
+        if isinstance(raw_latched_fallback, Mapping)
+        else None
+    )
+    if temperature_K <= VAPOROCK_T_MAX_K:
+        return None
+    if mode != "openimcc" and latched_fallback is None:
         return None
 
     base: dict[str, Any] = {
@@ -614,6 +631,111 @@ def _build_high_t_melt_activity_authority(
         "seam": {},
         "authority_exclusions": {},
     }
+
+    def fallback_authority(
+        reason: Mapping[str, Any],
+        classification: Mapping[str, Any] | None,
+        *,
+        latched: bool,
+        first_failure_temperature_K: float | None = None,
+    ) -> dict[str, Any]:
+        """Return one explicit, reportable fallback authority payload.
+
+        OpenIMCC is the high-temperature activity authority only while its
+        solve succeeds. Once it refuses, constant-gamma is the declared
+        extension for the current hour; simulator/core.py latches that
+        downgrade for the rest of the run so the activity rail cannot
+        alternate with composition-sensitive OpenIMCC retries.
+        """
+
+        fallback_reason = dict(reason)
+        code = str(
+            fallback_reason.get("code") or "openimcc_evaluation_refused"
+        )
+        if latched:
+            origin = (
+                " after the first OpenIMCC refusal"
+                if first_failure_temperature_K is None
+                else (
+                    " after the first OpenIMCC refusal at "
+                    f"{float(first_failure_temperature_K):g} K"
+                )
+            )
+            message = (
+                "OpenIMCC high-temperature activity fallback was latched"
+                f"{origin}; constant_gamma remains the visible "
+                "out-of-domain fallback."
+            )
+        else:
+            message = (
+                "OpenIMCC high-temperature activity authority refused this "
+                f"composition ({code}); constant_gamma is the visible "
+                "out-of-domain fallback."
+            )
+        notice = {
+            "code": _HIGH_T_ACTIVITY_FALLBACK_NOTICE_CODE,
+            "type": "typed_notice",
+            "status": "out_of_domain",
+            "reason": code,
+            "authority_level": "fallback",
+            "certified_band": {
+                "temperature_K": (
+                    float(VAPOROCK_T_MIN_K),
+                    float(VAPOROCK_T_MAX_K),
+                )
+            },
+            "provider": "constant_gamma",
+            "temperature_K": float(temperature_K),
+            "fallback": True,
+            "latched": bool(latched),
+            "continuity_rule": _HIGH_T_ACTIVITY_CONTINUITY_RULE,
+            "message": message,
+        }
+        base.update(
+            {
+                "provider": "constant_gamma",
+                "fallback": True,
+                "fallback_reason": fallback_reason,
+                "activities_by_oxide": {},
+                "openimcc_extrapolated": False,
+                "openimcc_flags": [],
+                "openimcc_notices": [],
+                "notices": [notice],
+                "continuity": {
+                    "rule": _HIGH_T_ACTIVITY_CONTINUITY_RULE,
+                    "latched": bool(latched),
+                    "first_failure_temperature_K": (
+                        None
+                        if first_failure_temperature_K is None
+                        else float(first_failure_temperature_K)
+                    ),
+                },
+                "composition_projection_classification": (
+                    dict(classification)
+                    if isinstance(classification, Mapping)
+                    else {}
+                ),
+            }
+        )
+        return base
+
+    if latched_fallback is not None:
+        latched_reason = latched_fallback.get("fallback_reason")
+        if not isinstance(latched_reason, Mapping):
+            latched_reason = {
+                "code": "openimcc_evaluation_refused",
+                "type": "OpenImccRefusal",
+                "detail": "OpenIMCC fallback was latched without a reason",
+            }
+        return fallback_authority(
+            latched_reason,
+            latched_fallback.get("composition_projection_classification"),
+            latched=True,
+            first_failure_temperature_K=latched_fallback.get(
+                "first_failure_temperature_K"
+            ),
+        )
+
     try:
         from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
             evaluate_cleaned_melt,
@@ -632,27 +754,29 @@ def _build_high_t_melt_activity_authority(
             if isinstance(diagnostics, Mapping)
             else None
         )
-        base.update(
-            {
-                "provider": "constant_gamma",
-                "fallback": True,
-                "fallback_reason": {
-                    "code": code,
-                    "type": type(exc).__name__,
-                    "detail": str(exc),
-                },
-                "activities_by_oxide": {},
-                "openimcc_extrapolated": False,
-                "openimcc_flags": [],
-                "openimcc_notices": [],
-                "composition_projection_classification": (
-                    dict(classification)
-                    if isinstance(classification, Mapping)
-                    else {}
-                ),
+        reason = {
+            "code": code,
+            "type": type(exc).__name__,
+            "detail": str(exc),
+        }
+        if isinstance(diagnostics, Mapping):
+            solver_diagnostics = {
+                key: diagnostics[key]
+                for key in (
+                    "iterations",
+                    "residual_inf",
+                    "residual_l2",
+                    "scipy_message",
+                )
+                if key in diagnostics
             }
+            if solver_diagnostics:
+                reason["solver_diagnostics"] = solver_diagnostics
+        return fallback_authority(
+            reason,
+            classification,
+            latched=False,
         )
-        return base
 
     bridge = cleaned.bridge
     policy_notices: list[dict[str, Any]] = []
