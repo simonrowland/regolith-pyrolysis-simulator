@@ -7983,6 +7983,9 @@ class Migrator:
         self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
         self._oxygen_pressure_landed: dict[str, Decimal] = {}
         self._oxygen_pressure_conflict: set[str] = set()
+        # Only an initial composition declared as a registry value may take
+        # precedence over later legacy lab-parameter rows.
+        self._registry_value_initial_experiments: set[str] = set()
         # Compilation record JSON paths registered as Work assets (not INDEX).
         self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
 
@@ -8539,6 +8542,11 @@ class Migrator:
                         )
                     )
                 continue
+            if (
+                experiment.sample.initial_composition is not None
+                and experiment.sample.initial_composition.state.is_value
+            ):
+                self._registry_value_initial_experiments.add(experiment.experiment_id)
             self.result.experiments[experiment.experiment_id] = experiment
             if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
                 self.result.experiments_by_work[work.work_id].append(
@@ -9253,7 +9261,9 @@ class Migrator:
                 values=values if isinstance(values, Mapping) else None,
                 observation_id=obs_id,
                 source=source_key,
-                prefer_existing_initial=declared_experiment_id is not None,
+                prefer_existing_initial=(
+                    declared_experiment_id in self._registry_value_initial_experiments
+                ),
             )
         oxygen_roots: list[object] = []
         if isinstance(values, Mapping):

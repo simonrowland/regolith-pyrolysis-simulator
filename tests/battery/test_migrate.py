@@ -2572,7 +2572,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     )
     assert not mismatches, mismatches[:20]
     assert n_numeric == sum(census.values())
-    assert census.get("activity_coefficient") == 128
+    # Re-pinned after the loader-survival regeneration: Holzheid +33 published
+    # gamma cells (12 CoO, 14 NiO, 7 FeO); mismatches remains 0.
+    assert census.get("activity_coefficient") == 161
     # Re-pinned with data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
     # (51 p_partial points, 2026-09-24): p_partial 18->69 and n_numeric 223->274.
     # The counts moved because data became visible, not because a check was relaxed - mismatches stays 0.
@@ -2591,7 +2593,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # mass_loss_fraction 9->19, n_numeric 209->223. The counts moved because the
     # data became visible, not because a check was relaxed - mismatches stays 0.
     assert census.get("evaporation_rate") == 25
-    assert census.get("mass_loss_fraction") == 19
+    # Re-pinned after the loader-survival regeneration: Richter +50 measured
+    # mass_loss_pct / 100 singleton series; mismatches remains 0.
+    assert census.get("mass_loss_fraction") == 69
     assert census.get("mass_loss_rate", 0) == 0
     # Re-pinned once for the reviewed Ueshima replacement: its Fe-Mo Table 4
     # adds 58 printed T_C points, routed as transition_temperature. The
@@ -2601,7 +2605,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("ueshima-1982-fe-mo-thermal") == {
         "transition_temperature": 58
     }
-    assert n_numeric == 356, (n_numeric, census, n_unavailable)
+    # Re-pinned after the loader-survival regeneration: Holzheid +33 plus
+    # Richter +50, for +83 numeric cells overall; mismatches remains 0.
+    assert n_numeric == 439, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
