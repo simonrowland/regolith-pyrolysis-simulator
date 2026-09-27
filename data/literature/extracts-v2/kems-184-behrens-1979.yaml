@@ -1157,11 +1157,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1179,16 +1179,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1197,7 +1197,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1240,7 +1240,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -1268,11 +1268,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1290,16 +1290,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1308,7 +1308,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1351,7 +1351,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -1379,11 +1379,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1401,16 +1401,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1419,7 +1419,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1462,7 +1462,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -1490,11 +1490,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1512,16 +1512,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1530,7 +1530,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1573,7 +1573,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -1601,11 +1601,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1623,16 +1623,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1641,7 +1641,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1684,7 +1684,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -1712,11 +1712,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1734,16 +1734,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1752,7 +1752,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1795,7 +1795,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -1823,11 +1823,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1845,16 +1845,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1863,7 +1863,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1906,7 +1906,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -1934,11 +1934,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1956,16 +1956,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1974,7 +1974,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2017,7 +2017,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -2045,11 +2045,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2067,16 +2067,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2085,7 +2085,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2128,7 +2128,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -2156,11 +2156,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2178,16 +2178,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2196,7 +2196,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2239,7 +2239,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -2267,11 +2267,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2289,16 +2289,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2307,7 +2307,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2350,7 +2350,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -2378,11 +2378,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2400,16 +2400,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2418,7 +2418,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2461,7 +2461,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -2489,11 +2489,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2511,16 +2511,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2529,7 +2529,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2572,7 +2572,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -2600,11 +2600,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2622,16 +2622,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2640,7 +2640,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2683,7 +2683,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -2711,11 +2711,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2733,16 +2733,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2751,7 +2751,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2794,7 +2794,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -2822,11 +2822,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2844,16 +2844,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2862,7 +2862,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2905,7 +2905,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -2933,11 +2933,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2955,16 +2955,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2973,7 +2973,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -3016,7 +3016,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:
@@ -3044,11 +3044,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3066,16 +3066,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -3084,7 +3084,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -3127,7 +3127,7 @@ observations:
         page: 136
         table: '2'
   derivation:
-    relation: atm_to_Pa
+    relation: atm_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
     - pdf:kems-184-behrens-1979
     parameters:

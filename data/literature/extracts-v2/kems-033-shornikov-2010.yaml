@@ -106,8 +106,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [2300.0, 2300.0]; no midpoint invented
+      tag: value
+      value: '2300'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -133,6 +133,16 @@ observations:
     figure: '2'
     note: calculated vs Markova 1986 KEMS symbols at 2300 K
   read_from: pdf:kems-033-shornikov-2010
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2300'
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        figure: '2'
+        note: calculated vs Markova 1986 KEMS symbols at 2300 K
 - observation_id: kems-033-shornikov-2010::shornikov_2010_lunar_basalt_start_quoted_markova
   experiment_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e::kems-033-shornikov-2010
   identity:

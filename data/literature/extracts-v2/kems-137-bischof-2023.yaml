@@ -49,8 +49,8 @@ observations:
   experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'measured_KEMS_ion_intensities'
+      tag: value
+      value: ion_intensity
     species:
       formula: Ga
       phase:
@@ -62,10 +62,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_KEMS_ion_intensities'; refusing to pick
-      a number
+    unavailable_reason: 'no mapped ion_intensity field selected; source fields: quantity, method_class, semantics, readings,
+      supporting_evidence'
     approximate: false
   uncertainty:
     kind: none
@@ -92,11 +137,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -114,16 +159,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -132,7 +191,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -188,11 +247,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -210,16 +269,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -228,7 +301,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -284,11 +357,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -306,16 +379,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -324,7 +411,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -380,11 +467,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -402,16 +489,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -420,7 +521,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -476,11 +577,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -498,16 +599,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -516,7 +631,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -572,11 +687,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -594,16 +709,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -612,7 +741,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -668,11 +797,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -690,16 +819,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -708,7 +851,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -764,11 +907,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -786,16 +929,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -804,7 +961,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -860,11 +1017,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -882,16 +1039,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -900,7 +1071,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -956,11 +1127,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -978,16 +1149,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -996,7 +1181,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1052,11 +1237,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1074,16 +1259,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ga
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ga
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1092,7 +1291,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1175,8 +1374,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -1273,8 +1486,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -1476,8 +1703,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -1679,8 +1920,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -1882,8 +2137,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2085,8 +2354,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2288,8 +2571,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2491,8 +2788,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2694,8 +3005,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -2897,8 +3222,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -3100,8 +3439,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -3303,8 +3656,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -3506,8 +3873,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -3709,8 +4090,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -3912,8 +4307,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -4115,8 +4524,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -4318,8 +4741,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -4521,8 +4958,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -4724,8 +5175,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -4927,8 +5392,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -5130,8 +5609,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -5333,8 +5826,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -5536,8 +6043,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -5739,8 +6260,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -5942,8 +6477,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -6145,8 +6694,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -6348,8 +6911,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -6551,8 +7128,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -6754,8 +7345,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -6945,8 +7550,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -7136,8 +7755,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -7327,8 +7960,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -7518,8 +8165,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -7709,8 +8370,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -7900,8 +8575,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -8091,8 +8780,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -8282,8 +8985,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -8473,8 +9190,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -8664,8 +9395,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -8855,8 +9600,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -9046,8 +9805,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -9237,8 +10010,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -9428,8 +10215,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -9619,8 +10420,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -9810,8 +10625,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -10001,8 +10830,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -10192,8 +11035,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -10383,8 +11240,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -10574,8 +11445,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -10765,8 +11650,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -10956,8 +11855,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -11147,8 +12060,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -11338,8 +12265,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -11529,8 +12470,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -11720,8 +12675,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -11911,8 +12880,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -12102,8 +13085,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -12293,8 +13290,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -12484,8 +13495,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -12675,8 +13700,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -12866,8 +13905,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -13057,8 +14110,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -13248,8 +14315,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -13439,8 +14520,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GaO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GaO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -13641,8 +14736,8 @@ observations:
   experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'measured_KEMS_ion_intensities'
+      tag: value
+      value: ion_intensity
     species:
       formula: In
       phase:
@@ -13654,10 +14749,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_KEMS_ion_intensities'; refusing to pick
-      a number
+    unavailable_reason: 'no mapped ion_intensity field selected; source fields: quantity, method_class, semantics, readings,
+      supporting_evidence_observation_id'
     approximate: false
   uncertainty:
     kind: none
@@ -13684,11 +14824,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13706,16 +14846,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -13724,7 +14878,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -13780,11 +14934,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13802,16 +14956,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -13820,7 +14988,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -13876,11 +15044,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13898,16 +15066,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -13916,7 +15098,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -13972,11 +15154,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13994,16 +15176,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -14012,7 +15208,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -14068,11 +15264,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14090,16 +15286,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -14108,7 +15318,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -14164,11 +15374,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14186,16 +15396,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -14204,7 +15428,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -14260,11 +15484,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14282,16 +15506,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -14300,7 +15538,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -14356,11 +15594,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14378,16 +15616,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -14396,7 +15648,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -14452,11 +15704,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14474,16 +15726,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -14492,7 +15758,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -14548,11 +15814,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14570,16 +15836,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -14588,7 +15868,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -14644,11 +15924,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14666,16 +15946,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: In
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: In
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -14684,7 +15978,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -14767,8 +16061,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -14862,8 +16170,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -15053,8 +16375,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -15244,8 +16580,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -15435,8 +16785,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -15626,8 +16990,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -15817,8 +17195,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -16008,8 +17400,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -16199,8 +17605,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -16390,8 +17810,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -16581,8 +18015,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -16772,8 +18220,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -16963,8 +18425,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -17154,8 +18630,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -17345,8 +18835,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -17536,8 +19040,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -17727,8 +19245,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -17918,8 +19450,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -18109,8 +19655,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -18300,8 +19860,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -18491,8 +20065,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -18682,8 +20270,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -18873,8 +20475,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -19064,8 +20680,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -19255,8 +20885,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -19446,8 +21090,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -19637,8 +21295,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -19828,8 +21500,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -20019,8 +21705,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -20210,8 +21910,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -20401,8 +22115,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -20592,8 +22320,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -20783,8 +22525,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -20974,8 +22730,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -21165,8 +22935,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -21356,8 +23140,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -21547,8 +23345,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -21738,8 +23550,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -21929,8 +23755,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -22120,8 +23960,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -22311,8 +24165,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -22502,8 +24370,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -22693,8 +24575,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -22884,8 +24780,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -23075,8 +24985,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -23266,8 +25190,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -23457,8 +25395,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -23648,8 +25600,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -23839,8 +25805,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -24030,8 +26010,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -24221,8 +26215,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -24412,8 +26420,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -24603,8 +26625,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -24794,8 +26830,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -24985,8 +27035,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -25176,8 +27240,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -25367,8 +27445,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -25558,8 +27650,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -25749,8 +27855,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -25940,8 +28060,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -26131,8 +28265,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -26322,8 +28470,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -26513,8 +28675,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -26704,8 +28880,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -26895,8 +29085,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -27086,8 +29290,22 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier coefficient does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: InO1.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: InO1.5
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir

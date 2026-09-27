@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [523.15, 523.15]; no midpoint invented
+      tag: value
+      value: '523.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_amino_acid_quantitation_signal_vs_murchison';
@@ -47,3 +47,12 @@ observations:
     section: Results & Discussion
     note: Wet-chemistry pyrolysis quantitation signals for QL vs co-analyzed Murchison
   read_from: unknown:lpsc-2024-bennu-pyrolysis-vandam
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '523.15'
+      locator:
+        pdf_page_index: 1
+        section: Results & Discussion
+        note: Wet-chemistry pyrolysis quantitation signals for QL vs co-analyzed Murchison

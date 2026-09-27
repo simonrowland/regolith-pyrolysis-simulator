@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [957.15, 957.15]; no midpoint invented
+      tag: value
+      value: '957.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -45,6 +45,15 @@ observations:
     figure: '4'
     note: Figure 4 Residual gas analysis from test 12
   read_from: pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '957.15'
+      locator:
+        pdf_page_index: 4
+        figure: '4'
+        note: Figure 4 Residual gas analysis from test 12
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig5_ilmenite_EDS_ratios
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::cardiff-2007-vacuum-pyrolysis-gsfc
   identity:

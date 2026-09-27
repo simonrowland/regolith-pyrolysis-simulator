@@ -11,11 +11,11 @@ observations:
     species:
       formula: SiO2_melt
       phase:
-        tag: unknown
-        reason: phase string 'BSE_composition_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -96,11 +96,11 @@ observations:
     species:
       formula: SiO2_melt
       phase:
-        tag: unknown
-        reason: phase string 'BSM_composition_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -520,11 +520,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -542,16 +542,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -560,7 +560,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -606,11 +606,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'pure_molten_SiO2' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -691,11 +691,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'multicomponent_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -713,16 +713,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -731,7 +731,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -816,11 +816,11 @@ observations:
     species:
       formula: SiO2_melt
       phase:
-        tag: unknown
-        reason: phase string 'multicomponent_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0

@@ -196,8 +196,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1815.15, 1815.15]; no midpoint invented
+      tag: value
+      value: '1815.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_glass_spot_series_digitised'; refusing to
@@ -229,6 +229,14 @@ observations:
     page: 83
     figure: '5.23'
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1815.15'
+      locator:
+        page: 83
+        figure: '5.23'
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig523_ms1_epma_glass_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -3270,8 +3278,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1911.15, 1911.15]; no midpoint invented
+      tag: value
+      value: '1911.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'untreated_foil_edx_standardabweichung'; refusing
@@ -3304,6 +3312,15 @@ observations:
     table: '5.2'
     note: unbehandelte Folie Standardabweichung
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1911.15'
+      locator:
+        page: 73
+        table: '5.2'
+        note: unbehandelte Folie Standardabweichung
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_untreated_foil_sd_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -3554,8 +3571,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1815.15, 1815.15]; no midpoint invented
+      tag: value
+      value: '1815.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'blank_foil_edx_atom_pct'; refusing to pick a number
@@ -3587,6 +3604,15 @@ observations:
     table: '5.4'
     note: unbehandelte Folie / blank foil block
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1815.15'
+      locator:
+        page: 85
+        table: '5.4'
+        note: unbehandelte Folie / blank foil block
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table54_blank_foil_edx_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -3948,8 +3974,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1853.15, 1853.15]; no midpoint invented
+      tag: value
+      value: '1853.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_spot_analyses_wt_pct'; refusing to pick a
@@ -3982,6 +4008,15 @@ observations:
     table: '5.6'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 103
+        table: '5.6'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -4040,8 +4075,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1853.15, 1853.15]; no midpoint invented
+      tag: value
+      value: '1853.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_spot_analyses_wt_pct_full_grid'; refusing
@@ -4072,6 +4107,14 @@ observations:
     page: 103
     table: '5.6'
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 103
+        table: '5.6'
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table56_ms5c_epma_full_grid_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:

@@ -106,8 +106,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1933.0, 1933.0]; no midpoint invented
+      tag: value
+      value: '1933'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'CaO_component_CAS_multicomponent_gibbs'; refusing
@@ -130,6 +130,15 @@ observations:
     line_range: 27-45
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        table: '1'
+        line_range: 27-45
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_fe_bearing_melt_activity_context
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -526,8 +535,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+      tag: value
+      value: '1300'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'K2O_component_of_NKS_gibbs_table3'; refusing to
@@ -550,6 +559,15 @@ observations:
     line_range: 61-70
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        table: '3'
+        line_range: 61-70
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_mg_bearing_melt_activity_context
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -610,8 +628,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
+      tag: value
+      value: '1273'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -634,6 +652,16 @@ observations:
     line_range: 65-75
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273'
+      locator:
+        table: '4'
+        paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+        line_range: 65-75
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=7799edb641d6
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -652,8 +680,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
+      tag: value
+      value: '1273'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -676,6 +704,16 @@ observations:
     line_range: 65-75
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273'
+      locator:
+        table: '4'
+        paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+        line_range: 65-75
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=913eed662581
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -694,8 +732,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
+      tag: value
+      value: '1273'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -718,6 +756,16 @@ observations:
     line_range: 65-75
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273'
+      locator:
+        table: '4'
+        paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+        line_range: 65-75
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=94357813a9c8
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -736,8 +784,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
+      tag: value
+      value: '1273'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -760,6 +808,16 @@ observations:
     line_range: 65-75
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273'
+      locator:
+        table: '4'
+        paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+        line_range: 65-75
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_chemical_potential_nbs_table4::points:h=d10f059ef489
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -778,8 +836,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1273.0, 1273.0]; no midpoint invented
+      tag: value
+      value: '1273'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -802,6 +860,16 @@ observations:
     line_range: 65-75
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273'
+      locator:
+        table: '4'
+        paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+        line_range: 65-75
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=4b24ac670246
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -820,8 +888,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+      tag: value
+      value: '1300'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -844,6 +912,16 @@ observations:
     line_range: 61-70
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        table: '3'
+        paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+        line_range: 61-70
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=6bb241e026b0
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -862,8 +940,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+      tag: value
+      value: '1300'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -886,6 +964,16 @@ observations:
     line_range: 61-70
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        table: '3'
+        paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+        line_range: 61-70
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=7a9a22ce5e1f
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -904,8 +992,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+      tag: value
+      value: '1300'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -928,6 +1016,16 @@ observations:
     line_range: 61-70
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        table: '3'
+        paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+        line_range: 61-70
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=a3d16fd06d21
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -946,8 +1044,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+      tag: value
+      value: '1300'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -970,6 +1068,16 @@ observations:
     line_range: 61-70
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        table: '3'
+        paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+        line_range: 61-70
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_na2o_k2o_sio2_gibbs_table3::points:h=ac35f888d84f
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:
@@ -988,8 +1096,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1300.0, 1300.0]; no midpoint invented
+      tag: value
+      value: '1300'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1012,6 +1120,16 @@ observations:
     line_range: 61-70
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
   read_from: unknown:kems-016-stolyarova-1992
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        table: '3'
+        paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+        line_range: 61-70
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
 - observation_id: kems-016-stolyarova-1992::stolyarova_1992_silicate_kems_geometry_activities
   experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::kems-016-stolyarova-1992
   identity:

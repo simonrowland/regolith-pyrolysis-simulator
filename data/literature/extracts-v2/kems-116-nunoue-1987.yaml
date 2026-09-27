@@ -108,11 +108,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -151,11 +151,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -194,11 +194,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -237,11 +237,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -280,17 +280,17 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -314,6 +314,15 @@ observations:
     pdf_page_index: 7
     figure: '7'
   read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 874
+        pdf_page_index: 7
+        figure: '7'
 - observation_id: kems-116-nunoue-1987::nunoue_1987_fig8_activities_1600C_figure_only
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
@@ -323,17 +332,17 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1873'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -357,6 +366,15 @@ observations:
     pdf_page_index: 7
     figure: '8'
   read_from: pdf:kems-116-nunoue-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 874
+        pdf_page_index: 7
+        figure: '8'
 - observation_id: kems-116-nunoue-1987::nunoue_1987_kems_geometry_and_calibration
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
@@ -366,11 +384,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -410,11 +428,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -448,25 +466,67 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1511'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1511'
     approximate: false
   uncertainty:
     kind: printed
@@ -498,29 +558,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1516.0:h=ce7ba418cdbf
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1516'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1516'
     approximate: false
   uncertainty:
     kind: printed
@@ -552,29 +660,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1533.0:h=f2019a6768a5
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1533'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1533'
     approximate: false
   uncertainty:
     kind: printed
@@ -606,29 +762,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1560.0:h=2163e3af3522
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1560'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1560'
     approximate: false
   uncertainty:
     kind: printed
@@ -660,29 +864,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1651.0:h=7102fb70c4dd
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1651'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1651'
     approximate: false
   uncertainty:
     kind: printed
@@ -714,29 +966,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1655.0:h=e5a82ba2efac
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1655'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1655'
     approximate: false
   uncertainty:
     kind: printed
@@ -768,29 +1068,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1658.0:h=b6be0fd42076
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1658'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1658'
     approximate: false
   uncertainty:
     kind: printed
@@ -822,29 +1170,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1685.0:h=cd1e7b027fcf
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1685'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1685'
     approximate: false
   uncertainty:
     kind: printed
@@ -876,29 +1272,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1704.0:h=a0b399b32665
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1704'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1704'
     approximate: false
   uncertainty:
     kind: printed
@@ -930,29 +1374,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1731.0:h=f70225e307dd
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1731'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1731'
     approximate: false
   uncertainty:
     kind: printed
@@ -984,29 +1476,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1742.0:h=6f6ab8094240
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1742'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1742'
     approximate: false
   uncertainty:
     kind: printed
@@ -1038,29 +1578,77 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table2_miscibility_gap::T=1764.0:h=52faafc0cfe4
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'miscibility_gap_temperature'
+      tag: value
+      value: transition_temperature
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1764'
+      value: miscibility_gap_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1764'
     approximate: false
   uncertainty:
     kind: printed
@@ -1092,6 +1680,12 @@ observations:
         pdf_page_index: 5
         table: '2'
         note: Table 2. Miscibility gap in Fe-Sn system.
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:kems-116-nunoue-1987
+    parameters: []
+    output_unit: N_Sn mole fraction; T in C as printed
 - observation_id: kems-116-nunoue-1987::nunoue_1987_table3_activities::rows:h=0a1f4acfd061
   experiment_id: 10.2355/tetsutohagane1955.73.7_868::experiment::fe-sn-series
   identity:
@@ -1101,11 +1695,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1148,11 +1742,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1195,11 +1789,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1242,11 +1836,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1289,11 +1883,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1336,11 +1930,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1383,11 +1977,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1430,11 +2024,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1477,11 +2071,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1524,11 +2118,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1571,11 +2165,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1618,11 +2212,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1665,11 +2259,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1712,11 +2306,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1759,11 +2353,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1806,11 +2400,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1853,11 +2447,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1900,11 +2494,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0

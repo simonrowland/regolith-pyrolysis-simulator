@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'NaO0.5_activity_polynomial'; refusing to pick
@@ -45,6 +45,15 @@ observations:
     equation: '5'
     note: Printed log a_NaO0.5 polynomial at 1300 C
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        equation: '5'
+        note: Printed log a_NaO0.5 polynomial at 1300 C
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_activity_fit_1400
@@ -65,8 +74,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'NaO0.5_activity_polynomial'; refusing to pick
@@ -90,6 +99,15 @@ observations:
     equation: '6'
     note: Printed log a_NaO0.5 polynomial at 1400 C
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        equation: '6'
+        note: Printed log a_NaO0.5 polynomial at 1400 C
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1300_pO2_1e-10::point:0
@@ -116,8 +134,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -177,6 +195,16 @@ observations:
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.08 at p(O2)=10^-10 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        paragraph: Estimation of alpha*
+        note: Printed alpha*=0.08 at p(O2)=10^-10 bar
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
@@ -221,8 +249,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -282,6 +310,16 @@ observations:
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.13 at p(O2)=10^-8 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        paragraph: Estimation of alpha*
+        note: Printed alpha*=0.13 at p(O2)=10^-8 bar
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
@@ -326,8 +364,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -387,6 +425,16 @@ observations:
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.095 at p(O2)=10^-9 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        paragraph: Estimation of alpha*
+        note: Printed alpha*=0.095 at p(O2)=10^-9 bar
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
@@ -431,8 +479,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -492,6 +540,16 @@ observations:
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.05 at p(O2)=10^-10 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        paragraph: Estimation of alpha*
+        note: Printed alpha*=0.05 at p(O2)=10^-10 bar
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
@@ -535,8 +593,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -596,6 +654,16 @@ observations:
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.048 at p(O2)=10^-8 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        paragraph: Estimation of alpha*
+        note: Printed alpha*=0.048 at p(O2)=10^-8 bar
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
@@ -639,8 +707,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -700,6 +768,16 @@ observations:
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.043 at p(O2)=10^-9 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        paragraph: Estimation of alpha*
+        note: Printed alpha*=0.043 at p(O2)=10^-9 bar
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
@@ -737,8 +815,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -762,6 +840,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-10 bar, t=0 min, open triangle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Triangle series; p(O2)=10^-10 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
   identity:
@@ -780,8 +867,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -805,6 +892,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-10 bar, t=60 min, open triangle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Triangle series; p(O2)=10^-10 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
   identity:
@@ -823,8 +919,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -848,6 +944,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-10 bar, t=120 min, open triangle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Triangle series; p(O2)=10^-10 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
   identity:
@@ -866,8 +971,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -891,6 +996,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-10 bar, t=180 min, open triangle; 600 dpi shape-template centroid; overlaps the boxed-square marker
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Triangle series; p(O2)=10^-10 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -909,8 +1023,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -934,6 +1048,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-8 bar, t=0 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -952,8 +1075,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -977,6 +1100,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-8 bar, t=60 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -995,8 +1127,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1020,6 +1152,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-8 bar, t=90 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1038,8 +1179,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1063,6 +1204,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-8 bar, t=120 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1081,8 +1231,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1106,6 +1256,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-8 bar, t=180 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1124,8 +1283,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1149,6 +1308,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-8 bar, t=300 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1167,8 +1335,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1192,6 +1360,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-8 bar, t=360 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:7
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1210,8 +1387,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1235,6 +1412,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-8 bar, t=540 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
@@ -1253,8 +1439,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1278,6 +1464,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-9 bar, t=0 min, boxed square; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Square series; p(O2)=10^-9 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
@@ -1296,8 +1491,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1321,6 +1516,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-9 bar, t=60 min, boxed square; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Square series; p(O2)=10^-9 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
@@ -1339,8 +1543,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1364,6 +1568,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-9 bar, t=180 min, boxed square; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Square series; p(O2)=10^-9 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
@@ -1382,8 +1595,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1407,6 +1620,15 @@ observations:
     figure: 1a
     note: p(O2)=10^-9 bar, t=240 min, boxed square; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: 1a
+        note: Square series; p(O2)=10^-9 bar, T=1300 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1425,8 +1647,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1450,6 +1672,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-10 bar, t=0 min, open triangle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Triangle series; p(O2)=10^-10 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1468,8 +1699,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1493,6 +1724,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-10 bar, t=10 min, open triangle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Triangle series; p(O2)=10^-10 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1511,8 +1751,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1536,6 +1776,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-10 bar, t=15 min, open triangle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Triangle series; p(O2)=10^-10 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1554,8 +1803,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1579,6 +1828,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-10 bar, t=20 min, open triangle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Triangle series; p(O2)=10^-10 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:4
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1597,8 +1855,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1622,6 +1880,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-10 bar, t=30 min, open triangle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Triangle series; p(O2)=10^-10 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
@@ -1640,8 +1907,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1665,6 +1932,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-8 bar, t=0 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
@@ -1683,8 +1959,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1708,6 +1984,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-8 bar, t=30 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
@@ -1726,8 +2011,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1751,6 +2036,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-8 bar, t=60 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
@@ -1769,8 +2063,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1794,6 +2088,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-8 bar, t=90 min, filled circle; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Solid-circle series; p(O2)=10^-8 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
   identity:
@@ -1812,8 +2115,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1837,6 +2140,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-9 bar, t=0 min, boxed square; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Square series; p(O2)=10^-9 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
   identity:
@@ -1855,8 +2167,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1880,6 +2192,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-9 bar, t=20 min, boxed square; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Square series; p(O2)=10^-9 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
   identity:
@@ -1898,8 +2219,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1923,6 +2244,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-9 bar, t=40 min, boxed square; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Square series; p(O2)=10^-9 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
   identity:
@@ -1941,8 +2271,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1966,6 +2296,15 @@ observations:
     figure: 1b
     note: p(O2)=10^-9 bar, t=60 min, boxed square; 600 dpi shape-template centroid
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: 1b
+        note: Square series; p(O2)=10^-9 bar, T=1400 C
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -1984,8 +2323,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2009,6 +2348,15 @@ observations:
     figure: '2'
     note: 1300 C dotted-line square at p(O2)=10^-10 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: '2'
+        note: Dotted 1300 C series at Na2O=20 wt%; points digitized from the PDF plot
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -2027,8 +2375,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2052,6 +2400,15 @@ observations:
     figure: '2'
     note: 1300 C dotted-line square at p(O2)=10^-9 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: '2'
+        note: Dotted 1300 C series at Na2O=20 wt%; points digitized from the PDF plot
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -2070,8 +2427,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2095,6 +2452,15 @@ observations:
     figure: '2'
     note: 1300 C dotted-line square at p(O2)=10^-8 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: '2'
+        note: Dotted 1300 C series at Na2O=20 wt%; points digitized from the PDF plot
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -2113,8 +2479,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2138,6 +2504,15 @@ observations:
     figure: '2'
     note: 1400 C solid-line circle at p(O2)=10^-10 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: '2'
+        note: Solid 1400 C series at Na2O=20 wt%; points digitized from the PDF plot
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -2156,8 +2531,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2181,6 +2556,15 @@ observations:
     figure: '2'
     note: 1400 C solid-line circle at p(O2)=10^-9 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: '2'
+        note: Solid 1400 C series at Na2O=20 wt%; points digitized from the PDF plot
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -2199,8 +2583,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2224,6 +2608,15 @@ observations:
     figure: '2'
     note: 1400 C solid-line circle at p(O2)=10^-8 bar
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: '2'
+        note: Solid 1400 C series at Na2O=20 wt%; points digitized from the PDF plot
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fit_1300
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -2242,8 +2635,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sodium_evaporation_rate_power_law_fit'; refusing
@@ -2268,6 +2661,16 @@ observations:
     paragraph: The dependence of jNa on p(O2)
     note: Printed dotted-line power-law fit for 1300 C
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 2
+        figure: '2'
+        paragraph: The dependence of jNa on p(O2)
+        note: Printed dotted-line power-law fit for 1300 C
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:1
@@ -2290,8 +2693,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sodium_evaporation_rate_power_law_fit'; refusing
@@ -2316,6 +2719,16 @@ observations:
     paragraph: The dependence of jNa on p(O2)
     note: Printed solid-line power-law fit for 1400 C
   read_from: unknown:ta-shirai-2000-lpsc
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 2
+        figure: '2'
+        paragraph: The dependence of jNa on p(O2)
+        note: Printed solid-line power-law fit for 1400 C
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:0
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:1

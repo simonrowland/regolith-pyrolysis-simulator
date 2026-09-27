@@ -64,7 +64,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not activity
     species:
       formula: FeO
       phase:
@@ -164,7 +164,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'ion_current_ratio_vs_time'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -177,11 +177,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1643.0, 1643.0]; no midpoint invented
-    reference_state:
-      tag: unknown
-      reason: qualifier vs_time does not name a reference_state
+      tag: value
+      value: '1643'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -206,12 +203,22 @@ observations:
     figure: '3'
     note: Time dependence of ion current ratios at X_P2O5=0.0499
   read_from: pdf:kems-057-kambayashi-1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1914
+        pdf_page_index: 4
+        figure: '3'
+        note: Time dependence of ion current ratios at X_P2O5=0.0499
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_fig4_time_dependence_figure_only
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'ion_current_ratio_vs_time'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -226,9 +233,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1633.0, 1663.0]; no midpoint invented
-    reference_state:
-      tag: unknown
-      reason: qualifier vs_time does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -258,7 +262,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'ion_current_ratio_vs_T'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -273,9 +277,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
-    reference_state:
-      tag: unknown
-      reason: qualifier vs_T does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -349,7 +350,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not activity
     species:
       formula: P2O5
       phase:
@@ -437,8 +438,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'henrian_activity_coefficient'
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
       phase:
@@ -450,13 +451,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: gamma_P2O5 relative to P2O5(l) using Turkdogan and Pearson (ref 17)'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_activity_coefficient'; refusing to pick
-      a number
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model_or_data_source,
+      gamma_1370C, gamma_1370C_as_printed, gamma_1380C, gamma_1380C_as_printed, gamma_1390C, gamma_1390C_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -485,8 +528,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'henrian_activity_coefficient'
+      tag: value
+      value: activity_coefficient
     species:
       formula: P2O5
       phase:
@@ -498,13 +541,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1643.0, 1663.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: henrian_solid
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'henrian_activity_coefficient'; refusing to pick
-      a number
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, derivation_note,
+      X_P2O5_henry_upper, gamma_1370C, gamma_1370C_as_printed, gamma_1380C, gamma_1380C_as_printed, gamma_1390C, gamma_1390C_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -584,11 +682,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -606,16 +704,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -624,7 +736,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -705,11 +817,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -727,16 +839,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -745,7 +871,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -826,11 +952,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -848,16 +974,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -866,7 +1006,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -947,11 +1087,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -969,16 +1109,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -987,7 +1141,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1068,11 +1222,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1090,16 +1244,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1108,7 +1276,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1189,11 +1357,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1211,16 +1379,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1229,7 +1411,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1310,11 +1492,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1332,16 +1514,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1350,7 +1546,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1431,11 +1627,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1453,16 +1649,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1471,7 +1681,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1552,11 +1762,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1574,16 +1784,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1592,7 +1816,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1673,11 +1897,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1695,16 +1919,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1713,7 +1951,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1794,11 +2032,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1816,16 +2054,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1834,7 +2086,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1915,11 +2167,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1937,16 +2189,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1955,7 +2221,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2036,11 +2302,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2058,16 +2324,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2076,7 +2356,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2157,11 +2437,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2179,16 +2459,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2197,7 +2491,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2278,11 +2572,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2300,16 +2594,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2318,7 +2626,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2399,11 +2707,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2421,16 +2729,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2439,7 +2761,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2520,11 +2842,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2542,16 +2864,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2560,7 +2896,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2641,11 +2977,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2663,16 +2999,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2681,7 +3031,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2762,11 +3112,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2784,16 +3134,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2802,7 +3166,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2883,11 +3247,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2905,16 +3269,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2923,7 +3301,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -3004,11 +3382,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3026,16 +3404,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -3044,7 +3436,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -3125,11 +3517,11 @@ observations:
     species:
       formula: P2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3147,16 +3539,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -3165,7 +3571,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -3708,8 +4114,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.0, 1573.0]; no midpoint invented
+      tag: value
+      value: '1573'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'internal_standard'; refusing to pick a number
@@ -3735,6 +4141,17 @@ observations:
     section: '2.1'
     note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
   read_from: pdf:kems-057-kambayashi-1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+        note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_po2_table6_partial_pressure::T=1643.0:h=259408c74d22
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
@@ -3744,11 +4161,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3766,16 +4183,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -3784,7 +4215,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -3865,11 +4296,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3887,16 +4318,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -3905,7 +4350,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -3986,11 +4431,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4008,16 +4453,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -4026,7 +4485,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -4107,11 +4566,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4129,16 +4588,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -4147,7 +4620,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -4228,11 +4701,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4250,16 +4723,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -4268,7 +4755,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -4349,11 +4836,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4371,16 +4858,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -4389,7 +4890,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -4470,11 +4971,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4492,16 +4993,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -4510,7 +5025,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -4591,11 +5106,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4613,16 +5128,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -4631,7 +5160,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -4712,11 +5241,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4734,16 +5263,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -4752,7 +5295,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -4833,11 +5376,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4855,16 +5398,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -4873,7 +5430,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -4954,11 +5511,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4976,16 +5533,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -4994,7 +5565,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -5075,11 +5646,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5097,16 +5668,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5115,7 +5700,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -5196,11 +5781,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5218,16 +5803,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5236,7 +5835,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -5317,11 +5916,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5339,16 +5938,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5357,7 +5970,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -5438,11 +6051,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5460,16 +6073,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5478,7 +6105,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -5559,11 +6186,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5581,16 +6208,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5599,7 +6240,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -5680,11 +6321,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5702,16 +6343,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5720,7 +6375,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -5801,11 +6456,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5823,16 +6478,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5841,7 +6510,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -5922,11 +6591,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5944,16 +6613,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -5962,7 +6645,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -6043,11 +6726,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6065,16 +6748,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -6083,7 +6780,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -6164,11 +6861,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6186,16 +6883,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -6204,7 +6915,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -6285,11 +6996,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6307,16 +7018,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PO2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -6325,7 +7050,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -11745,8 +12470,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -11758,12 +12483,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -11801,8 +12582,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -11814,12 +12595,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -11857,8 +12694,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -11870,12 +12707,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -11913,8 +12806,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -11926,12 +12819,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -11969,8 +12918,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -11982,12 +12931,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12025,8 +13030,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12038,12 +13043,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12081,8 +13142,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12094,12 +13155,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12137,8 +13254,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12150,12 +13267,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12193,8 +13366,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12206,12 +13379,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1653'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12249,8 +13478,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12262,12 +13491,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1653'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12305,8 +13590,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12318,12 +13603,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1653'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12361,8 +13702,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12374,12 +13715,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1653'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12417,8 +13814,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12430,12 +13827,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1653'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12473,8 +13926,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12486,12 +13939,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1653'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12529,8 +14038,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12542,12 +14051,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1653'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12585,8 +14150,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12598,12 +14163,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12641,8 +14262,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12654,12 +14275,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12697,8 +14374,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12710,12 +14387,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12753,8 +14486,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12766,12 +14499,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12809,8 +14598,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12822,12 +14611,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12865,8 +14710,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12878,12 +14723,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -12921,8 +14822,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'raoultian_activity'
+      tag: value
+      value: activity
     species:
       formula: P2O5
       phase:
@@ -12934,12 +14835,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1663'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: P2O5
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: unknown
+            reason: source does not state polymorph
+          charge:
+            tag: value
+            value: 0
+        component_basis: P2O5
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: sample_no, T_C, T_K, X_P2O5, P2O5_wt_percent, t_in_FetO,
+      a_P2O5_times_1e17_as_printed, a_P2O5, a_conversion, standard_state_as_printed'
     approximate: false
   uncertainty:
     kind: printed

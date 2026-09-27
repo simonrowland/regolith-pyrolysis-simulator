@@ -404,16 +404,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -422,7 +422,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -507,16 +507,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -525,7 +525,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -610,16 +610,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -628,7 +628,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -714,16 +714,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -732,7 +732,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -817,16 +817,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -835,7 +835,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -920,16 +920,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -938,7 +938,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1101,8 +1101,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+      tag: value
+      value: '298.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1137,6 +1137,16 @@ observations:
     table: '10'
     note: quote=GaO(g) = Ga(g) + O(g) 129404 Pets04, FACTSG
   read_from: pdf:kems-138-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 14
+        pdf_page_index: 15
+        table: '10'
+        note: quote=GaO(g) = Ga(g) + O(g) 129404 Pets04, FACTSG
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio_deep4_quoted
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
@@ -1347,16 +1357,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1365,7 +1375,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1449,16 +1459,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1467,7 +1477,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1551,16 +1561,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1569,7 +1579,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1653,16 +1663,16 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: source gas standard state not grounded
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1671,7 +1681,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2042,8 +2052,8 @@ observations:
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'ion_intensity_isotherm'
+      tag: value
+      value: ion_intensity
     species:
       formula: Ga
       phase:
@@ -2055,15 +2065,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity does not use per
     temperature_K:
       tag: value
       value: '1622'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity does not use formation_elements
     reference_state:
       tag: unknown
       reason: qualifier isotherm does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'ion_intensity_isotherm'; refusing to pick a number
+    unavailable_reason: 'no mapped ion_intensity field selected; source fields: quantity, method_class, Ga_plus_cps, Ga2_plus_cps,
+      Ga3_plus_cps, GaO_plus_cps, Ga2_dimer_plus_cps, Ga2O_plus_cps, T_K, duration_h, as_printed, table_csv'
     approximate: false
   uncertainty:
     kind: printed

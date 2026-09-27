@@ -7,7 +7,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_series'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Fe
       phase:
@@ -22,9 +22,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1750.0, 2250.0]; no midpoint invented
-    reference_state:
-      tag: unknown
-      reason: qualifier series does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -60,7 +57,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_Mg'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Mg
       phase:
@@ -108,7 +105,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_O2'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: O2
       phase:
@@ -156,7 +153,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_O'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: O
       phase:
@@ -204,7 +201,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_SiO'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: SiO
       phase:
@@ -394,8 +391,8 @@ observations:
   experiment_id: 10.1016/j.icarus.2017.02.006::kems-133-costa-2017
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'solidus'
+      tag: value
+      value: transition_temperature
     species:
       formula: Fe
       phase:
@@ -407,12 +404,54 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '2050'
+      value: solidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'solidus'; refusing to pick a number
+    kind: point
+    point: '2050'
     approximate: false
   uncertainty:
     kind: printed

@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -45,6 +45,16 @@ observations:
     note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: PDF p. 4 / printed p. 1167
+        table: '3'
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
 - observation_id: kems-002-ohno-1967::ohno_1967_cr_specific_evaporation_constant::point:0
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -270,8 +280,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -293,6 +303,14 @@ observations:
     table: '3'
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '3'
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
 - observation_id: kems-002-ohno-1967::ohno_1967_cu_specific_evaporation_constant::point:0
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -518,8 +536,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -544,6 +562,17 @@ observations:
     note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: PDF p. 4 / printed p. 1167
+        table: '3'
+        paragraph: Evaporation coefficients of Mn, Cu, Sn, Cr and S in molten iron
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
 - observation_id: kems-002-ohno-1967::ohno_1967_mn_specific_evaporation_constant::point:0
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -781,8 +810,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha;
@@ -812,6 +841,17 @@ observations:
     note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: PDF p. 4 / printed p. 1167
+        table: '3'
+        paragraph: α (cond) for Fe-S alloys
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
 - observation_id: kems-002-ohno-1967::ohno_1967_s_condensation_class_b1
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -830,8 +870,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha;
@@ -854,6 +894,15 @@ observations:
     paragraph: S condensation coefficient Ward-Machlin
     source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
   read_from: unknown:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        table: '3'
+        paragraph: S condensation coefficient Ward-Machlin
+        source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
 - observation_id: kems-002-ohno-1967::ohno_1967_s_specific_evaporation_constant::point:0
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:
@@ -1367,8 +1416,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source flags not_hkl_langmuir_coefficient; not an HKL/Langmuir alpha;
@@ -1391,6 +1440,15 @@ observations:
     table: '3'
     note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
   read_from: pdf:kems-002-ohno-1967
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        page: PDF p. 4 / printed p. 1167
+        table: '3'
+        note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-002-ohno-1967/tables.md
 - observation_id: kems-002-ohno-1967::ohno_1967_sn_specific_evaporation_constant::point:0
   experiment_id: 10.2320/jinstmet1952.31.10_1164::kems-002-ohno-1967
   identity:

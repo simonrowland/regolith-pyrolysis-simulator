@@ -87,8 +87,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
@@ -119,6 +119,19 @@ observations:
       Ag | AgO0.5(l) = Ag(g) + ¼O2 | 1 | 0 | -2.23 |  |  | \nN |  |  |  | 1 |  |  |"
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
+          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
+          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
+          \ K\nAg | AgO0.5(l) = Ag(g) + ¼O2 | 1 | 0 | -2.23 |  |  | \nN |  |  |  | 1 |  |  |"
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
 - observation_id: kems-012-sossi-2019::sossi_2019_ag_table4_gamma_this_work
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -143,8 +156,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -155,8 +168,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AgO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AgO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -217,6 +243,17 @@ observations:
     note: Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '4'
+        section: 4.6 Evaporation coefficients / Table 4
+        line_range: 1112-1118
+        note: Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_ag_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -253,8 +290,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AgO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AgO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -398,8 +448,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+      tag: value
+      value: '1573.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
@@ -430,6 +480,19 @@ observations:
       Cd | CdO(l) = Cd(g) + ½O2 | 2 | 0 | -2.48 |  |  | \nN |  |  |  | 1 |  |  |"
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 56
+        table: '3'
+        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
+          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
+          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
+          \ K\nCd | CdO(l) = Cd(g) + ½O2 | 2 | 0 | -2.48 |  |  | \nN |  |  |  | 1 |  |  |"
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
 - observation_id: kems-012-sossi-2019::sossi_2019_cd_table4_gamma_this_work
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -454,8 +517,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -466,8 +529,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CdO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CdO
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -528,6 +604,17 @@ observations:
     note: Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '4'
+        section: 4.6 Evaporation coefficients / Table 4
+        line_range: 1112-1118
+        note: Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_cd_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -564,8 +651,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CdO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CdO
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -773,8 +873,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -809,6 +909,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_cr_table5_experimental_CrO_ox_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -1047,8 +1158,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CuO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CuO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -1146,8 +1270,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CuO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CuO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -1248,8 +1385,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -1284,6 +1421,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_cu_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -1636,8 +1784,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -1672,6 +1820,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_ga_table5_experimental_Ga_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -7040,8 +7199,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GeO2
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GeO2
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -7139,8 +7311,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: GeO2
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: GeO2
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -7241,8 +7426,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -7277,6 +7462,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_ge_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -7556,8 +7752,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
@@ -7597,6 +7793,19 @@ observations:
       K | KO0.5(l) = K(g) + ¼O2 | 1 | 0 |  | -3.95±0.06 |  | \nN |  |  |  |  | 2 |  |"
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
+          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
+          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
+          \ K\nK | KO0.5(l) = K(g) + ¼O2 | 1 | 0 |  | -3.95±0.06 |  | \nN |  |  |  |  | 2 |  |"
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
 - observation_id: kems-012-sossi-2019::sossi_2019_k_open_furnace_alpha_e_context
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -7760,8 +7969,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -7772,8 +7981,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: KO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: KO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -7835,6 +8057,17 @@ observations:
     note: Table 4 γ_i (this work) for KO0.5; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '4'
+        section: 4.6 Evaporation coefficients / Table 4
+        line_range: 1112-1118
+        note: Table 4 γ_i (this work) for KO0.5; authors set α_e=1 and compute γ from K*/K
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_k_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -7859,8 +8092,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -7871,8 +8104,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: KO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: KO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -7939,6 +8185,22 @@ observations:
       \ |  |  |"
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 57
+        table: '4'
+        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;\
+          \ quote=Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients\
+          \ calculated with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with\
+          \ αe = 1 from eq. 6.\nSpecies                                                                  Temperature (K)\n\
+          \                                       1573.15                 1673.15                 1773.15            1823.15\
+          \        1923.15\nSpecies | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nKO0.5 | γi (this\
+          \ work) |  | 2.2×10⁻⁴±5.5×10⁻⁵ |  |  |"
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
 - observation_id: kems-012-sossi-2019::sossi_2019_k_table5_experimental
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -7957,8 +8219,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -7993,6 +8255,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_k_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -13259,8 +13532,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
@@ -13300,6 +13573,19 @@ observations:
       Li | LiO0.5(l) + ¼O2 = LiO(g) | -1 | 0 |  | -3.39±0.07 |  | \nN |  |  |  |  | 2 |  |"
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
+          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
+          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
+          \ K\nLi | LiO0.5(l) + ¼O2 = LiO(g) | -1 | 0 |  | -3.39±0.07 |  | \nN |  |  |  |  | 2 |  |"
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
 - observation_id: kems-012-sossi-2019::sossi_2019_li_logKstar_table3_Li_g
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -13386,8 +13672,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
@@ -13427,6 +13713,19 @@ observations:
       Li | LiO0.5(l) = Li(g) + ¼O2 | 1 | 0 |  | -5.36±0.05 |  | \nN |  |  |  |  | 2 |  |"
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
+          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
+          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
+          \ K\nLi | LiO0.5(l) = Li(g) + ¼O2 | 1 | 0 |  | -5.36±0.05 |  | \nN |  |  |  |  | 2 |  |"
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
 - observation_id: kems-012-sossi-2019::sossi_2019_li_table4_gamma_this_work
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -13451,8 +13750,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -13463,8 +13762,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -13526,6 +13838,17 @@ observations:
     note: Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '4'
+        section: 4.6 Evaporation coefficients / Table 4
+        line_range: 1112-1118
+        note: Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_li_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -13562,8 +13885,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -13648,8 +13984,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -13684,6 +14020,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_li_table5_experimental_Li_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -28630,8 +28977,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_system_reaction_enthalpy_entropy'; refusing
@@ -28666,6 +29013,17 @@ observations:
     note: Table 5 pure-system columns (not this experiment)
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 pure-system columns (not this experiment)
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_mn_table5_pure_system_not_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -29118,8 +29476,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -29154,6 +29512,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_mo_table5_experimental_MoO3_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -29371,8 +29740,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
@@ -29412,6 +29781,16 @@ observations:
     note: α_e,NaO0.5 from eq.6 using literature γ_NaO0.5 at 1400 °C
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        section: 4.6 Evaporation coefficients
+        line_range: 300-302
+        note: α_e,NaO0.5 from eq.6 using literature γ_NaO0.5 at 1400 °C
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_na_alpha_e_gamma_derived_range_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -29695,8 +30074,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'log10_K_star_equilibrium_fit'; refusing to pick
@@ -29736,6 +30115,19 @@ observations:
       Na | NaO0.5(l) = Na(g) + ¼O2 | 1 | 0 |  | -4.25±0.10 |  | \nN |  |  |  |  | 2 |  |"
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 56
+        table: '3'
+        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t3.provenance.yaml;\
+          \ quote=Table 3. The logK* values and SD uncertainty and stoichiometries of reaction (n) found by non-linear least-squares\
+          \ fit to the experimental data.\nElement | Reaction | n | t0 (min) | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15\
+          \ K\nNa | NaO0.5(l) = Na(g) + ¼O2 | 1 | 0 |  | -4.25±0.10 |  | \nN |  |  |  |  | 2 |  |"
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
 - observation_id: kems-012-sossi-2019::sossi_2019_na_pure_system_LH_table5
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -29754,8 +30146,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_system_reaction_enthalpy_entropy'; refusing
@@ -29791,6 +30183,18 @@ observations:
     note: Table 5 pure-system columns for NaO0.5(l)=Na(g)+1/4 O2; Source column = 2 (L&H 1984)
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        paragraph: Na* pure system ΔS°=0.128 kJ/molK, ΔH°=255.0 kJ; Source 2 = Lamoreaux & Hildenbrand 1984
+        section: Table 5 pure-system thermodynamic data
+        line_range: '1121'
+        note: Table 5 pure-system columns for NaO0.5(l)=Na(g)+1/4 O2; Source column = 2 (L&H 1984)
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_na_pure_system_LH_table5_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -29865,8 +30269,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -29877,8 +30281,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -29940,6 +30357,17 @@ observations:
     note: Table 4 γ_i (this work) for NaO0.5; authors set α_e=1 and compute γ from K*/K
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '4'
+        section: 4.6 Evaporation coefficients / Table 4
+        line_range: 1112-1118
+        note: Table 4 γ_i (this work) for NaO0.5; authors set α_e=1 and compute γ from K*/K
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_na_table4_gamma_this_work_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -29964,8 +30392,8 @@ observations:
       tag: unknown
       reason: no per mapped from source
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1673.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -29976,8 +30404,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -30044,6 +30485,22 @@ observations:
       \ |  |  |"
     source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
   read_from: pdf:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 57
+        table: '4'
+        note: "Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml;\
+          \ quote=Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation coefficients\
+          \ calculated with eq. 6\nusing activity coefficients shown in the references, activity coefficients calculated with\
+          \ αe = 1 from eq. 6.\nSpecies                                                                  Temperature (K)\n\
+          \                                       1573.15                 1673.15                 1773.15            1823.15\
+          \        1923.15\nSpecies | Quantity | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nNaO0.5 | γi (this\
+          \ work) |  | 1.0×10⁻³±2.2×10⁻⁴ |  |  |"
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
 - observation_id: kems-012-sossi-2019::sossi_2019_pb_logKstar_table3_PbO_g
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -30332,8 +30789,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PbO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PbO
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -30430,8 +30900,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: PbO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: PbO
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -30526,8 +31009,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -30562,6 +31045,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_pb_table5_experimental_PbO_g_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -30791,8 +31285,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: RbO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: RbO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -30890,8 +31397,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: RbO0.5
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: RbO0.5
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -30984,8 +31504,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -31020,6 +31540,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_rb_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:
@@ -61526,8 +62057,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: ZnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: ZnO
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -61625,8 +62169,21 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: qualifier this_work does not name a reference_state
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: ZnO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: ZnO
     reservoir:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
@@ -61727,8 +62284,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'experimental_reaction_enthalpy_entropy'; refusing
@@ -61763,6 +62320,17 @@ observations:
     note: Table 5 experimental columns
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
   read_from: unknown:kems-012-sossi-2019
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        table: '5'
+        section: Table 5 pure-system / experimental thermodynamic data
+        line_range: 1121-1127
+        note: Table 5 experimental columns
+        source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
 - observation_id: kems-012-sossi-2019::sossi_2019_zn_table5_experimental_quoted_20260906
   experiment_id: 10.1016/j.gca.2019.06.021::kems-012-sossi-2019
   identity:

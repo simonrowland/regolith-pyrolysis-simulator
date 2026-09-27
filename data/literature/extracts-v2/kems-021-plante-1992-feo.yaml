@@ -101,12 +101,12 @@ observations:
     figure: '4'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
-- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=3a2b47c99153
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p15
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -118,13 +118,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
-      to pick a number
+    kind: point
+    point: '7.04'
     approximate: false
   uncertainty:
     kind: printed
@@ -158,12 +199,18 @@ observations:
         table: '1'
         note: Table 1 row x(FeO)=0.15
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30
-  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p30
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p15::rows:h=530b489d64f6
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p15
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -175,13 +222,158 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
-      to pick a number
+    kind: point
+    point: '2.33'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.15
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.15
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=8ab48e8a15ab
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p30
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: point
+    point: '23.61'
     approximate: false
   uncertainty:
     kind: printed
@@ -215,12 +407,18 @@ observations:
         table: '1'
         note: Table 1 row x(FeO)=0.30
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40
-  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p40
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p30::rows:h=c0fd2c2a2315
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p30
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -232,13 +430,158 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
-      to pick a number
+    kind: point
+    point: '6.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.30
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.30
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=27620d32b777
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p40
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: point
+    point: '7.83'
     approximate: false
   uncertainty:
     kind: printed
@@ -272,12 +615,18 @@ observations:
         table: '1'
         note: Table 1 row x(FeO)=0.40
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54
-  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p54
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p40::rows:h=c923adf0ad27
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p40
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -289,13 +638,158 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
-      to pick a number
+    kind: point
+    point: '48.41'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.40
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.40
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=cad40b2f02a7
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p54
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: point
+    point: '37.2'
     approximate: false
   uncertainty:
     kind: printed
@@ -329,12 +823,18 @@ observations:
         table: '1'
         note: Table 1 row x(FeO)=0.54
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70
-  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p70
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p54::rows:h=fa110e67ab1d
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p54
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -346,13 +846,158 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
-      to pick a number
+    kind: point
+    point: '12.04'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.54
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.54
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=31cbd0349b51
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p70
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: point
+    point: '22.85'
     approximate: false
   uncertainty:
     kind: printed
@@ -386,12 +1031,18 @@ observations:
         table: '1'
         note: Table 1 row x(FeO)=0.70
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80
-  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p80
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p70::rows:h=3471283ba8b1
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p70
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -403,13 +1054,158 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
-      to pick a number
+    kind: point
+    point: '23.29'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.70
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.70
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=74b0251157b4
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p80
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: point
+    point: '27.11'
     approximate: false
   uncertainty:
     kind: printed
@@ -443,12 +1239,18 @@ observations:
         table: '1'
         note: Table 1 row x(FeO)=0.80
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90
-  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p90
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p80::rows:h=ac160c987d81
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p80
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'
+      tag: value
+      value: ion_intensity_ratio
     species:
       formula: Fe
       phase:
@@ -460,13 +1262,158 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'I_Fe_plus_over_I_Mg_plus_and_I_SiO_plus'; refusing
-      to pick a number
+    kind: point
+    point: '29.05'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.80
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.80
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=85cdfbdee3ac
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p90
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: point
+    point: '40.3'
     approximate: false
   uncertainty:
     kind: printed
@@ -500,6 +1447,116 @@ observations:
         table: '1'
         note: Table 1 row x(FeO)=0.90
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_xfeo_0p90::rows:h=facdb3555ee2
+  experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-xfeo-0p90
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier ratio does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: point
+    point: '21.64'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 row x(FeO)=0.90
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 row x(FeO)=0.90
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: ion_intensity_ratio_dimensionless
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=0dc01e52b8c5
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -518,8 +1575,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 1973.0]; no midpoint invented
+      tag: value
+      value: '1973'
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
@@ -547,6 +1604,16 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=207c3002b37e
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -565,8 +1632,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 1973.0]; no midpoint invented
+      tag: value
+      value: '1973'
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
@@ -594,6 +1661,16 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=26cb5881522b
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -612,8 +1689,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 1973.0]; no midpoint invented
+      tag: value
+      value: '1973'
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
@@ -641,6 +1718,16 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=57702a194746
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -659,8 +1746,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 1973.0]; no midpoint invented
+      tag: value
+      value: '1973'
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
@@ -688,6 +1775,16 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=609ca37e350f
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -706,8 +1803,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 1973.0]; no midpoint invented
+      tag: value
+      value: '1973'
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
@@ -735,6 +1832,16 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=a59118c01625
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -753,8 +1860,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 1973.0]; no midpoint invented
+      tag: value
+      value: '1973'
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
@@ -782,6 +1889,16 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=dabdcb75787c
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -800,8 +1917,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 1973.0]; no midpoint invented
+      tag: value
+      value: '1973'
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
@@ -829,6 +1946,16 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=dcccbea0c28f
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -847,8 +1974,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 1973.0]; no midpoint invented
+      tag: value
+      value: '1973'
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
@@ -876,6 +2003,16 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=feb46807f00a
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -894,8 +2031,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1973.0, 1973.0]; no midpoint invented
+      tag: value
+      value: '1973'
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
@@ -923,3 +2060,13 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
   read_from: unknown:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md

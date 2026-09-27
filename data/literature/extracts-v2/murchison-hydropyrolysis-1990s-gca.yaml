@@ -536,8 +536,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [593.15, 593.15]; no midpoint invented
+      tag: value
+      value: '593.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -560,6 +560,16 @@ observations:
     table: '1'
     note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '593.15'
+      locator:
+        published_page: 1389
+        pdf_page_index: 5
+        table: '1'
+        note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms::points:h=4e6f0bfc153f
   experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
   identity:
@@ -578,8 +588,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [593.15, 593.15]; no midpoint invented
+      tag: value
+      value: '593.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -602,6 +612,16 @@ observations:
     table: '1'
     note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '593.15'
+      locator:
+        published_page: 1389
+        pdf_page_index: 5
+        table: '1'
+        note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms::points:h=68c6ef39f635
   experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
   identity:
@@ -620,8 +640,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [593.15, 593.15]; no midpoint invented
+      tag: value
+      value: '593.15'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -644,6 +664,16 @@ observations:
     table: '1'
     note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
   read_from: pdf:murchison-hydropyrolysis-1990s-gca
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '593.15'
+      locator:
+        published_page: 1389
+        pdf_page_index: 5
+        table: '1'
+        note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
 - observation_id: murchison-hydropyrolysis-1990s-gca::sephton_2004_table2_component_classification_quoted
   experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
   identity:

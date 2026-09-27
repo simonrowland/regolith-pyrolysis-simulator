@@ -20,8 +20,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_gibbs_energy_change'; refusing to pick
@@ -51,6 +51,15 @@ observations:
     pdf_page_index: 8
     equation: '26'
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 559
+        pdf_page_index: 8
+        equation: '26'
 - observation_id: kems-111-ichise-1982::ichise_1982_fig1_ion_intensity_A4_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
@@ -112,8 +121,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -137,6 +146,15 @@ observations:
     pdf_page_index: 3
     figure: '2'
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 554
+        pdf_page_index: 3
+        figure: '2'
 - observation_id: kems-111-ichise-1982::ichise_1982_fig3_Ag_standard_procedure_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -155,8 +173,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -180,6 +198,15 @@ observations:
     pdf_page_index: 3
     figure: '3'
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 554
+        pdf_page_index: 3
+        figure: '3'
 - observation_id: kems-111-ichise-1982::ichise_1982_fig4_activities_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
@@ -198,8 +225,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -223,6 +250,15 @@ observations:
     pdf_page_index: 5
     figure: '4'
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 556
+        pdf_page_index: 5
+        figure: '4'
 - observation_id: kems-111-ichise-1982::ichise_1982_fig5_ln_gamma_Fe_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
@@ -241,8 +277,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     reference_state:
       tag: unknown
       reason: qualifier coefficient does not name a reference_state
@@ -270,6 +306,15 @@ observations:
     pdf_page_index: 5
     figure: '5'
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 556
+        pdf_page_index: 5
+        figure: '5'
 - observation_id: kems-111-ichise-1982::ichise_1982_fig6_error_estimate_figure_only
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
@@ -288,8 +333,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     reference_state:
       tag: unknown
       reason: qualifier error_envelope does not name a reference_state
@@ -317,6 +362,15 @@ observations:
     pdf_page_index: 7
     figure: '6'
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 558
+        pdf_page_index: 7
+        figure: '6'
 - observation_id: kems-111-ichise-1982::ichise_1982_infinite_dilution_gamma
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
@@ -498,8 +552,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_method_geometry_reference'; refusing to pick
@@ -524,6 +578,15 @@ observations:
     pdf_page_index: 2
     section: II. Experimental
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II. Experimental
 - observation_id: kems-111-ichise-1982::ichise_1982_quoted_Mo_psat
   experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
   identity:
@@ -555,16 +618,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Mo
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Mo
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -573,7 +650,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -618,6 +695,12 @@ observations:
         published_page: 552
         pdf_page_index: 1
         paragraph: Mo has very low vapor pressure, about 3×10^{-10} atm even at 2000 K
+  derivation:
+    relation: identity.reference_state=ideal-gas Mo(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-111-ichise-1982
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=0b915694fe76
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -642,8 +725,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -704,6 +787,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=15e7ca45ad79
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -728,8 +821,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -790,6 +883,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=2bd42fc2072f
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -814,8 +917,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -876,6 +979,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=4a3ca738d713
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -900,8 +1013,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -962,6 +1075,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=61b24c836f3b
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -986,8 +1109,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1048,6 +1171,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=66a48e1388ad
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1072,8 +1205,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1134,6 +1267,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=684310f7e4dc
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1158,8 +1301,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1220,6 +1363,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=75c3e4a3badb
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1244,8 +1397,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1306,6 +1459,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=75ef3a2396b9
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1330,8 +1493,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1392,6 +1555,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=766e174dab72
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1416,8 +1589,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1478,6 +1651,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=892653fc1b69
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1502,8 +1685,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1564,6 +1747,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=d74913a84e78
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1588,8 +1781,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1650,6 +1843,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=dde737a1c934
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1674,8 +1877,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1736,6 +1939,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=ed963f66158d
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1760,8 +1973,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1822,6 +2035,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=edf168336178
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1846,8 +2069,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1908,6 +2131,16 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
 - observation_id: kems-111-ichise-1982::ichise_1982_table1_lambda::rows:h=f0e43f12761f
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-high-mo-ag-standard
   identity:
@@ -1932,8 +2165,8 @@ observations:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
+      tag: value
+      value: '1823'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -1994,7 +2227,17 @@ observations:
     table: '1'
     note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
   read_from: pdf:kems-111-ichise-1982
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=0aa5d604c392
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=0db5db1d881a
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2030,8 +2273,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2058,7 +2315,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -2091,7 +2348,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=0b1612f96bce
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.778'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=10938853ab5a
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2127,8 +2416,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2155,8 +2458,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, a_Fe_as_printed, phases, excluded,
-      exclusion_as_printed'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -2189,7 +2491,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=144ccc724209
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.842'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=1387f56114bf
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2225,8 +2559,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2253,7 +2601,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -2286,7 +2634,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=151666fae982
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.154'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=138b6ffd4683
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2322,8 +2702,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2350,7 +2744,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -2383,7 +2777,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=16677f13bbd8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.251'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=158c2abe0513
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2419,8 +2845,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2447,7 +2887,8 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, a_Fe_as_printed, phases, point_conditions,
+      excluded, exclusion_as_printed'
     approximate: false
   uncertainty:
     kind: printed
@@ -2480,7 +2921,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=3a82bf182de8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.434'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=1f11cc5c1a46
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2516,8 +2989,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2544,7 +3031,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -2577,7 +3064,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=49bda492c142
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.434'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=2b170346d4f2
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2613,8 +3132,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2641,7 +3174,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -2674,7 +3207,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=4a20038171ab
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.912'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=2b58e7565a8e
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2710,8 +3275,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2738,7 +3317,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -2771,7 +3350,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=5077fd117e43
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.556'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=319ad0894bb7
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2807,8 +3418,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2835,7 +3460,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -2868,7 +3493,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=715db22ad529
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.2'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=32210278b9ad
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -2904,8 +3561,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2932,7 +3603,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -2965,7 +3636,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=90124989a607
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.3'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=383727daf076
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3001,8 +3704,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3029,7 +3746,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3062,7 +3779,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=93d287958fee
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.201'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=488a505c3938
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3098,8 +3847,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3126,7 +3889,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3159,7 +3922,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=9c4c7e5ebe9d
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.666'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=4cff1b4c9da7
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3195,8 +3990,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3223,7 +4032,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3256,7 +4065,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=a105c5cc52b0
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.434'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=50c95f1a93c9
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3292,8 +4133,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3320,7 +4175,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3353,7 +4208,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=a86848ce17ba
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.339'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=56d5e90c7d7b
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3389,8 +4276,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3417,7 +4318,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3450,7 +4351,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=b5bb1839d1a0
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.24'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=605b8e3ecb90
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3486,8 +4419,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3514,7 +4461,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3547,7 +4494,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=b8d19f4a9d72
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.348'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=8e86187e641d
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3583,8 +4562,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3611,7 +4604,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3644,7 +4637,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=cf55d502e490
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.793'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=a5939ff12093
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3680,8 +4705,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3708,7 +4747,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3741,7 +4780,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=db77e6b50fee
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.096'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=aa4ccd8d2335
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3777,8 +4848,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3805,7 +4890,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3838,7 +4923,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=eef76986c57e
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.333'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=b2b28dee590c
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3874,8 +4991,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3902,7 +5033,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -3935,7 +5066,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=f4dc03963140
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.912'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=be5800499252
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -3971,8 +5134,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3999,7 +5176,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -4032,7 +5209,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=f69b389909e1
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.613'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=c74133439782
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -4068,8 +5277,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4096,7 +5319,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -4129,7 +5352,39 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
-- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=f932b88a472c
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.254'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
+- observation_id: kems-111-ichise-1982::ichise_1982_table2_a_Fe_1823K::rows:h=edb2af0837ea
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-low-mo-in-situ
   identity:
     quantity:
@@ -4165,8 +5420,22 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4193,7 +5462,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases'
+    unavailable_reason: 'no mapped activity field selected; source fields: no, x_Mo, a_Fe, phases, point_conditions'
     approximate: false
   uncertainty:
     kind: printed
@@ -4226,6 +5495,38 @@ observations:
         pdf_page_index: 4
         table: '2'
         note: Table 2. Result of activity measurements at 1823 K.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_x_Mo_axis
+          components:
+          - - Mo
+            - '0.302'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 555
+        pdf_page_index: 4
+        table: '2'
+        note: Printed x_Mo axis; no complementary Fe fraction invented.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No numeric KEMS cell or chamber pressure is printed.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
+        note: No fO2 or pO2 is printed.
 - observation_id: kems-111-ichise-1982::ichise_1982_table3_phase_boundaries::rows:h=c62f63e16472
   experiment_id: 10.2355/isijinternational1966.22.552::experiment::fe-mo-phase-boundary-series
   identity:

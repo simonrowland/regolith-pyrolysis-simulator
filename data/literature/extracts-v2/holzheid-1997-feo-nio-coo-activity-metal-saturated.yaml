@@ -125,12 +125,12 @@ observations:
     table: '1'
     section: Silicate starting compositions (electron microprobe analysis)
   read_from: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_1::T=1673:row=v-69:h=48aa30be148a
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_1::T=1673:row=v-69:h=6447173f45bb
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-1
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -142,12 +142,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.72'
     approximate: false
   uncertainty:
     kind: printed
@@ -157,15 +212,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 69
@@ -176,7 +232,7 @@ observations:
         tag: value
         value: '1673'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
@@ -185,16 +241,24 @@ observations:
         tag: value
         value: '-9.63'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_2::T=1677:row=ad-12:h=42651c094af7
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_2::T=1677:row=ad-12:h=447f954a34a7
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-ad-12-2
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -206,12 +270,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1677'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.31'
     approximate: false
   uncertainty:
     kind: printed
@@ -221,15 +340,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=AD 12
@@ -240,7 +360,7 @@ observations:
         tag: value
         value: '1677'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=AD 12
@@ -249,16 +369,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=AD 12
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_3::T=1670:row=v-70:h=7664c1332a5f
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_3::T=1670:row=v-70:h=7e30f423fc05
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-3
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -270,12 +398,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1670'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.46'
     approximate: false
   uncertainty:
     kind: printed
@@ -285,15 +468,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 70
@@ -304,7 +488,7 @@ observations:
         tag: value
         value: '1670'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
@@ -313,16 +497,24 @@ observations:
         tag: value
         value: '-9.93'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_4::T=1675:row=v-64:h=b12ff227854a
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_4::T=1675:row=v-64:h=86e726ae4b1d
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-4
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -334,12 +526,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1675'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.49'
     approximate: false
   uncertainty:
     kind: printed
@@ -349,15 +596,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 64
@@ -368,7 +616,7 @@ observations:
         tag: value
         value: '1675'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
@@ -377,16 +625,24 @@ observations:
         tag: value
         value: '-9.79'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_5::T=1671:row=v-66:h=8423e3ba37a9
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_5::T=1671:row=v-66:h=f494d432ed9a
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-5
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -398,12 +654,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1671'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.66'
     approximate: false
   uncertainty:
     kind: printed
@@ -413,15 +724,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 66
@@ -432,7 +744,7 @@ observations:
         tag: value
         value: '1671'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
@@ -441,16 +753,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_6::T=1670:row=v-70:h=1130422a845a
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_6::T=1670:row=v-70:h=3fba5be3c6ad
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-6
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -462,12 +782,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1670'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.77'
     approximate: false
   uncertainty:
     kind: printed
@@ -477,15 +852,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 70
@@ -496,7 +872,7 @@ observations:
         tag: value
         value: '1670'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
@@ -505,16 +881,24 @@ observations:
         tag: value
         value: '-9.93'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_7::T=1671:row=v-66:h=53b35b83f631
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_7::T=1671:row=v-66:h=c68ae97a3aad
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-7
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -526,12 +910,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1671'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '4.93'
     approximate: false
   uncertainty:
     kind: printed
@@ -541,15 +980,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 66
@@ -560,7 +1000,7 @@ observations:
         tag: value
         value: '1671'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
@@ -569,16 +1009,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_8::T=1671:row=v-65:h=5a22ba59970b
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_co_variable_mgo_1_8::T=1671:row=v-65:h=b326dbdce21b
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-65-8
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -590,12 +1038,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1671'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '6.22'
     approximate: false
   uncertainty:
     kind: printed
@@ -605,15 +1108,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 65
@@ -624,7 +1128,7 @@ observations:
         tag: value
         value: '1671'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 65
@@ -633,16 +1137,24 @@ observations:
         tag: value
         value: '-9.66'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 65
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_10::T=1671:row=v-65:h=6934ee5d2922
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_10::T=1671:row=v-65:h=0904f5c39603
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-65-22
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -654,12 +1166,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1671'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.39'
     approximate: false
   uncertainty:
     kind: printed
@@ -669,15 +1236,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 65
@@ -688,7 +1256,7 @@ observations:
         tag: value
         value: '1671'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 65
@@ -697,16 +1265,24 @@ observations:
         tag: value
         value: '-9.66'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 65
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_1::T=1673:row=v-69:h=d96d7bef61d9
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_1::T=1673:row=v-69:h=1b4ce9a4fe09
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-13
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -718,12 +1294,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.06'
     approximate: false
   uncertainty:
     kind: printed
@@ -733,15 +1364,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 69
@@ -752,7 +1384,7 @@ observations:
         tag: value
         value: '1673'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
@@ -761,16 +1393,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_2::T=1673:row=v-69:h=655adb7ffa99
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_2::T=1673:row=v-69:h=0e012450a218
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-14
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -782,12 +1422,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.6'
     approximate: false
   uncertainty:
     kind: printed
@@ -797,15 +1492,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 69
@@ -816,7 +1512,7 @@ observations:
         tag: value
         value: '1673'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
@@ -825,16 +1521,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_3::T=1677:row=ad-12:h=af8bca643df9
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_3::T=1677:row=ad-12:h=3abab7dac9f6
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-ad-12-15
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -846,12 +1550,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1677'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.61'
     approximate: false
   uncertainty:
     kind: printed
@@ -861,15 +1620,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=AD 12
@@ -880,7 +1640,7 @@ observations:
         tag: value
         value: '1677'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=AD 12
@@ -889,16 +1649,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=AD 12
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_4::T=1670:row=v-70:h=9a160ef40ee3
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_4::T=1670:row=v-70:h=ecdb5a393e32
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-16
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -910,12 +1678,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1670'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.07'
     approximate: false
   uncertainty:
     kind: printed
@@ -925,15 +1748,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 70
@@ -944,7 +1768,7 @@ observations:
         tag: value
         value: '1670'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
@@ -953,16 +1777,24 @@ observations:
         tag: value
         value: '-9.93'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_5::T=1670:row=v-70:h=9b90eb3b5fe4
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_5::T=1670:row=v-70:h=7c7392517433
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-17
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -974,12 +1806,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1670'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.59'
     approximate: false
   uncertainty:
     kind: printed
@@ -989,15 +1876,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 70
@@ -1008,7 +1896,7 @@ observations:
         tag: value
         value: '1670'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
@@ -1017,16 +1905,24 @@ observations:
         tag: value
         value: '-9.93'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_6::T=1675:row=v-64:h=cba7f5bdee83
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_6::T=1675:row=v-64:h=b9a8374e7827
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-18
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -1038,12 +1934,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1675'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.21'
     approximate: false
   uncertainty:
     kind: printed
@@ -1053,15 +2004,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 64
@@ -1072,7 +2024,7 @@ observations:
         tag: value
         value: '1675'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
@@ -1081,16 +2033,24 @@ observations:
         tag: value
         value: '-9.79'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_7::T=1671:row=v-66:h=c7154e3b1e8e
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_7::T=1671:row=v-66:h=e8ebeb9bf4c8
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-19
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -1102,12 +2062,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1671'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.84'
     approximate: false
   uncertainty:
     kind: printed
@@ -1117,15 +2132,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 66
@@ -1136,7 +2152,7 @@ observations:
         tag: value
         value: '1671'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
@@ -1145,16 +2161,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_8::T=1670:row=v-70:h=1e5b56785460
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_8::T=1670:row=v-70:h=1da0cfacf448
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-70-20
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -1166,12 +2190,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1670'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.3'
     approximate: false
   uncertainty:
     kind: printed
@@ -1181,15 +2260,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 70
@@ -1200,7 +2280,7 @@ observations:
         tag: value
         value: '1670'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
@@ -1209,16 +2289,24 @@ observations:
         tag: value
         value: '-9.93'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 70
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_9::T=1671:row=v-66:h=fd24584a4132
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3a_ad_ni_variable_mgo_1_9::T=1671:row=v-66:h=cc3bc1bd13f9
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-21
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -1230,12 +2318,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1671'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.2'
     approximate: false
   uncertainty:
     kind: printed
@@ -1245,15 +2388,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3a
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 66
@@ -1264,7 +2408,7 @@ observations:
         tag: value
         value: '1671'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
@@ -1273,16 +2417,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3a
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1::T=1673:row=v-69:h=a87cc0f10b33
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_1::T=1673:row=v-69:h=fc68d2176cde
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-27
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
       phase:
@@ -1294,12 +2446,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: wustite(liquid) standard state for FeO activity coefficient'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.72'
     approximate: false
   uncertainty:
     kind: printed
@@ -1309,15 +2503,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3b
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 69
@@ -1328,7 +2523,7 @@ observations:
         tag: value
         value: '1673'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
@@ -1337,16 +2532,24 @@ observations:
         tag: value
         value: '-9.63'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_2::T=1673:row=v-69:h=4a0c8f51f8e5
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_2::T=1673:row=v-69:h=feb4acafdbd7
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-69-28
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
       phase:
@@ -1358,12 +2561,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: wustite(liquid) standard state for FeO activity coefficient'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.83'
     approximate: false
   uncertainty:
     kind: printed
@@ -1373,15 +2618,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3b
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 69
@@ -1392,7 +2638,7 @@ observations:
         tag: value
         value: '1673'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
@@ -1401,16 +2647,24 @@ observations:
         tag: value
         value: '-9.63'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 69
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_3::T=1677:row=ad-10:h=506dfe3c484e
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_3::T=1677:row=ad-10:h=15e90bc486c4
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-ad-10-29
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
       phase:
@@ -1422,12 +2676,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1677'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: wustite(liquid) standard state for FeO activity coefficient'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.62'
     approximate: false
   uncertainty:
     kind: printed
@@ -1437,15 +2733,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3b
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=AD 10
@@ -1456,7 +2753,7 @@ observations:
         tag: value
         value: '1677'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=AD 10
@@ -1465,16 +2762,24 @@ observations:
         tag: value
         value: '-10.31'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=AD 10
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_4::T=1677:row=v-64:h=7e469433f283
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_4::T=1677:row=v-64:h=bc02e7245bb0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-30
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
       phase:
@@ -1486,12 +2791,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1677'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: wustite(liquid) standard state for FeO activity coefficient'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.47'
     approximate: false
   uncertainty:
     kind: printed
@@ -1501,15 +2848,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3b
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 64
@@ -1520,7 +2868,7 @@ observations:
         tag: value
         value: '1677'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
@@ -1529,16 +2877,24 @@ observations:
         tag: value
         value: '-9.79'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_5::T=1667:row=v-68:h=1bd92ad6f74b
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_5::T=1667:row=v-68:h=7ae8ec4a97c0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-31
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
       phase:
@@ -1550,12 +2906,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1667'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: wustite(liquid) standard state for FeO activity coefficient'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.44'
     approximate: false
   uncertainty:
     kind: printed
@@ -1565,15 +2963,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3b
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 68
@@ -1584,7 +2983,7 @@ observations:
         tag: value
         value: '1667'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 68
@@ -1593,16 +2992,24 @@ observations:
         tag: value
         value: '-9.7'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 68
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_6::T=1671:row=v-66:h=9f07df4cc885
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_6::T=1671:row=v-66:h=7cbb400f2c29
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-32
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
       phase:
@@ -1614,12 +3021,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1671'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: wustite(liquid) standard state for FeO activity coefficient'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '4.41'
     approximate: false
   uncertainty:
     kind: printed
@@ -1629,15 +3078,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3b
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 66
@@ -1648,7 +3098,7 @@ observations:
         tag: value
         value: '1671'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
@@ -1657,16 +3107,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_7::T=1671:row=v-66:h=e575e9ba8f07
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3b_ad_fe_nico_variable_mgo_1_7::T=1671:row=v-66:h=936d7689c793
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-66-33
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'FeO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: FeO
       phase:
@@ -1678,12 +3136,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1671'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: wustite(liquid) standard state for FeO activity coefficient'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '5.22'
     approximate: false
   uncertainty:
     kind: printed
@@ -1693,15 +3193,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 25
+    page: 26
     table: 3b
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 66
@@ -1712,7 +3213,7 @@ observations:
         tag: value
         value: '1671'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
@@ -1721,16 +3222,24 @@ observations:
         tag: value
         value: '-9.64'
       locator:
-        page: 25
+        page: 26
         table: 3b
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 66
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_1::T=1673:row=bk57:h=05a78a562cce
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_1::T=1673:row=bk57:h=766ad9754121
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-bk57-9
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -1742,12 +3251,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.21'
     approximate: false
   uncertainty:
     kind: printed
@@ -1757,15 +3321,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 26
+    page: 27
     table: 3c
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=BK57
@@ -1776,7 +3341,7 @@ observations:
         tag: value
         value: '1673'
       locator:
-        page: 26
+        page: 27
         table: 3c
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=BK57
@@ -1785,16 +3350,24 @@ observations:
         tag: value
         value: '-9.58'
       locator:
-        page: 26
+        page: 27
         table: 3c
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=BK57
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_2::T=1667:row=v-68:h=9f60ee18222f
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_2::T=1667:row=v-68:h=f90d168764d0
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-10
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -1806,12 +3379,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1667'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.08'
     approximate: false
   uncertainty:
     kind: printed
@@ -1821,15 +3449,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 26
+    page: 27
     table: 3c
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 68
@@ -1840,7 +3469,7 @@ observations:
         tag: value
         value: '1667'
       locator:
-        page: 26
+        page: 27
         table: 3c
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 68
@@ -1849,16 +3478,24 @@ observations:
         tag: value
         value: '-9.7'
       locator:
-        page: 26
+        page: 27
         table: 3c
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 68
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_3::T=1675:row=v-64:h=8bb77e4bfd01
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_3::T=1675:row=v-64:h=452d6cc1ed62
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-11
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -1870,12 +3507,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1675'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.48'
     approximate: false
   uncertainty:
     kind: printed
@@ -1885,15 +3577,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 26
+    page: 27
     table: 3c
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 64
@@ -1904,7 +3597,7 @@ observations:
         tag: value
         value: '1675'
       locator:
-        page: 26
+        page: 27
         table: 3c
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
@@ -1913,16 +3606,24 @@ observations:
         tag: value
         value: '-9.79'
       locator:
-        page: 26
+        page: 27
         table: 3c
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_4::T=1667:row=v-68:h=ad07415d9711
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3c_bk_co_variable_mgo_4::T=1667:row=v-68:h=f95843db5c2b
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-12
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CoO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: CoO
       phase:
@@ -1934,12 +3635,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1667'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CoO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CoO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '1.89'
     approximate: false
   uncertainty:
     kind: printed
@@ -1949,15 +3705,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 26
+    page: 27
     table: 3c
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 68
@@ -1968,7 +3725,7 @@ observations:
         tag: value
         value: '1667'
       locator:
-        page: 26
+        page: 27
         table: 3c
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 68
@@ -1977,16 +3734,24 @@ observations:
         tag: value
         value: '-9.79'
       locator:
-        page: 26
+        page: 27
         table: 3c
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 68
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_1::T=1673:row=bk57:h=b41139a3df10
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_1::T=1673:row=bk57:h=84dd207e4d31
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-bk57-23
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -1998,12 +3763,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.33'
     approximate: false
   uncertainty:
     kind: printed
@@ -2013,15 +3833,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 26
+    page: 27
     table: 3d
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=BK57
@@ -2032,7 +3853,7 @@ observations:
         tag: value
         value: '1673'
       locator:
-        page: 26
+        page: 27
         table: 3d
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=BK57
@@ -2041,16 +3862,24 @@ observations:
         tag: value
         value: '-9.58'
       locator:
-        page: 26
+        page: 27
         table: 3d
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=BK57
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_2::T=1667:row=v-68:h=fd7f1205f635
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_2::T=1667:row=v-68:h=6c9b06b42393
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-68-24
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -2062,12 +3891,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1667'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.84'
     approximate: false
   uncertainty:
     kind: printed
@@ -2077,15 +3961,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 26
+    page: 27
     table: 3d
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 68
@@ -2096,7 +3981,7 @@ observations:
         tag: value
         value: '1667'
       locator:
-        page: 26
+        page: 27
         table: 3d
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 68
@@ -2105,16 +3990,24 @@ observations:
         tag: value
         value: '-9.7'
       locator:
-        page: 26
+        page: 27
         table: 3d
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 68
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_3::T=1675:row=v-64:h=9fd824bf1c5b
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_3::T=1675:row=v-64:h=dc93b12cad82
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-64-25
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -2126,12 +4019,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1675'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -2141,15 +4089,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 26
+    page: 27
     table: 3d
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 64
@@ -2160,7 +4109,7 @@ observations:
         tag: value
         value: '1675'
       locator:
-        page: 26
+        page: 27
         table: 3d
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
@@ -2169,16 +4118,24 @@ observations:
         tag: value
         value: '-9.79'
       locator:
-        page: 26
+        page: 27
         table: 3d
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 64
-- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_4::T=1667:row=v-67:h=d9768e05465f
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
+- observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table3d_bk_ni_variable_mgo_4::T=1667:row=v-67:h=e0aa79b12016
   experiment_id: 10.1016/s0009-2541(97)00030-2::experiment::variable-mgo-v-67-26
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'NiO_solubility_and_MgO_dependence'
+      tag: value
+      value: activity_coefficient
     species:
       formula: NiO
       phase:
@@ -2190,12 +4147,67 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '1667'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NiO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NiO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.74'
     approximate: false
   uncertainty:
     kind: printed
@@ -2205,15 +4217,16 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: holzheid-1997-feo-nio-coo-activity-metal-saturated
   locator:
-    page: 26
+    page: 27
     table: 3d
     section: Equilibration of metal and silicate melts with variable MgO-content
     note: row=V 67
@@ -2224,7 +4237,7 @@ observations:
         tag: value
         value: '1667'
       locator:
-        page: 26
+        page: 27
         table: 3d
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 67
@@ -2233,10 +4246,18 @@ observations:
         tag: value
         value: '-9.79'
       locator:
-        page: 26
+        page: 27
         table: 3d
         section: Equilibration of metal and silicate melts with variable MgO-content
         note: row=V 67
+  derived_from:
+  - holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_equilibrium_free_energy_fits
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
+    parameters: []
+    output_unit: wt.% and dimensionless activity coefficient as printed
 - observation_id: holzheid-1997-feo-nio-coo-activity-metal-saturated::holzheid_1997_table4_activity_coefficient_summary
   experiment_id: 10.1016/s0009-2541(97)00030-2::holzheid-1997-feo-nio-coo-activity-metal-saturated
   identity:

@@ -597,7 +597,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_overlay_figure_only'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Fe
       phase:
@@ -612,9 +612,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1925.0]; no midpoint invented
-    reference_state:
-      tag: unknown
-      reason: qualifier overlay_figure_only does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -651,7 +648,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_overlay_figure_only'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Fe
       phase:
@@ -666,9 +663,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1925.0]; no midpoint invented
-    reference_state:
-      tag: unknown
-      reason: qualifier overlay_figure_only does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1797,7 +1791,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_overlay_figure_only'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: SiO
       phase:
@@ -1812,9 +1806,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1925.0]; no midpoint invented
-    reference_state:
-      tag: unknown
-      reason: qualifier overlay_figure_only does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1851,7 +1842,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_overlay_figure_only'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: SiO
       phase:
@@ -1866,9 +1857,6 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1925.0]; no midpoint invented
-    reference_state:
-      tag: unknown
-      reason: qualifier overlay_figure_only does not name a reference_state
   value:
     kind: categorical
     categorical: bound_not_point_ordering

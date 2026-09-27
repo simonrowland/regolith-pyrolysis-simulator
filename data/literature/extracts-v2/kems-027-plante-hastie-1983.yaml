@@ -135,7 +135,7 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: 'source standard_state is not typed: a(CsBO2)=P/P° with P° from Gurvich and Veits 1983; not ideal CsBO2(l) mixing'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -438,7 +438,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'undetected_radionuclide_partial_pressure_limit'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Na
       phase:
@@ -480,25 +480,81 @@ observations:
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_CsBO2'
+      tag: value
+      value: p_partial
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CsBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CsBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0005579890743'
     approximate: false
   uncertainty:
     kind: printed
@@ -542,29 +598,111 @@ observations:
         figure: '19'
         note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
           (average of Series I and II).
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000005506924'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1200.0:h=ad8dcf297945
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_CsBO2'
+      tag: value
+      value: p_partial
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CsBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CsBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.005276953311'
     approximate: false
   uncertainty:
     kind: printed
@@ -608,29 +746,111 @@ observations:
         figure: '19'
         note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
           (average of Series I and II).
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000005207948'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1250.0:h=ae3b69ee8db3
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_CsBO2'
+      tag: value
+      value: p_partial
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CsBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CsBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0141813152775'
     approximate: false
   uncertainty:
     kind: printed
@@ -674,29 +894,111 @@ observations:
         figure: '19'
         note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
           (average of Series I and II).
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000001399587'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1300.0:h=de101914ca94
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_CsBO2'
+      tag: value
+      value: p_partial
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CsBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CsBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.035320294065'
     approximate: false
   uncertainty:
     kind: printed
@@ -740,29 +1042,111 @@ observations:
         figure: '19'
         note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
           (average of Series I and II).
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000003485842'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1400.0:h=7f94aad0bd5e
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_CsBO2'
+      tag: value
+      value: p_partial
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CsBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CsBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.180184119675'
     approximate: false
   uncertainty:
     kind: printed
@@ -806,29 +1190,111 @@ observations:
         figure: '19'
         note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
           (average of Series I and II).
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000001778279'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1500.0:h=65a15c4273c0
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_CsBO2'
+      tag: value
+      value: p_partial
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CsBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CsBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.7396903332'
     approximate: false
   uncertainty:
     kind: printed
@@ -872,29 +1338,111 @@ observations:
         figure: '19'
         note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
           (average of Series I and II).
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000007300176'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1600.0:h=90d7a7af205a
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_CsBO2'
+      tag: value
+      value: p_partial
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1600'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: CsBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: CsBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '2.5451684895'
     approximate: false
   uncertainty:
     kind: printed
@@ -938,29 +1486,111 @@ observations:
         figure: '19'
         note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by two
           (average of Series I and II).
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00002511886'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: First five KMS and four TMS points selected as most representative. KMS CsBO2 from Series I multiplied by
+            two (average of Series I and II).
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1000.0:h=c368d21e3159
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_LiBO2'
+      tag: value
+      value: p_partial
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00065420911815'
     approximate: false
   uncertainty:
     kind: printed
@@ -1001,29 +1631,109 @@ observations:
         pdf_page_index: 51
         figure: '19'
         note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000006456542'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1100.0:h=79ea37904bcc
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_LiBO2'
+      tag: value
+      value: p_partial
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00977827083975'
     approximate: false
   uncertainty:
     kind: printed
@@ -1064,29 +1774,109 @@ observations:
         pdf_page_index: 51
         figure: '19'
         note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000009650403'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1200.0:h=2db4dec5147b
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_LiBO2'
+      tag: value
+      value: p_partial
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0931214949525'
     approximate: false
   uncertainty:
     kind: printed
@@ -1127,29 +1917,109 @@ observations:
         pdf_page_index: 51
         figure: '19'
         note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000009190377'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1250.0:h=297af26062cf
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_LiBO2'
+      tag: value
+      value: p_partial
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.25102478415'
     approximate: false
   uncertainty:
     kind: printed
@@ -1190,29 +2060,109 @@ observations:
         pdf_page_index: 51
         figure: '19'
         note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000002477422'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1300.0:h=47be77b8b03a
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_LiBO2'
+      tag: value
+      value: p_partial
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.626981976075'
     approximate: false
   uncertainty:
     kind: printed
@@ -1253,29 +2203,109 @@ observations:
         pdf_page_index: 51
         figure: '19'
         note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000006187831'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1400.0:h=91eba2cdbb09
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_LiBO2'
+      tag: value
+      value: p_partial
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.21473523525'
     approximate: false
   uncertainty:
     kind: printed
@@ -1316,29 +2346,109 @@ observations:
         pdf_page_index: 51
         figure: '19'
         note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00003172697'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1423.15:h=cc49cab0fda1
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_LiBO2'
+      tag: value
+      value: p_partial
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '4.5421748085'
     approximate: false
   uncertainty:
     kind: printed
@@ -1379,29 +2489,109 @@ observations:
         pdf_page_index: 51
         figure: '19'
         note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00004482778'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1500.0:h=f4b5fc597850
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_LiBO2'
+      tag: value
+      value: p_partial
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '13.2551034525'
     approximate: false
   uncertainty:
     kind: printed
@@ -1442,29 +2632,109 @@ observations:
         pdf_page_index: 51
         figure: '19'
         note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0001308177'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1600.0:h=302a07b5bab6
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_LiBO2'
+      tag: value
+      value: p_partial
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1600'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: LiBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: LiBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '45.7842990675'
     approximate: false
   uncertainty:
     kind: printed
@@ -1505,29 +2775,109 @@ observations:
         pdf_page_index: 51
         figure: '19'
         note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0004518559'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed LS in Fig. 19 caption. Fig. 17 plots LiBO2 ×10 for clarity; coefficients are unscaled P.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1000.0:h=ab17e525982e
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_NaBO2'
+      tag: value
+      value: p_partial
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00156933882525'
     approximate: false
   uncertainty:
     kind: printed
@@ -1572,29 +2922,111 @@ observations:
         figure: '19'
         note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
           equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000001548817'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1100.0:h=0b0d048df3fd
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_NaBO2'
+      tag: value
+      value: p_partial
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0189467516175'
     approximate: false
   uncertainty:
     kind: printed
@@ -1639,29 +3071,111 @@ observations:
         figure: '19'
         note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
           equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000001869899'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1200.0:h=f00c3544c7ab
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_NaBO2'
+      tag: value
+      value: p_partial
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1200'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.151025419125'
     approximate: false
   uncertainty:
     kind: printed
@@ -1706,29 +3220,111 @@ observations:
         figure: '19'
         note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
           equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000001490505'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1250.0:h=1c52d5bef45c
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_NaBO2'
+      tag: value
+      value: p_partial
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1250'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.3764580414'
     approximate: false
   uncertainty:
     kind: printed
@@ -1773,29 +3369,111 @@ observations:
         figure: '19'
         note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
           equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000003715352'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1300.0:h=bea99e58d80f
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_NaBO2'
+      tag: value
+      value: p_partial
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1300'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.874722816975'
     approximate: false
   uncertainty:
     kind: printed
@@ -1840,29 +3518,111 @@ observations:
         figure: '19'
         note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
           equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000008632843'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1400.0:h=a06ab10e3887
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_NaBO2'
+      tag: value
+      value: p_partial
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '3.94199947575'
     approximate: false
   uncertainty:
     kind: printed
@@ -1907,29 +3667,111 @@ observations:
         figure: '19'
         note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
           equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00003890451'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1423.15:h=43868802bb86
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_NaBO2'
+      tag: value
+      value: p_partial
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1423.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '5.4198073755'
     approximate: false
   uncertainty:
     kind: printed
@@ -1974,29 +3816,111 @@ observations:
         figure: '19'
         note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
           equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00005348934'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1500.0:h=abddf66e4845
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_NaBO2'
+      tag: value
+      value: p_partial
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '14.53393641'
     approximate: false
   uncertainty:
     kind: printed
@@ -2041,29 +3965,111 @@ observations:
         figure: '19'
         note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
           equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0001434388'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls::T=1600.0:h=966c02c5f618
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_NaBO2'
+      tag: value
+      value: p_partial
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '1600'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: NaBO2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: NaBO2
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '45.5215025475'
     approximate: false
   uncertainty:
     kind: printed
@@ -2108,6 +4114,32 @@ observations:
         figure: '19'
         note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
           equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - pdf:kems-027-plante-hastie-1983
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0004492623'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 45
+          pdf_page_index: 51
+          figure: '19'
+          note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
+            equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit.
+    output_unit: Pa
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
   experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   identity:
@@ -2241,7 +4273,7 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: 'source standard_state is not typed: a(LiBO2)=P/P°(JANAF 1971 LiBO2,l)'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2472,7 +4504,8 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: no reference_state mapped from source
+      reason: 'source explicitly excludes a Raoultian reference state: a(NaBO2) = P(NaBO2)/P°(NaBO2,l) with P° from JANAF
+        1971. Not a Raoultian Na2O activity.'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2673,7 +4706,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_O2'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: O2
       phase:
@@ -2717,7 +4750,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'partial_pressure_O2'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: O2
       phase:
@@ -2813,7 +4846,7 @@ observations:
   identity:
     quantity:
       tag: unknown
-      reason: unsupported quantity 'undetected_radionuclide_simulant_partial_pressure'
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Na
       phase:

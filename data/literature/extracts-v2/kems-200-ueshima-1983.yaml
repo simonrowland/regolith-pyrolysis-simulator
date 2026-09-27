@@ -8517,8 +8517,8 @@ observations:
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'pure_Fe_melting_onset'
+      tag: value
+      value: transition_temperature
     species:
       formula: Mo
       phase:
@@ -8530,12 +8530,54 @@ observations:
       charge:
         tag: value
         value: 0
-    temperature_K:
+    subtype:
       tag: value
-      value: '1811.15'
+      value: pure_Fe_melting_onset
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_Fe_melting_onset'; refusing to pick a number
+    kind: point
+    point: '1811.15'
     approximate: false
   uncertainty:
     kind: printed
@@ -8609,8 +8651,8 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1823.15, 1823.15]; no midpoint invented
+      tag: value
+      value: '1823.15'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -8635,6 +8677,16 @@ observations:
     paragraph: 'English synopsis: previous Knudsen cell mass spectrometric measurement of the activities in the Fe-Mo binary
       alloys'
   read_from: pdf:kems-200-ueshima-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        published_page: 556
+        pdf_page_index: 1
+        paragraph: 'English synopsis: previous Knudsen cell mass spectrometric measurement of the activities in the Fe-Mo
+          binary alloys'
 - observation_id: kems-200-ueshima-1983::ueshima_1983_quoted_kems_thermal_analysis
   experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
   identity:

@@ -122,16 +122,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -140,7 +154,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -208,6 +222,12 @@ observations:
               pdf_page_index: 2
               paragraph: SiO pressure reaches the maximum value P_SiO=6.2×10^-3 tor at T=1875 C
         output_unit: K
+  derivation:
+    relation: identity.reference_state=ideal-gas SiO(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated::T=2293.15:row=murchison:h=a3f009ee6200
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -217,11 +237,11 @@ observations:
     species:
       formula: Murchison
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -239,16 +259,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -257,7 +291,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -352,11 +386,11 @@ observations:
     species:
       formula: Murchison
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -374,16 +408,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -392,7 +440,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -487,11 +535,11 @@ observations:
     species:
       formula: Efremovka_type_A
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -509,16 +557,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -527,7 +589,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -622,11 +684,11 @@ observations:
     species:
       formula: Efremovka_type_B
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -644,16 +706,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -662,7 +738,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -757,11 +833,11 @@ observations:
     species:
       formula: Murchison
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -779,16 +855,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -797,7 +887,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -892,11 +982,11 @@ observations:
     species:
       formula: Efremovka_type_A
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -914,16 +1004,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -932,7 +1036,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1027,11 +1131,11 @@ observations:
     species:
       formula: Efremovka_type_A
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1049,16 +1153,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1067,7 +1185,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1162,11 +1280,11 @@ observations:
     species:
       formula: Efremovka_type_B
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1184,16 +1302,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1202,7 +1334,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1297,11 +1429,11 @@ observations:
     species:
       formula: Efremovka_type_A
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1319,16 +1451,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1337,7 +1483,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1432,11 +1578,11 @@ observations:
     species:
       formula: Efremovka_type_B
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1454,16 +1600,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1472,7 +1632,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1567,11 +1727,11 @@ observations:
     species:
       formula: Efremovka_type_A
       phase:
-        tag: unknown
-        reason: phase string 'high_T_residual_Murchison_and_Efremovka_CAI' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1589,16 +1749,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O2
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1607,7 +1781,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1856,16 +2030,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1874,7 +2062,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -1946,6 +2134,12 @@ observations:
               paragraph: The pressure of aluminium increases accordingly to the temperature rises to 2100 C and reaches the
                 maximum pressure P_Al=1.7×10^-3 tor
         output_unit: K
+  derivation:
+    relation: identity.reference_state=ideal-gas Al(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Ca_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -1977,16 +2171,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ca
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ca
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -1995,7 +2203,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2063,6 +2271,12 @@ observations:
               pdf_page_index: 1
               paragraph: Ca (P_Ca=7.5×10^-5 tor) are observed in vapor at this temperature
         output_unit: K
+  derivation:
+    relation: identity.reference_state=ideal-gas Ca(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Ca_max_1950_2025C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2094,16 +2308,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Ca
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Ca
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2112,7 +2340,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2148,6 +2376,12 @@ observations:
     pdf_page_index: 1
     paragraph: Calcium reaches the maximum pressure (P_Ca=4.4×10^-4 tor) at temperatures 1950-2025 C
   read_from: pdf:kems-028-yakovlev-1984
+  derivation:
+    relation: identity.reference_state=ideal-gas Ca(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_FeO_top_1650C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2157,11 +2391,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_CM_chondrite_melt_knudsen' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2179,16 +2413,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2197,7 +2445,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2265,6 +2513,13 @@ observations:
               pdf_page_index: 1
               paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
         output_unit: K
+  derivation:
+    relation: species.phase=gas declared by source standard_state FeO(g); identity.reference_state=ideal-gas FeO(g) at 1 bar
+      from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Fe_max_1450_1725C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2296,16 +2551,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2314,7 +2583,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2350,6 +2619,12 @@ observations:
     pdf_page_index: 1
     paragraph: Maximum P=10^-2 tor is watched in the wide temperature range (T=1450-1725 C)
   read_from: pdf:kems-028-yakovlev-1984
+  derivation:
+    relation: identity.reference_state=ideal-gas Fe(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Fe_troilite_1050C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2381,16 +2656,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Fe
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Fe
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2399,7 +2688,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2471,6 +2760,12 @@ observations:
               paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly
                 connected with the decay of troilite
         output_unit: K
+  derivation:
+    relation: identity.reference_state=ideal-gas Fe(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_K_P_1225C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2502,16 +2797,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: K
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: K
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2520,7 +2829,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2588,6 +2897,12 @@ observations:
               pdf_page_index: 1
               paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
         output_unit: K
+  derivation:
+    relation: identity.reference_state=ideal-gas K(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Mg_max_1750_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2619,16 +2934,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Mg
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Mg
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2637,7 +2966,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2673,6 +3002,12 @@ observations:
     pdf_page_index: 1
     paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2 tor and 8.3×10^-3 tor
   read_from: pdf:kems-028-yakovlev-1984
+  derivation:
+    relation: identity.reference_state=ideal-gas Mg(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Na_P_1225C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2704,16 +3039,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2722,7 +3071,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2791,6 +3140,12 @@ observations:
               pdf_page_index: 1
               paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
         output_unit: K
+  derivation:
+    relation: identity.reference_state=ideal-gas Na(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_SiO_Mg_max_1750_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2822,16 +3177,30 @@ observations:
       reason: profile p_partial does not use standard_pressure_Pa
     reaction:
       tag: unknown
-      reason: no reaction mapped from source
+      reason: source reaction/equilibrium not grounded
     formation_elements:
       tag: not_applicable
       reason: profile p_partial does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
     reservoir:
       tag: unknown
-      reason: no reservoir mapped from source
+      reason: source condensed reservoir not grounded
     composition:
       tag: unknown
       reason: no composition mapped from source
@@ -2840,7 +3209,7 @@ observations:
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      reason: in_cell_total_pressure_not_derivable
     sweep_gas:
       tag: not_applicable
       reason: profile p_partial does not use sweep_gas
@@ -2876,6 +3245,12 @@ observations:
     pdf_page_index: 1
     paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2 tor and 8.3×10^-3 tor
   read_from: pdf:kems-028-yakovlev-1984
+  derivation:
+    relation: identity.reference_state=ideal-gas SiO(g) at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-028-yakovlev-1984
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_TiO_gt_TiO2_at_Ca_max
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
