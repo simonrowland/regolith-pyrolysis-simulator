@@ -21,6 +21,7 @@ from simulator.battery.migrate import (
     pressure_from_equipment,
     sample_from_equipment,
     to_plain,
+    wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import Located, State, Value, ValueKind, as_decimal
 from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
@@ -312,6 +313,210 @@ def test_labparam_richter_initial_weight_mg_reaches_sample_mass_kg(tmp_path: Pat
     assert located.inference.relation == "mg_to_kg"
     params = dict(located.inference.parameters)
     assert params["original"].state.value == as_decimal("25.4")
+
+
+_RICHTER_STARTING_EXPERIMENTS = (
+    "cai-r3-12",
+    "cai-r-16",
+    "cai-r-14",
+    "cai-r-15",
+    "cai-r-17",
+    "cai-r-6",
+    "cai-r2-21",
+    "cai-r2-20",
+    "cai-r2-18",
+    "cai-r2-19",
+    "cai-r2-17",
+    "cai-r2-7",
+    "cai-r2-13",
+    "cai-r2-15",
+    "cai-r2-14",
+    "cai-r2-9",
+    "cai-r2-8",
+    "cai-r3-2",
+)
+_RICHTER_EXTRACT = (
+    REPO_ROOT
+    / "data"
+    / "literature"
+    / "extracts"
+    / "kems-010-richter-2007.yaml"
+)
+
+
+def test_richter_declared_sample_survives_fresh_migration() -> None:
+    doc = yaml.safe_load(_RICHTER_EXTRACT.read_text(encoding="utf-8"))
+    source_experiments = {
+        str(item["experiment_id"]): item for item in doc["experiments"]
+    }
+    migrator = Migrator()
+    migrator._migrate_extract(_RICHTER_EXTRACT)
+
+    for raw_id in _RICHTER_STARTING_EXPERIMENTS:
+        source = source_experiments[raw_id]
+        experiment_id = next(
+            experiment_id
+            for experiment_id in migrator.result.experiments
+            if experiment_id.endswith(f"::experiment::{raw_id}")
+        )
+        sample = migrator.result.experiments[experiment_id].sample
+        initial = sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert initial.inference is not None
+        assert initial.inference.relation == "wt_pct_to_mole_fraction"
+        assert "original_unit=wt_pct" in initial.inference.inputs
+        assert initial.inference.output_unit == "mole_fraction"
+        assert initial.locator is not None and initial.locator.published_page == 5549
+
+        expected_initial = tuple(
+            (str(name), as_decimal(value))
+            for name, value in source["sample"]["initial_composition"]["state"][
+                "value"
+            ]["components"]
+        )
+        assert initial.state.value.components == expected_initial
+
+        printed = sample.printed_composition
+        assert printed is not None and printed.state.is_value
+        expected_printed = {
+            str(name): as_decimal(value)
+            for name, value in source["sample"]["printed_composition"]["state"][
+                "value"
+            ].items()
+        }
+        actual_printed = {
+            str(name): as_decimal(value)
+            for name, value in printed.state.value.items()
+        }
+        assert actual_printed == expected_printed
+
+
+_MENDYBAEV_EXTRACT = (
+    REPO_ROOT
+    / "data"
+    / "literature"
+    / "extracts"
+    / "mendybaev-2017-fun-cai-lab-evaporation.yaml"
+)
+_MENDYBAEV_RUNS = (
+    "func-5",
+    "func-10",
+    "func-1",
+    "func-9",
+    "func-3",
+    "func-7",
+    "func-8",
+    "func-4",
+    "func-6",
+)
+
+
+def test_mendybaev_runs_use_starting_glass_and_retain_residue_printed() -> None:
+    doc = yaml.safe_load(_MENDYBAEV_EXTRACT.read_text(encoding="utf-8"))
+    residue_by_run = {}
+    for observation in doc["species"]["FUNC"]["observations"]:
+        values = observation.get("values") or {}
+        for row in values.get("series") or ():
+            raw_id = str(row.get("sample") or "").lower()
+            if raw_id in _MENDYBAEV_RUNS:
+                residue_by_run[raw_id] = {
+                    str(name): as_decimal(value)
+                    for name, value in row["composition_wt_pct"].items()
+                }
+    starting_components = (
+        ("MgO", as_decimal("0.493970330792")),
+        ("Al2O3", as_decimal("0.059763722349")),
+        ("SiO2", as_decimal("0.375072728594")),
+        ("CaO", as_decimal("0.071193218264")),
+    )
+    migrator = Migrator()
+    migrator._migrate_extract(_MENDYBAEV_EXTRACT)
+
+    for raw_id in _MENDYBAEV_RUNS:
+        experiment_id = next(
+            experiment_id
+            for experiment_id in migrator.result.experiments
+            if experiment_id.endswith(f"::experiment::{raw_id}")
+        )
+        sample = migrator.result.experiments[experiment_id].sample
+        initial = sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert initial.state.value.components == starting_components
+        assert initial.inference is not None
+        assert initial.inference.relation == "wt_pct_to_mole_fraction"
+        assert "original_unit=wt_pct" in initial.inference.inputs
+        if raw_id != "func-5":
+            assert initial.locator is not None
+            assert initial.locator.paragraph == "FUNC starting"
+
+        observation = next(
+            item
+            for item in migrator.result.observations.values()
+            if item.experiment_id == experiment_id
+        )
+        printed = (observation.point_conditions or {}).get("printed_composition")
+        assert printed is not None and printed.state.is_value
+        expected_printed = residue_by_run[raw_id]
+        actual_printed = {
+            str(name): as_decimal(value)
+            for name, value in printed.state.value.items()
+        }
+        assert actual_printed == expected_printed
+        if raw_id != "func-5":
+            residue = wt_pct_to_mole_fraction(expected_printed)
+            assert abs(
+                dict(initial.state.value.components)["MgO"]
+                - dict(residue.components)["MgO"]
+            ) > Decimal("0.01")
+
+
+def test_conflicting_explicit_initial_compositions_remain_refused() -> None:
+    first = Located(
+        State.of(
+            wt_pct_to_mole_fraction(
+                {"MgO": Decimal("40"), "SiO2": Decimal("60")}
+            )
+        )
+    )
+    second = Located(
+        State.of(
+            wt_pct_to_mole_fraction(
+                {"MgO": Decimal("50"), "SiO2": Decimal("50")}
+            )
+        )
+    )
+    assert _prefer_located(first, second) is None
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_empty_declared_sample_does_not_prefer_conflicting_legacy_recipes(
+    tmp_path: Path, reverse: bool,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["experiments"] = [{"experiment_id": "declared-empty", "sample": {}}]
+    template = extract["species"]["Na"]["observations"][0]
+    recipes = [
+        ("first", {"MgO": 40, "SiO2": 60}),
+        ("second", {"MgO": 50, "SiO2": 50}),
+    ]
+    if reverse:
+        recipes.reverse()
+    observations = []
+    for suffix, recipe in recipes:
+        row = yaml.safe_load(yaml.safe_dump(template))
+        row["observation_id"] = f"legacy-{suffix}"
+        row["experiment"] = "declared-empty"
+        row["equipment"] = {"composition_wt_pct": recipe}
+        observations.append(row)
+    extract["species"]["Na"]["observations"] = observations
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    experiment = next(
+        item
+        for item in result.experiments.values()
+        if item.experiment_id.endswith("::experiment::declared-empty")
+    )
+    assert experiment.sample.initial_composition is None
 
 
 def test_labparam_vocabulary_is_data(tmp_path: Path) -> None:
