@@ -373,7 +373,7 @@ observations:
     note: quote=The iridium KC contains the sample to be analysed and is composed of a crucible 8.5 mm high with an outer
       diameter of 7.8 mm and 0.2 mm wall thickness, and a lid with a 0.4 mm orifice at its centre.
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_ga2o_1752k
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_ga2o_1752k::T=1752.0:h=e9b083c235d7
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
     quantity:
@@ -397,8 +397,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1752.0, 1752.0]; no midpoint invented
+      tag: value
+      value: '1752'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -436,10 +436,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1752'
-      - '0.79'
+    kind: point
+    point: '0.79'
     approximate: false
   uncertainty:
     kind: printed
@@ -462,7 +460,23 @@ observations:
     paragraph: results_polytherm
     note: quote=Ga2O exhibits by far the highest partial pressures (0.79 ± 0.3 Pa at 1752 K)
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_ga_1752k
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1752'
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        paragraph: results_polytherm
+        note: quote=Ga2O exhibits by far the highest partial pressures (0.79 ± 0.3 Pa at 1752 K)
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_ga_1752k::T=1752.0:h=e52a5f22cf4f
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
     quantity:
@@ -486,8 +500,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1752.0, 1752.0]; no midpoint invented
+      tag: value
+      value: '1752'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -525,10 +539,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1752'
-      - '0.11'
+    kind: point
+    point: '0.11'
     approximate: false
   uncertainty:
     kind: printed
@@ -551,7 +563,23 @@ observations:
     paragraph: results_polytherm
     note: quote=followed by Ga, whose partial pressure is lower by a factor of 7 (0.11 ± 0.016 Pa at 1752 K)
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_gao_1752k
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1752'
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        paragraph: results_polytherm
+        note: quote=followed by Ga, whose partial pressure is lower by a factor of 7 (0.11 ± 0.016 Pa at 1752 K)
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_gao_1752k::T=1752.0:h=3dc85fcdbd6b
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
   identity:
     quantity:
@@ -575,8 +603,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1752.0, 1752.0]; no midpoint invented
+      tag: value
+      value: '1752'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -614,10 +642,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1752'
-      - '0.007'
+    kind: point
+    point: '0.007'
     approximate: false
   uncertainty:
     kind: printed
@@ -640,7 +666,24 @@ observations:
     paragraph: results_polytherm
     note: quote=The partial pressures of GaO (0.007 ± 0.002 Pa) are several orders of magnitude lower again at the same temperature.
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_in2o_1611k
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1752'
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        paragraph: results_polytherm
+        note: quote=The partial pressures of GaO (0.007 ± 0.002 Pa) are several orders of magnitude lower again at the same
+          temperature.
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_in2o_1611k::T=1611.0:h=64802d09a53c
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -664,8 +707,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1611.0, 1611.0]; no midpoint invented
+      tag: value
+      value: '1611'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -703,10 +746,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1611'
-      - '1.41'
+    kind: point
+    point: '1.41'
     approximate: false
   uncertainty:
     kind: printed
@@ -729,7 +770,23 @@ observations:
     paragraph: results_In
     note: quote=from In2O (1.41 ± 0.52 Pa at 1611 K)
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_in_1611k
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1611'
+      locator:
+        published_page: 8
+        pdf_page_index: 9
+        paragraph: results_In
+        note: quote=from In2O (1.41 ± 0.52 Pa at 1611 K)
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_in_1611k::T=1611.0:h=ea09c1396f8a
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -753,8 +810,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1611.0, 1611.0]; no midpoint invented
+      tag: value
+      value: '1611'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -792,10 +849,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1611'
-      - '0.3'
+    kind: point
+    point: '0.3'
     approximate: false
   uncertainty:
     kind: printed
@@ -818,7 +873,23 @@ observations:
     paragraph: results_In
     note: quote=then In (0.30 ± 0.05 Pa) to InO (0.0036 ± 0.001 Pa)
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_psat_ino_1611k
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1611'
+      locator:
+        published_page: 8
+        pdf_page_index: 9
+        paragraph: results_In
+        note: quote=then In (0.30 ± 0.05 Pa) to InO (0.0036 ± 0.001 Pa)
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-138-bischof-2023::bischof_2023_psat_ino_1611k::T=1611.0:h=eb933846adb8
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -842,8 +913,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1611.0, 1611.0]; no midpoint invented
+      tag: value
+      value: '1611'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -881,10 +952,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1611'
-      - '0.0036'
+    kind: point
+    point: '0.0036'
     approximate: false
   uncertainty:
     kind: printed
@@ -907,6 +976,22 @@ observations:
     paragraph: results_In
     note: quote=InO (0.0036 ± 0.001 Pa)
   read_from: pdf:kems-138-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1611'
+      locator:
+        published_page: 8
+        pdf_page_index: 9
+        paragraph: results_In
+        note: quote=InO (0.0036 ± 0.001 Pa)
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-138-bischof-2023::bischof_2023_sigma_O2
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:
@@ -1231,7 +1316,7 @@ observations:
     paragraph: abstract
     note: quote=Delta_f H298, 3rd (InO(g)) = 157744 ± 3681 Jmol-1
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work
+- observation_id: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1425.0:h=df7f4c4aeca7
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -1255,8 +1340,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1425.0, 1550.0]; no midpoint invented
+      tag: value
+      value: '1425'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1294,12 +1379,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1425'
-      - '0.014'
-    - - '1550'
-      - '0.327'
+    kind: point
+    point: '0.014'
     approximate: false
   uncertainty:
     kind: printed
@@ -1321,7 +1402,125 @@ observations:
     table: '12'
     note: quote=p(In2O) [Pa] 0.014 0.327
   read_from: pdf:kems-138-bischof-2023
-- observation_id: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1425'
+      locator:
+        published_page: 16
+        pdf_page_index: 17
+        table: '12'
+        note: quote=p(In2O) [Pa] 0.014 0.327
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-138-bischof-2023::bischof_2023_table12_in2o_psat_this_work::T=1550.0:h=b96eb8daeeb2
+  experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In2O
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1550'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.327'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no sigma printed on Table 12 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-138-bischof-2023
+  locator:
+    published_page: 16
+    pdf_page_index: 17
+    table: '12'
+    note: quote=p(In2O) [Pa] 0.014 0.327
+  read_from: pdf:kems-138-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1550'
+      locator:
+        published_page: 16
+        pdf_page_index: 17
+        table: '12'
+        note: quote=p(In2O) [Pa] 0.014 0.327
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1425.0:h=d5c3844ce072
   experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
   identity:
     quantity:
@@ -1345,8 +1544,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1425.0, 1550.0]; no midpoint invented
+      tag: value
+      value: '1425'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1384,12 +1583,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: series
-    series:
-    - - '1425'
-      - '0.003'
-    - - '1550'
-      - '0.072'
+    kind: point
+    point: '0.003'
     approximate: false
   uncertainty:
     kind: printed
@@ -1411,6 +1606,124 @@ observations:
     table: '12'
     note: quote=p(In) [Pa] 0.003 0.072
   read_from: pdf:kems-138-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1425'
+      locator:
+        published_page: 16
+        pdf_page_index: 17
+        table: '12'
+        note: quote=p(In) [Pa] 0.003 0.072
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
+- observation_id: kems-138-bischof-2023::bischof_2023_table12_in_psat_this_work::T=1550.0:h=032e484e3793
+  experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1550'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.072'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no sigma printed on Table 12 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-138-bischof-2023
+  locator:
+    published_page: 16
+    pdf_page_index: 17
+    table: '12'
+    note: quote=p(In) [Pa] 0.003 0.072
+  read_from: pdf:kems-138-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1550'
+      locator:
+        published_page: 16
+        pdf_page_index: 17
+        table: '12'
+        note: quote=p(In) [Pa] 0.003 0.072
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:kems-138-bischof-2023
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-138-bischof-2023::bischof_2023_table12_o2_psat_derived
   experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
   identity:

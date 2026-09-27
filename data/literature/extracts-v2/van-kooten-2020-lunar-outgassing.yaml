@@ -2,14 +2,14 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/van-kooten-2020-lunar-outgassing.yaml
 observations:
-- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_method_and_new_measurements
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_method_and_new_measurements::rows:row=10045:h=da2079759bb0
   experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
   identity:
     quantity:
       tag: unknown
       reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
     species:
-      formula: Zn
+      formula: '10045'
       phase:
         tag: unknown
         reason: phase string 'lunar_rock_samples' is not in the closed automatic map
@@ -21,8 +21,265 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'zinc_isotope_delta_and_concentration'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Table 1 prints 2SD for isotope values; no uncertainty is printed for Zn concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    section: 2. Zinc Isotope Data of MGS and Mare Basalts
+    note: Table 1 rows marked This study; method paragraph immediately preceding the table.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_method_and_new_measurements::rows:row=15455:h=122cd116fc57
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '15455'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Table 1 prints 2SD for isotope values; no uncertainty is printed for Zn concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    section: 2. Zinc Isotope Data of MGS and Mare Basalts
+    note: Table 1 rows marked This study; method paragraph immediately preceding the table.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_method_and_new_measurements::rows:row=76255:h=999884029b1d
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '76255'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Table 1 prints 2SD for isotope values; no uncertainty is printed for Zn concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    section: 2. Zinc Isotope Data of MGS and Mare Basalts
+    note: Table 1 rows marked This study; method paragraph immediately preceding the table.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_method_and_new_measurements::rows:row=76335:h=a3dd3546ba26
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '76335'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Table 1 prints 2SD for isotope values; no uncertainty is printed for Zn concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    section: 2. Zinc Isotope Data of MGS and Mare Basalts
+    note: Table 1 rows marked This study; method paragraph immediately preceding the table.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_method_and_new_measurements::rows:row=76535:h=60271a3904e9
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '76535'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Table 1 prints 2SD for isotope values; no uncertainty is printed for Zn concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    section: 2. Zinc Isotope Data of MGS and Mare Basalts
+    note: Table 1 rows marked This study; method paragraph immediately preceding the table.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_method_and_new_measurements::rows:row=77035:h=ee3663b3c9ef
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '77035'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Table 1 prints 2SD for isotope values; no uncertainty is printed for Zn concentration.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    section: 2. Zinc Isotope Data of MGS and Mare Basalts
+    note: Table 1 rows marked This study; method paragraph immediately preceding the table.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_method_and_new_measurements::rows:row=78328:h=bbdb850874d0
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '78328'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -90,14 +347,14 @@ observations:
     note: Printed aggregate ranges and weighted averages; underlying Table S1 is only referenced, not included in the corpus
       PDF.
   read_from: unknown:van-kooten-2020-lunar-outgassing
-- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_table1_quoted_rows
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_table1_quoted_rows::rows:row=15445:h=0722944c46e8
   experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
   identity:
     quantity:
       tag: unknown
       reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
     species:
-      formula: Zn
+      formula: '15445'
       phase:
         tag: unknown
         reason: phase string 'lunar_rock_samples' is not in the closed automatic map
@@ -109,8 +366,277 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'zinc_isotope_delta_and_concentration'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Uncertainties are reproduced exactly from Table 1; source-paper references are not reclassified as direct measurements
+        here.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_measurement
+    attribution: Table 1 reproduces these rows from Day et al. (2020b) and Kato et al. (2015), as identified in its Reference
+      column.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 rows whose Reference column is Day20 or Kato17; retained as quoted attributed data, not this study's measurements.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_table1_quoted_rows::rows:row=15455:h=a1c51385fa66
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '15455'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Uncertainties are reproduced exactly from Table 1; source-paper references are not reclassified as direct measurements
+        here.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_measurement
+    attribution: Table 1 reproduces these rows from Day et al. (2020b) and Kato et al. (2015), as identified in its Reference
+      column.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 rows whose Reference column is Day20 or Kato17; retained as quoted attributed data, not this study's measurements.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_table1_quoted_rows::rows:row=72415:h=28db3c0f7636
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '72415'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Uncertainties are reproduced exactly from Table 1; source-paper references are not reclassified as direct measurements
+        here.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_measurement
+    attribution: Table 1 reproduces these rows from Day et al. (2020b) and Kato et al. (2015), as identified in its Reference
+      column.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 rows whose Reference column is Day20 or Kato17; retained as quoted attributed data, not this study's measurements.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_table1_quoted_rows::rows:row=76535:h=80340da869a9
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '76535'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Uncertainties are reproduced exactly from Table 1; source-paper references are not reclassified as direct measurements
+        here.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_measurement
+    attribution: Table 1 reproduces these rows from Day et al. (2020b) and Kato et al. (2015), as identified in its Reference
+      column.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 rows whose Reference column is Day20 or Kato17; retained as quoted attributed data, not this study's measurements.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_table1_quoted_rows::rows:row=77215:h=fec02a8e00ea
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '77215'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Uncertainties are reproduced exactly from Table 1; source-paper references are not reclassified as direct measurements
+        here.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_measurement
+    attribution: Table 1 reproduces these rows from Day et al. (2020b) and Kato et al. (2015), as identified in its Reference
+      column.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 rows whose Reference column is Day20 or Kato17; retained as quoted attributed data, not this study's measurements.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_table1_quoted_rows::rows:row=78235:h=0a2f7ec0055b
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '78235'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      convention: 2SD
+      note: Uncertainties are reproduced exactly from Table 1; source-paper references are not reclassified as direct measurements
+        here.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_measurement
+    attribution: Table 1 reproduces these rows from Day et al. (2020b) and Kato et al. (2015), as identified in its Reference
+      column.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: van-kooten-2020-lunar-outgassing
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 rows whose Reference column is Day20 or Kato17; retained as quoted attributed data, not this study's measurements.
+  read_from: unknown:van-kooten-2020-lunar-outgassing
+- observation_id: van-kooten-2020-lunar-outgassing::van_kooten_2020_zinc_table1_quoted_rows::rows:row=78235:h=38e4a7bf9b10
+  experiment_id: 10.3847/psj/abbe13::van-kooten-2020-lunar-outgassing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'zinc_isotope_delta_and_concentration'
+    species:
+      formula: '78235'
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_rock_samples' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

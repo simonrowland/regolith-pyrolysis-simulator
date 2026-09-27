@@ -280,7 +280,7 @@ observations:
     pdf_page_index: 1
     table: '1'
   read_from: pdf:kems-118-yamamoto-1983
-- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=0aaf4f1919e3
   experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
@@ -344,8 +344,7 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C, composition_basis,
-      rows'
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
     approximate: false
   uncertainty:
     kind: printed
@@ -367,7 +366,953 @@ observations:
     table: '2'
     note: Table 2 caption prints 'iron current ratios' (ion).
   read_from: pdf:kems-118-yamamoto-1983
-- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=26e839cc1684
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=40c8d08458d7
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=4b3f4c6ae44d
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=5be03216b9d3
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=6a44acd011d6
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=a81198daa73c
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=b3d50be00004
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=ca46ae89fedf
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=d28810d4ba34
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=e8d0738f6cc3
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table2_ion_ratios::rows:h=ef57c44d43e6
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1873.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_1550C, ln_1600C, R_dln_dinvT_J_mol'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed on Table 2 cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=0b871349a89e
   experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
@@ -392,8 +1337,7 @@ observations:
       reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_gamma_and_partial_molar_heats'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -415,7 +1359,618 @@ observations:
     pdf_page_index: 3
     table: '3'
   read_from: pdf:kems-118-yamamoto-1983
-- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=15804911c292
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=1fc7c7d6ad53
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=20dfe90820e8
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=3ad4506f8d85
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=436205d8d316
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=a2440e76c48c
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=ab5085f55c6c
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=b26b0c809465
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=b3572c86b465
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=d27734b509ae
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=e6f781408ad0
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=ee2aebec397f
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats::rows:h=f2568ec0fbe9
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1883.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier gamma_and_partial_molar_heats does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  read_from: pdf:kems-118-yamamoto-1983
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=0f7b5ea1ca6a
   experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
   identity:
     quantity:
@@ -479,8 +2034,853 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: quantity, method_class, T_C, T_K, composition_basis,
-      rows'
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=4895d7b0e3ce
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=53c18d45d52e
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=56b89150ca02
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=59ca605c634a
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=8a71d181254f
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=8d61490484ee
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=977ce82b277f
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=9a1ce98e624f
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 59
+        pdf_page_index: 4
+        table: '4'
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table4_dilute_ion_ratios_1600C::rows:h=b1cf6759e448
+  experiment_id: 10.2355/isijinternational1966.23.56::experiment::fe-sn-series
+  identity:
+    quantity:
+      tag: value
+      value: ion_intensity_ratio
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped ion_intensity_ratio field selected; source fields: N_Sn, ln_ISn_over_IFe'
     approximate: false
   uncertainty:
     kind: printed
@@ -558,7 +2958,7 @@ observations:
     pdf_page_index: 5
     table: '5'
   read_from: pdf:kems-118-yamamoto-1983
-- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison::T=1810.15:h=522e489c442a
   experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
   identity:
     quantity:
@@ -576,12 +2976,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1810.0, 1873.0]; no midpoint invented
+      tag: value
+      value: '1810.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -602,3 +3001,485 @@ observations:
     pdf_page_index: 9
     table: '6'
   read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1810.15'
+      locator:
+        published_page: 64
+        pdf_page_index: 9
+        table: '6'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1537'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        output_unit: K
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison::T=1820.15:h=46656eba465d
+  experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1820.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on Table 6 except this-work values already stored elsewhere
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 64
+    pdf_page_index: 9
+    table: '6'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1820.15'
+      locator:
+        published_page: 64
+        pdf_page_index: 9
+        table: '6'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1547'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        output_unit: K
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison::T=1820.15:h=4bd7b30173d5
+  experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1820.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on Table 6 except this-work values already stored elsewhere
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 64
+    pdf_page_index: 9
+    table: '6'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1820.15'
+      locator:
+        published_page: 64
+        pdf_page_index: 9
+        table: '6'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1547'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        output_unit: K
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison::T=1823.15:h=a1a2dc74a141
+  experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on Table 6 except this-work values already stored elsewhere
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 64
+    pdf_page_index: 9
+    table: '6'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        published_page: 64
+        pdf_page_index: 9
+        table: '6'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1550'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        output_unit: K
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison::T=1823.15:h=ea41f3de1fc3
+  experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1823.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on Table 6 except this-work values already stored elsewhere
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 64
+    pdf_page_index: 9
+    table: '6'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        published_page: 64
+        pdf_page_index: 9
+        table: '6'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1550'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        output_unit: K
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison::T=1873.15:h=1120a0a763b7
+  experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on Table 6 except this-work values already stored elsewhere
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 64
+    pdf_page_index: 9
+    table: '6'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 64
+        pdf_page_index: 9
+        table: '6'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        output_unit: K
+- observation_id: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison::T=1873.15:h=a4916c83c241
+  experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
+    species:
+      formula: Sn
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no ± on Table 6 except this-work values already stored elsewhere
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-118-yamamoto-1983
+  locator:
+    published_page: 64
+    pdf_page_index: 9
+    table: '6'
+  read_from: pdf:kems-118-yamamoto-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 64
+        pdf_page_index: 9
+        table: '6'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1600'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 64
+              pdf_page_index: 9
+              table: '6'
+        output_unit: K

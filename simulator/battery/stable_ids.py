@@ -67,12 +67,14 @@ def tabulated_cell_suffix(
     return suffix
 
 
-def series_row_extra(raw_item: Any) -> str | None:
+def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | None:
     """Content suffix for a series row when T alone is not unique.
 
     Prefer a printed row label (run / sample / locator.paragraph) plus a
     short sha1 of the row payload with temperature fields removed. Distinct
     printed rows rematerialize to distinct ids without encounter ordinals.
+    New row/point containers can retain the full printed locator in that
+    payload; legacy series children leave it out to preserve their ids.
     """
 
     if not isinstance(raw_item, Mapping):
@@ -93,8 +95,9 @@ def series_row_extra(raw_item: Any) -> str | None:
         "temperature_K",
         "temperature_quote",
         "quote",
-        "locator",
     }
+    if not include_locator:
+        skip.add("locator")
     residual = {k: raw_item[k] for k in raw_item if k not in skip}
     if residual:
         blob = json.dumps(residual, sort_keys=True, default=str, separators=(",", ":"))
@@ -119,8 +122,12 @@ def series_point_id(
     if temperature is not None:
         base = f"{parent_id}::T={temperature_token(temperature)}"
         return f"{base}:{extra}" if extra else base
+    # No temperature: the printed row/content suffix is the identity.
+    # An encounter index would rename the row when the table is reordered.
+    if extra:
+        return f"{parent_id}::{extra}"
     raise ValueError(
-        "series point id requires a temperature or field name (no ordinal index)"
+        "series point id requires a temperature, field name, or printed-row identity (no ordinal index)"
     )
 
 

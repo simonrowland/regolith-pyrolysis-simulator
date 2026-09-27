@@ -109,6 +109,41 @@
     "campaigns_elapsed": 0.4,
     "backend_status": "unavailable",
     "backend_authoritative": false,
+    "composition_projected_liquidus_notice": {
+      "kind": "composition_projected",
+      "reason": "composition_projected",
+      "authority": "extrapolated",
+      "notices": [
+        {
+          "kind": "composition_projected",
+          "reason": "composition_projected",
+          "authority": "extrapolated",
+          "certified_band": {
+            "engine": "magemin",
+            "database": "ig",
+            "bulk_components": [
+              "SiO2",
+              "Al2O3",
+              "CaO",
+              "MgO",
+              "FeOt",
+              "K2O",
+              "Na2O",
+              "TiO2",
+              "O",
+              "Cr2O3",
+              "H2O"
+            ]
+          },
+          "dropped_components": [
+            {
+              "component": "P2O5",
+              "mass_fraction": 0.008809612614480485
+            }
+          ]
+        }
+      ]
+    },
     "evidence_class": "internal-analytical",
     "runtime_status": "unavailable",
     "degradation_reason": "unavailable",

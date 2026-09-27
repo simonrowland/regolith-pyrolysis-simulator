@@ -45,7 +45,7 @@ observations:
     section: 4. Extraction of the Lunar 3He
     note: Prose description of early experiments; Fig. 3 is not digitized
   read_from: unknown:fdm879
-- observation_id: fdm879::fdm879_table1_lunar_3he_reserves
+- observation_id: fdm879::fdm879_table1_lunar_3he_reserves::rows:h=c620ff31c110
   experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::fdm879
   identity:
     quantity:
@@ -64,8 +64,87 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'lunar_3He_reserves_by_surface_region'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fdm879
+  locator:
+    page: 3
+    table: '1'
+    note: Lunar 3He Reserves Calculated From U.S. Apollo and Soviet LUNA Missions
+  read_from: unknown:fdm879
+- observation_id: fdm879::fdm879_table1_lunar_3he_reserves::rows:h=ca9e2f4277cf
+  experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::fdm879
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'lunar_3He_reserves_by_surface_region'
+    species:
+      formula: He
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No uncertainty is printed in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: fdm879
+  locator:
+    page: 3
+    table: '1'
+    note: Lunar 3He Reserves Calculated From U.S. Apollo and Soviet LUNA Missions
+  read_from: unknown:fdm879
+- observation_id: fdm879::fdm879_table1_lunar_3he_reserves::rows:h=cd7858d924ac
+  experiment_id: 1c9c17397afd890c630236e8a04cdef7e453c90d844c4e8f70a4f1796794e965::fdm879
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'lunar_3He_reserves_by_surface_region'
+    species:
+      formula: He
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

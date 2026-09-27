@@ -223,6 +223,52 @@
       "count": 12,
       "calibration_status": "out_of_range"
     },
+    "composition_projected_liquidus_notice": {
+      "kind": "composition_projected",
+      "reason": "composition_projected",
+      "authority": "extrapolated",
+      "notices": [
+        {
+          "kind": "composition_projected",
+          "reason": "composition_projected",
+          "authority": "extrapolated",
+          "certified_band": {
+            "min_T_C": 1200.0,
+            "max_T_C": 1630.0,
+            "source": "REF-001 Kress91 1200-1630 C calibration band"
+          },
+          "dropped_components": [
+            {
+              "component": "NiO",
+              "mass_fraction": 0.020301671141521784
+            }
+          ],
+          "bounds_source": "kress91_liquid_calibration_floor",
+          "projected_bounds": "invalid",
+          "projection_certified_band": {
+            "engine": "magemin",
+            "database": "ig",
+            "bulk_components": [
+              "SiO2",
+              "Al2O3",
+              "CaO",
+              "MgO",
+              "FeOt",
+              "K2O",
+              "Na2O",
+              "TiO2",
+              "O",
+              "Cr2O3",
+              "H2O"
+            ]
+          },
+          "floor_T_C": 1200.0,
+          "temperature_band_case": "below_1200C_extrapolation",
+          "temperature_band_status": "extrapolation_below_calibration_floor",
+          "temperature_band_source": "REF-001 Kress91 liquid relation; below 1200 C calibration floor"
+        }
+      ]
+    },
     "evidence_class": "internal-analytical",
     "runtime_status": "unavailable",
     "degradation_reason": "unavailable",
@@ -13859,82 +13905,9 @@
     }
   },
   "melt_redox_gate_floor_fallback_engagement": {
-    "engaged": true,
-    "total_count": 12,
-    "by_hour": [
-      {
-        "campaign": "C2B",
-        "hour": 0,
-        "campaign_hour": 0,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 1,
-        "campaign_hour": 1,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 2,
-        "campaign_hour": 2,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 3,
-        "campaign_hour": 3,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 4,
-        "campaign_hour": 4,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 5,
-        "campaign_hour": 5,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 6,
-        "campaign_hour": 6,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 7,
-        "campaign_hour": 7,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 8,
-        "campaign_hour": 8,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 9,
-        "campaign_hour": 9,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 10,
-        "campaign_hour": 10,
-        "count": 1
-      },
-      {
-        "campaign": "C2B",
-        "hour": 11,
-        "campaign_hour": 11,
-        "count": 1
-      }
-    ]
+    "engaged": false,
+    "total_count": 0,
+    "by_hour": []
   },
   "pO2_enforcement_by_hour": [],
   "per_hour_summary": [

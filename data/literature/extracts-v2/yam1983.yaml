@@ -47,7 +47,7 @@ observations:
     pdf_page_index: 1
     paragraph: English abstract + 結言 (p.741)
   read_from: pdf:yam1983
-- observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B
+- observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=1e5f24b31f32
   experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
   identity:
     quantity:
@@ -72,8 +72,7 @@ observations:
       reason: qualifier and_raoultian_gamma does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_and_raoultian_gamma'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -101,7 +100,378 @@ observations:
       10^{-4}·A, 10^{-4}·δA, B, δB. The 10^{-4}·A column is A×10^{-4}, so A/K = (printed)×10^4. Ref. row is the Fe2O3-bearing
       reference melt, not a binary X_Na2O.'
   read_from: pdf:yam1983
-- observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B
+- observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=40053620303f
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1173.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 δA and δB are the least-squares coefficient errors. Propagated σ(log10 a) = sqrt((δA/T)^2 + (δB)^2) as
+        the authors describe around eq. (9). Do not invent additional uncertainty.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_beta_alumina_concentration_cell'
+    original_method_class: emf_beta_alumina_concentration_cell
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 3
+    published_page: 738
+    pdf_page_index: 3
+    table: '1'
+    figure: '5'
+    equation: -log a_Na2O = A/T + B
+    note: 'Table 1 caption (English in source): "Coefficients of lines for -log a_Na2O = A/T + B." Column headers: X_Na2O,
+      10^{-4}·A, 10^{-4}·δA, B, δB. The 10^{-4}·A column is A×10^{-4}, so A/K = (printed)×10^4. Ref. row is the Fe2O3-bearing
+      reference melt, not a binary X_Na2O.'
+  read_from: pdf:yam1983
+- observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=61094dbd1f43
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1173.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 δA and δB are the least-squares coefficient errors. Propagated σ(log10 a) = sqrt((δA/T)^2 + (δB)^2) as
+        the authors describe around eq. (9). Do not invent additional uncertainty.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_beta_alumina_concentration_cell'
+    original_method_class: emf_beta_alumina_concentration_cell
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 3
+    published_page: 738
+    pdf_page_index: 3
+    table: '1'
+    figure: '5'
+    equation: -log a_Na2O = A/T + B
+    note: 'Table 1 caption (English in source): "Coefficients of lines for -log a_Na2O = A/T + B." Column headers: X_Na2O,
+      10^{-4}·A, 10^{-4}·δA, B, δB. The 10^{-4}·A column is A×10^{-4}, so A/K = (printed)×10^4. Ref. row is the Fe2O3-bearing
+      reference melt, not a binary X_Na2O.'
+  read_from: pdf:yam1983
+- observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=9683cc729d1c
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1173.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 δA and δB are the least-squares coefficient errors. Propagated σ(log10 a) = sqrt((δA/T)^2 + (δB)^2) as
+        the authors describe around eq. (9). Do not invent additional uncertainty.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_beta_alumina_concentration_cell'
+    original_method_class: emf_beta_alumina_concentration_cell
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 3
+    published_page: 738
+    pdf_page_index: 3
+    table: '1'
+    figure: '5'
+    equation: -log a_Na2O = A/T + B
+    note: 'Table 1 caption (English in source): "Coefficients of lines for -log a_Na2O = A/T + B." Column headers: X_Na2O,
+      10^{-4}·A, 10^{-4}·δA, B, δB. The 10^{-4}·A column is A×10^{-4}, so A/K = (printed)×10^4. Ref. row is the Fe2O3-bearing
+      reference melt, not a binary X_Na2O.'
+  read_from: pdf:yam1983
+- observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=aef8f61bbd3a
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1173.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 δA and δB are the least-squares coefficient errors. Propagated σ(log10 a) = sqrt((δA/T)^2 + (δB)^2) as
+        the authors describe around eq. (9). Do not invent additional uncertainty.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_beta_alumina_concentration_cell'
+    original_method_class: emf_beta_alumina_concentration_cell
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 3
+    published_page: 738
+    pdf_page_index: 3
+    table: '1'
+    figure: '5'
+    equation: -log a_Na2O = A/T + B
+    note: 'Table 1 caption (English in source): "Coefficients of lines for -log a_Na2O = A/T + B." Column headers: X_Na2O,
+      10^{-4}·A, 10^{-4}·δA, B, δB. The 10^{-4}·A column is A×10^{-4}, so A/K = (printed)×10^4. Ref. row is the Fe2O3-bearing
+      reference melt, not a binary X_Na2O.'
+  read_from: pdf:yam1983
+- observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=b86334d0337a
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1173.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 δA and δB are the least-squares coefficient errors. Propagated σ(log10 a) = sqrt((δA/T)^2 + (δB)^2) as
+        the authors describe around eq. (9). Do not invent additional uncertainty.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_beta_alumina_concentration_cell'
+    original_method_class: emf_beta_alumina_concentration_cell
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 3
+    published_page: 738
+    pdf_page_index: 3
+    table: '1'
+    figure: '5'
+    equation: -log a_Na2O = A/T + B
+    note: 'Table 1 caption (English in source): "Coefficients of lines for -log a_Na2O = A/T + B." Column headers: X_Na2O,
+      10^{-4}·A, 10^{-4}·δA, B, δB. The 10^{-4}·A column is A×10^{-4}, so A/K = (printed)×10^4. Ref. row is the Fe2O3-bearing
+      reference melt, not a binary X_Na2O.'
+  read_from: pdf:yam1983
+- observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=bff678ee8106
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1173.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 δA and δB are the least-squares coefficient errors. Propagated σ(log10 a) = sqrt((δA/T)^2 + (δB)^2) as
+        the authors describe around eq. (9). Do not invent additional uncertainty.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_beta_alumina_concentration_cell'
+    original_method_class: emf_beta_alumina_concentration_cell
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 3
+    published_page: 738
+    pdf_page_index: 3
+    table: '1'
+    figure: '5'
+    equation: -log a_Na2O = A/T + B
+    note: 'Table 1 caption (English in source): "Coefficients of lines for -log a_Na2O = A/T + B." Column headers: X_Na2O,
+      10^{-4}·A, 10^{-4}·δA, B, δB. The 10^{-4}·A column is A×10^{-4}, so A/K = (printed)×10^4. Ref. row is the Fe2O3-bearing
+      reference melt, not a binary X_Na2O.'
+  read_from: pdf:yam1983
+- observation_id: yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=c848624c90f3
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
+    species:
+      formula: Na2O
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1173.0, 1673.0]; no midpoint invented
+    reference_state:
+      tag: unknown
+      reason: qualifier and_raoultian_gamma does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 δA and δB are the least-squares coefficient errors. Propagated σ(log10 a) = sqrt((δA/T)^2 + (δB)^2) as
+        the authors describe around eq. (9). Do not invent additional uncertainty.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'emf_beta_alumina_concentration_cell'
+    original_method_class: emf_beta_alumina_concentration_cell
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 3
+    published_page: 738
+    pdf_page_index: 3
+    table: '1'
+    figure: '5'
+    equation: -log a_Na2O = A/T + B
+    note: 'Table 1 caption (English in source): "Coefficients of lines for -log a_Na2O = A/T + B." Column headers: X_Na2O,
+      10^{-4}·A, 10^{-4}·δA, B, δB. The 10^{-4}·A column is A×10^{-4}, so A/K = (printed)×10^4. Ref. row is the Fe2O3-bearing
+      reference melt, not a binary X_Na2O.'
+  read_from: pdf:yam1983
+- observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B::rows:h=1227d9bdc83d
   experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
   identity:
     quantity:
@@ -123,8 +493,7 @@ observations:
       reason: source T_range_K [1373.0, 1773.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_gibbs_duhem_from_Na2O'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -148,4 +517,335 @@ observations:
       a_SiO2 = A''/T + B''." Column headers: X_Na2O, 10^{-4}·A'', 10^{-4}·δA'', B'', δB''.'
   read_from: pdf:yam1983
   derived_from:
-  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=b86334d0337a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=9683cc729d1c
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=bff678ee8106
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=aef8f61bbd3a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=61094dbd1f43
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=1e5f24b31f32
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=40053620303f
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=c848624c90f3
+- observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B::rows:h=1c3b7dac0cd2
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gibbs_duhem_from_Na2O'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1373.0, 1773.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    model: gibbs_duhem
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 5
+    published_page: 740
+    pdf_page_index: 5
+    table: '2'
+    equation: -log a_SiO2 = A'/T + B'
+    note: 'Gibbs-Duhem of Table 1 a_Na2O; tridymite standard. Table 2 caption: "Coefficients of least square lines for -log
+      a_SiO2 = A''/T + B''." Column headers: X_Na2O, 10^{-4}·A'', 10^{-4}·δA'', B'', δB''.'
+  read_from: pdf:yam1983
+  derived_from:
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=b86334d0337a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=9683cc729d1c
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=bff678ee8106
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=aef8f61bbd3a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=61094dbd1f43
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=1e5f24b31f32
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=40053620303f
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=c848624c90f3
+- observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B::rows:h=4ca37e6c304b
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gibbs_duhem_from_Na2O'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1373.0, 1773.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    model: gibbs_duhem
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 5
+    published_page: 740
+    pdf_page_index: 5
+    table: '2'
+    equation: -log a_SiO2 = A'/T + B'
+    note: 'Gibbs-Duhem of Table 1 a_Na2O; tridymite standard. Table 2 caption: "Coefficients of least square lines for -log
+      a_SiO2 = A''/T + B''." Column headers: X_Na2O, 10^{-4}·A'', 10^{-4}·δA'', B'', δB''.'
+  read_from: pdf:yam1983
+  derived_from:
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=b86334d0337a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=9683cc729d1c
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=bff678ee8106
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=aef8f61bbd3a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=61094dbd1f43
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=1e5f24b31f32
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=40053620303f
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=c848624c90f3
+- observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B::rows:h=594553a4481c
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gibbs_duhem_from_Na2O'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1373.0, 1773.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    model: gibbs_duhem
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 5
+    published_page: 740
+    pdf_page_index: 5
+    table: '2'
+    equation: -log a_SiO2 = A'/T + B'
+    note: 'Gibbs-Duhem of Table 1 a_Na2O; tridymite standard. Table 2 caption: "Coefficients of least square lines for -log
+      a_SiO2 = A''/T + B''." Column headers: X_Na2O, 10^{-4}·A'', 10^{-4}·δA'', B'', δB''.'
+  read_from: pdf:yam1983
+  derived_from:
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=b86334d0337a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=9683cc729d1c
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=bff678ee8106
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=aef8f61bbd3a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=61094dbd1f43
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=1e5f24b31f32
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=40053620303f
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=c848624c90f3
+- observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B::rows:h=6601bbf93a64
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gibbs_duhem_from_Na2O'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1373.0, 1773.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    model: gibbs_duhem
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 5
+    published_page: 740
+    pdf_page_index: 5
+    table: '2'
+    equation: -log a_SiO2 = A'/T + B'
+    note: 'Gibbs-Duhem of Table 1 a_Na2O; tridymite standard. Table 2 caption: "Coefficients of least square lines for -log
+      a_SiO2 = A''/T + B''." Column headers: X_Na2O, 10^{-4}·A'', 10^{-4}·δA'', B'', δB''.'
+  read_from: pdf:yam1983
+  derived_from:
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=b86334d0337a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=9683cc729d1c
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=bff678ee8106
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=aef8f61bbd3a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=61094dbd1f43
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=1e5f24b31f32
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=40053620303f
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=c848624c90f3
+- observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B::rows:h=7a0a07d0a9ed
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gibbs_duhem_from_Na2O'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1373.0, 1773.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    model: gibbs_duhem
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 5
+    published_page: 740
+    pdf_page_index: 5
+    table: '2'
+    equation: -log a_SiO2 = A'/T + B'
+    note: 'Gibbs-Duhem of Table 1 a_Na2O; tridymite standard. Table 2 caption: "Coefficients of least square lines for -log
+      a_SiO2 = A''/T + B''." Column headers: X_Na2O, 10^{-4}·A'', 10^{-4}·δA'', B'', δB''.'
+  read_from: pdf:yam1983
+  derived_from:
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=b86334d0337a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=9683cc729d1c
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=bff678ee8106
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=aef8f61bbd3a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=61094dbd1f43
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=1e5f24b31f32
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=40053620303f
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=c848624c90f3
+- observation_id: yam1983::yam1983_sio2_table2_minus_log10_a_AT_B::rows:h=ef45a68eaf6e
+  experiment_id: 10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_gibbs_duhem_from_Na2O'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1373.0, 1773.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    model: gibbs_duhem
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: yam1983
+  locator:
+    page: 5
+    published_page: 740
+    pdf_page_index: 5
+    table: '2'
+    equation: -log a_SiO2 = A'/T + B'
+    note: 'Gibbs-Duhem of Table 1 a_Na2O; tridymite standard. Table 2 caption: "Coefficients of least square lines for -log
+      a_SiO2 = A''/T + B''." Column headers: X_Na2O, 10^{-4}·A'', 10^{-4}·δA'', B'', δB''.'
+  read_from: pdf:yam1983
+  derived_from:
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=b86334d0337a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=9683cc729d1c
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=bff678ee8106
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=aef8f61bbd3a
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=61094dbd1f43
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=1e5f24b31f32
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=40053620303f
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B::rows:h=c848624c90f3

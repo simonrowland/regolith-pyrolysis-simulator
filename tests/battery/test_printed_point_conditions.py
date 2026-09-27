@@ -16,6 +16,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import ValueKind
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.battery.migrate import REPO_ROOT, migrate
@@ -30,7 +31,9 @@ _TEMPERATURE_ROUTES = (
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_si_psat_1873k", "1873.0", "table", "1"),
     ("kems-049-kato-1993-ms-review", "kato_1993_table1_w_psat_1873k", "1873.0", "table", "1"),
     # Table 3 "at 1300 C"; the extract documents the authors' T_C + 273 convention.
-    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c", "1573.0", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::rows:h=979ecc7f3c6b", "1573.0", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::rows:h=cedcb5fddf77", "1573.0", "table", "3"),
+    ("kems-057-kambayashi-1985", "kambayashi_1985_pbo_table3_ion_current_ratios_1300c::rows:h=535271423e81", "1573.0", "table", "3"),
     ("kems-057-kambayashi-1985", "kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only", "1573.0", "figure", "2"),
     # Fig. 8 slope: "Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C".
     ("kems-057-kambayashi-1985", "kambayashi_1985_fe_sublimation_enthalpy_1370c", "1643.0", "figure", "8"),
@@ -38,14 +41,12 @@ _TEMPERATURE_ROUTES = (
     ("kems-048-turkdogan-2001-sio2-gamma", "turkdogan_2001_eq5_log_gamma_sio2_cao_saturated_model_derived", "1873.15", "equation", "5"),
     ("kems-048-turkdogan-2001-sio2-gamma", "turkdogan_2001_eq5_log_gamma_p2o5_model_derived", "1873.15", "equation", "5"),
     # Quoted Table 4: "Izotermicheskaya degazatsiya ... (800 C, posle 15 min)".
-    ("murchison-degassing-2023-springer", "voropaev_2023_table4_chelyabinsk_quoted_h2", "1073.15", "table", "4"),
-    ("murchison-degassing-2023-springer", "voropaev_2023_table4_chelyabinsk_quoted_h2o", "1073.15", "table", "4"),
+    ("murchison-degassing-2023-springer", "voropaev_2023_table4_chelyabinsk_quoted_h2::T=1073.15:h=358acbddd711", "1073.15", "table", "4"),
+    ("murchison-degassing-2023-springer", "voropaev_2023_table4_chelyabinsk_quoted_h2o::T=1073.15:h=756df92a3970", "1073.15", "table", "4"),
     # Figure captions print the single temperature of each plotted dataset.
     ("slag-003-hino-kitagawa-banya-1993", "hino_kitagawa_banya_1993_fig4_figure_only", "1823.0", "figure", "4"),
     ("slag-003-hino-kitagawa-banya-1993", "hino_kitagawa_banya_1993_fig6_figure_only", "1923.0", "figure", "6"),
     ("slag-003-hino-kitagawa-banya-1993", "hino_kitagawa_banya_1993_fig10_figure_only", "1873.0", "figure", "10"),
-    # Table 1 FactSage prediction "at 2500 K"; second-law prose "at 1976 K".
-    ("kems-139-jacobson-2024", "jacobson_2024_t1_factsage_2500k_predicted_psat", "2500.0", "table", "1"),
     ("kems-139-jacobson-2024", "jacobson_2024_t2_hfo_second_law_narrative", "1976.0", None, None),
     # "each experiment run at a temperature of 2650 K" (Experiments section).
     ("steurer-1985-vapor-phase-pyrolysis", "steurer_1985_sio2_induction_experiment", "2650.0", None, None),
@@ -88,6 +89,21 @@ def test_printed_point_temperature_routes(
     assert locator is not None, "routed point condition must carry its locator"
     if locator_key is not None:
         assert getattr(locator, locator_key) == locator_value
+
+
+def test_jacobson_table1_bound_parent_keeps_printed_temperature(tmp_path: Path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-139-jacobson-2024")
+    obs = result.observations[
+        "kems-139-jacobson-2024::jacobson_2024_t1_factsage_2500k_predicted_psat"
+    ]
+    assert obs.value.kind is ValueKind.CATEGORICAL
+    assert obs.value.categorical == "bound_not_point_ordering"
+    temperature = (obs.point_conditions or {}).get("temperature_K")
+    assert temperature is not None
+    assert temperature.state.is_value
+    assert temperature.state.value == Decimal("2500.0")
+    assert temperature.locator is not None
+    assert temperature.locator.table == "1"
 
 
 def test_kato_table1_routes_every_printed_1873k_row(tmp_path: Path) -> None:

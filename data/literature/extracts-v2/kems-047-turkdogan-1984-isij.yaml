@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/kems-047-turkdogan-1984-isij.yaml
 observations:
-- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_COS_calculated_p
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_COS_calculated_p::points:h=376c6aef439b
   experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
   identity:
     quantity:
@@ -24,8 +24,7 @@ observations:
       value: '1773.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_partial_pressure'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -60,7 +59,64 @@ observations:
         table: '1'
         note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
           columns. Not this work's KEMS.
-- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_CS_calculated_p
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_COS_calculated_p::points:h=73a09555d160
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_partial_pressure'
+    species:
+      formula: COS
+      phase:
+        tag: unknown
+        reason: phase string 'blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_CS_calculated_p::points:h=c040cac172c4
   experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
   identity:
     quantity:
@@ -82,8 +138,7 @@ observations:
       value: '1773.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_partial_pressure'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -118,7 +173,64 @@ observations:
         table: '1'
         note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
           columns. Not this work's KEMS.
-- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_S2_calculated_p
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_CS_calculated_p::points:h=e92b0cc53932
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_partial_pressure'
+    species:
+      formula: CS
+      phase:
+        tag: unknown
+        reason: phase string 'blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_S2_calculated_p::points:h=10278297e0e5
   experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
   identity:
     quantity:
@@ -140,8 +252,7 @@ observations:
       value: '1773.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_partial_pressure'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -176,7 +287,64 @@ observations:
         table: '1'
         note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
           columns. Not this work's KEMS.
-- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_SiO_calculated_p
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_S2_calculated_p::points:h=71b771161dc2
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_partial_pressure'
+    species:
+      formula: S2
+      phase:
+        tag: unknown
+        reason: phase string 'blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_SiO_calculated_p::points:h=5b994a86eecd
   experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
   identity:
     quantity:
@@ -198,8 +366,7 @@ observations:
       value: '1773.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_partial_pressure'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -234,7 +401,64 @@ observations:
         table: '1'
         note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
           columns. Not this work's KEMS.
-- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_SiS_calculated_p
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_SiO_calculated_p::points:h=d3be4a914791
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_partial_pressure'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_SiS_calculated_p::points:h=4505981102b5
   experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
   identity:
     quantity:
@@ -256,8 +480,7 @@ observations:
       value: '1773.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_partial_pressure'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -292,7 +515,64 @@ observations:
         table: '1'
         note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
           columns. Not this work's KEMS.
-- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table2_K_calculated_p
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_SiS_calculated_p::points:h=c972eb3564ee
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_partial_pressure'
+    species:
+      formula: SiS
+      phase:
+        tag: unknown
+        reason: phase string 'blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table2_K_calculated_p::T=1473.15:h=a574e30fd13a
   experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
   identity:
     quantity:
@@ -310,12 +590,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1473.15, 1773.15]; no midpoint invented
+      tag: value
+      value: '1473.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_partial_pressure'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -339,3 +618,293 @@ observations:
     note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
       a(K2O) from Steiler ref. 68.
   read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '2'
+        note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
+          a(K2O) from Steiler ref. 68.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 607
+              pdf_page_index: 17
+              table: '2'
+              note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5.
+                Calculated; a(K2O) from Steiler ref. 68.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 607
+              pdf_page_index: 17
+              table: '2'
+              note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5.
+                Calculated; a(K2O) from Steiler ref. 68.
+        output_unit: K
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table2_K_calculated_p::T=1573.15:h=f1db887ec4c4
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_partial_pressure'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'blast_furnace_slag_0.5pct_K2O_Bprime_1.5' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed on Table 2.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '2'
+    note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
+      a(K2O) from Steiler ref. 68.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '2'
+        note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
+          a(K2O) from Steiler ref. 68.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 607
+              pdf_page_index: 17
+              table: '2'
+              note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5.
+                Calculated; a(K2O) from Steiler ref. 68.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 607
+              pdf_page_index: 17
+              table: '2'
+              note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5.
+                Calculated; a(K2O) from Steiler ref. 68.
+        output_unit: K
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table2_K_calculated_p::T=1673.15:h=4a8c1b4617de
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_partial_pressure'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'blast_furnace_slag_0.5pct_K2O_Bprime_1.5' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed on Table 2.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '2'
+    note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
+      a(K2O) from Steiler ref. 68.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '2'
+        note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
+          a(K2O) from Steiler ref. 68.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 607
+              pdf_page_index: 17
+              table: '2'
+              note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5.
+                Calculated; a(K2O) from Steiler ref. 68.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 607
+              pdf_page_index: 17
+              table: '2'
+              note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5.
+                Calculated; a(K2O) from Steiler ref. 68.
+        output_unit: K
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table2_K_calculated_p::T=1773.15:h=07b59956f4e5
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::kems-047-turkdogan-1984-isij
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_partial_pressure'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'blast_furnace_slag_0.5pct_K2O_Bprime_1.5' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed on Table 2.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '2'
+    note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
+      a(K2O) from Steiler ref. 68.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '2'
+        note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
+          a(K2O) from Steiler ref. 68.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              published_page: 607
+              pdf_page_index: 17
+              table: '2'
+              note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5.
+                Calculated; a(K2O) from Steiler ref. 68.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 607
+              pdf_page_index: 17
+              table: '2'
+              note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5.
+                Calculated; a(K2O) from Steiler ref. 68.
+        output_unit: K

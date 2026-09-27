@@ -582,7 +582,7 @@ observations:
     figure: '14'
     equation: '47'
   read_from: pdf:slag-001-banya-1993
-- observation_id: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG
+- observation_id: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG::rows:h=291c785431d9
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
     quantity:
@@ -601,8 +601,142 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'gas_slag_silica_reduction_deltaG'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: ΔG°_SiO2(crist) = 675 700 − 365.7 T (J). SiO2(l) = SiO2(crist), ΔG° = −9 580 + 4.80 T (J). ΔG°_SiO2(l) =
+      666 100 − 360.9 T (J). ΔG°_SiO2(R.S.) = 648 700 − 363.7 T (J).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 4
+    published_page: 4
+    pdf_page_index: 3
+    equation: 6, 9, 12
+    note: Printed ΔG° for SiO2 + 3C = SiC + 2CO with three silica reference states
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG::rows:h=4df20b9e5c56
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gas_slag_silica_reduction_deltaG'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: ΔG°_SiO2(crist) = 675 700 − 365.7 T (J). SiO2(l) = SiO2(crist), ΔG° = −9 580 + 4.80 T (J). ΔG°_SiO2(l) =
+      666 100 − 360.9 T (J). ΔG°_SiO2(R.S.) = 648 700 − 363.7 T (J).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 4
+    published_page: 4
+    pdf_page_index: 3
+    equation: 6, 9, 12
+    note: Printed ΔG° for SiO2 + 3C = SiC + 2CO with three silica reference states
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG::rows:h=94bbe057f903
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gas_slag_silica_reduction_deltaG'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: ΔG°_SiO2(crist) = 675 700 − 365.7 T (J). SiO2(l) = SiO2(crist), ΔG° = −9 580 + 4.80 T (J). ΔG°_SiO2(l) =
+      666 100 − 360.9 T (J). ΔG°_SiO2(R.S.) = 648 700 − 363.7 T (J).
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 4
+    published_page: 4
+    pdf_page_index: 3
+    equation: 6, 9, 12
+    note: Printed ΔG° for SiO2 + 3C = SiC + 2CO with three silica reference states
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_eq6_9_12_silica_gas_slag_dG::rows:h=dd498a43cda8
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'gas_slag_silica_reduction_deltaG'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-SiO2_binary_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2102,7 +2236,7 @@ observations:
     table: '2'
     note: Interaction energy αij between cations of other components
   read_from: pdf:slag-001-banya-1993
-- observation_id: slag-001-banya-1993::banya_1993_table3_CaO_conversions
+- observation_id: slag-001-banya-1993::banya_1993_table3_CaO_conversions::rows:h=9659d53273ed
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
     quantity:
@@ -2124,8 +2258,7 @@ observations:
       reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_reference_state_conversion_deltaG'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2150,7 +2283,54 @@ observations:
     table: '3'
     note: Table 3 rows for CaO
   read_from: pdf:slag-001-banya-1993
-- observation_id: slag-001-banya-1993::banya_1993_table3_MgO_conversions
+- observation_id: slag-001-banya-1993::banya_1993_table3_CaO_conversions::rows:h=9d9d2d657dc3
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: CaO(s)=CaO(R.S.) ΔG° = +18 160 − 23.309T; CaO(l)=CaO(R.S.) ΔG° = −40 880 − 4.703T
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Table 3 rows for CaO
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_MgO_conversions::rows:h=25d3b282136c
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
     quantity:
@@ -2172,8 +2352,7 @@ observations:
       reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_reference_state_conversion_deltaG'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2198,7 +2377,54 @@ observations:
     table: '3'
     note: Table 3 rows for MgO
   read_from: pdf:slag-001-banya-1993
-- observation_id: slag-001-banya-1993::banya_1993_table3_MnO_conversions
+- observation_id: slag-001-banya-1993::banya_1993_table3_MgO_conversions::rows:h=f1e49e574633
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: MgO(s)=MgO(R.S.) ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.) ΔG° = −23 300 + 1.833T
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Table 3 rows for MgO
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_MnO_conversions::rows:h=2d871e3d107c
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
     quantity:
@@ -2220,8 +2446,7 @@ observations:
       reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_reference_state_conversion_deltaG'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2246,7 +2471,54 @@ observations:
     table: '3'
     note: Table 3 rows for MnO
   read_from: pdf:slag-001-banya-1993
-- observation_id: slag-001-banya-1993::banya_1993_table3_Na2O_conversion
+- observation_id: slag-001-banya-1993::banya_1993_table3_MnO_conversions::rows:h=bb7b54310d50
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: MnO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: MnO(s)=MnO(R.S.) ΔG° = −32 470 + 26.143T; MnO(l)=MnO(R.S.) ΔG° = −86 860 + 51.465T
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Table 3 rows for MnO
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_Na2O_conversion::rows:h=bea34e0c3da8
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
     quantity:
@@ -2268,8 +2540,7 @@ observations:
       reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_reference_state_conversion_deltaG'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2294,7 +2565,7 @@ observations:
     table: '3'
     note: Table 3 rows for Na2O
   read_from: pdf:slag-001-banya-1993
-- observation_id: slag-001-banya-1993::banya_1993_table3_P2O5_conversion
+- observation_id: slag-001-banya-1993::banya_1993_table3_P2O5_conversion::rows:h=a7c82174f4ac
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
     quantity:
@@ -2316,8 +2587,7 @@ observations:
       reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_reference_state_conversion_deltaG'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2342,7 +2612,7 @@ observations:
     table: '3'
     note: Table 3 rows for P2O5
   read_from: pdf:slag-001-banya-1993
-- observation_id: slag-001-banya-1993::banya_1993_table3_SiO2_conversions
+- observation_id: slag-001-banya-1993::banya_1993_table3_SiO2_conversions::rows:h=217f7d73594b
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
     quantity:
@@ -2364,8 +2634,7 @@ observations:
       reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_reference_state_conversion_deltaG'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -2391,7 +2660,103 @@ observations:
     table: '3'
     note: Table 3 rows for SiO2
   read_from: pdf:slag-001-banya-1993
-- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors
+- observation_id: slag-001-banya-1993::banya_1993_table3_SiO2_conversions::rows:h=b507049dc5cc
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: SiO2(β-tr)=SiO2(R.S.) ΔG° = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.) ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)
+      ΔG° = +17 450 + 2.820T
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Table 3 rows for SiO2
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_SiO2_conversions::rows:h=d0ddc733d884
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: SiO2(β-tr)=SiO2(R.S.) ΔG° = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.) ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)
+      ΔG° = +17 450 + 2.820T
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Table 3 rows for SiO2
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=217f7d73594b
   experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
   identity:
     quantity:
@@ -2413,8 +2778,568 @@ observations:
       reason: qualifier reference_state_conversion_deltaG does not name a reference_state
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_reference_state_conversion_deltaG'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=25d3b282136c
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=2d871e3d107c
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=9659d53273ed
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=9d9d2d657dc3
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=a7c82174f4ac
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=b507049dc5cc
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=bb7b54310d50
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=bea34e0c3da8
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=d0ddc733d884
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=ef0cdde1ca8e
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Table 3
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540 + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG°
+      = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030 − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG°
+      = −32 470 + 26.143T; MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+      = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.)  ΔG°
+      = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-001-banya-1993
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '3'
+    note: Conversion factors of activities; ΔG° = A + B T (J)
+  read_from: pdf:slag-001-banya-1993
+- observation_id: slag-001-banya-1993::banya_1993_table3_conversion_factors::rows:h=f1e49e574633
+  experiment_id: 10.2355/isijinternational.33.2::slag-001-banya-1993
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'activity_reference_state_conversion_deltaG'
+    species:
+      formula: FeO
+      phase:
+        tag: unknown
+        reason: phase string 'oxide_melt_reference_state_conversion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier reference_state_conversion_deltaG does not name a reference_state
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

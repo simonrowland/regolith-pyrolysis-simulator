@@ -5837,7 +5837,7 @@ observations:
     table: '3'
     note: Mendeley Data Table_3_initial_MVCE.xlsx
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t4_ag_diffusivity_inverse_model
+- observation_id: kems-140-heck-2025::heck_2025_t4_ag_diffusivity_inverse_model::points:h=03c500fc2adf
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -5859,7 +5859,7 @@ observations:
       reason: source T_range_K [1481.0, 1673.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'diffusivity'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -5880,7 +5880,50 @@ observations:
     table: '4'
     note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t4_as_diffusivity_inverse_model
+- observation_id: kems-140-heck-2025::heck_2025_t4_ag_diffusivity_inverse_model::points:h=8e471e02b1dc
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'diffusivity'
+    species:
+      formula: Ag
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1481.0, 1673.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 4 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '4'
+    note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
+  read_from: pdf:kems-140-heck-2025
+- observation_id: kems-140-heck-2025::heck_2025_t4_as_diffusivity_inverse_model::points:h=00d81cb145e3
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -5902,7 +5945,7 @@ observations:
       reason: source T_range_K [1481.0, 1673.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'diffusivity'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -5923,7 +5966,50 @@ observations:
     table: '4'
     note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t4_cd_diffusivity_inverse_model
+- observation_id: kems-140-heck-2025::heck_2025_t4_as_diffusivity_inverse_model::points:h=beff7749d2dd
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'diffusivity'
+    species:
+      formula: As
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1481.0, 1673.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 4 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '4'
+    note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
+  read_from: pdf:kems-140-heck-2025
+- observation_id: kems-140-heck-2025::heck_2025_t4_cd_diffusivity_inverse_model::points:h=1b23d59009f2
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -5945,7 +6031,7 @@ observations:
       reason: source T_range_K [1481.0, 1673.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'diffusivity'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -5966,7 +6052,7 @@ observations:
     table: '4'
     note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t4_ge_diffusivity_inverse_model
+- observation_id: kems-140-heck-2025::heck_2025_t4_ge_diffusivity_inverse_model::points:h=64aac4990ffe
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -5988,7 +6074,7 @@ observations:
       reason: source T_range_K [1481.0, 1673.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'diffusivity'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6009,7 +6095,7 @@ observations:
     table: '4'
     note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t4_pb_diffusivity_inverse_model
+- observation_id: kems-140-heck-2025::heck_2025_t4_pb_diffusivity_inverse_model::points:h=65c6d1a13bf3
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6031,7 +6117,7 @@ observations:
       reason: source T_range_K [1481.0, 1673.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'diffusivity'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6052,7 +6138,7 @@ observations:
     table: '4'
     note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t4_zn_diffusivity_inverse_model
+- observation_id: kems-140-heck-2025::heck_2025_t4_zn_diffusivity_inverse_model::points:h=d1be498f3be4
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6074,7 +6160,7 @@ observations:
       reason: source T_range_K [1481.0, 1673.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'diffusivity'; refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6095,7 +6181,7 @@ observations:
     table: '4'
     note: Mendeley Data Table_4_D.xlsx; inverse-model D, not a Langmuir flux
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AgOp5_Agg_ag
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AgOp5_Agg_ag::T=1523:h=31fe2937ae9c
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6113,12 +6199,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1481.0, 1773.0]; no midpoint invented
+      tag: value
+      value: '1523'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6139,7 +6224,117 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AsO1p5_AsOg_as
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AgOp5_Agg_ag::T=1573:h=fe86bb4aae60
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Ag
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AgOp5_Agg_ag::T=1673:h=f9459972d609
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Ag
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AsO1p5_AsOg_as::T=1523:h=b4293e4a0a53
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6157,12 +6352,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1481.0, 1773.0]; no midpoint invented
+      tag: value
+      value: '1523'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6183,7 +6377,117 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_CdO_Cdg_cd
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AsO1p5_AsOg_as::T=1573:h=364fcf967073
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: As
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_AsO1p5_AsOg_as::T=1673:h=a7d1a1231df1
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: As
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_CdO_Cdg_cd::T=1523:h=9fab44cde71e
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6201,12 +6505,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1481.0, 1773.0]; no midpoint invented
+      tag: value
+      value: '1523'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6227,7 +6530,66 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_CuOp5_Cug_cu
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_CdO_Cdg_cd::T=1573:h=6c2f745243ca
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Cd
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_CuOp5_Cug_cu::T=1481:h=6875881eca47
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6245,12 +6607,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1481.0, 1773.0]; no midpoint invented
+      tag: value
+      value: '1481'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6271,7 +6632,117 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_GeO2_GeOg_ge
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1481'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_CuOp5_Cug_cu::T=1673:h=206545738e02
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_CuOp5_Cug_cu::T=1773:h=5b8e66d94688
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Cu
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_GeO2_GeOg_ge::T=1481:h=002de07f7927
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6289,12 +6760,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1481.0, 1773.0]; no midpoint invented
+      tag: value
+      value: '1481'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6315,6 +6785,116 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1481'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_GeO2_GeOg_ge::T=1673:h=caeba00a94fd
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Ge
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_GeO2_GeOg_ge::T=1773:h=dcf604827733
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Ge
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
 - observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_InO1p5_InOg_in
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
@@ -6359,7 +6939,7 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_InO1p5_Ing_in
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_InO1p5_Ing_in::T=1481:h=23135937d429
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6377,12 +6957,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1481.0, 1773.0]; no midpoint invented
+      tag: value
+      value: '1481'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6403,7 +6982,66 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_PbOg_pb
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1481'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_InO1p5_Ing_in::T=1573:h=21ad3e11c9de
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: In
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_PbOg_pb::T=1523:h=8b29b1931af6
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6421,12 +7059,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1481.0, 1773.0]; no midpoint invented
+      tag: value
+      value: '1523'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6447,7 +7084,15 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_Pbg_pb
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_PbOg_pb::T=1573:h=25c9d6bde1e4
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6465,12 +7110,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1481.0, 1773.0]; no midpoint invented
+      tag: value
+      value: '1573'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6491,7 +7135,117 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
-- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_ZnO_Zng_zn
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_Pbg_pb::T=1481:h=8e9082074ee8
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Pb
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1481'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1481'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_Pbg_pb::T=1573:h=920e3351aa34
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Pb
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_ZnO_Zng_zn::T=1481:h=074f5cb411d8
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:
     quantity:
@@ -6509,12 +7263,11 @@ observations:
         tag: value
         value: 0
     temperature_K:
-      tag: unknown
-      reason: source T_range_K [1481.0, 1773.0]; no midpoint invented
+      tag: value
+      value: '1481'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6535,6 +7288,65 @@ observations:
     table: '5'
     note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
   read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1481'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+- observation_id: kems-140-heck-2025::heck_2025_t5_logKstar_ZnO_Zng_zn::T=1573:h=fbcf3868b8c6
+  experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_equilibrium_coefficient_log_Kstar'
+    species:
+      formula: Zn
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 5 (+)σ (-)σ as printed
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-140-heck-2025
+  locator:
+    table: '5'
+    note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
+  read_from: pdf:kems-140-heck-2025
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573'
+      locator:
+        table: '5'
+        note: Mendeley Data Table_5_K.xlsx; apparent K* from Eq. 5
 - observation_id: kems-140-heck-2025::heck_2025_t6_agop5_agg_ag_HS
   experiment_id: 10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series
   identity:

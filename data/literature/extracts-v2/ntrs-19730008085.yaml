@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/ntrs-19730008085.yaml
 observations:
-- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=1073.15:h=80c70d6f3255
   experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
   identity:
     quantity:
@@ -19,10 +19,12 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -43,7 +45,1119 @@ observations:
     table: '4'
     note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
   read_from: unknown:ntrs-19730008085
-- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=1173.15:h=1482f2908b3b
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1173.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '900'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=1273.15:h=67ac330bcd3e
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=1373.15:h=d9f435ecf28b
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=1473.15:h=96d3696186d1
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=1573.15:h=ffc408caa671
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=1673.15:h=5896f4345f9c
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=1773.15:h=381aecdb87aa
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=373.15:h=8c1cda976142
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '373.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=473.15:h=7a5d9d0fc2a5
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '473.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=573.15:h=2a694ac2dd3e
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '573.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '300'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=673.15:h=046c1ea80f14
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '673.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '400'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=773.15:h=1f394b1e88ea
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '773.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '500'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=873.15:h=aea2f17af57c
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '873.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '600'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_cumulative_release::T=973.15:h=6484ab5c959d
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'cumulative_percent_noble_gas_release_vs_T'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '973.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on cumulative-percent cells
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 38
+    table: '4'
+    note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '973.15'
+      locator:
+        pdf_page_index: 38
+        table: '4'
+        note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '700'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 38
+              table: '4'
+              note: Appendix I Table 4 Cumulative percent of each noble gas released from stepwise heating of lunar fines
+                (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=1073.15:h=ffc56fd4695e
   experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
   identity:
     quantity:
@@ -60,10 +1174,12 @@ observations:
       charge:
         tag: value
         value: 0
+    temperature_K:
+      tag: value
+      value: '1073.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents';
-      refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -84,3 +1200,1085 @@ observations:
     table: '1'
     note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
   read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1073.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '800'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=1173.15:h=fab1aba74a73
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1173.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1173.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '900'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=1273.15:h=db98a906bf64
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1273.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1273.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=1373.15:h=5971ce8b6229
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1100'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=1473.15:h=0aab696202c4
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=1573.15:h=1d67d7762f30
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=1673.15:h=db2dada0600f
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=1773.15:h=0835e4b4a1cd
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=373.15:h=4f899639dcd4
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '373.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '373.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=473.15:h=061db48a5121
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '473.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '473.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '200'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=573.15:h=5fd9870f5042
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '573.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '573.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '300'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=673.15:h=bb665979c85b
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '673.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '673.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '400'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=773.15:h=aca739fc97e2
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '773.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '773.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '500'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=873.15:h=0385f2854e20
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '873.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '873.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '600'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K
+- observation_id: ntrs-19730008085::manuel_1972_15601_64_he_ne_ar_stepwise::T=973.15:h=1ecb411d8e91
+  experiment_id: 4b6f8e86637b9cb6cce1ea1afe66bc32c6dfd883579880ab418439f9f5cd39c0::ntrs-19730008085
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'stepwise_He_Ne_Ar_isotope_ratios_and_contents'
+    species:
+      formula: lunar_fines_15601_64
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_soil_fines' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '973.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row ± as printed on isotope ratios; gas-content cells printed without explicit ± in Table 1.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: ntrs-19730008085
+  locator:
+    pdf_page_index: 35
+    table: '1'
+    note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+  read_from: unknown:ntrs-19730008085
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '973.15'
+      locator:
+        pdf_page_index: 35
+        table: '1'
+        note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '700'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              pdf_page_index: 35
+              table: '1'
+              note: Appendix I Table 1 Helium, neon and argon from stepwise heating of lunar fines (15601.64)
+        output_unit: K

@@ -8762,7 +8762,7 @@ observations:
     note: row=Na2O-SiO2 x(SiO2)=0.805 T=1473 K
     source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
   read_from: pdf:kems-ms2000-044
-- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2::rows:h=0dab3be197f2
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
   identity:
     quantity:
@@ -8784,8 +8784,8 @@ observations:
       reason: source T_range_K [869.0, 1285.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'solid_silicate_formation_from_oxides'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [974, 1071] is a temperature domain,
+      not the observable
     approximate: false
   uncertainty:
     kind: printed
@@ -8799,7 +8799,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=0dab3be197f2
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -8814,7 +8814,7 @@ observations:
     table: '2'
     source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   read_from: unknown:kems-ms2000-044
-- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2::rows:h=12ef0f0c598e
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
   identity:
     quantity:
@@ -8836,8 +8836,372 @@ observations:
       reason: source T_range_K [869.0, 1285.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'solid_silicate_formation_from_oxides'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [879, 1050] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_formation_thermochemistry'
+    original_method_class: solid_silicate_formation_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=0dab3be197f2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2::rows:h=26700d382e18
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [942, 1271] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_formation_thermochemistry'
+    original_method_class: solid_silicate_formation_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=0dab3be197f2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2::rows:h=2e3901c508d4
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [869, 1014] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_formation_thermochemistry'
+    original_method_class: solid_silicate_formation_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=0dab3be197f2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2::rows:h=6d750e35551d
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [953, 1110] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_formation_thermochemistry'
+    original_method_class: solid_silicate_formation_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=0dab3be197f2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2::rows:h=7fc1af449642
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [891, 1041] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_formation_thermochemistry'
+    original_method_class: solid_silicate_formation_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=0dab3be197f2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2::rows:h=87879a6d224c
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1068, 1285] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_formation_thermochemistry'
+    original_method_class: solid_silicate_formation_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=0dab3be197f2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2::rows:h=d5c6431e1cab
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [973, 1078] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_formation_thermochemistry'
+    original_method_class: solid_silicate_formation_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=0dab3be197f2
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '2'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=0dab3be197f2
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [974, 1071] is a temperature domain,
+      not the observable
     approximate: false
   uncertainty:
     kind: printed
@@ -8864,7 +9228,357 @@ observations:
     table: '2'
     source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
   read_from: pdf:kems-ms2000-044
-- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=12ef0f0c598e
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [879, 1050] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_second_law_fit
+    attribution: Table 2. Thermodynamic functions of formation of sodium and potassium silicates from β-Na2O, solid K2O and
+      quartz. Silicate | Temperature range, K | −∆H / J mol-1 | ∆S / J mol-1 K-1 1/11 3Na2O·8SiO2 974-1071 58300±755 6.70±0.70
+      1/3 Na2O·2SiO2 973-1078 73660±715 5.70±0.70 1/2 Na2O·SiO2 953-1110 115400±600 -2.30±0.60 1/5 3Na2O·2SiO2 1068-1285 110500±580
+      6.15±0.55 1/3 2Na2O·SiO2 942-1271 127100±620 -6.90±0.60 1/5 K2O·4SiO2 891-1041 65900±500 1.18±0.41 1/3 K2O·2SiO2 869-1014
+      112560±540 -3.47±0.50 1/2 K2O·SiO2 879-1050 145940±570 -5.24±0.57
+    model: model_derived_second_law_fit
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=26700d382e18
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [942, 1271] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_second_law_fit
+    attribution: Table 2. Thermodynamic functions of formation of sodium and potassium silicates from β-Na2O, solid K2O and
+      quartz. Silicate | Temperature range, K | −∆H / J mol-1 | ∆S / J mol-1 K-1 1/11 3Na2O·8SiO2 974-1071 58300±755 6.70±0.70
+      1/3 Na2O·2SiO2 973-1078 73660±715 5.70±0.70 1/2 Na2O·SiO2 953-1110 115400±600 -2.30±0.60 1/5 3Na2O·2SiO2 1068-1285 110500±580
+      6.15±0.55 1/3 2Na2O·SiO2 942-1271 127100±620 -6.90±0.60 1/5 K2O·4SiO2 891-1041 65900±500 1.18±0.41 1/3 K2O·2SiO2 869-1014
+      112560±540 -3.47±0.50 1/2 K2O·SiO2 879-1050 145940±570 -5.24±0.57
+    model: model_derived_second_law_fit
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=2e3901c508d4
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [869, 1014] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_second_law_fit
+    attribution: Table 2. Thermodynamic functions of formation of sodium and potassium silicates from β-Na2O, solid K2O and
+      quartz. Silicate | Temperature range, K | −∆H / J mol-1 | ∆S / J mol-1 K-1 1/11 3Na2O·8SiO2 974-1071 58300±755 6.70±0.70
+      1/3 Na2O·2SiO2 973-1078 73660±715 5.70±0.70 1/2 Na2O·SiO2 953-1110 115400±600 -2.30±0.60 1/5 3Na2O·2SiO2 1068-1285 110500±580
+      6.15±0.55 1/3 2Na2O·SiO2 942-1271 127100±620 -6.90±0.60 1/5 K2O·4SiO2 891-1041 65900±500 1.18±0.41 1/3 K2O·2SiO2 869-1014
+      112560±540 -3.47±0.50 1/2 K2O·SiO2 879-1050 145940±570 -5.24±0.57
+    model: model_derived_second_law_fit
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=6d750e35551d
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [953, 1110] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_second_law_fit
+    attribution: Table 2. Thermodynamic functions of formation of sodium and potassium silicates from β-Na2O, solid K2O and
+      quartz. Silicate | Temperature range, K | −∆H / J mol-1 | ∆S / J mol-1 K-1 1/11 3Na2O·8SiO2 974-1071 58300±755 6.70±0.70
+      1/3 Na2O·2SiO2 973-1078 73660±715 5.70±0.70 1/2 Na2O·SiO2 953-1110 115400±600 -2.30±0.60 1/5 3Na2O·2SiO2 1068-1285 110500±580
+      6.15±0.55 1/3 2Na2O·SiO2 942-1271 127100±620 -6.90±0.60 1/5 K2O·4SiO2 891-1041 65900±500 1.18±0.41 1/3 K2O·2SiO2 869-1014
+      112560±540 -3.47±0.50 1/2 K2O·SiO2 879-1050 145940±570 -5.24±0.57
+    model: model_derived_second_law_fit
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=7fc1af449642
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [891, 1041] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_second_law_fit
+    attribution: Table 2. Thermodynamic functions of formation of sodium and potassium silicates from β-Na2O, solid K2O and
+      quartz. Silicate | Temperature range, K | −∆H / J mol-1 | ∆S / J mol-1 K-1 1/11 3Na2O·8SiO2 974-1071 58300±755 6.70±0.70
+      1/3 Na2O·2SiO2 973-1078 73660±715 5.70±0.70 1/2 Na2O·SiO2 953-1110 115400±600 -2.30±0.60 1/5 3Na2O·2SiO2 1068-1285 110500±580
+      6.15±0.55 1/3 2Na2O·SiO2 942-1271 127100±620 -6.90±0.60 1/5 K2O·4SiO2 891-1041 65900±500 1.18±0.41 1/3 K2O·2SiO2 869-1014
+      112560±540 -3.47±0.50 1/2 K2O·SiO2 879-1050 145940±570 -5.24±0.57
+    model: model_derived_second_law_fit
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=87879a6d224c
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1068, 1285] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_second_law_fit
+    attribution: Table 2. Thermodynamic functions of formation of sodium and potassium silicates from β-Na2O, solid K2O and
+      quartz. Silicate | Temperature range, K | −∆H / J mol-1 | ∆S / J mol-1 K-1 1/11 3Na2O·8SiO2 974-1071 58300±755 6.70±0.70
+      1/3 Na2O·2SiO2 973-1078 73660±715 5.70±0.70 1/2 Na2O·SiO2 953-1110 115400±600 -2.30±0.60 1/5 3Na2O·2SiO2 1068-1285 110500±580
+      6.15±0.55 1/3 2Na2O·SiO2 942-1271 127100±620 -6.90±0.60 1/5 K2O·4SiO2 891-1041 65900±500 1.18±0.41 1/3 K2O·2SiO2 869-1014
+      112560±540 -3.47±0.50 1/2 K2O·SiO2 879-1050 145940±570 -5.24±0.57
+    model: model_derived_second_law_fit
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_formation_table2_class_quote_r2::rows:h=d5c6431e1cab
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_silicate_formation_from_oxides'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [869.0, 1285.0]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [973, 1078] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-row uncertainty is stored with each published value.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived_second_law_fit
+    attribution: Table 2. Thermodynamic functions of formation of sodium and potassium silicates from β-Na2O, solid K2O and
+      quartz. Silicate | Temperature range, K | −∆H / J mol-1 | ∆S / J mol-1 K-1 1/11 3Na2O·8SiO2 974-1071 58300±755 6.70±0.70
+      1/3 Na2O·2SiO2 973-1078 73660±715 5.70±0.70 1/2 Na2O·SiO2 953-1110 115400±600 -2.30±0.60 1/5 3Na2O·2SiO2 1068-1285 110500±580
+      6.15±0.55 1/3 2Na2O·SiO2 942-1271 127100±620 -6.90±0.60 1/5 K2O·4SiO2 891-1041 65900±500 1.18±0.41 1/3 K2O·2SiO2 869-1014
+      112560±540 -3.47±0.50 1/2 K2O·SiO2 879-1050 145940±570 -5.24±0.57
+    model: model_derived_second_law_fit
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=3c97f1fc8074
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
   identity:
     quantity:
@@ -8886,8 +9600,7 @@ observations:
       reason: source T_range_K [298.15, 298.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates';
-      refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -8902,7 +9615,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
     decided_by:
       worker: extract-supersedes
       date: unspecified
@@ -8917,7 +9630,7 @@ observations:
     table: '3'
     source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
   read_from: unknown:kems-ms2000-044
-- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=553849e2958f
   experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
   identity:
     quantity:
@@ -8939,8 +9652,1255 @@ observations:
       reason: source T_range_K [298.15, 298.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates';
-      refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=610b1019bb48
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=70412dc5d2ae
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=7ef802998013
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=934aeff348cf
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=b98053a1446a
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=bc04250d6937
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=c435b9b0b957
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=c45f946fd423
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=c5cb76dc73c5
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=c997475e5be5
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=d3c8024e610e
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3::rows:h=e644ad4d03ed
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'solid_silicate_thermochemistry'
+    original_method_class: solid_silicate_thermochemistry
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+    decided_by:
+      worker: extract-supersedes
+      date: unspecified
+      evidence:
+        page: PDF p. 23
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+  read_from: unknown:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=3c97f1fc8074
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=553849e2958f
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=610b1019bb48
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=70412dc5d2ae
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=7ef802998013
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=934aeff348cf
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=b98053a1446a
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=bc04250d6937
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=c435b9b0b957
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=c45f946fd423
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=c5cb76dc73c5
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=c997475e5be5
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=d3c8024e610e
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Present-source per-row uncertainties are stored where published; comparison-source rows have no uncertainty in
+        Table 3.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class model_derived_and_compiled'
+    original_method_class: model_derived_and_compiled
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-ms2000-044
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf
+  read_from: pdf:kems-ms2000-044
+- observation_id: kems-ms2000-044::ms2000_044_solid_silicate_standard_functions_table3_class_quote_r2::rows:h=e644ad4d03ed
+  experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::kems-ms2000-044
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'standard_thermodynamic_functions_of_solid_silicates'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'solid_sodium_and_potassium_silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

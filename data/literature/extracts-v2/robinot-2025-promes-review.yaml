@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/robinot-2025-promes-review.yaml
 observations:
-- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=0e04a801e0d6
   experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
   identity:
     quantity:
@@ -21,8 +21,427 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'bulk_oxide_wt_pct_min_max_average'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=33600da2031a
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=38cec70c1378
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=47d9450904eb
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=5415e39b99f6
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=55af07921582
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=57be1f655abf
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=70d4f148f910
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=94e6e5c5fc61
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=99d018727d85
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: compilation min/max/average; no sigma printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robinot-2025-promes-review
+  locator:
+    page: 243
+    published_page: 243
+    pdf_page_index: 3
+    table: '1'
+    note: born-digital Table 1; citations [3-5] McKay/Ling/Chen
+  read_from: pdf:robinot-2025-promes-review
+- observation_id: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg::rows:h=9c6a91afcaa6
+  experiment_id: 10.1016/j.actaastro.2025.05.008::robinot-2025-promes-review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'bulk_oxide_wt_pct_min_max_average'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed

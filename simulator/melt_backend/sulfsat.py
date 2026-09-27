@@ -143,6 +143,9 @@ class SulfurSaturationResult:
     * ``'unavailable'`` - PySulfSat is not installed (or its import
       raised).  Numeric fields stay 0.0; ``warnings`` carries the
       reason.
+    * ``'not_evaluated'`` - the caller could not establish melt presence.
+      Numeric fields stay 0.0; ``not_evaluated_reason`` and
+      ``melt_presence_basis`` carry the typed diagnostic.
     """
 
     SCSS_ppm: float = 0.0
@@ -152,6 +155,8 @@ class SulfurSaturationResult:
     S_in_sulfate_ppm: float = 0.0
     warnings: List[str] = field(default_factory=list)
     calibration_status: str = 'unavailable'
+    melt_presence_basis: Dict[str, Any] = field(default_factory=dict)
+    not_evaluated_reason: Optional[str] = None
 
 
 def _qfm_logfo2_oneill(T_K: float) -> float:

@@ -170,7 +170,7 @@ observations:
     figure: 5a
     section: 3.3 Copper and Zinc isotope ratios
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-01/08/18a:h=15244af03916
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
@@ -234,8 +234,7 @@ observations:
       reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: quantity, method_class, model, note,
-      rows'
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
     approximate: false
   uncertainty:
     kind: none
@@ -255,6 +254,1782 @@ observations:
     table: '1'
     section: modelled logK* values
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-3.07'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-01/08/18b:h=9ee042da8e54
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-3.07'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-01/08/18d:h=7f71e0b72a7f
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-8.04'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-02/08/18a:h=b97cf9a98901
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-3.26'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-03/08/18b:h=e2444d338188
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-7.99'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-10/04/17a-r:h=fd8b58d3f174
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-10/04/17a:h=b8c1f90788c4
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-25/07/18a:h=7a87799a6cdc
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-6.02'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-3/08/18a:h=14704ff2b79c
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.8'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-31/07/18a:h=16bceb025fa0
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.74'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-31/07/18b:h=8c908665b14c
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-2.74'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-31/07/18c:h=f8c97ce13a37
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-5.7'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-31/07/18d:h=c0042539113e
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-8'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-4/04/17c:h=65fa2f98bb0c
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-5/04/17a:h=179cff7b288b
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-5/04/17b:h=0de88534e2fa
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-6/04/17a:h=bc2e5ef4413d
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-6/04/17b:h=d079754ac729
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-6/04/17c:h=42c3ac3edd78
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::rows:row=p-7/04/17a:h=e41e4fe35515
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: Cu
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: qualifier coefficient does not name a reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity_coefficient field selected; source fields: run, temperature_C, logfO2, logKstar_Cu'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 6
+    table: '1'
+    section: modelled logK* values
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        table: '1'
+        section: modelled logK* values
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18a::T=1670.15:row=p-01/08/18a:h=eadfaa7b50a7
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::sossi-2020-p-01-08-18a
   identity:
@@ -4471,7 +6246,7 @@ observations:
         page: 6
         table: '1'
         record: P 7/04/17b
-- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18a:h=dc5779d64a19
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:
     quantity:
@@ -4535,8 +6310,9 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: quantity, method_class, model,
-      assumptions, rows'
+    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: run, logfO2, time_min, element,
+      D0_m2_s, D0_uncertainty_m2_s, f_surface, f_bulk, logKstar_surface, logKstar_bulk, tevap_s, delta66Zn_per_mil_calc, alpha_surface_assumed,
+      alpha_bulk_calc'
     approximate: false
   uncertainty:
     kind: none
@@ -4556,6 +6332,300 @@ observations:
     table: '2'
     section: standalone elemental zoning profiles
   read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-6'
+      locator:
+        page: 8
+        table: '2'
+        section: standalone elemental zoning profiles
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18b:h=139106c975fe
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: run, logfO2, time_min, element,
+      D0_m2_s, D0_uncertainty_m2_s, f_surface, f_bulk, logKstar_surface, logKstar_bulk, tevap_s, delta66Zn_per_mil_calc, alpha_surface_assumed,
+      alpha_bulk_calc'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 8
+    table: '2'
+    section: standalone elemental zoning profiles
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-6'
+      locator:
+        page: 8
+        table: '2'
+        section: standalone elemental zoning profiles
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18c:h=918c75ed534f
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: run, logfO2, time_min, element,
+      D0_m2_s, D0_uncertainty_m2_s, f_surface, f_bulk, logKstar_surface, logKstar_bulk, tevap_s, delta66Zn_per_mil_calc, alpha_surface_assumed,
+      alpha_bulk_calc'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 8
+    table: '2'
+    section: standalone elemental zoning profiles
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-8'
+      locator:
+        page: 8
+        table: '2'
+        section: standalone elemental zoning profiles
+- observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18c:h=92732d667692
+  experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Zn
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1573.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: run, logfO2, time_min, element,
+      D0_m2_s, D0_uncertainty_m2_s, f_surface, f_bulk, logKstar_surface, logKstar_bulk, tevap_s, delta65Cu_per_mil_calc, alpha_surface_assumed,
+      alpha_bulk_calc'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sossi-2020-cu-zn-isotope-evap-formalism
+  locator:
+    page: 8
+    table: '2'
+    section: standalone elemental zoning profiles
+  read_from: unknown:sossi-2020-cu-zn-isotope-evap-formalism
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value: '-8'
+      locator:
+        page: 8
+        table: '2'
+        section: standalone elemental zoning profiles
 - observation_id: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:0
   experiment_id: 10.1016/j.gca.2020.08.011::experiment::cu-zn-evaporation-series
   identity:

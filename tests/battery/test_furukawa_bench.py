@@ -46,11 +46,18 @@ def test_furukawa_registry_preserves_unassigned_geometry_and_observations(tmp_pa
     assert str(stability.value.state.value.bound_value) == '0.5'
     rows = [o for block in doc["species"].values() for o in block["observations"]]
     assert len(rows) == 21
-    assert len(result.observations) == 21
+    # Three values.rows tables (3+9+8) replace their parents; the other 18 stay.
+    assert len(result.observations) == 38
     for row in rows:
-        observation = result.observations[f"fixture-source::{row['observation_id']}"]
-        experiment = result.experiments[observation.experiment_id]
-        if "experiment" in row:
-            assert experiment.bench_id == bench.id
-        if "quoted_" in row["observation_id"]:
-            assert experiment.bench_id is None
+        parent_id = f"fixture-source::{row['observation_id']}"
+        matched = [
+            obs for obs in result.observations.values()
+            if obs.observation_id == parent_id or obs.observation_id.startswith(parent_id + "::")
+        ]
+        assert matched, parent_id
+        for observation in matched:
+            experiment = result.experiments[observation.experiment_id]
+            if "experiment" in row:
+                assert experiment.bench_id == bench.id
+            if "quoted_" in row["observation_id"]:
+                assert experiment.bench_id is None

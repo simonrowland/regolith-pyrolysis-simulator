@@ -380,7 +380,10 @@ from simulator.vapour_rail.batch import FluxActivationContext
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import EvaporationMixin
 from simulator.extraction import ExtractionMixin
-from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.melt_backend.base import (
+    InternalAnalyticalBackend,
+    MeltCompositionError,
+)
 from simulator.melt_backend.sulfsat import (
     SulfSatGate,
     SulfurSaturationResult,
@@ -954,16 +957,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # SULFUR_SATURATION_GATE intent (PySulfSat). Lazy-probe: when
         # the optional [sulfur] extra is absent, the gate stays
         # un-initialised and ``is_available()`` returns False, which
-        # causes the Stage 0 + post-equilibrium hooks below to record
-        # an 'unavailable' result and fall back to builtin partitioning.
+        # causes the post-equilibrium hook below to record an
+        # 'unavailable' result and fall back to builtin partitioning.
         # The gate itself never emits a LedgerTransition (binding spec
         # §4 — it is a diagnostic gate, not a writer).
         self._sulfsat_gate = SulfSatGate()
         self._sulfsat_gate.initialize({})
-        # Latest SulfurSaturationResult captured by either the Stage 0
-        # hook (``_record_stage0_sulfsat_result``) or the post-equilibrium
+        # Latest SulfurSaturationResult captured by the post-equilibrium
         # hook in ``_get_equilibrium``. Available to the UI / diagnostics
-        # without forcing a recompute. None until the first call.
+        # without forcing a recompute. None until a melt is present and
+        # the first call succeeds.
         self._last_sulfur_saturation_result: SulfurSaturationResult | None = None
         self.setpoints = copy.deepcopy(setpoints)
         self.feedstocks = copy.deepcopy(feedstocks)
@@ -1460,6 +1463,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_out_of_domain_diagnostics = {}
         self._engine_commissioning_steps = []
         self._sulfur_saturation_steps = []
+        self._last_sulfur_saturation_result = None
         self._backend_failed = False
 
         self.melt.temperature_C = 25.0
@@ -6083,6 +6087,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if curve is None:
             try:
                 curve = self._freeze_gate_curve()
+            except MeltCompositionError:
+                raise
             except IntentResultStatusError:
                 # An engine that answered with a status we do not recognise is
                 # NOT an unavailable engine, and must not be routed to the
@@ -6113,6 +6119,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # default.
                 raise
             except Exception as exc:  # noqa: BLE001 - optional liquidus engines
+                # composition_projected is out-of-domain physics, not a missing
+                # liquidus. Usable projected bounds, a later ladder bound, or
+                # the named Kress floor are chosen inside _freeze_gate_curve.
+                # This branch must not treat the projection's exception as
+                # that floor: doing so arms liquidus_unavailable_floor_fallback
+                # and drops the named source.
+                if 'composition_projected' in str(exc):
+                    raise
                 reason = str(exc)
                 liquidus_status = _liquidus_status_from_freeze_gate_exception(
                     exc
@@ -6177,12 +6191,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
         if isinstance(memo, dict):
             memo[key] = dict(normalized_curve)
-        self._last_melt_redox_liquidus_gate_diagnostic = {
+        self._record_composition_projected_liquidus_notice_from_curve(
+            normalized_curve
+        )
+        gate_diagnostic = {
             'status': 'ok',
             'source': normalized_curve.get('source', 'liquidus_solidus'),
             'solidus_T_C': solidus_T_C,
             'liquidus_T_C': liquidus_T_C,
         }
+        projected_notice = normalized_curve.get('composition_projected_notice')
+        if isinstance(projected_notice, Mapping):
+            gate_diagnostic['composition_projected_notice'] = dict(
+                projected_notice
+            )
+        self._stamp_kress_floor_diagnostic(gate_diagnostic)
+        self._last_melt_redox_liquidus_gate_diagnostic = gate_diagnostic
         return normalized_curve
 
     def _melt_redox_liquid_fraction_factor(
@@ -6265,13 +6289,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else 0.0
             )
         liquid_fraction = max(0.0, min(1.0, liquid_fraction))
-        self._last_melt_redox_liquid_fraction_diagnostic = {
+        fraction_diagnostic = {
             'status': 'ok',
             'source': curve.get('source', 'liquidus_solidus'),
             'liquid_fraction': liquid_fraction,
             'solidus_T_C': curve.get('solidus_T_C'),
             'liquidus_T_C': curve.get('liquidus_T_C'),
         }
+        projected_notice = curve.get('composition_projected_notice')
+        if isinstance(projected_notice, Mapping):
+            fraction_diagnostic['composition_projected_notice'] = dict(
+                projected_notice
+            )
+        self._stamp_kress_floor_diagnostic(fraction_diagnostic)
+        self._last_melt_redox_liquid_fraction_diagnostic = fraction_diagnostic
         return liquid_fraction
 
     def _melt_redox_source_capacity_mol_per_ln_fO2(
@@ -9620,12 +9651,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             label,
             [*foulant_specs, *direct_volatile_specs],
         )
-        # SULFUR_SATURATION_GATE — Stage 0 hook. Refines the sulfate /
-        # sulfide partitioning diagnostic when PySulfSat is available;
-        # otherwise records an 'unavailable' result so the builtin Stage
-        # 0 bucketing remains authoritative.
-        self._run_stage0_sulfsat_gate()
-
     def _load_ledger_account(
         self, account: str, species_kg: Mapping[str, float], *, source: str
     ) -> None:
@@ -10079,47 +10104,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if kg > 0.0
         }
 
-    def _run_stage0_sulfsat_gate(self) -> None:
-        """
-        Run the SULFUR_SATURATION_GATE at the end of Stage 0.
-
-        Records the result on ``self._last_sulfur_saturation_result`` so
-        the UI / diagnostics can read the SCSS / SCAS / S6+ partitioning
-        without re-running the gate. The result never mutates the atom
-        ledger; Stage 0 keeps its builtin sulfate / sulfide bucketing
-        authoritative. When the gate reports ``out_of_range`` the
-        warning is preserved on the result; the caller is expected to
-        log it but not redirect inventory.
-        """
-        s_input_ppm = self._stage0_sulfur_input_ppm()
-        if s_input_ppm <= 0.0:
-            self._last_sulfur_saturation_result = None
-            return
-        comp_wt = self._melt_oxide_wt_pct()
-        if not comp_wt:
-            self._last_sulfur_saturation_result = None
-            return
-        # The Stage 0 reload pinpoints the melt at room temperature; the
-        # SCSS / SCAS empirical fits are calibrated above ~1000 K. Using
-        # a representative liquidus temperature (1473 K) for the Stage 0
-        # diagnostic keeps the gate output meaningful before the melt
-        # has been heated, without claiming a temperature it has not
-        # reached. Post-equilibrium calls override this with the actual
-        # melt T.
-        T_K = 1473.0
-        P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
-        fO2_log = self._current_melt_redox_fO2_log()
-        self._sync_oxygen_reservoir_mirror()
-        self._last_sulfur_saturation_result = (
-            self._sulfsat_gate.compute_sulfur_saturation(
-                liquid_comp_wt=comp_wt,
-                T_K=T_K,
-                P_bar=P_bar,
-                fO2_log=fO2_log,
-                S_input_ppm=s_input_ppm,
-            )
-        )
-
     def _attach_post_equilibrium_sulfsat(
         self, result: 'Any'
     ) -> None:
@@ -10127,9 +10111,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Post-equilibrium SULFUR_SATURATION_GATE hook.
 
         Called from ``_get_equilibrium`` after a successful backend
-        equilibration. If Stage 0 sulfide / sulfate inventory is
-        non-zero, calls the gate at the melt's current T / P / fO2 and
-        attaches the result to ``result.sulfur_saturation`` (and
+        equilibration. If the result reports a positive liquid fraction,
+        or omits it and the melt-redox liquid-fraction signal reports a
+        melt, and Stage 0 sulfide / sulfate inventory is non-zero, calls
+        the gate at the melt's current T / P / fO2 and attaches the result
+        to ``result.sulfur_saturation`` (and
         ``self._last_sulfur_saturation_result``). When the gate reports
         ``out_of_range`` or ``unavailable`` the warning is appended to
         ``result.warnings`` so existing diagnostic surfaces (UI,
@@ -10137,11 +10123,101 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         is never mutated here — the gate has no ledger authority
         (binding spec §4 forbids it).
         """
+        liquid_fraction = getattr(result, 'liquid_fraction', None)
+        melt_presence_basis: Dict[str, Any]
+        melt_presence_unavailable = False
+        if liquid_fraction is None:
+            T_K = float(self.melt.temperature_C) + 273.15
+            if T_K <= 0.0:
+                self._last_sulfur_saturation_result = None
+                try:
+                    result.sulfur_saturation = None
+                except AttributeError:
+                    pass
+                return
+            liquid_fraction = self._melt_redox_liquid_fraction_factor(T_K)
+            liquid_diagnostic = getattr(
+                self,
+                '_last_melt_redox_liquid_fraction_diagnostic',
+                {},
+            )
+            liquid_diagnostic = (
+                dict(liquid_diagnostic)
+                if isinstance(liquid_diagnostic, Mapping)
+                else {}
+            )
+            status = str(liquid_diagnostic.get('status') or '')
+            if status == 'unavailable':
+                melt_presence_unavailable = True
+                authority = 'unavailable'
+            elif (
+                status in {
+                    'liquidus_unavailable_floor_fallback',
+                    'invalid',
+                }
+                or 'floor_T_C' in liquid_diagnostic
+            ):
+                authority = 'Kress91_liquid_calibration_floor'
+            else:
+                authority = 'liquidus_solidus'
+            melt_presence_basis = {
+                **liquid_diagnostic,
+                'basis': 'melt_redox_liquid_fraction_factor',
+                'authority': authority,
+                'liquid_fraction': float(liquid_fraction),
+            }
+        else:
+            try:
+                liquid_fraction = float(liquid_fraction)
+            except (TypeError, ValueError):
+                liquid_fraction = 0.0
+            melt_presence_basis = {
+                'basis': 'backend_liquid_fraction',
+                'status': 'reported',
+                'source': 'backend:equilibrium_result',
+                'authority': 'backend_reported',
+                'liquid_fraction': liquid_fraction,
+            }
+        try:
+            melt_present = float(liquid_fraction) > 0.0
+        except (TypeError, ValueError):
+            melt_present = False
+        if not melt_present and not melt_presence_unavailable:
+            self._last_sulfur_saturation_result = None
+            try:
+                result.sulfur_saturation = None
+            except AttributeError:
+                pass
+            return
         s_input_ppm = self._stage0_sulfur_input_ppm()
         if s_input_ppm <= 0.0:
+            self._last_sulfur_saturation_result = None
             return
         comp_wt = self._melt_oxide_wt_pct()
         if not comp_wt:
+            self._last_sulfur_saturation_result = None
+            return
+        if melt_presence_unavailable:
+            reason = 'melt_presence_signal_unavailable'
+            source = melt_presence_basis.get('source')
+            note = f'SulfSat not evaluated: {reason}'
+            if source:
+                note += f' (source={source})'
+            sulfur_result = SulfurSaturationResult(
+                warnings=[note],
+                calibration_status='not_evaluated',
+                melt_presence_basis=dict(melt_presence_basis),
+                not_evaluated_reason=reason,
+            )
+            self._last_sulfur_saturation_result = sulfur_result
+            try:
+                result.sulfur_saturation = sulfur_result
+            except AttributeError:
+                pass
+            warnings_list = getattr(result, 'warnings', None)
+            if isinstance(warnings_list, list):
+                warnings_list.append(f'SulfSat gate (not_evaluated): {note}')
+            self._note_sulfur_saturation_step(sulfur_result)
             return
         T_K = float(self.melt.temperature_C) + 273.15
         if T_K <= 0.0:
@@ -10156,6 +10232,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fO2_log=fO2_log,
             S_input_ppm=s_input_ppm,
         )
+        sulfur_result.melt_presence_basis = dict(melt_presence_basis)
         self._last_sulfur_saturation_result = sulfur_result
         try:
             result.sulfur_saturation = sulfur_result
@@ -10192,6 +10269,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'warnings': warnings,
             },
         }
+        melt_presence_basis = getattr(
+            sulfur_result, 'melt_presence_basis', None
+        )
+        if isinstance(melt_presence_basis, Mapping) and melt_presence_basis:
+            step['notice']['melt_presence_basis'] = dict(melt_presence_basis)
+        not_evaluated_reason = getattr(
+            sulfur_result, 'not_evaluated_reason', None
+        )
+        if not_evaluated_reason:
+            step['notice']['reason'] = str(not_evaluated_reason)
         steps = getattr(self, '_sulfur_saturation_steps', None)
         if not isinstance(steps, list):
             steps = []
@@ -10222,16 +10309,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 continue
             hours.append(hour)
             warning_key = tuple(str(item) for item in list(notice.get('warnings') or ()))
-            identity = (status, warning_key)
+            basis = notice.get('melt_presence_basis')
+            basis_key = repr(basis) if isinstance(basis, Mapping) else None
+            reason = str(notice.get('reason') or '').strip()
+            identity = (status, warning_key, basis_key, reason)
             if identity in seen:
                 continue
             seen.add(identity)
-            notices.append(
-                {
-                    'calibration_status': status,
-                    'warnings': list(warning_key),
-                }
-            )
+            notice_payload = {
+                'calibration_status': status,
+                'warnings': list(warning_key),
+            }
+            if isinstance(basis, Mapping) and basis:
+                notice_payload['melt_presence_basis'] = dict(basis)
+            if reason:
+                notice_payload['reason'] = reason
+            notices.append(notice_payload)
         if not hours or not notices:
             return None
         statuses = {item['calibration_status'] for item in notices}
@@ -10610,9 +10703,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # (EVAPORATION_FLUX, ...) sit on top of this same kernel.
         self._refresh_vapor_pressures_from_kernel(result)
         # SULFUR_SATURATION_GATE — post-equilibrium hook. Runs only when
-        # Stage 0 left sulfide / sulfate inventory behind; otherwise
-        # short-circuits without touching PySulfSat. Never mutates the
-        # ledger (the gate has no LedgerTransition authority).
+        # the backend reports a positive liquid fraction and Stage 0 left
+        # sulfide / sulfate inventory behind; otherwise short-circuits
+        # without touching PySulfSat. Never mutates the ledger (the gate
+        # has no LedgerTransition authority).
         self._attach_post_equilibrium_sulfsat(result)
         store = _pt0_determinism_store_for(self)
         if store is not None and getattr(store, 'capture_enabled', False):

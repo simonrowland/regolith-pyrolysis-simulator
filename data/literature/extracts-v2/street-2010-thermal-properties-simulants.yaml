@@ -250,14 +250,14 @@ observations:
     pdf_page_index: 10
     section: Discussion JSC-1AF
   read_from: pdf:street-2010-thermal-properties-simulants
-- observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions
+- observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions::rows:row=anorthosite:h=60fe6731145c
   experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
   identity:
     quantity:
       tag: unknown
       reason: unsupported quantity 'dta_transition_temperatures'
     species:
-      formula: JSC-1AF
+      formula: Anorthosite
       phase:
         tag: unknown
         reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
@@ -272,8 +272,259 @@ observations:
       reason: source T_range_K [563.15, 1591.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'dta_transition_temperatures'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: street-2010-thermal-properties-simulants
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    table: '1'
+    section: Equipment / Results
+  read_from: pdf:street-2010-thermal-properties-simulants
+- observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions::rows:row=dunitec:h=90f6e687e60b
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dta_transition_temperatures'
+    species:
+      formula: Dunitec
+      phase:
+        tag: unknown
+        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: street-2010-thermal-properties-simulants
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    table: '1'
+    section: Equipment / Results
+  read_from: pdf:street-2010-thermal-properties-simulants
+- observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions::rows:row=hq-glass:h=6ffcc8404b23
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dta_transition_temperatures'
+    species:
+      formula: HQ Glass
+      phase:
+        tag: unknown
+        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: street-2010-thermal-properties-simulants
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    table: '1'
+    section: Equipment / Results
+  read_from: pdf:street-2010-thermal-properties-simulants
+- observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions::rows:row=jsc-1afa:h=c3524d1cb3cc
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dta_transition_temperatures'
+    species:
+      formula: JSC-1AFa
+      phase:
+        tag: unknown
+        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: street-2010-thermal-properties-simulants
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    table: '1'
+    section: Equipment / Results
+  read_from: pdf:street-2010-thermal-properties-simulants
+- observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions::rows:row=jsc-1afb:h=e55006a1d219
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dta_transition_temperatures'
+    species:
+      formula: JSC-1AFb
+      phase:
+        tag: unknown
+        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: street-2010-thermal-properties-simulants
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    table: '1'
+    section: Equipment / Results
+  read_from: pdf:street-2010-thermal-properties-simulants
+- observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions::rows:row=norite:h=2306704b3bc0
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dta_transition_temperatures'
+    species:
+      formula: Norite
+      phase:
+        tag: unknown
+        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: street-2010-thermal-properties-simulants
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    table: '1'
+    section: Equipment / Results
+  read_from: pdf:street-2010-thermal-properties-simulants
+- observation_id: street-2010-thermal-properties-simulants::street_2010_table1_dta_transitions::rows:row=nu-lht-2m:h=4fcf42c14b2f
+  experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::experiment::dta-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'dta_transition_temperatures'
+    species:
+      formula: NU-LHT-2M
+      phase:
+        tag: unknown
+        reason: phase string 'simulant_and_feedstock_powders' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [563.15, 1591.15]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none

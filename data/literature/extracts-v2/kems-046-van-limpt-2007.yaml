@@ -42,7 +42,7 @@ observations:
     section: '4.6'
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured::rows:h=6cb70d3994e3
   experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
@@ -61,8 +61,85 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_K2O_activity_vs_temperature'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'transpiration_evaporation'
+    original_method_class: transpiration_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 172
+    figure: '4.15'
+    note: figure reading; measured markers kept separate from ASM model
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured::rows:h=84fd3a870a86
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_K2O_activity_vs_temperature'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'alkali_lime_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'transpiration_evaporation'
+    original_method_class: transpiration_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 172
+    figure: '4.15'
+    note: figure reading; measured markers kept separate from ASM model
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p161-p200/out/kems-046-van-limpt-2007-p161-p200/vlm/kems-046-van-limpt-2007-p161-p200.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured::rows:h=d8554cf893da
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_K2O_activity_vs_temperature'
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'alkali_lime_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -122,7 +199,7 @@ observations:
     note: figure reading; measured markers only, approximate values from plotted points
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=71003fc4a080
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -141,8 +218,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_Na_saturation_pressure'; refusing to
-      pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -162,7 +238,202 @@ observations:
     note: figure reading; measured markers only, approximate values
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_model_output
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=81052be4d82c
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_Na_saturation_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 156
+    figure: '4.6'
+    note: figure reading; measured markers only, approximate values
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=ba080dd9fd64
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_Na_saturation_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 156
+    figure: '4.6'
+    note: figure reading; measured markers only, approximate values
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=d7cea0bc6a14
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_Na_saturation_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 156
+    figure: '4.6'
+    note: figure reading; measured markers only, approximate values
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=de5c41eaa19d
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_Na_saturation_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 156
+    figure: '4.6'
+    note: figure reading; measured markers only, approximate values
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::rows:h=fcf10aea322b
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'measured_Na_saturation_pressure'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 156
+    figure: '4.6'
+    note: figure reading; measured markers only, approximate values
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_model_output::rows:h=02d8f9bd07ef
   experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
   identity:
     quantity:
@@ -181,8 +452,7 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'modeled_Na_saturation_pressure'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -211,7 +481,7 @@ observations:
     note: figure reading; thermochemical-model marker kept separate from measured marker
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig48_boron_evaporation_measured
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig48_boron_evaporation_measured::rows:h=a3b93128c898
   experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007
   identity:
     quantity:
@@ -233,8 +503,7 @@ observations:
       value: '1723.15'
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'measured_total_boron_evaporation_rate_vs_sqrt_water_pressure';
-      refusing to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none
@@ -486,7 +755,7 @@ observations:
     table: '4.3'
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
   read_from: unknown:kems-046-van-limpt-2007
-- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=2f44afb961d8
   experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
   identity:
     quantity:
@@ -505,8 +774,197 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'sodium_disilicate_total_weight_loss'; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'transpiration_evaporation'
+    original_method_class: transpiration_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 158
+    table: '4.4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=4068e4804bb5
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_disilicate_total_weight_loss'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'transpiration_evaporation'
+    original_method_class: transpiration_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 158
+    table: '4.4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=7f8ea303e2ee
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_disilicate_total_weight_loss'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'transpiration_evaporation'
+    original_method_class: transpiration_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 158
+    table: '4.4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=c3363335aa25
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_disilicate_total_weight_loss'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'transpiration_evaporation'
+    original_method_class: transpiration_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 158
+    table: '4.4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=d483eec90ed7
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_disilicate_total_weight_loss'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'transpiration_evaporation'
+    original_method_class: transpiration_evaporation
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: kems-046-van-limpt-2007
+  locator:
+    page: 158
+    table: '4.4'
+    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
+  read_from: unknown:kems-046-van-limpt-2007
+- observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::rows:h=e1531318d76b
+  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'sodium_disilicate_total_weight_loss'
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none

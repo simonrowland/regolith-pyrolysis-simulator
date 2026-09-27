@@ -114,7 +114,7 @@ observations:
     pdf_page_index: 4
     section: 2. Experimental setup
   read_from: unknown:llnl-2021-cai-aerodynamic-levitation
-- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2
+- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=3449c34e85e3
   experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation
   identity:
     quantity:
@@ -133,8 +133,121 @@ observations:
         value: 0
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'isotope_fractionation_factors'; refusing to pick
-      a number
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: llnl-2021-cai-aerodynamic-levitation
+  locator:
+    pdf_page_index: 14
+    table: '2'
+    section: Isotopic fractionation factors
+  read_from: unknown:llnl-2021-cai-aerodynamic-levitation
+- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=37c913db6e7b
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotope_fractionation_factors'
+    species:
+      formula: B_type_CAI
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: llnl-2021-cai-aerodynamic-levitation
+  locator:
+    pdf_page_index: 14
+    table: '2'
+    section: Isotopic fractionation factors
+  read_from: unknown:llnl-2021-cai-aerodynamic-levitation
+- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=93ba22baeed9
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotope_fractionation_factors'
+    species:
+      formula: B_type_CAI
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: llnl-2021-cai-aerodynamic-levitation
+  locator:
+    pdf_page_index: 14
+    table: '2'
+    section: Isotopic fractionation factors
+  read_from: unknown:llnl-2021-cai-aerodynamic-levitation
+- observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=e710ee1b2aba
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'isotope_fractionation_factors'
+    species:
+      formula: B_type_CAI
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
     approximate: false
   uncertainty:
     kind: none

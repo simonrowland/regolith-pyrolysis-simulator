@@ -2,7 +2,7 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/berkowitz-chupka-inghram-1957.yaml
 observations:
-- observation_id: berkowitz-chupka-inghram-1957::BIC57_VO_absolute_points
+- observation_id: berkowitz-chupka-inghram-1957::BIC57_VO_absolute_points::T=1875:h=b846f134213c
   experiment_id: a734f2ca0b8622e2c393530f6af3dfbbcaab75e5bb36250cc4a43e48ebd81db9::berkowitz-chupka-inghram-1957
   identity:
     quantity:
@@ -26,8 +26,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use per
     temperature_K:
-      tag: unknown
-      reason: no single temperature_K mapped from source
+      tag: value
+      value: '1875'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -65,12 +65,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: series
-    series:
-    - - '1875'
-      - '0.155'
-    - - '1876'
-      - '0.116'
+    kind: point
+    point: '0.155'
     approximate: false
   uncertainty:
     kind: none
@@ -87,3 +83,112 @@ observations:
     note: BIC57_VO_absolute_points
     record: BIC57_VO_absolute_points
   read_from: pdf:berkowitz-chupka-inghram-1957
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1875'
+      locator:
+        note: BIC57_VO_absolute_points
+        record: BIC57_VO_absolute_points
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:berkowitz-chupka-inghram-1957
+    parameters: []
+    output_unit: Pa
+- observation_id: berkowitz-chupka-inghram-1957::BIC57_VO_absolute_points::T=1876:h=0ec759b19020
+  experiment_id: a734f2ca0b8622e2c393530f6af3dfbbcaab75e5bb36250cc4a43e48ebd81db9::berkowitz-chupka-inghram-1957
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: VO_VO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1876'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '0.116'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: berkowitz-chupka-inghram-1957
+  locator:
+    note: BIC57_VO_absolute_points
+    record: BIC57_VO_absolute_points
+  read_from: pdf:berkowitz-chupka-inghram-1957
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1876'
+      locator:
+        note: BIC57_VO_absolute_points
+        record: BIC57_VO_absolute_points
+  derivation:
+    relation: identity:Pa
+    inputs:
+    - pdf:berkowitz-chupka-inghram-1957
+    parameters: []
+    output_unit: Pa
