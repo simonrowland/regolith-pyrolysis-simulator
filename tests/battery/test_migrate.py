@@ -2514,7 +2514,13 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     )
     assert not mismatches, mismatches[:20]
     assert n_numeric == sum(census.values())
-    assert census.get("activity_coefficient") == 128
+    # Re-pinned for the reviewed Holzheid 1997 correction: its 33 Table 3 gamma cells
+    # now migrate as model_derived numeric activity_coefficient series (author
+    # calculations, not measurements). Per-source delta: holzheid-1997 0->33;
+    # activity_coefficient 128->161, n_numeric 356->389. This census counts printed
+    # cells that survive migration regardless of evidence class (as for Ueshima
+    # model_derived above) - mismatches stays 0.
+    assert census.get("activity_coefficient") == 161
     # Re-pinned with data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
     # (51 p_partial points, 2026-09-24): p_partial 18->69 and n_numeric 223->274.
     # The counts moved because data became visible, not because a check was relaxed - mismatches stays 0.
@@ -2543,7 +2549,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("ueshima-1982-fe-mo-thermal") == {
         "transition_temperature": 58
     }
-    assert n_numeric == 356, (n_numeric, census, n_unavailable)
+    assert n_numeric == 389, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
