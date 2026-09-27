@@ -302,6 +302,60 @@ def test_load_batch_seeds_melt_fO2_log_from_intrinsic_value() -> None:
     assert sim.melt.oxygen_reservoir.reference_T_K is None
 
 
+def test_axial_stirring_shortens_melt_renewal_and_moves_1mbar_interface() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1500.0
+    sim.melt.p_total_mbar = 1.0
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim._melt_headspace_composition_mbar = {"N2": 1.0}
+
+    def solve(axial_stir: float) -> dict[str, Any]:
+        sim.melt.stir_state.axial = axial_stir
+        return sim._oxygen_interface_state(
+            1.0e-9,
+            intrinsic_fO2_log=-4.0,
+        )
+
+    quiescent = solve(0.0)
+    low_stir = solve(4.0)
+    high_stir = solve(8.0)
+
+    assert quiescent["melt_side_transport_mode"] == "quiescent_diffusion"
+    assert quiescent["melt_side_transport_notice"]["flag"] == (
+        "quiescent_diffusion_fallback"
+    )
+    assert low_stir["melt_side_transport_mode"] == "forced_surface_renewal"
+    assert high_stir["melt_side_surface_renewal_time_s"] < low_stir[
+        "melt_side_surface_renewal_time_s"
+    ]
+    assert high_stir["melt_side_k_O_m_s"] > low_stir["melt_side_k_O_m_s"]
+    assert high_stir["interface_pO2_bar"] > low_stir["interface_pO2_bar"]
+    assert high_stir["interface_pO2_bar"] != pytest.approx(
+        low_stir["interface_pO2_bar"]
+    )
+
+
+def test_missing_melt_diffusivity_is_typed_unavailable() -> None:
+    sim = _make_sim()
+    sim.setpoints["sso_r"]["oxygen_exchange"].pop(
+        "melt_oxygen_diffusivity_m2_s"
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="unavailable_melt_side_transport",
+    ) as excinfo:
+        sim._oxygen_interface_state(1.0e-9, intrinsic_fO2_log=-4.0)
+
+    assert excinfo.value.reason == "unavailable_melt_side_transport"
+    assert excinfo.value.notice == {
+        "flag": "melt_side_transport_unavailable",
+        "reason": "missing_or_invalid_melt_oxygen_diffusivity",
+        "authority_level": "refused",
+        "certified_band": None,
+    }
+
+
 def test_intrinsic_melt_fo2_refuses_invalid_temperature() -> None:
     sim = _make_sim()
 

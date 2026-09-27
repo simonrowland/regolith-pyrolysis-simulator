@@ -73,6 +73,7 @@ from simulator.condensation import (
     _validate_alkali_activity_entry,
 )
 from simulator.core import (
+    OxygenInterfaceConfigurationError,
     PyrolysisSimulator,
     _feedstock_surface_pressure_mbar,
 )
@@ -517,28 +518,46 @@ def _headspace_downstream_pressure(value: Any) -> float:
 
 
 _OXYGEN_EXCHANGE_BASE_CONFIG = {
-    "k_O_ref_m_s": 2.0e-5,
-    "k_O_min_m_s": 5.0e-6,
-    "k_O_max_m_s": 5.0e-5,
-    "T_ref_K": 1773.15,
-    "Ea_J_mol": 150000.0,
+    "melt_oxygen_diffusivity_m2_s": {
+        "value": 1.0e-9,
+        "units": "m2/s",
+        "source": "test melt redox diffusivity",
+        "range": [1.0e-10, 1.0e-8],
+    },
+    "surface_renewal_velocity_ref_m_s": {
+        "value": 1.0e-2,
+        "units": "m/s",
+        "source": "test surface renewal speed",
+        "range": [1.0e-4, 1.0e-1],
+    },
     "effective_melt_depth_m": 0.2,
 }
 
 
-def _oxygen_exchange_k(field: str, value: Any) -> tuple[float, str]:
-    config = {**_OXYGEN_EXCHANGE_BASE_CONFIG, field: value}
+def _oxygen_exchange_k(field: str, value: Any) -> tuple[float, str, dict[str, Any]]:
+    config = dict(_OXYGEN_EXCHANGE_BASE_CONFIG)
+    diffusivity = dict(config["melt_oxygen_diffusivity_m2_s"])
+    diffusivity[field] = value
+    config["melt_oxygen_diffusivity_m2_s"] = diffusivity
     sim = SimpleNamespace(
         _oxygen_exchange_config=lambda: config,
         _require_oxygen_exchange_config=lambda: config,
+        _oxygen_exchange_effective_melt_depth_m=lambda: 0.2,
+        melt=SimpleNamespace(
+            stir_state=SimpleNamespace(axial=6.0, radial=1.0),
+        ),
     )
     return PyrolysisSimulator._oxygen_exchange_k_m_s(sim, 1773.15)
 
 
-def _oxygen_exchange_temperature(value: Any) -> tuple[float, str]:
+def _oxygen_exchange_temperature(value: Any) -> tuple[float, str, dict[str, Any]]:
     sim = SimpleNamespace(
         _oxygen_exchange_config=lambda: _OXYGEN_EXCHANGE_BASE_CONFIG,
         _require_oxygen_exchange_config=lambda: _OXYGEN_EXCHANGE_BASE_CONFIG,
+        _oxygen_exchange_effective_melt_depth_m=lambda: 0.2,
+        melt=SimpleNamespace(
+            stir_state=SimpleNamespace(axial=6.0, radial=1.0),
+        ),
     )
     return PyrolysisSimulator._oxygen_exchange_k_m_s(sim, value)
 
@@ -898,31 +917,28 @@ HARD_CASES = (
     ),
     HardCase("oxygen_exchange_temperature", _oxygen_exchange_temperature, ValueError),
     HardCase(
-        "oxygen_exchange_k_ref",
-        lambda v: _oxygen_exchange_k("k_O_ref_m_s", v),
-        ValueError,
+        "oxygen_exchange_diffusivity_value",
+        lambda v: _oxygen_exchange_k("value", v),
+        OxygenInterfaceConfigurationError,
+        (1.0e-9, 1.0e-8),
     ),
     HardCase(
-        "oxygen_exchange_k_min",
-        lambda v: _oxygen_exchange_k("k_O_min_m_s", v),
-        ValueError,
-        (1.0e-6, 2.0e-6),
+        "oxygen_exchange_diffusivity_units",
+        lambda v: _oxygen_exchange_k("units", v),
+        OxygenInterfaceConfigurationError,
+        ("m2/s", "m2/s"),
     ),
     HardCase(
-        "oxygen_exchange_k_max",
-        lambda v: _oxygen_exchange_k("k_O_max_m_s", v),
-        ValueError,
+        "oxygen_exchange_diffusivity_range",
+        lambda v: _oxygen_exchange_k("range", [v, 1.0e-8]),
+        OxygenInterfaceConfigurationError,
+        (1.0e-10, 1.0e-9),
     ),
     HardCase(
-        "oxygen_exchange_reference_temperature",
-        lambda v: _oxygen_exchange_k("T_ref_K", v),
-        ValueError,
-        (1000, 1500.0),
-    ),
-    HardCase(
-        "oxygen_exchange_activation_energy",
-        lambda v: _oxygen_exchange_k("Ea_J_mol", v),
-        ValueError,
+        "oxygen_exchange_diffusivity_source",
+        lambda v: _oxygen_exchange_k("source", v),
+        OxygenInterfaceConfigurationError,
+        ("test melt redox diffusivity", "test melt redox diffusivity"),
     ),
     HardCase("oxygen_exchange_depth", _oxygen_exchange_depth, ValueError),
     HardCase(
@@ -1772,73 +1788,27 @@ def test_legitimate_boolean_fields_remain_boolean(flag: bool) -> None:
     ).enabled is flag
 
 
-# --- oxygen-exchange Arrhenius flag: physics pins that outlive the null policy ---
-#
-# These do NOT assert what a present null does. That is settled elsewhere and the
-# other way: bool_feature_flag (simulator/config_flags.py, commit 92769d93 on
-# work-v064-green) admits temperature_dependence_enabled to an allow-list and reads a
-# present null as ABSENT, i.e. default-on. This branch does not carry that helper yet,
-# so nothing here may depend on either reading -- every assertion below holds on both.
-#
-# What they do pin is the thing that made the null defect hard to see: the flag's
-# effect on k_O, INCLUDING the temperature at which it has none.
-
-_TDE = "temperature_dependence_enabled"
-_OFF_REFERENCE_T_K = 1500.0
-
-
-def _oxygen_exchange_flag(value: Any, T_K: float = _OFF_REFERENCE_T_K):
-    config: dict[str, Any] = dict(_OXYGEN_EXCHANGE_BASE_CONFIG)
-    if value is not ...:
-        config[_TDE] = value
+def _oxygen_exchange_axial(axial: float) -> tuple[float, str, dict[str, Any]]:
     sim = SimpleNamespace(
-        _oxygen_exchange_config=lambda: dict(config),
-        _require_oxygen_exchange_config=lambda: dict(config),
+        _oxygen_exchange_config=lambda: _OXYGEN_EXCHANGE_BASE_CONFIG,
+        _require_oxygen_exchange_config=lambda: _OXYGEN_EXCHANGE_BASE_CONFIG,
+        _oxygen_exchange_effective_melt_depth_m=lambda: 0.2,
+        melt=SimpleNamespace(
+            stir_state=SimpleNamespace(axial=axial, radial=1.0),
+        ),
     )
-    return PyrolysisSimulator._oxygen_exchange_k_m_s(sim, T_K)
+    return PyrolysisSimulator._oxygen_exchange_k_m_s(sim, 1773.15)
 
 
-@pytest.mark.parametrize("honest", [..., True, False], ids=["absent", "true", "false"])
-def test_oxygen_exchange_temperature_dependence_flag_admits_honest_values(
-    honest: Any,
-) -> None:
-    # Absent must keep meaning "default on", and an explicit False must remain a
-    # supported operator choice rather than something a later guard rejects.
-    k_O, source = _oxygen_exchange_flag(honest)
-    assert k_O > 0.0
-    assert ("temperature_dependence_disabled" in source) is (honest is False), source
+def test_oxygen_exchange_axial_stirring_controls_forced_surface_renewal() -> None:
+    quiescent, quiescent_source, quiescent_transport = _oxygen_exchange_axial(0.0)
+    low, low_source, low_transport = _oxygen_exchange_axial(4.0)
+    high, high_source, high_transport = _oxygen_exchange_axial(8.0)
 
-
-def test_oxygen_exchange_temperature_dependence_changes_k_in_the_clamped_regime() -> None:
-    # k(T) = k_ref*exp((-Ea/R)(1/T - 1/T_ref)) clamped to [k_min, k_max]
-    #   k_ref=2e-5, Ea=150 kJ/mol, T_ref=1773.15 K, k_min=5e-6, k_max=5e-5
-    # At 1500 K: (-150000/8.314)(1/1500 - 1/1773.15) = -1.8529, so
-    #   raw = 2e-5 * e^-1.8529 = 3.136e-6, which is BELOW k_min and clamps UP to 5e-6.
-    # Disabled is a flat k_ref = 2e-5. The ratio is therefore k_ref/k_min exactly,
-    # set by the CLAMP rather than by the exponential -- hence exact, no float slop.
-    on, _ = _oxygen_exchange_flag(True)
-    off, _ = _oxygen_exchange_flag(False)
-    assert off == pytest.approx(4.0 * on, rel=1e-9), (on, off)
-
-
-def test_oxygen_exchange_temperature_dependence_changes_k_in_the_unclamped_regime() -> None:
-    # The companion to the case above, and the one that exercises the PHYSICS rather
-    # than the clamp. At 1900 K: (-150000/8.314)(1/1900 - 1/1773.15) = +0.67926, so
-    #   raw = 2e-5 * e^0.67926 = 3.9449e-5, which is below k_max = 5e-5 -> NOT clamped.
-    # Disabled is a flat 2e-5, so off/on = 2e-5/3.9449e-5 = 0.50698, a pure Arrhenius
-    # ratio. Without this the pair above would only ever prove the clamp is wired up.
-    on, _ = _oxygen_exchange_flag(True, 1900.0)
-    off, _ = _oxygen_exchange_flag(False, 1900.0)
-    assert on == pytest.approx(3.9449e-5, rel=1e-4), on
-    assert off / on == pytest.approx(0.50698, rel=1e-4), (on, off)
-
-
-def test_oxygen_exchange_temperature_dependence_is_invisible_at_the_reference_temperature() -> None:
-    # Pins the blind spot rather than leaving it to be rediscovered: at T_ref the
-    # exponent is exactly 0, so k = k_ref on both branches of the flag. Any probe of
-    # this flag written at 1773.15 K -- which is what the neighbouring
-    # _oxygen_exchange_k helper in this file uses -- cannot observe its effect at all.
-    T_ref_K = 1773.15
-    on, _ = _oxygen_exchange_flag(True, T_ref_K)
-    off, _ = _oxygen_exchange_flag(False, T_ref_K)
-    assert on == pytest.approx(off), (on, off)
+    assert quiescent_source == "quiescent_diffusion_D_over_L"
+    assert quiescent_transport["melt_side_transport_mode"] == "quiescent_diffusion"
+    assert low_source == high_source == "higbie_forced_surface_renewal"
+    assert low_transport["melt_side_surface_renewal_time_s"] > high_transport[
+        "melt_side_surface_renewal_time_s"
+    ]
+    assert quiescent < low < high
