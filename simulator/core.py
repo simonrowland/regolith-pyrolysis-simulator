@@ -11484,7 +11484,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         diagnostic = dict(kernel_result.diagnostic or {})
         high_t_activity = dict(diagnostic.get("high_t_melt_activity") or {})
         if (
-            self._high_t_melt_activity == 'openimcc'
+            getattr(self, '_high_t_melt_activity', 'openimcc') == 'openimcc'
             and high_t_activity.get('provider') == 'constant_gamma'
             and high_t_activity.get('fallback') is True
         ):
