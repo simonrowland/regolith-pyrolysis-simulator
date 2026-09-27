@@ -3142,39 +3142,60 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             vapor_pressure_provenance=vapor_pressure_provenance,
         )
 
-        # The catalog ceiling is an evaluator output contract.  Enforce it
-        # after every rail has produced its final per-species pressure and
-        # before an IntentResult can expose the mapping to evaporation.  A
-        # ceiling violation refuses only that species' flux for this hour;
-        # omitting it from the live pressure mapping prevents the value from
-        # being interpreted as a Hertz-Knudsen flux while other species continue.
+        # The catalog ceiling is a certified output band, not an input-validity
+        # gate.  A finite pressure from finite controls remains the best
+        # available prediction outside that band: capping it would change the
+        # Hertz-Knudsen driving pressure, while carrying it preserves the
+        # mass-action result (P ∝ a * (pO2 / pO2_ref)^n) for the operator to
+        # audit.  Mark the live value out_of_domain; reserve refusal for a
+        # missing/invalid quantity that never produced a pressure.
         vapor_pressure_species_refusals: dict[str, dict[str, Any]] = {}
+        vapor_pressure_out_of_domain_notices: dict[str, dict[str, Any]] = {}
         for species, pressure_Pa in sorted(vapor_pressures.items()):
             pressure = float(pressure_Pa)
             if pressure > CATALOG_PHYSICAL_PRESSURE_CEILING_PA:
                 species_name = str(species)
                 ceiling = float(CATALOG_PHYSICAL_PRESSURE_CEILING_PA)
-                vapor_pressure_species_refusals[species_name] = {
-                    "status": "refused",
-                    "flux_status": "refused",
+                provenance = vapor_pressure_provenance.get(species_name) or {}
+                notice = {
+                    "status": "out_of_domain",
+                    "output_status": "status_bearing",
+                    "flux_status": "predicted",
+                    "availability": "available",
                     "reason": "vapor_pressure_physical_pressure_ceiling",
+                    "original_reason": "vapor_pressure_physical_pressure_ceiling",
                     "species": species_name,
                     "pressure_Pa": pressure,
                     "ceiling_Pa": ceiling,
+                    "authority_level": "extrapolated",
+                    "certified_band": {
+                        "pressure_Pa": (0.0, ceiling),
+                        "pO2_bar": (
+                            MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
+                            MELT_DISSOCIATION_PO2_MAX_BAR,
+                        ),
+                    },
+                    "pO2_bar_used": provenance.get("pO2_bar"),
                     "flagged": True,
                     "backlog": True,
                     "measured_zero": False,
-                    "ledger_moved_mol": 0.0,
-                    "mass_moved_mol": 0.0,
+                    "ledger_moved_mol": None,
+                    "mass_moved_mol": None,
                 }
-                vapor_pressures.pop(species, None)
-                vapor_pressure_sources.pop(species, None)
-                vapor_pressure_provenance.pop(species, None)
-                species_authority.pop(species, None)
+                vapor_pressure_out_of_domain_notices[species_name] = notice
+                provenance["physical_pressure_ceiling_notice"] = notice
+                provenance.setdefault("extrapolation_notice", notice)
+                vapor_pressure_provenance[species_name] = provenance
+                source = str(vapor_pressure_sources.get(species_name) or "")
+                if source:
+                    vapor_pressure_sources[species_name] = (
+                        f"{source}:vapor_pressure_physical_pressure_ceiling"
+                    )
                 warnings.append(
                     "vapor_pressure_physical_pressure_ceiling: "
                     f"species={species_name} pressure_Pa={pressure:g} "
-                    f"ceiling_Pa={ceiling:g}; flux refused for this hour"
+                    f"ceiling_Pa={ceiling:g}; predicted and flagged "
+                    "out_of_domain"
                 )
         floor_inversion_notices = _attach_pO2_floor_inversion_notices(
             vapor_pressures=vapor_pressures,
@@ -3205,6 +3226,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
             "vapor_pressure_species_refusals": (
                 vapor_pressure_species_refusals
+            ),
+            "vapor_pressure_out_of_domain_notices": (
+                vapor_pressure_out_of_domain_notices
             ),
             "activities": activities,
             "activities_provider": "BuiltinVaporPressureProvider",

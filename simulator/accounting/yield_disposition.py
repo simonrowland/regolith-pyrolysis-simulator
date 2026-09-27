@@ -185,6 +185,11 @@ def capture_ledger_snapshot(sim: Any, snapshot: Any) -> None:
     evaporation_authority = _evaporation_authority_snapshot(sim, snapshot)
     if evaporation_authority:
         row["evaporation_authority"] = evaporation_authority
+    vapor_pressure_refusals = getattr(snapshot, "vapor_pressure_refusals", {})
+    if isinstance(vapor_pressure_refusals, Mapping) and vapor_pressure_refusals:
+        row["vapor_pressure_refusals"] = copy.deepcopy(
+            dict(vapor_pressure_refusals)
+        )
     rows[key] = row
 
 
@@ -1822,6 +1827,25 @@ def _build_ideal_train_melt_boundary(
         _merge_atoms(account_terms[term], element_atoms)
 
     authority_by_species = _surface_authority_by_species(sim, snapshots)
+    # A refused vapour carrier has no surface-crossing evidence.  Map its
+    # formula to feedstock elements so the ideal-train projection reports the
+    # affected quantity as unavailable; do not infer retained melt from the
+    # untouched ledger balance or debit a compensating transition.
+    for snapshot in snapshots:
+        refusals = snapshot.get("vapor_pressure_refusals")
+        if not isinstance(refusals, Mapping):
+            continue
+        for raw_species, raw_refusal in refusals.items():
+            if not isinstance(raw_refusal, Mapping):
+                continue
+            if str(raw_refusal.get("status", "")) != "refused":
+                continue
+            species = str(raw_species)
+            refusal = copy.deepcopy(dict(raw_refusal))
+            refusal["code"] = "vapor_pressure_species_unavailable"
+            refusal["species"] = species
+            for element in _element_atoms({species: 1.0}, registry):
+                surface_refusals[element].append(copy.deepcopy(refusal))
     rows: list[dict[str, Any]] = []
     maximum_residual_fraction = 0.0
     maximum_residual_mol_atoms = 0.0
