@@ -10462,6 +10462,10 @@ class Migrator:
             ident_kwargs["temperature_K"] = State.of(Decimal("298.15"))
         source_reference_state = None
         if q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+            # Activities and activity coefficients are dimensionless by the
+            # closed quantity contract; ``per`` records that basis rather
+            # than an unstated source measurement.
+            ident_kwargs["per"] = State.of(PerBasis.DIMENSIONLESS)
             source_standard_state = obs.get("standard_state")
             if source_standard_state in (None, ""):
                 source_standard_state = values.get("standard_state")

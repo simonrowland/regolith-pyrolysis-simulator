@@ -2919,6 +2919,8 @@ def test_k01_source_activity_is_quantity_activity(tmp_path: Path) -> None:
     obs = next(iter(result.observations.values()))
     assert quantity_token(obs.identity) is Quantity.ACTIVITY
     assert quantity_token(obs.identity) is not Quantity.ACTIVITY_COEFFICIENT
+    assert obs.identity.per is not None and obs.identity.per.is_value
+    assert obs.identity.per.value is PerBasis.DIMENSIONLESS
     assert obs.value.kind is ValueKind.POINT
     assert obs.value.point == as_decimal("7.19e-10")
 
