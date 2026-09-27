@@ -207,6 +207,21 @@ def test_log10_kf_follows_delta_fg_and_has_no_kj_band() -> None:
         assert decision_band_for(quantity, SourceRelation.SAME_INPUT) is None
 
 
+def test_log10_k_star_stays_typed_outside_formation_ellingham() -> None:
+    attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation(
+            "na2o-k-star",
+            "exp-1",
+            _na2o_liquid(Quantity.LOG10_K_STAR),
+            Decimal("-4.25"),
+        ),
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "ellingham-emits-reaction-dg-only"
+
+
 def test_zero_kelvin_row_does_not_blank_later_series_points() -> None:
     from simulator.battery.compilation_tier import compilation_tier_census
 

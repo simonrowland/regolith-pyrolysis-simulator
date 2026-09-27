@@ -1860,6 +1860,73 @@ def test_g01_map_phase_refuses_heuristics() -> None:
     assert mapped.is_unknown
 
 
+def test_t998_alkali_source_tokens_are_closed() -> None:
+    from simulator.battery.migrate import PHASE_MAP, REGIME_TO_METHOD
+
+    assert (
+        QUANTITY_ALIASES["evaporation_coefficient_gamma_equals_alpha"]
+        is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    )
+    assert QUANTITY_ALIASES["log10_K_star_equilibrium_fit"] is Quantity.LOG10_K_STAR
+    assert PHASE_MAP["basaltic_silicate_melt"] is Phase.L
+    assert PHASE_MAP["silicate_melt_ferrobasalt_FCMAS"] is Phase.L
+    assert (
+        REGIME_TO_METHOD["langmuir_free_evaporation"]
+        is MethodToken.LANGMUIR_FREE_EVAPORATION
+    )
+    assert (
+        REGIME_TO_METHOD["open_furnace_apparent"]
+        is MethodToken.LANGMUIR_FREE_EVAPORATION
+    )
+
+
+def test_t998_admitted_source_rows_survive_migration(tmp_path: Path) -> None:
+    zhang = _migrate_real_extract(tmp_path / "zhang", "kems-006-zhang-2021.yaml")
+    zhang_rows = [
+        observation
+        for observation in zhang.observations.values()
+        if "zhang_2021_table4_" in observation.observation_id
+    ]
+    products = sorted(
+        (str(observation.identity.species.formula), str(observation.identity.temperature_K.value), str(observation.value.point))
+        for observation in zhang_rows
+        if observation.value.kind is ValueKind.POINT
+    )
+    assert products == [
+        ("K", "1473.15", "6.9E-8"),
+        ("K", "1673.15", "0.00000111"),
+        ("Na", "1473.15", "0.0000032"),
+        ("Na", "1673.15", "0.0000262"),
+    ]
+    assert {row.provenance["scoring"]["oxide_formula"] for row in zhang_rows} == {
+        "K2O",
+        "Na2O",
+    }
+
+    sossi = _migrate_real_extract(tmp_path / "sossi", "kems-012-sossi-2019.yaml")
+    target = [
+        observation
+        for observation in sossi.observations.values()
+        if observation.observation_id.split("::", 1)[-1]
+        in {
+            "sossi_2019_na_logKstar_table3",
+            "sossi_2019_k_logKstar_table3",
+            "sossi_2019_na_table4_gamma_this_work",
+            "sossi_2019_k_table4_gamma_this_work",
+        }
+    ]
+    assert len(target) == 4
+    assert {quantity_token(row.identity) for row in target} == {
+        Quantity.LOG10_K_STAR,
+        Quantity.ACTIVITY_COEFFICIENT,
+    }
+    assert all(row.derived_from == ("tables:kems-012-sossi-2019",) for row in target)
+    assert {row.derivation.relation for row in target if row.derivation} == {
+        "nonlinear_least_squares_K_star_fit",
+        "K_star_over_alpha_e_and_pure_system_equilibrium_constant",
+    }
+
+
 def test_g2_paren_phase_aliases_map_gas_and_condensed() -> None:
     mapped, why = map_phase("(g)")
     assert mapped.is_value and mapped.value is Phase.G and why is None
@@ -2278,6 +2345,7 @@ _CENSUS_QUANTITY_ALIASES = {
     "delta_fG_kJ_mol": "delta_fG",
     "log10_Kf": "log10_Kf",
     "log10_kf": "log10_Kf",
+    "log10_K_star_equilibrium_fit": "log10_K_star",
     "activity": "activity",
     "activity_coefficient": "activity_coefficient",
     "activity_coefficient_this_work": "activity_coefficient",
@@ -2285,6 +2353,7 @@ _CENSUS_QUANTITY_ALIASES = {
     "literature_vaporization_coefficient": "evaporation_coefficient_alpha",
     "alpha": "evaporation_coefficient_alpha",
     "evaporation_coefficient_alpha": "evaporation_coefficient_alpha",
+    "evaporation_coefficient_gamma_equals_alpha": "evaporation_coefficient_alpha",
     "o2_yield": "o2_yield",
     "mass_loss_fraction": "mass_loss_fraction",
     "bulk_mass_loss_wt_pct": "mass_loss_fraction",
@@ -2297,6 +2366,7 @@ _CENSUS_CLOSED_QUANTITIES = {
     "p_partial",
     "p_reference",
     "log10_Kf",
+    "log10_K_star",
     "activity",
     "activity_coefficient",
     "evaporation_coefficient_alpha",
@@ -2402,7 +2472,13 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
     if q_token == "activity":
         return _num(item["activity"]) if "activity" in item else None
     if q_token == "evaporation_coefficient_alpha":
-        return _num(item["alpha"]) if "alpha" in item else None
+        if "alpha" in item:
+            return _num(item["alpha"])
+        # Zhang Table 4 prints alpha and MELTS Gamma separately; this task
+        # admits the measured alpha·Gamma product for implied-alpha scoring.
+        if "alpha_times_Gamma" in item:
+            return _num(item["alpha_times_Gamma"])
+        return None
     if q_token == "evaporation_rate":
         candidates = [
             (key, value)
@@ -2636,9 +2712,11 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # p_partial 69->75, evaporation_coefficient_alpha 12->30, n_numeric 274->298.
     # The lunar DeMaria 1973 merge adds its 61 Table I p_partial cells as
     # run-labelled series: p_partial 75->136 and n_numeric 356->417.
+    # Re-pinned for t998: Zhang Table 4 Na/K alpha points add four printed
+    # cells, evaporation_coefficient_alpha 30->34 and n_numeric 450->454.
     assert census.get("p_partial") == 136
     assert census.get("p_sat") == 21
-    assert census.get("evaporation_coefficient_alpha") == 30
+    assert census.get("evaporation_coefficient_alpha") == 34
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
     # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
     # files, so their series went uncounted: evaporation_rate 21->25,
@@ -2655,7 +2733,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("ueshima-1982-fe-mo-thermal") == {
         "transition_temperature": 58
     }
-    assert n_numeric == 450, (n_numeric, census, n_unavailable)
+    assert n_numeric == 454, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:

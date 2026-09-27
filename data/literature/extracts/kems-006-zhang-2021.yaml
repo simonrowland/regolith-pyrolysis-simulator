@@ -1692,21 +1692,49 @@ species:
       units: dimensionless
       values:
         quantity: evaporation_coefficient_gamma_equals_alpha
+        admission_status: admitted
+        method_class: directly_reduced_measurement
+        derived_from:
+        - tables:kems-006-zhang-2021
+        inference:
+          relation: table4_evaporation_coefficient_alpha_fit
+          inputs:
+          - tables:kems-006-zhang-2021
+          output_unit: dimensionless
+        provenance:
+          scoring:
+            kind: implied_alpha_from_alpha_times_Gamma
+            oxide_formula: Na2O
+            measured_field: alpha_times_Gamma
+            literature_alpha_band:
+            - 0.07
+            - 0.3
+            literature_alpha_band_locator: Zhang 2021 Table 4, physical p. 74
         gas_species: Na(g)
         material: basaltic_glass_this_study
         gamma_evaporation_coefficient: 0.14
-        per_temperature:
+        starting_glass_wt_pct:
+          Na2O: 2.27
+          MgO: 7.09
+          CaO: 11.21
+          TiO2: 1.79
+          SiO2: 45.94
+          Al2O3: 16.0
+          FeO: 10.67
+          K2O: 2.49
+          Rb2O: 1.86
+        series:
         - T_K: 1673.15
           T_C: 1400
           P_bar_as_published: <10^{-9}
-          alpha: 0.14
+          alpha_printed: 0.14
           alpha_sigma: 0.03
           Gamma_NaO0.5: 0.00019
           alpha_times_Gamma: 2.62e-05
         - T_K: 1473.15
           T_C: 1200
           P_bar_as_published: <10^{-9}
-          alpha: 0.08
+          alpha_printed: 0.08
           alpha_sigma: 0.02
           Gamma_NaO0.5: 4.1e-05
           alpha_times_Gamma: 3.2e-06
@@ -1715,6 +1743,7 @@ species:
           during_1400_C_run: IW+3.7 to IW+2.6
           during_1200_C_run: IW+4.6 to IW+2.2
           kind: modelled_from_Fe_redox_and_alkali_loss_not_imposed
+          status: modelled_not_printed
         prose_best_fit_1200_C: 0.08
         prose_best_fit_1400_C: 0.14
         arrhenius_ln_alpha_Gamma_as_published: ln(γNa ΓNaO0.5) = −22239/T + 2.4979
@@ -1793,22 +1822,56 @@ species:
       units: dimensionless
       values:
         quantity: evaporation_coefficient_gamma_equals_alpha
+        admission_status: admitted
+        method_class: directly_reduced_measurement
+        derived_from:
+        - tables:kems-006-zhang-2021
+        inference:
+          relation: table4_evaporation_coefficient_alpha_fit
+          inputs:
+          - tables:kems-006-zhang-2021
+          output_unit: dimensionless
+        provenance:
+          scoring:
+            kind: implied_alpha_from_alpha_times_Gamma
+            oxide_formula: K2O
+            measured_field: alpha_times_Gamma
+            literature_alpha_band:
+            - 0.07
+            - 0.3
+            literature_alpha_band_locator: Zhang 2021 Table 4, physical p. 74
         gas_species: K(g)
-        per_temperature:
+        material: basaltic_glass_this_study
+        starting_glass_wt_pct:
+          Na2O: 2.27
+          MgO: 7.09
+          CaO: 11.21
+          TiO2: 1.79
+          SiO2: 45.94
+          Al2O3: 16.0
+          FeO: 10.67
+          K2O: 2.49
+          Rb2O: 1.86
+        series:
         - T_K: 1673.15
           T_C: 1400
           P_bar_as_published: <10^{-9}
-          alpha: 0.13
+          alpha_printed: 0.13
           alpha_sigma: 0.1
           Gamma_KO0.5: 8.4e-06
           alpha_times_Gamma: 1.11e-06
         - T_K: 1473.15
           T_C: 1200
           P_bar_as_published: <10^{-9}
-          alpha: 0.05
+          alpha_printed: 0.05
           alpha_sigma: 0.02
           Gamma_KO0.5: 1.3e-06
           alpha_times_Gamma: 6.9e-08
+        fO2_as_published:
+          during_1400_C_run: IW+3.7 to IW+2.6
+          during_1200_C_run: IW+4.6 to IW+2.2
+          kind: modelled_from_Fe_redox_and_alkali_loss_not_imposed
+          status: modelled_not_printed
         prose_best_fit_1200_C: 0.054
         prose_best_fit_1400_C: 0.132
         contradiction_prose_vs_table4:
