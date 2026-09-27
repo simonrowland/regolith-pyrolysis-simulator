@@ -5425,12 +5425,43 @@ _PRESSURE_SUM_KEYS = (
     "measured_partial_pressures",
     "significant_partial_pressures",
 )
+_PRESSURE_NON_POINT_RE = re.compile(
+    r"(?:about|approximately|approx\.?|range|upper\s+end\s+pinned)"
+    r"|[~≈–—]|(?:\d\s*-\s*\d)|範囲|约|約",
+    re.IGNORECASE,
+)
+_PRESSURE_CHAMBER_RE = re.compile(
+    r"(?:chamber|background|ultimate\s*[_ ]?vacuum|residual\s*[_ ]?pressure|"
+    r"到達真空度|到达真空度)",
+    re.IGNORECASE,
+)
 _PRESSURE_IDENTITY_UNKNOWN = {
     "reaction": "source reaction/equilibrium not grounded",
     "reference_state": "source gas standard state not grounded",
     "reservoir": "source condensed reservoir not grounded",
     "total_pressure_Pa": "in_cell_total_pressure_not_derivable",
 }
+
+
+def _pressure_row_is_model_derived(
+    *payloads: Mapping[str, Any],
+) -> bool:
+    """Keep model/derived row pressures out of experiment inheritance."""
+
+    for payload in payloads:
+        if not isinstance(payload, Mapping):
+            continue
+        method_class = str(
+            payload.get("method_class") or payload.get("class_tag") or ""
+        ).strip().casefold()
+        if not method_class:
+            continue
+        mapped = METHOD_CLASS_MAP.get(method_class)
+        if mapped is EvidenceClass.MODEL_DERIVED:
+            return True
+        if method_class == "model" or method_class.startswith("model_"):
+            return True
+    return False
 
 
 def _extract_text(payload: object) -> str:
@@ -5720,6 +5751,8 @@ def _pressure_total_from_extract(
     gas_formula: str | None,
     source_text: str,
 ) -> tuple[State[Decimal] | None, str | None]:
+    if _pressure_row_is_model_derived(obs, values):
+        return None, None
     raw = _pressure_payload_value(obs, values, "total_pressure_Pa")
     if isinstance(raw, Mapping) and raw.get("tag") is not None:
         try:
@@ -5989,7 +6022,11 @@ def _partial_pressure_point_condition(
     return located_value(total.value, locator)
 
 
-def _printed_experiment_pressure(located: Located[Any] | None) -> Decimal | None:
+def _printed_experiment_pressure(
+    located: Located[Any] | None,
+    *,
+    method: State[MethodToken] | None = None,
+) -> Decimal | None:
     """Return an exact printed experiment pressure, never an inferred one."""
 
     if located is None or not located.state.is_value:
@@ -6008,6 +6045,28 @@ def _printed_experiment_pressure(located: Located[Any] | None) -> Decimal | None
         )
     ):
         return None
+    metadata = []
+    if inference is not None:
+        metadata.extend(inference.inputs)
+    if located.locator is not None:
+        metadata.extend(
+            str(getattr(located.locator, name) or "")
+            for name in ("note", "paragraph", "section", "table", "figure", "equation", "record")
+        )
+    metadata_text = " ".join(metadata)
+    if _PRESSURE_NON_POINT_RE.search(metadata_text):
+        return None
+    effective_method = method
+    if (
+        effective_method is not None
+        and not effective_method.is_value
+        and effective_method.is_unknown
+    ):
+        effective_method = None
+    if effective_method is not None and effective_method.is_value:
+        is_knudsen = effective_method.value is MethodToken.KNUDSEN_EFFUSION
+        if is_knudsen and _PRESSURE_CHAMBER_RE.search(metadata_text):
+            return None
     return raw.point
 
 
@@ -7656,26 +7715,31 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
         )
     else:
         extra = (f"as_published={hit.as_published}", f"printed={hit.entry.printed}")
+    if mapping.get("as_printed") is not None:
+        extra += (f"as_printed={mapping['as_printed']}",)
     qualification = " ".join(
         [f"{key}=true" for key in ("upper_bound", "lower_bound") if mapping.get(key) is True]
         + [str(mapping.get(key) or "") for key in ("inference", "qualifier", "note", "quote")]
     )
     non_point = any(mapping.get(key) is True for key in ("upper_bound", "lower_bound")) or any(
         re.search(
-            r"\b(?:less than|better than|did not exceed|about|approximately)\b"
-            r"|[~≈]"
+            r"\b(?:less than|better than|did not exceed)\b"
             r"|^\s*(?:(?:pressure|vacuum)\s*)?[<>≤≥](?:\s*\d|\s*$)",
             str(mapping.get(key) or ""), re.I,
         )
         for key in ("inference", "qualifier", "note", "quote")
     )
+    if _lab_kind(hit.entry.field) == "pressure" and _PRESSURE_NON_POINT_RE.search(
+        qualification
+    ):
+        non_point = True
     approximate = (
         _lab_kind(hit.entry.field) == "pressure"
         and isinstance(mapping, Mapping)
         and (
             str(mapping.get("kind") or "").lower() in {"about_nominal", "approximate"}
             or bool(mapping.get("approximate"))
-            or bool(re.search(r"\b(?:about|approximately)\b|[~≈]", str(mapping.get("as_printed") or ""), re.I))
+            or bool(_PRESSURE_NON_POINT_RE.search(str(mapping.get("as_printed") or "")))
         )
     )
     state = (
@@ -8214,6 +8278,12 @@ def pressure_from_equipment(
     values: object = None,
     locator: Locator | None = None,
 ) -> PressureEnvironment:
+    if _pressure_row_is_model_derived(values if isinstance(values, Mapping) else {}):
+        # A model/derived row may describe a nominal calculation pressure, but
+        # that row is not a printed experimental condition for the experiment
+        # registry or for observations of another method.
+        equipment = None
+        values = None
     vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
     roots = _lab_roots(equipment, values)
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
@@ -9527,6 +9597,8 @@ class Migrator:
         self,
         experiment_id: str,
         existing: Mapping[str, Any],
+        *,
+        method: State[MethodToken] | None = None,
     ) -> tuple[dict[str, Any], tuple[str, ...]]:
         """Lift printed experiment conditions into an observation identity.
 
@@ -9555,9 +9627,23 @@ class Migrator:
         if pressure_can_fill:
             pressure_source = "experiment.pressure_environment.total_pressure_Pa"
             pressure = _printed_experiment_pressure(
-                experiment.pressure_environment.total_pressure_Pa
+                experiment.pressure_environment.total_pressure_Pa,
+                method=(
+                    method
+                    if method is not None and method.is_value
+                    else experiment.method
+                ),
             )
-            if pressure is None:
+            effective_method = (
+                method
+                if method is not None and method.is_value
+                else experiment.method
+            )
+            is_knudsen = (
+                effective_method.is_value
+                and effective_method.value is MethodToken.KNUDSEN_EFFUSION
+            )
+            if pressure is None and not is_knudsen:
                 sweep = experiment.pressure_environment.sweep_gas
                 if sweep.state.is_value and isinstance(sweep.state.value, SweepGas):
                     gas = sweep.state.value
@@ -10708,7 +10794,7 @@ class Migrator:
             skip_tables=True,
         )
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
-            experiment_id, ident_kwargs
+            experiment_id, ident_kwargs, method=method
         )
         for name, state in experiment_identity.items():
             if name not in ident_kwargs or (

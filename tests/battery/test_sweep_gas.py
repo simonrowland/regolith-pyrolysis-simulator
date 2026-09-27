@@ -11,9 +11,10 @@ import pytest
 
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from simulator.battery.enums import RefusalReason
+from simulator.battery.enums import Quantity, RefusalReason
 from simulator.battery.migrate import (
     Migrator,
+    _pressure_total_from_extract,
     _sweep_gas_from_plain,
     experiment_from_plain,
     to_plain,
@@ -21,7 +22,7 @@ from simulator.battery.migrate import (
 from simulator.battery.records import State, SweepGas, SweepGasComponent
 from simulator.battery.validate import validate_experiment, validate_sweep_gas
 from tests.battery import factories
-from tests.battery.test_migrate import _write_min_tree
+from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
 from tests.battery.test_migrate_benches import _registry_extract
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -227,6 +228,83 @@ def test_missing_cco_waypoint_keeps_fo2_refused(tmp_path) -> None:
     assert observation.identity.fO2_Pa.reason == (
         "no fO2_Pa mapped from source"
     )
+
+
+def test_hastie_model_pressure_does_not_inherit_to_kems_points(tmp_path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-020-hastie-1981-nbsir.yaml"
+    )
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity == State.of(Quantity.P_PARTIAL)
+    ]
+    assert len(points) == 12
+    assert all(
+        observation.identity.total_pressure_Pa is not None
+        and observation.identity.total_pressure_Pa.is_unknown
+        for observation in points
+    )
+    experiment = next(iter(result.experiments.values()))
+    assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
+
+
+def test_model_row_total_pressure_is_not_a_partial_pressure_identity() -> None:
+    model = load_cached_safe_yaml(
+        (EXTRACTS / "kems-020-hastie-1981-nbsir.yaml").read_text()
+    )
+    row = next(
+        observation
+        for observation in model["species"]["Na"]["observations"]
+        if observation["observation_id"]
+        == "hastie_1981_table3_solgasmix_model_not_measurement"
+    )
+    total, provenance = _pressure_total_from_extract(
+        row, row["values"], gas_formula="Na", source_text=""
+    )
+    assert total is None
+    assert provenance is None
+
+
+def test_ueda_about_chamber_pressure_does_not_inherit_to_knudsen_points(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-095-ueda-1986.yaml")
+    points = [
+        observation
+        for observation in result.observations.values()
+        if "ueda_1986_table1_xrd::" in observation.observation_id
+    ]
+    assert len(points) == 9
+    assert all(
+        observation.identity.total_pressure_Pa is None
+        or observation.identity.total_pressure_Pa.is_unknown
+        for observation in points
+    )
+
+
+def test_homma_range_upper_end_does_not_inherit_as_a_point(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-001-homma-1966.yaml")
+    assert not any(
+        observation.identity.total_pressure_Pa is not None
+        and observation.identity.total_pressure_Pa.is_value
+        for observation in result.observations.values()
+    )
+
+
+def test_ohno_range_upper_end_does_not_inherit_as_a_point(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-002-ohno-1967.yaml")
+    assert not any(
+        observation.identity.total_pressure_Pa is not None
+        and observation.identity.total_pressure_Pa.is_value
+        for observation in result.observations.values()
+    )
+
+
+def test_sossi_printed_one_atmosphere_still_inherits(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
+    observation = result.observations[
+        "kems-012-sossi-2019::sossi_2019_k_class_b1"
+    ]
+    assert observation.identity.total_pressure_Pa == State.of(Decimal("100000"))
 
 
 @pytest.mark.parametrize("defect", [
