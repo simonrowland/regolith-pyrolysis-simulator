@@ -24,6 +24,7 @@ from simulator.battery.score import (
     ENGINE_CHANNELS,
     SCORE_ENGINE_SET,
     candidate_observation,
+    composition_wt_pct,
     predict_with_engine,
 )
 from simulator.battery.records import Composition, Species
@@ -62,6 +63,18 @@ VAPOROCK_ROOT = _vaporock_root()
 
 def _require_openimcc() -> None:
     pytest.importorskip("openimcc", reason="openimcc is not importable")
+
+
+def _require_ti_gas() -> None:
+    _require_openimcc()
+    from openimcc import load_gas_datapack
+
+    datapack = load_gas_datapack()
+    if (
+        "Ti(g)" not in datapack.gas_df.index
+        or "TiO2(l)" not in datapack.oxide_df.index
+    ):
+        pytest.skip("installed openimcc datapack does not contain the Ti gas channel")
 
 
 def _scratch_path() -> Path | None:
@@ -141,8 +154,50 @@ print(json.dumps({"available": handle.available, "reason": handle.unavailable_re
     assert "remedy:" in payload["reason"]
 
 
-def test_openimcc_unsupported_ti_gas_species_is_typed() -> None:
+def test_openimcc_unsupported_cr_gas_species_is_typed() -> None:
     _require_openimcc()
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("TiO2", Decimal("0.2")),
+            ("SiO2", Decimal("0.8")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = F.activity_identity(
+        formula="TiO2",
+        component_basis="TiO2",
+        composition=composition,
+        T_K=Decimal("2200"),
+        fO2_Pa=Decimal("1e-4"),
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.P_PARTIAL,
+        species=Species("Cr", Phase.G),
+    )
+    observation = F.observation(
+        "openimcc-cr-gas",
+        "openimcc-test",
+        identity,
+        Decimal("1"),
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        isolated=False,
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert prediction.refusal_detail["reason"] == "outside_supported_species"
+    assert "Cr" not in prediction.refusal_detail["reported"]
+    assert "Si" in prediction.refusal_detail["reported"]
+
+
+def test_openimcc_ti_gas_matches_direct_calculation() -> None:
+    _require_ti_gas()
+    from openimcc import evaluate, evaluate_gas, load_gas_datapack
+
     composition = Composition(
         basis="ordered_complete_mole_inventory",
         components=(
@@ -164,7 +219,7 @@ def test_openimcc_unsupported_ti_gas_species_is_typed() -> None:
         species=Species("Ti", Phase.G),
     )
     observation = F.observation(
-        "openimcc-ti-gas",
+        "openimcc-ti-gas-positive",
         "openimcc-test",
         identity,
         Decimal("1"),
@@ -174,11 +229,37 @@ def test_openimcc_unsupported_ti_gas_species_is_typed() -> None:
         observation,
         isolated=False,
     )
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-    assert prediction.refusal_detail["reason"] == "outside_supported_species"
-    assert "Ti" not in prediction.refusal_detail["reported"]
-    assert "Si" in prediction.refusal_detail["reported"]
+
+    from simulator.melt_backend.imcc_sf04 import openimcc_bridge
+
+    wt_pct = composition_wt_pct(composition)
+    assert wt_pct is not None
+    melt = evaluate(
+        wt_pct,
+        2200.0,
+        pack=openimcc_bridge._load_pack("v1.0.2"),
+        basis_type="wt",
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    gas = evaluate_gas(
+        dict(zip(melt.parent_oxides, melt.parent_activity, strict=True)),
+        2200.0,
+        1e-9,
+        load_gas_datapack(),
+        parent_oxides=melt.parent_oxides,
+        allow_extrapolation=True,
+    )
+    reported = dict(gas)
+
+    assert prediction.value is not None
+    assert math.isfinite(float(prediction.value))
+    assert prediction.value > 0
+    assert prediction.refusal_reason is None
+    assert "Ti" in reported
+    # 1e-4 Pa fO2 becomes 1e-9 bar; evaluate_gas returns bar, and the scorer
+    # converts P(Ti) back to Pa (1 bar = 1e5 Pa).
+    assert float(prediction.value) == pytest.approx(reported["Ti"] * 1.0e5)
 
 
 def test_openimcc_domain_policy_matches_legacy_imcc() -> None:
