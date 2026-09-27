@@ -970,6 +970,16 @@ def _condition_stage3_temperature_window_values(
             anchor=anchor,
             delta_fraction=delta_fraction,
         )
+        # Normalize before tightening the interval so an out-of-window raw
+        # sample keeps its original coordinate instead of clipping to zero.
+        close_unit = _unit_for_path(
+            STAGE3_CLOSE_T_C_PATH,
+            close_spec,
+            values,
+            units,
+            close_low,
+            close_high,
+        )
         close_low = max(close_low, open_T_C + STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C)
         _raise_if_infeasible(
             STAGE3_CLOSE_T_C_PATH,
@@ -978,7 +988,6 @@ def _condition_stage3_temperature_window_values(
             STAGE3_OPEN_T_C_PATH,
             "stage3_temperature_window_infeasible_bounds",
         )
-        close_unit = units.get(STAGE3_CLOSE_T_C_PATH, 0.0)
         values[STAGE3_CLOSE_T_C_PATH] = _map_numeric_unit_value(
             close_spec,
             close_unit,
@@ -993,6 +1002,14 @@ def _condition_stage3_temperature_window_values(
             anchor=anchor,
             delta_fraction=delta_fraction,
         )
+        open_unit = _unit_for_path(
+            STAGE3_OPEN_T_C_PATH,
+            open_spec,
+            values,
+            units,
+            open_low,
+            open_high,
+        )
         open_high = min(
             open_high,
             close_T_C - STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C,
@@ -1004,7 +1021,6 @@ def _condition_stage3_temperature_window_values(
             STAGE3_CLOSE_T_C_PATH,
             "stage3_temperature_window_infeasible_bounds",
         )
-        open_unit = units.get(STAGE3_OPEN_T_C_PATH, 0.0)
         values[STAGE3_OPEN_T_C_PATH] = _map_numeric_unit_value(
             open_spec,
             open_unit,
@@ -1018,6 +1034,14 @@ def _condition_stage3_temperature_window_values(
         anchor=anchor,
         delta_fraction=delta_fraction,
     )
+    close_unit = _unit_for_path(
+        STAGE3_CLOSE_T_C_PATH,
+        close_spec,
+        values,
+        units,
+        close_low,
+        close_high,
+    )
     close_low = max(
         close_low,
         open_T_C + STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C,
@@ -1029,7 +1053,6 @@ def _condition_stage3_temperature_window_values(
         STAGE3_OPEN_T_C_PATH,
         "stage3_temperature_window_infeasible_bounds",
     )
-    close_unit = units.get(STAGE3_CLOSE_T_C_PATH, 0.0)
     values[STAGE3_CLOSE_T_C_PATH] = _map_numeric_unit_value(
         close_spec,
         close_unit,

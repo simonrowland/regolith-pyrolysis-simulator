@@ -26,7 +26,14 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
 )
-from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    KnobSpec,
+    RecipePatch,
+    RecipeSchema,
+    STAGE3_CLOSE_T_C_PATH,
+    STAGE3_OPEN_T_C_PATH,
+    STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C,
+)
 from simulator.optimize.strategy import bayesian
 from simulator.optimize.strategy.genetic import (
     OPTUNA_NSGA2_REQUIRED_MESSAGE,
@@ -184,7 +191,7 @@ def _trials_by_candidate(strategy: OptunaNSGA2Strategy) -> dict[str, object]:
     }
 
 
-def _assert_pressure_trial_params_match_patches(
+def _assert_conditioned_trial_params_match_patches(
     strategy: OptunaNSGA2Strategy,
     candidates: list[Candidate],
 ) -> None:
@@ -193,19 +200,23 @@ def _assert_pressure_trial_params_match_patches(
         schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
     )
     trials_by_number = {trial.number: trial for trial in strategy.study.trials}
+    conditioned_paths = tuple(
+        path
+        for pair in pressure_pairs
+        for path in pair
+    ) + (STAGE3_OPEN_T_C_PATH, STAGE3_CLOSE_T_C_PATH)
     checked = 0
     for candidate in candidates:
         trial = trials_by_number[candidate.metadata["trial_number"]]
-        for po2_path, total_path in pressure_pairs:
-            for path in (po2_path, total_path):
-                if path not in candidate.patch.values:
-                    continue
-                name = ".".join(path)
-                assert name in trial.params
-                assert float(trial.params[name]) == pytest.approx(
-                    float(candidate.patch.values[path])
-                )
-                checked += 1
+        for path in conditioned_paths:
+            if path not in candidate.patch.values:
+                continue
+            name = ".".join(path)
+            assert name in trial.params
+            assert float(trial.params[name]) == pytest.approx(
+                float(candidate.patch.values[path])
+            )
+            checked += 1
     assert checked > 0
 
 
@@ -351,13 +362,19 @@ def test_nsga2_ask_returns_schema_valid_unique_deterministic_candidates() -> Non
                 assert float(value) >= float(spec.low)
             if spec.high is not None:
                 assert float(value) <= float(spec.high)
+    widths = [
+        candidate.patch.values[STAGE3_CLOSE_T_C_PATH]
+        - candidate.patch.values[STAGE3_OPEN_T_C_PATH]
+        for candidate in first
+    ]
+    assert max(widths) > STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C
 
 
 def test_nsga2_pressure_conditioning_updates_recorded_trial_params() -> None:
     strategy = OptunaNSGA2Strategy(RecipeSchema(), seed=17, objective_profile=PROFILE)
     candidates = strategy.ask(4)
 
-    _assert_pressure_trial_params_match_patches(strategy, candidates)
+    _assert_conditioned_trial_params_match_patches(strategy, candidates)
 
 
 def test_nsga2_multi_objective_directions_and_pareto_front_are_derived_from_profile() -> None:
