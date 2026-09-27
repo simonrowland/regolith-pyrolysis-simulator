@@ -162,7 +162,7 @@ def test_in_domain_shadow_carries_imcc_provenance_and_activity_rows() -> None:
 
 
 def test_missing_openimcc_is_typed_refusal_and_not_a_run_failure(monkeypatch) -> None:
-    import simulator.melt_backend.imcc_sf04.openimcc_bridge as bridge
+    import simulator.melt_backend.openimcc_bridge as bridge
 
     monkeypatch.setattr(bridge, "_openimcc", None)
     monkeypatch.setattr(

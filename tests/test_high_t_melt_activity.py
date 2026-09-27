@@ -21,13 +21,13 @@ from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
+from simulator.melt_backend.openimcc_bridge import (
     FE2O3_TO_FEO_TOTAL_WT_FACTOR,
     OpenImccBridgeResult,
     OpenImccCompositionPolicyRefusal,
     evaluate_cleaned_melt,
 )
-import simulator.melt_backend.imcc_sf04.openimcc_bridge as openimcc_bridge_module
+import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.runner import PyrolysisRun
 

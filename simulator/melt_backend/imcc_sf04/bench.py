@@ -30,9 +30,11 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import re
 import statistics
 import sys
+from importlib import resources
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass
@@ -42,7 +44,7 @@ from typing import Any, TextIO
 import numpy as np
 import yaml
 
-from simulator.melt_backend.imcc_sf04 import (
+from openimcc import (
     ImccCompositionOutsideValidatedEnvelopeError,
     ImccComponentOutsideDomainError,
     ImccCompositionIncompleteError,
@@ -53,7 +55,6 @@ from simulator.melt_backend.imcc_sf04 import (
     ImccNonconvergenceError,
     ImccRefusal,
     ImccTOutsideDatapackDomainError,
-    evaluate,
     label_research_datapack,
     load_datapack,
 )
@@ -163,6 +164,11 @@ def _resolve_path(value: str | Path) -> Path:
     cwd_path = Path.cwd() / path
     if cwd_path.exists():
         return cwd_path.resolve()
+    if str(path) == path.name and path.name in {
+        "imcc-sf04-v1.0.2.json",
+        "imcc-sf04-ext-v4.json",
+    }:
+        return path
     return (_REPO_ROOT / path).resolve()
 
 
@@ -321,6 +327,23 @@ def load_pack(pack_path: Path) -> _PackedEngine:
     Research overlays that fail that gate (ext-v1/v2/v3) use the same
     ``label_research_datapack`` path as harness ``ImccEngine(published=False)``.
     """
+    package_name = pack_path.name
+    if (
+        not os.path.lexists(pack_path)
+        and str(pack_path) == package_name
+        and package_name in {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}
+    ):
+        resource = resources.files("openimcc").joinpath(
+            "data", "packs", package_name
+        )
+        with resources.as_file(resource) as path:
+            pack = load_datapack(path)
+        return _PackedEngine(
+            pack=pack,
+            enable_sp_extension=pack.model_id != "IMCC-SF04",
+            model_id=str(pack.model_id),
+            version=str(pack.version),
+        )
     raw = json.loads(pack_path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
         raise ImccMalformedDatapackError("datapack JSON root must be an object")
@@ -351,6 +374,8 @@ def _evaluate_imcc(
     temperature_K: float,
 ) -> tuple[str, dict[str, float], dict[str, float], str]:
     """Return (status, activities, gammas, reason) with ImccEngine mapping."""
+    from simulator.melt_backend.imcc_sf04.adapter import evaluate
+
     try:
         result = evaluate(
             composition_wt_pct,

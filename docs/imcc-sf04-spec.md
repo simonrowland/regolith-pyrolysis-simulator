@@ -10,8 +10,10 @@ steer; GO-bounded verdict) — section refs below are into that file. Owner ruli
 shadow source (partial coverage fine); long-tail data beyond central databases WAITS FOR GROK.
 
 **Implementation status (doc audit, 2026-08-28):** this is a spec, and the "CLEARED to fire"
-line above is r2.1 scheduling state, not current status. Code has since landed:
-`simulator/melt_backend/imcc_sf04/` (`kernel.py`, `gas.py`, `adapter.py`) plus
+line above is r2.1 scheduling state, not current status. The simulator uses the optional
+`openimcc` package for the IMCC kernel and datapack adapter; local gas tables and simulator
+trust labels remain in `simulator/melt_backend/imcc_sf04/`. Code has landed in
+`simulator/melt_backend/imcc_sf04/` (`gas.py`, `adapter.py`) plus
 `tests/test_imcc_kernel.py`, `test_imcc_gas.py`, `test_imcc_adapter.py`,
 `test_imcc_rung3_fixture.py`, and `test_imcc_sp_extension.py`. Read the chunk sequencing in
 §10 as the design order, not as a work queue. Every bare research path below

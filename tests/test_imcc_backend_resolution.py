@@ -26,7 +26,7 @@ from simulator.melt_backend.imcc_sf04.backend import (
     ImccSf04Backend,
     ImccSf04ExtBackend,
 )
-from simulator.melt_backend.imcc_sf04.kernel import _PUBLISHED_DATAPACK_SHA256
+from openimcc.kernel import _PUBLISHED_DATAPACK_SHA256
 
 
 _POTS_PATH = Path("data/binary_pots.yaml")
@@ -115,6 +115,22 @@ def test_resolve_backend_imcc_names_and_underscores(name: str, cls: type) -> Non
     backend = resolve_backend(name, BackendSelectionPolicy.RUNNER_STRICT)
     assert isinstance(backend, cls)
     assert backend.is_available() is True
+
+
+@pytest.mark.parametrize(
+    ("x_k2o", "expected_status"),
+    ((0.500002, "out_of_domain"), (0.5, "ok"), (0.500006, "out_of_domain")),
+)
+def test_backend_uses_strict_composition_envelope(
+    x_k2o: float, expected_status: str
+) -> None:
+    backend = ImccSf04Backend()
+    assert backend.initialize({})
+    result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol={"K2O": x_k2o, "SiO2": 1.0 - x_k2o},
+    )
+    assert result.status == expected_status
 
 
 @pytest.mark.parametrize("name", ["imcc-sf04", "imcc-sf04-ext", "imcc_sf04"])

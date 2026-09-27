@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import openimcc
 
 import simulator.melt_backend.imcc_sf04 as imcc_sf04
 from simulator.backend_names import canonical_backend_name
@@ -31,16 +32,14 @@ from simulator.melt_backend.imcc_sf04 import (
     label_research_datapack,
     load_datapack,
 )
-from simulator.melt_backend.imcc_sf04.kernel import (
+from openimcc.kernel import (
     ImccRefusal,
     _label_loaded_datapack,
     solve_imcc_sf04,
 )
 
 
-DATAPACK_PATH = Path(
-    "data/melt_activity/imcc/imcc-sf04-v1.0.2.json"
-)
+DATAPACK_PATH = Path(openimcc.__file__).parent / "data/packs/imcc-sf04-v1.0.2.json"
 
 
 def _make_uniform_composition(pack: ImccLoadedDatapack) -> dict[str, float]:
@@ -172,6 +171,223 @@ def test_composition_envelope_boundary_is_inside() -> None:
     pack = load_datapack(DATAPACK_PATH)
     result = evaluate(_make_alkali_composition(pack, 0.5), 2500.0, pack)
     assert result.labels.envelope_status == "inside"
+
+
+@pytest.mark.parametrize("x_me2o", (0.500002, 0.500006))
+def test_envelope_slack_does_not_cross_simulator_boundary(x_me2o: float) -> None:
+    pack = load_datapack(DATAPACK_PATH)
+    with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError):
+        evaluate(_make_alkali_composition(pack, x_me2o), 1800.0, pack)
+
+
+@pytest.mark.parametrize(
+    ("temperature_K", "max_iter"), ((1800.0, 0), (1800.0, 1), (100.0, 100))
+)
+def test_envelope_refusal_precedes_solver_and_temperature(
+    temperature_K: float, max_iter: int
+) -> None:
+    pack = load_datapack(DATAPACK_PATH)
+    with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError):
+        evaluate(
+            {"K2O": 0.500002, "SiO2": 0.499998},
+            temperature_K,
+            pack,
+            max_iter=max_iter,
+        )
+
+
+@pytest.mark.parametrize("composition_kind", ("sequence", "extension"))
+def test_envelope_precedence_covers_supported_composition_shapes(
+    composition_kind: str,
+) -> None:
+    from importlib.resources import files
+
+    if composition_kind == "sequence":
+        pack = load_datapack(DATAPACK_PATH)
+        composition = [0.499998, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.500002]
+        options = {}
+    else:
+        extension_path = files("openimcc").joinpath(
+            "data", "packs", "imcc-sf04-ext-v4.json"
+        )
+        pack = load_datapack(extension_path)
+        composition = {"K2O": 0.500002, "SiO2": 0.499998, "S": 0.01}
+        options = {"enable_sp_extension": True}
+
+    with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError):
+        evaluate(composition, 100.0, pack, max_iter=0, **options)
+
+
+@pytest.mark.parametrize("component", ("S", "P2O5"))
+@pytest.mark.parametrize("temperature_K", (100.0, 1800.0))
+def test_core_pack_unsupported_zero_extension_precedes_envelope(
+    component: str, temperature_K: float
+) -> None:
+    pack = load_datapack(DATAPACK_PATH)
+    composition = {"K2O": 0.500002, "SiO2": 0.499998, component: 0.0}
+
+    with pytest.raises(ImccComponentOutsideDomainError) as exc:
+        evaluate(composition, temperature_K, pack)
+
+    assert exc.value.code == "imcc_component_outside_domain"
+    assert component in str(exc.value)
+
+
+@pytest.mark.parametrize("extension_pack", (False, True))
+@pytest.mark.parametrize("temperature_K", (100.0, 1800.0))
+def test_nan_basis_envelope_refusal_precedes_package_validation(
+    extension_pack: bool, temperature_K: float
+) -> None:
+    from importlib.resources import files
+
+    if extension_pack:
+        pack = load_datapack(
+            files("openimcc").joinpath("data", "packs", "imcc-sf04-ext-v4.json")
+        )
+    else:
+        pack = load_datapack(DATAPACK_PATH)
+
+    with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError):
+        evaluate(
+            {"K2O": 0.500002, "SiO2": 0.499998},
+            temperature_K,
+            pack,
+            basis=float("nan"),
+            enable_sp_extension=extension_pack,
+        )
+
+
+@pytest.mark.parametrize("extension_pack", (False, True))
+def test_extension_refusal_precedes_strict_envelope(extension_pack: bool) -> None:
+    from importlib.resources import files
+
+    if extension_pack:
+        pack_path = files("openimcc").joinpath(
+            "data", "packs", "imcc-sf04-ext-v4.json"
+        )
+        pack = load_datapack(pack_path)
+        composition = {"K2O": 0.500002, "SiO2": 0.499998}
+    else:
+        pack = load_datapack(DATAPACK_PATH)
+        composition = {"K2O": 0.500002, "SiO2": 0.499998, "S": 0.01}
+
+    with pytest.raises(openimcc.ImccSPComponentRequiresExtensionError):
+        evaluate(composition, 1800.0, pack)
+
+
+def test_adapter_labels_keep_green_positional_order_and_add_package_labels() -> None:
+    from dataclasses import fields
+
+    assert tuple(field.name for field in fields(ImccAdapterLabels))[:4] == (
+        "identity", "coverage", "trust", "envelope_status"
+    )
+    with pytest.raises(TypeError):
+        ImccAdapterLabels({}, {})
+    labels = ImccAdapterLabels(
+        {"identity": "value"}, {"coverage": "value"}, "trust", "inside"
+    )
+    assert (labels.identity, labels.coverage, labels.trust, labels.envelope_status) == (
+        {"identity": "value"},
+        {"coverage": "value"},
+        "trust",
+        "inside",
+    )
+
+    pack = load_datapack(DATAPACK_PATH)
+    result = evaluate(_make_uniform_composition(pack), 1700.0, pack)
+    assert result.labels.identity["model_id"] == "IMCC-SF04"
+    assert result.labels.coverage
+    assert result.labels.trust == "internal-analytical"
+    assert result.labels.envelope_status == "inside"
+    assert any("Na and K activities" in notice for notice in result.labels.notices)
+    assert any(
+        flag.startswith("paper-demonstrated-window:") for flag in result.labels.flags
+    )
+
+
+def test_explicit_named_pack_file_is_validated_as_given(tmp_path: Path) -> None:
+    import hashlib
+
+    from benchmarks.melt_activity_benchmark import ImccEngine, _imcc_pack_sha256
+    from simulator.melt_backend.imcc_sf04.bench import load_pack as load_bench_pack
+    from simulator.melt_backend.imcc_sf04.cli import _load_pack, main as cli_main
+
+    malformed = tmp_path / "imcc-sf04-v1.0.2.json"
+    malformed.write_text("{}", encoding="utf-8")
+    with pytest.raises(ImccMalformedDatapackError):
+        _load_pack(malformed)
+    assert cli_main(["validate-pack", "--pack", str(malformed)]) == 2
+    with pytest.raises(ImccMalformedDatapackError):
+        load_bench_pack(malformed)
+    with pytest.raises(ImccMalformedDatapackError):
+        ImccEngine("imcc-published", malformed, published=True)._load()
+    assert _imcc_pack_sha256(malformed) == hashlib.sha256(b"{}").hexdigest()
+
+    missing_path = tmp_path / "missing" / malformed.name
+    with pytest.raises(ImccMalformedDatapackError):
+        _load_pack(missing_path)
+    with pytest.raises((FileNotFoundError, OSError)):
+        load_bench_pack(missing_path)
+    with pytest.raises(ImccMalformedDatapackError):
+        ImccEngine("imcc-published", missing_path, published=True)._load()
+
+
+def test_name_only_builtin_pack_selection_uses_package_resource() -> None:
+    from benchmarks.melt_activity_benchmark import ImccEngine, _imcc_pack_sha256
+    from simulator.melt_backend.imcc_sf04.bench import load_pack as load_bench_pack
+    from simulator.melt_backend.imcc_sf04.cli import _load_pack
+
+    name = "imcc-sf04-v1.0.2.json"
+    cli_pack = _load_pack(name)
+    bench_pack = load_bench_pack(Path(name))
+    benchmark_pack = ImccEngine("imcc-published", Path(name), published=True)._load()
+    assert cli_pack.version == bench_pack.version == benchmark_pack.version == "1.0.2"
+    assert _imcc_pack_sha256(Path(name)) == _imcc_pack_sha256(
+        Path(openimcc.__file__).parent / "data/packs" / name
+    )
+
+
+def test_dangling_builtin_symlink_is_an_explicit_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from benchmarks.melt_activity_benchmark import ImccEngine, _imcc_pack_sha256
+    from simulator.melt_backend.imcc_sf04.bench import load_pack as load_bench_pack
+    from simulator.melt_backend.imcc_sf04.cli import _load_pack
+
+    monkeypatch.chdir(tmp_path)
+    for name in ("imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"):
+        path = Path(name)
+        path.symlink_to(tmp_path / "missing-target.json")
+        with pytest.raises(Exception):
+            _load_pack(path)
+        with pytest.raises(Exception):
+            load_bench_pack(path)
+        with pytest.raises(Exception):
+            ImccEngine("imcc-published", path, published=True)._load()
+        with pytest.raises(FileNotFoundError):
+            _imcc_pack_sha256(path)
+
+
+def test_builtin_named_directory_is_an_explicit_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from benchmarks.melt_activity_benchmark import ImccEngine, _imcc_pack_sha256
+    from simulator.melt_backend.imcc_sf04.bench import load_pack as load_bench_pack
+    from simulator.melt_backend.imcc_sf04.cli import _load_pack, main as cli_main
+
+    monkeypatch.chdir(tmp_path)
+    for name in ("imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"):
+        path = Path(name)
+        path.mkdir()
+        with pytest.raises(Exception):
+            _load_pack(path)
+        assert cli_main(["validate-pack", "--pack", str(path)]) == 1
+        with pytest.raises(IsADirectoryError):
+            load_bench_pack(path)
+        with pytest.raises(Exception):
+            ImccEngine("imcc-published", path, published=True)._load()
+        with pytest.raises(IsADirectoryError):
+            _imcc_pack_sha256(path)
 
 
 def test_allow_out_of_envelope_labels_result() -> None:
@@ -403,6 +619,9 @@ def test_refusal_raw_datapack_through_adapter() -> None:
     with pytest.raises(ImccUnprovenDatapackError) as exc:
         evaluate(_make_uniform_composition(loaded), 2500.0, raw)
     assert exc.value.code == "imcc_unproven_datapack"
+
+    with pytest.raises(ImccUnprovenDatapackError):
+        evaluate({"K2O": 0.500002, "SiO2": 0.499998}, 2500.0, raw)
 
 
 def test_explicit_research_datapack_labels_survive_adapter() -> None:

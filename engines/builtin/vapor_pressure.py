@@ -595,7 +595,7 @@ def _build_high_t_melt_activity_authority(
         "authority_exclusions": {},
     }
     try:
-        from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
+        from simulator.melt_backend.openimcc_bridge import (
             evaluate_cleaned_melt,
         )
 

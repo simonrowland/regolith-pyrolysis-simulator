@@ -270,6 +270,15 @@ def test_build_engines_includes_intrinsic_thermoengine_leg():
     assert engines[0].health_timeout_s == 19.0
 
 
+def test_default_published_imcc_pack_loads_through_real_configuration():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    engines = benchmark.build_engines(
+        ["imcc-published"], fixture, alphamelts_timeout_s=1.0
+    )
+
+    assert engines[0]._load().version == "1.0.2"
+
+
 def test_coverage_map_records_melts_refusal_below_30_sio2():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     rows = benchmark.run_coverage_map(

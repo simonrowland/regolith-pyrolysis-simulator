@@ -1,8 +1,8 @@
 """Optional bridge from simulator melt compositions to the openimcc package.
 
-This module is diagnostic-only.  It does not register a backend or alter the
-vendored IMCC-SF04 path.  Callers must make ``openimcc`` importable explicitly;
-the bridge never falls back to the vendored kernel when it is absent.
+This module is diagnostic-only. Callers must make ``openimcc`` importable
+explicitly; the bridge never falls back to an in-repository kernel when it is
+absent.
 """
 
 from __future__ import annotations
@@ -494,7 +494,7 @@ def evaluate(
     is accepted as the external mass projection and is passed to openimcc as a
     ``wt`` composition; absolute mass units cancel in the normalization.  If
     both are supplied, the molar composition takes precedence, matching the
-    vendored MeltBackend adapter.
+    simulator MeltBackend adapter.
 
     ``pack`` accepts ``"v1.0.2"`` or ``"ext-v4"``.  The two extrapolation
     switches are explicit and default to refusal.  Positive ``Fe2O3`` remains
@@ -530,7 +530,22 @@ def evaluate(
         name: float(value)
         for name, value in zip(parent_oxides, result.parent_activity, strict=True)
     }
-    labels = result.labels
+    package_labels = result.labels
+    from simulator.melt_backend.imcc_sf04.adapter import ImccAdapterLabels
+
+    labels = ImccAdapterLabels(
+        identity=package_labels.identity,
+        coverage=package_labels.coverage,
+        trust="internal-analytical",
+        envelope_status=package_labels.envelope_status,
+        flags=tuple(package_labels.flags),
+        notices=tuple(package_labels.notices),
+        acid_sink_ratio=(
+            None
+            if package_labels.acid_sink_ratio is None
+            else float(package_labels.acid_sink_ratio)
+        ),
+    )
     identity = labels.identity
     return OpenImccBridgeResult(
         parent_oxide_activities=activities,

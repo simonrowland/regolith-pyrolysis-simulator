@@ -261,7 +261,7 @@ def _melts_reports_oxide_endmember(formula: str) -> tuple[bool, str]:
 def _imcc_reports_parent_oxide(formula: str) -> tuple[bool, str]:
     """IMCC ``parent_activity`` is x* on ``IMCC_PARENT_OXIDES``. Pure limit is 1."""
 
-    from simulator.melt_backend.imcc_sf04.gas import IMCC_PARENT_OXIDES
+    from openimcc import IMCC_PARENT_OXIDES
 
     if formula in IMCC_PARENT_OXIDES:
         return True, "raoultian_pure_liquid_oxide_parent"

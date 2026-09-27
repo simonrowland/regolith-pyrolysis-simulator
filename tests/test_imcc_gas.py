@@ -502,11 +502,11 @@ def test_typed_refusal_missing_gas_species(gas_pack: ImccGasDatapack) -> None:
 
 def test_gas_layer_uses_imcc_activities() -> None:
     """The gas layer accepts activities produced by the IMCC adapter."""
-    from simulator.melt_backend.imcc_sf04 import evaluate as evaluate_imcc
-    from simulator.melt_backend.imcc_sf04 import load_datapack as load_imcc_datapack
+    from openimcc import load_datapack as load_imcc_datapack
+    from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
 
     imcc_pack = load_imcc_datapack(
-        Path("data/melt_activity/imcc/imcc-sf04-v1.0.2.json")
+        None
     )
     # Case 1 from Hastie 1985 — a multicomponent lunar-glass-like composition.
     composition = {

@@ -7,6 +7,7 @@ import math
 import os
 import subprocess
 import sys
+import tempfile
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -25,8 +26,11 @@ from simulator.battery.score import (
     SCORE_ENGINE_SET,
     candidate_observation,
     composition_wt_pct,
+    ScoreContext,
     predict_with_engine,
+    score_store,
 )
+from simulator.battery.migrate import load_migrated_store, load_yaml
 from simulator.battery.records import Composition, Species
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
@@ -77,8 +81,124 @@ def _require_ti_gas() -> None:
         pytest.skip("installed openimcc datapack does not contain the Ti gas channel")
 
 
+def test_imcc_battery_emits_notice_for_strict_envelope_edge() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _ImccBatteryBackend
+
+    backend = _ImccBatteryBackend("imcc_sf04")
+    for x_k2o, expects_notice in ((0.500002, True), (0.5, False)):
+        result = backend.equilibrate(
+            temperature_C=1800.0 - 273.15,
+            composition_kg={
+                "K2O": x_k2o * 94.196,
+                "SiO2": (1.0 - x_k2o) * 60.0843,
+            },
+        )
+        notices = result.diagnostics["imcc_notices"]
+        matching = [
+            notice for notice in notices
+            if notice["kind"] == "imcc_composition_outside_validated_envelope"
+        ]
+        assert bool(matching) is expects_notice
+        if matching:
+            assert matching[0]["authority"] == "extrapolated"
+
+
+@pytest.mark.parametrize(
+    "composition_mol",
+    [
+        {"K2O": 0.500002, "SiO2": 0.499998},
+        {"K2O": 0.25, "Na2O": 0.250001, "SiO2": 0.499999},
+        {"K2O": 0.25, "Na2O": 0.250005, "SiO2": 0.499995},
+    ],
+)
+def test_openimcc_battery_keeps_package_envelope_slack(composition_mol) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    molar_mass = {"K2O": 94.196, "Na2O": 61.9789, "SiO2": 60.0843}
+    result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_kg={
+            oxide: amount * molar_mass[oxide] / 1000.0
+            for oxide, amount in composition_mol.items()
+        },
+    )
+
+    assert not any(
+        notice["kind"] == "openimcc_composition_outside_validated_envelope"
+        for notice in result.diagnostics["imcc_notices"]
+    )
+    assert result.diagnostics["authority"] is None
+
+
 def _scratch_path() -> Path | None:
     return PLANTE_HAND_ROWS if PLANTE_HAND_ROWS.is_file() else None
+
+
+def _plante_score_context() -> ScoreContext:
+    source_id = "kems-042-plante-1979"
+    work_file = "10.6028_nbs.sp.561v1.yaml"
+    extract_file = f"{source_id}.yaml"
+    coefficient_source_id = "sf04-magma-companion-workbook"
+    coefficient_work_file = "10.1016_j.icarus.2003.08.023.yaml"
+    coefficient_extract_file = f"{coefficient_source_id}.yaml"
+    with tempfile.TemporaryDirectory(prefix="plante-score-context-") as temp_dir:
+        root = Path(temp_dir)
+        for relative, source in (
+            (Path("data/literature/works") / work_file,
+             REPO_ROOT / "data/literature/works" / work_file),
+            (Path("data/literature/extracts-v2") / extract_file,
+             REPO_ROOT / "data/literature/extracts-v2" / extract_file),
+            (Path("data/literature/works") / coefficient_work_file,
+             REPO_ROOT / "data/literature/works" / coefficient_work_file),
+            (Path("data/literature/extracts-v2") / coefficient_extract_file,
+             REPO_ROOT / "data/literature/extracts-v2" / coefficient_extract_file),
+        ):
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.symlink_to(source)
+        works, experiments, observations = load_migrated_store(root)
+    source_doc = load_yaml(REPO_ROOT / "data/literature/extracts" / extract_file)
+    coefficient_doc = load_yaml(
+        REPO_ROOT / "data/literature/extracts" / coefficient_extract_file
+    )
+    origins = {
+        observation_id: extract_file
+        for observation_id in observations
+        if observation_id.startswith(f"{source_id}::")
+    }
+    origins.update(
+        {
+            observation_id: coefficient_extract_file
+            for observation_id in observations
+            if observation_id.startswith(f"{coefficient_source_id}::")
+        }
+    )
+    return ScoreContext(
+        works=works,
+        experiments=experiments,
+        observations=observations,
+        origins=origins,
+        extract_review={
+            source_id: source_doc.get("review_status"),
+            coefficient_source_id: coefficient_doc.get("review_status"),
+        },
+    )
+
+
+def _require_simulator_janaf_gas() -> None:
+    from simulator.melt_backend.imcc_sf04.gas import (
+        DEFAULT_GAS_DATABASE_PATH,
+        load_gas_datapack,
+    )
+
+    try:
+        load_gas_datapack()
+    except Exception as exc:  # noqa: BLE001 - capability probe for optional gas tables
+        pytest.skip(
+            f"simulator VapoRock JANAF gas tables are not resolvable at "
+            f"{DEFAULT_GAS_DATABASE_PATH}: {type(exc).__name__}: {exc}"
+        )
 
 
 def _binary_probe() -> BinaryPot:
@@ -130,9 +250,13 @@ class BlockOpenImcc(importlib.abc.MetaPathFinder):
         return None
 
 sys.meta_path.insert(0, BlockOpenImcc())
+import simulator
+import simulator.backends
+import engines.builtin.vapor_pressure
 from simulator.diagnostic_helpers.binary_pot_battery import open_battery_engine
-handle = open_battery_engine("openimcc")
-print(json.dumps({"available": handle.available, "reason": handle.unavailable_reason}))
+handles = {name: open_battery_engine(name) for name in ("openimcc", "imcc_sf04", "imcc_sf04_ext")}
+print(json.dumps({name: {"available": handle.available, "reason": handle.unavailable_reason}
+                  for name, handle in handles.items()}))
 '''
     env = {
         "PATH": os.environ.get("PATH", ""),
@@ -149,9 +273,14 @@ print(json.dumps({"available": handle.available, "reason": handle.unavailable_re
     )
     assert completed.returncode == 0, completed.stderr
     payload = json.loads(completed.stdout.strip().splitlines()[-1])
-    assert payload["available"] is False
-    assert "openimcc_not_importable" in payload["reason"]
-    assert "remedy:" in payload["reason"]
+    assert set(payload) == {"openimcc", "imcc_sf04", "imcc_sf04_ext"}
+    reasons = []
+    for entry in payload.values():
+        assert entry["available"] is False
+        assert "openimcc_not_importable" in entry["reason"]
+        assert "remedy:" in entry["reason"]
+        reasons.append(entry["reason"])
+    assert reasons[1:] == reasons[:1] * 2
 
 
 def test_openimcc_unsupported_cr_gas_species_is_typed() -> None:
@@ -230,7 +359,7 @@ def test_openimcc_ti_gas_matches_direct_calculation() -> None:
         isolated=False,
     )
 
-    from simulator.melt_backend.imcc_sf04 import openimcc_bridge
+    from simulator.melt_backend import openimcc_bridge
 
     wt_pct = composition_wt_pct(composition)
     assert wt_pct is not None
@@ -366,6 +495,34 @@ def test_openimcc_plante_candidates_equal_packaged_hand_values() -> None:
     assert len(deltas) == 162
     assert max(abs(delta) for delta in deltas) <= 1.0e-9
     assert statistics_median(measured_residuals) == pytest.approx(0.093, abs=0.01)
+
+
+def test_plante_candidate_lineage_unchanged_by_kernel_switch() -> None:
+    _require_simulator_janaf_gas()
+    context = _plante_score_context()
+    expected = {
+        Engine.IMCC_SF04: (True, "independent"),
+        # Measured on green 6925ccacd, which adds the t-1020 lineage mapping.
+        Engine.OPENIMCC: (True, "independent"),
+    }
+    for engine, lineage in expected.items():
+        residuals, candidates = score_store(
+            context,
+            engines=(engine,),
+            work_id="kems-042-plante-1979",
+        )
+        rows = [
+            (residual, candidates[residual.candidate])
+            for residual in residuals
+            if residual.candidate in candidates
+        ]
+        assert len(rows) == 162
+        assert all(candidate.engine is not None for _, candidate in rows)
+        assert {
+            (candidate.engine.lineage_complete, residual.source_relation.value)
+            for residual, candidate in rows
+            if candidate.engine is not None
+        } == {lineage}
 
 
 def test_openimcc_gas_table_mutation_to_vaporock_breaks_row_equality(monkeypatch) -> None:
