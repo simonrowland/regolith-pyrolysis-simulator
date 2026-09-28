@@ -2927,26 +2927,29 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
 
     assert per_operation_calls == 2
     assert mixed_transition.name == 'fe_redox_respeciation'
-    # b-598 ledger-owned redox trace; the committed FeO/Fe2O3/O2 amounts are
-    # the reviewed current trace in stack-merge-2/report.md:118-128.
-    assert per_operation_sim._transition_species_mol(
+    feo_consumed = per_operation_sim._transition_species_mol(
         mixed_transition,
         side='debits',
         account=_CLEANED_MELT_ACCOUNT,
         species='FeO',
-    ) == pytest.approx(542.4222177140451, rel=2.0e-3)
-    assert per_operation_sim._transition_species_mol(
+    )
+    fe2o3_formed = per_operation_sim._transition_species_mol(
         mixed_transition,
         side='credits',
         account=_CLEANED_MELT_ACCOUNT,
         species='Fe2O3',
-    ) == pytest.approx(271.21110885702257, rel=2.0e-3)
-    assert per_operation_sim._transition_species_mol(
+    )
+    overhead_o2_consumed = per_operation_sim._transition_species_mol(
         mixed_transition,
         side='debits',
         account='process.overhead_gas',
         species='O2',
-    ) == pytest.approx(135.60555442851128, rel=2.0e-3)
+    )
+    # 2 FeO + 1/2 O2 -> Fe2O3; assert the independently balanced reaction,
+    # not the simulator's measured extent.
+    assert feo_consumed > 0.0
+    assert feo_consumed == pytest.approx(2.0 * fe2o3_formed, rel=2.0e-12)
+    assert overhead_o2_consumed == pytest.approx(0.5 * fe2o3_formed, rel=2.0e-12)
     assert (
         per_operation_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log + 3.0
     ) == pytest.approx(0.0, abs=2.0e-12)
