@@ -201,6 +201,25 @@ benches:
   apparatus_family:
     state: {tag: value, value: FINNIGAN MAT 271 Knudsen effusion mass spectrometer}
     locator: &b137_apparatus {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}
+  cell_materials:
+    - state:
+        tag: value
+        value: Ir
+      locator:
+        page: 4
+        section: 2.2.1 Knudsen Effusion Mass Spectrometry
+    - state:
+        tag: value
+        value: W
+      locator:
+        page: 4
+        section: 2.2.1 Knudsen Effusion Mass Spectrometry
+    - state:
+        tag: value
+        value: Ta
+      locator:
+        page: 4
+        section: 2.2.1 Knudsen Effusion Mass Spectrometry
   cell_material_and_liner:
     state: {tag: value, value: Iridium Knudsen cell in tungsten housing with three nested tantalum heat shields}
     locator: *b137_apparatus

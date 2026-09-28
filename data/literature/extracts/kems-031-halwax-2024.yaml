@@ -18,6 +18,25 @@ benches:
   apparatus_family:
     state: {tag: value, value: Finnigan MAT 271 90 degree magnetic-sector Knudsen effusion mass spectrometer}
     locator: {page: 825, section: 'III. Experimental'}
+  cell_materials:
+    - state:
+        tag: value
+        value: Ir
+      locator:
+        page: 825
+        section: III. Experimental
+    - state:
+        tag: value
+        value: Mo
+      locator:
+        page: 825
+        section: III. Experimental
+    - state:
+        tag: value
+        value: Ta
+      locator:
+        page: 825
+        section: III. Experimental
   cell_material_and_liner:
     state: {tag: value, value: Iridium Knudsen cell in a molybdenum container with tantalum radiation shields}
     locator: {page: 825, section: 'III. Experimental'}

@@ -140,6 +140,33 @@ class RefusalReason(StrEnum):
     COEFFICIENT_BASIS_MISMATCH = "coefficient_basis_mismatch"
 
 
+class CellMaterial(StrEnum):
+    """Closed vocabulary for printed Knudsen-cell materials."""
+
+    PT = "Pt"
+    IR = "Ir"
+    RH = "Rh"
+    W = "W"
+    MO = "Mo"
+    TA = "Ta"
+    NB = "Nb"
+    RE = "Re"
+    NI = "Ni"
+    FE = "Fe"
+    C_GRAPHITE = "C_graphite"
+    AL2O3 = "Al2O3"
+    SIO2 = "SiO2"
+    MGO = "MgO"
+    ZRO2 = "ZrO2"
+    Y2O3 = "Y2O3"
+    THO2 = "ThO2"
+    BEO = "BeO"
+    BN = "BN"
+    SIC = "SiC"
+    OTHER_ALLOY = "other_alloy"
+    OTHER = "other"
+
+
 class BenchAbsenceReason(StrEnum):
     NOT_PUBLISHED = "not_published"
     NOT_NUMERIC = "not_numeric"

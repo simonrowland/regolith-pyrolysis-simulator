@@ -34,6 +34,7 @@ from simulator.battery.enums import (
     Authority,
     BenchAbsenceReason,
     BenchIdentityBasis,
+    CellMaterial,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -829,6 +830,7 @@ class Bench:
     apparatus_family: Located[str] | None = None
     method: Located[str] | None = None
     cell_material_and_liner: Located[str] | None = None
+    cell_materials: tuple[Located[CellMaterial], ...] | None = None
     geometry: ApparatusGeometry | None = None
     pumping_type: Located[str] | None = None
     pumping_speed_m3_s: Located[Value] | None = None

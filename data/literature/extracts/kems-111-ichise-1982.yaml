@@ -67,6 +67,14 @@ benches:
   method:
     state: {tag: value, value: Knudsen effusion mass spectrometry}
     locator: *apparatus_locator
+  cell_materials:
+    - state:
+        tag: value
+        value: Al2O3
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II.1 Experimental Apparatus
   cell_material_and_liner:
     state: {tag: value, value: Sintered alumina crucible}
     locator: *apparatus_locator

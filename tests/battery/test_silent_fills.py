@@ -12,6 +12,7 @@ import pytest
 from simulator.battery.enums import (
     AmountBasis,
     BenchIdentityBasis,
+    CellMaterial,
     Engine,
     NoticeKind,
     Phase,
@@ -160,6 +161,20 @@ def _kems_partial(*, cell_material: str | None, fO2_Pa: Decimal | None = None):
     return observation, experiment
 
 
+def _cell_material_bench(materials: tuple[CellMaterial, ...] | None) -> Bench:
+    return Bench(
+        id="bench-cell-material",
+        work_id="work-cell-material",
+        identity=BenchIdentity(
+            BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
+            reason="test fixture",
+        ),
+        cell_materials=(
+            None if materials is None else tuple(F.located(material) for material in materials)
+        ),
+    )
+
+
 def test_predict_with_engine_does_not_select_the_engine_default() -> None:
     source = inspect.getsource(predict_with_engine)
     assert "PO2_ENGINE_DEFAULT" not in source
@@ -274,152 +289,78 @@ def test_printed_oxygen_is_commanded(monkeypatch) -> None:
 
 
 @pytest.mark.parametrize(
-    ("cell_material", "expected_class"),
-    [
-        # Material-bearing rows from the confirm verdict's 31-bench KEMS census.
-        ("Platinum effusion cell", "inert"),
-        (
-            "Iridium Knudsen cell in a molybdenum container with tantalum radiation shields",
-            "mixed",
-        ),
-        (
-            "Iridium Knudsen cell in tungsten container with three tantalum heat shields",
-            "mixed",
-        ),
-        (
-            "Iridium Knudsen cell in tungsten housing with three nested tantalum heat shields",
-            "mixed",
-        ),
-        ("tungsten cell with iridium inner cup", "mixed"),
-        ("Welded platinum cell; 0.025 cm Pt sheet", "inert"),
-        (
-            "Platinum transpiration reactor; alumina thermocouple insulator",
-            "mixed",
-        ),
-        (
-            "Nb, Ta, Mo, or Ni cell material; aluminium powder sometimes mixed with test substance",
-            "reactive",
-        ),
-        ("Alumina Knudsen cell", "not_inert"),
-        ("Sintered alumina crucible", "not_inert"),
-        ("Quartz Knudsen cell", "not_inert"),
-        ("High-purity alumina SSA-S Knudsen cell", "not_inert"),
-        (
-            "Beryllia Knudsen cells for Fe-P-Al and Fe-P-Ti; alumina Knudsen cells for other Fe-P-i systems",
-            "not_inert",
-        ),
-        ("Y2O3", "not_inert"),
-        ("Laboratory-made thoria Knudsen cell", "not_inert"),
-        ("High-purity alumina SSA-S Knudsen-cell crucible", "not_inert"),
-        ("Tungsten effusion cell with rhenium boat", "reactive"),
-        ("High-purity alumina SSA-S cell; tantalum susceptor", "reactive"),
-        ("sintered alumina crucible and tantalum holder", "reactive"),
-        ("Alumina Knudsen cell and tantalum cell holder", "reactive"),
-        (
-            "Molybdenum lid, container, and orifice plate; alumina inner crucible",
-            "reactive",
-        ),
-        ("Alumina Knudsen cell with electrolytic-iron inner crucible", "reactive"),
-        ("Alumina Knudsen cell; tantalum cell holder", "reactive"),
-        (
-            "High-purity alumina Knudsen cell with tantalum susceptor and radiation shields",
-            "reactive",
-        ),
-        (
-            "Gas-tight high-purity Al2O3 crucible (Nippon Kagaku Togyo SSA-S) in a Ta container",
-            "reactive",
-        ),
-        ("High-purity alumina SSA-S; tantalum susceptor", "reactive"),
-        # Experiment and extract strings listed by the verdicts.
-        ("Pt (0.025 cm sheet welded; lid 0.015 cm Pt sheet)", "inert"),
-        ("platinum TMS/KMS (Bonnell and Hastie 1979)", "inert"),
-        (
-            "Pt Knudsen cell (KMS) and Pt transpiration boat/capillary (TMS)",
-            "inert",
-        ),
-        ("platinum KMS cell", "inert"),
-        ("platinum TMS reactor (boat, carrier, probe)", "inert"),
-        ("platinum Knudsen cell", "inert"),
-        ("iridium cell with graphite-coated lid; later graphite disc", "mixed"),
-        ("Ir liners in graphite cell", "mixed"),
-        ("Ir liners in graphite cell required for equilibrium", "mixed"),
-        (
-            "Mo cells for multi-orifice α series; Ir liners in graphite cell required for equilibrium (Mo reacts with olivine)",
-            "mixed",
-        ),
-        (
-            "Mo (multi-orifice α series); Ir liners in graphite required for equilibrium (Mo reacts with olivine)",
-            "mixed",
-        ),
-        ("Mo multi-orifice α series; Ir liners in graphite for equilibrium", "mixed"),
-        ("Mo", "reactive"),
-        ("graphite", "reactive"),
-        ("alumina", "not_inert"),
-        ("unknown", "unknown"),
-        ("unreported", "unknown"),
-        ("not reported", "unknown"),
-        # Element/formula closure and canonical-symbol collision probes.
-        ("Pt-Ir alloy Knudsen cell", "inert"),
-        ("PtIr alloy Knudsen cell", "inert"),
-        ("Pt-Rh alloy Knudsen cell", "mixed"),
-        ("platinum alloy Knudsen cell", "inert"),
-        ("iridium alloy Knudsen cell", "inert"),
-        ("Pt-Ir alloy cell with an alloy liner", "inert"),
-        ("Pt/10% Rh boat in horizontal Al2O3 tube furnace", "mixed"),
-        ("Re", "not_inert"),
-        ("rhenium", "not_inert"),
-        ("Re oxide passivated cell", "reactive"),
-        ("rhenium oxide", "reactive"),
-        ("rhenium passivated", "reactive"),
-        ("NaCl", "not_inert"),
-        ("In", "not_inert"),
-        ("As", "not_inert"),
-        ("No", "not_inert"),
-        ("At", "not_inert"),
-        ("Au", "not_inert"),
-        ("in as no at 0.025 cm", "unknown"),
-    ],
+    ("materials", "expected_class"),
+    (
+        ((CellMaterial.PT,), "inert"),
+        ((CellMaterial.IR,), "inert"),
+        ((CellMaterial.PT, CellMaterial.IR), "inert"),
+        ((CellMaterial.W,), "reactive"),
+        ((CellMaterial.MO,), "reactive"),
+        ((CellMaterial.TA,), "reactive"),
+        ((CellMaterial.NB,), "reactive"),
+        ((CellMaterial.C_GRAPHITE,), "reactive"),
+        ((CellMaterial.RE,), "reactive"),
+        ((CellMaterial.AL2O3,), "not_inert"),
+        ((CellMaterial.OTHER,), "not_inert"),
+        ((), "unknown"),
+    ),
 )
-def test_cell_material_class_golden_store_vocabulary(
-    cell_material: str,
+def test_cell_material_class_uses_only_typed_materials(
+    materials: tuple[CellMaterial, ...],
     expected_class: str,
 ) -> None:
-    assert _cell_material_class((cell_material,)) == expected_class
+    located = tuple(F.located(material) for material in materials)
+    assert _cell_material_class(located) == expected_class
 
 
-def test_cell_material_class_absent_bench_field_is_unknown() -> None:
-    # The confirm verdict's five empty KEMS bench fields have no material string.
-    assert _cell_material_class(()) == "unknown"
+def test_cell_material_vocabulary_is_closed() -> None:
+    assert {material.value for material in CellMaterial} == {
+        "Pt",
+        "Ir",
+        "Rh",
+        "W",
+        "Mo",
+        "Ta",
+        "Nb",
+        "Re",
+        "Ni",
+        "Fe",
+        "C_graphite",
+        "Al2O3",
+        "SiO2",
+        "MgO",
+        "ZrO2",
+        "Y2O3",
+        "ThO2",
+        "BeO",
+        "BN",
+        "SiC",
+        "other_alloy",
+        "other",
+    }
 
 
 @pytest.mark.parametrize(
-    "cell_material",
+    "materials",
     (
-        "platinum Knudsen cell",
-        "Pt-Ir alloy Knudsen cell",
-        "PtIr alloy Knudsen cell",
-        "platinum alloy Knudsen cell",
-        "iridium alloy Knudsen cell",
-        "Pt-Ir alloy cell with an alloy liner",
-    ),
-    ids=(
-        "platinum",
-        "platinum-iridium-alloy",
-        "compact-platinum-iridium-alloy",
-        "platinum-alloy-word-ignored",
-        "iridium-alloy-word-ignored",
-        "inert-pair-with-alloy-liner-word-ignored",
+        (CellMaterial.PT,),
+        (CellMaterial.IR,),
+        (CellMaterial.PT, CellMaterial.IR),
     ),
 )
 def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
-    cell_material: str,
+    materials: tuple[CellMaterial, ...],
     monkeypatch,
 ) -> None:
     seen = _capture_cell(monkeypatch)
-    observation, experiment = _kems_partial(cell_material=cell_material)
+    observation, experiment = _kems_partial(cell_material=None)
 
     predict_with_engine(
-        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=_cell_material_bench(materials),
+        isolated=False,
     )
 
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
@@ -427,83 +368,57 @@ def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
 
 
 @pytest.mark.parametrize(
-    ("experiment_material", "bench_material"),
-    [
-        (None, "iridium effusion cell"),
-        ("platinum Knudsen cell", "iridium effusion cell"),
-    ],
-    ids=("bench-only-iridium", "platinum-iridium"),
-)
-def test_bench_cell_material_is_combined_with_experiment_material(
-    experiment_material: str | None,
-    bench_material: str,
-    monkeypatch,
-) -> None:
-    seen = _capture_cell(monkeypatch)
-    observation, experiment = _kems_partial(cell_material=experiment_material)
-    bench = Bench(
-        id="bench-pt",
-        work_id="work-1",
-        identity=BenchIdentity(
-            BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
-            reason="test fixture",
+    ("materials", "reason"),
+    (
+        ((CellMaterial.W,), "reactive_cell_oxygen_reservoir"),
+        ((CellMaterial.MO,), "reactive_cell_oxygen_reservoir"),
+        ((CellMaterial.TA,), "reactive_cell_oxygen_reservoir"),
+        ((CellMaterial.NB,), "reactive_cell_oxygen_reservoir"),
+        ((CellMaterial.C_GRAPHITE,), "reactive_cell_oxygen_reservoir"),
+        ((CellMaterial.RE,), "reactive_cell_oxygen_reservoir"),
+        (
+            (CellMaterial.IR, CellMaterial.C_GRAPHITE),
+            "reactive_cell_oxygen_reservoir",
         ),
-        cell_material_and_liner=F.located(bench_material),
-    )
-
-    predict_with_engine(
-        Engine.OPENIMCC,
-        observation,
-        experiment=experiment,
-        bench=bench,
-        isolated=False,
-    )
-
-    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
-
-
-@pytest.mark.parametrize(
-    ("cell_material", "reason"),
-    [
-        ("tungsten Knudsen cell", "reactive_cell_oxygen_reservoir"),
-        ("molybdenum cell", "reactive_cell_oxygen_reservoir"),
-        ("tantalum crucible", "reactive_cell_oxygen_reservoir"),
-        ("rhenium oxide passivated cell", "reactive_cell_oxygen_reservoir"),
-        pytest.param(
-            "iridium cell, graphite-coated lid, and later graphite disc",
-            "cell_material_not_inert",
-            id="bencze-iridium-graphite",
-        ),
-        ("Ir liners in graphite cell", "cell_material_not_inert"),
-        ("pure graphite Knudsen cell", "reactive_cell_oxygen_reservoir"),
-        ("alumina-only Knudsen cell", "cell_material_not_inert"),
-        ("platinum cell with alumina liner", "cell_material_not_inert"),
-        ("platinum cell with tungsten liner", "cell_material_not_inert"),
-        ("platinum cell with unknown liner", "cell_material_unknown"),
-    ],
+        ((CellMaterial.AL2O3,), "cell_material_not_inert"),
+        ((CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
+        ((CellMaterial.OTHER,), "cell_material_not_inert"),
+    ),
 )
 def test_noninert_knudsen_cell_refuses_oxygen_balance(
-    cell_material: str,
+    materials: tuple[CellMaterial, ...],
     reason: str,
     monkeypatch,
 ) -> None:
     opened = _no_engine(monkeypatch)
-    observation, experiment = _kems_partial(cell_material=cell_material)
+    observation, experiment = _kems_partial(cell_material=None)
 
     prediction = predict_with_engine(
-        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=_cell_material_bench(materials),
+        isolated=False,
     )
 
     assert opened == []
     assert prediction.refusal_detail["reason"] == reason
 
 
-def test_unknown_knudsen_cell_refuses_with_typed_reason(monkeypatch) -> None:
+def test_platinum_alloy_prose_without_typed_material_is_unknown(monkeypatch) -> None:
     opened = _no_engine(monkeypatch)
     observation, experiment = _kems_partial(cell_material=None)
+    bench = replace(
+        _cell_material_bench(None),
+        cell_material_and_liner=F.located("platinum alloy"),
+    )
 
     prediction = predict_with_engine(
-        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        isolated=False,
     )
 
     assert opened == []
@@ -513,11 +428,15 @@ def test_unknown_knudsen_cell_refuses_with_typed_reason(monkeypatch) -> None:
 def test_printed_fo2_leaves_knudsen_request_unchanged_even_for_reactive_cell(monkeypatch) -> None:
     seen = _capture_cell(monkeypatch)
     observation, experiment = _kems_partial(
-        cell_material="tungsten cell", fO2_Pa=Decimal("1e-3")
+        cell_material=None, fO2_Pa=Decimal("1e-3")
     )
 
     predict_with_engine(
-        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=_cell_material_bench((CellMaterial.W,)),
+        isolated=False,
     )
 
     assert seen["mode"] == PO2_COMMANDED
@@ -527,7 +446,7 @@ def test_printed_fo2_leaves_knudsen_request_unchanged_even_for_reactive_cell(mon
 def test_derived_point_condition_fo2_is_not_sent_as_a_command(monkeypatch) -> None:
     seen = _capture_cell(monkeypatch)
     observation, experiment = _kems_partial(
-        cell_material="platinum cell", fO2_Pa=Decimal("1e-3")
+        cell_material=None, fO2_Pa=Decimal("1e-3")
     )
     derived = Located(
         State.of(Value.point_of(Decimal("1e-3"))),
@@ -541,7 +460,11 @@ def test_derived_point_condition_fo2_is_not_sent_as_a_command(monkeypatch) -> No
     observation = replace(observation, point_conditions={"fO2_Pa": derived})
 
     predict_with_engine(
-        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=_cell_material_bench((CellMaterial.PT,)),
+        isolated=False,
     )
 
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION

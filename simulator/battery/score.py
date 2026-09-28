@@ -25,6 +25,7 @@ from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
     Authority,
+    CellMaterial,
     CONDENSED_PHASES,
     EQUILIBRIUM_FIT_QUANTITIES,
     Engine,
@@ -75,6 +76,7 @@ from simulator.battery.records import (
     Evidence,
     Execution,
     Experiment,
+    Located,
     Notice,
     Observation,
     Residual,
@@ -1867,164 +1869,31 @@ def _has_solved_oxygen_balance_notice(
     )
 
 
-def _cell_material_values(
-    experiment: Experiment | None,
-    bench: Bench | None,
-) -> tuple[tuple[str, str], ...]:
-    values: list[tuple[str, str]] = []
-    for path, located in (
-        (
-            "experiment.apparatus.cell_material_and_liner",
-            experiment.apparatus.cell_material_and_liner
-            if experiment is not None and experiment.apparatus is not None
-            else None,
-        ),
-        (
-            "bench.cell_material_and_liner",
-            bench.cell_material_and_liner if bench is not None else None,
-        ),
-    ):
-        if located is None or not located.state.is_value:
-            continue
-        value = located.state.value
-        if isinstance(value, str) and value.strip():
-            values.append((path, value.strip()))
-    return tuple(values)
-
-
-_CELL_ELEMENT_SYMBOLS = frozenset(
-    "H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co "
-    "Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb "
-    "Te I Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re "
-    "Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es "
-    "Fm Md No Lr Rf Db Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv Ts Og".split()
-)
-_CELL_INERT_SYMBOLS = frozenset({"Pt", "Ir"})
-_CELL_REACTIVE_SYMBOLS = frozenset({"W", "Mo", "Ta", "Nb", "Ni", "Fe", "C"})
-_CELL_INERT_NAME_RE = re.compile(r"\b(?:platinum|iridium)\b", re.IGNORECASE)
-_CELL_REACTIVE_NAME_RE = re.compile(
-    r"\b(?:tungsten|molybdenum|tantalum|niobium|nickel|iron|steel|graphite|carbon|c)\b",
-    re.IGNORECASE,
-)
-_CELL_RHENIUM_NAME_RE = re.compile(r"\brhenium\b", re.IGNORECASE)
-_CELL_NOT_INERT_NAME_RE = re.compile(
-    r"\b(?:alumina|al2o3|sapphire|quartz|silica|sio2|y2o3|yttria|thoria|tho2|"
-    r"beo|beryllia|mgo|magnesia|zro2|zirconia|bn|boron\s+nitride|sic|"
-    r"aluminium|aluminum|rhodium)\b",
-    re.IGNORECASE,
-)
-_CELL_UNKNOWN_RE = re.compile(
-    r"\b(?:unknown|unspecified|unreported|not reported|not specified)\b",
-    re.IGNORECASE,
-)
-_CELL_OXIDATION_RE = re.compile(
-    r"\b(?:oxide|oxidized|oxidised|passivation|passivated)\b", re.IGNORECASE
-)
-_CELL_CHEMICAL_TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
-_CELL_HYPHENATED_FORMULA_RE = re.compile(
-    r"(?<![A-Za-z0-9])(?:[A-Z][a-z]?\d*)(?:[-/](?:[A-Z][a-z]?\d*))+"
-    r"(?![A-Za-z0-9])"
-)
-_CELL_ELEMENT_PART_RE = re.compile(r"([A-Z][a-z]?)(\d*)")
-
-
-def _cell_material_class(materials: Sequence[str]) -> str:
+def _cell_material_class(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> str:
     if not materials:
         return "unknown"
-    classes: list[str] = []
+    values: list[CellMaterial] = []
     for material in materials:
-        if _CELL_UNKNOWN_RE.search(material):
-            classes.append("unknown")
-            continue
-
-        oxidation = bool(_CELL_OXIDATION_RE.search(material))
-        material_classes: set[str] = set()
-        if _CELL_INERT_NAME_RE.search(material):
-            material_classes.add("inert")
-        if _CELL_REACTIVE_NAME_RE.search(material):
-            material_classes.add("reactive")
-        if _CELL_RHENIUM_NAME_RE.search(material):
-            material_classes.add("reactive" if oxidation else "not_inert")
-        if _CELL_NOT_INERT_NAME_RE.search(material):
-            material_classes.add("not_inert")
-
-        # Symbols use canonical case and whole tokens, so words like "in", "as",
-        # "no", and "at" do not become elements; the c in "0.025 cm" is not C.
-        # Element names above remain case-insensitive.
-        def symbol_class(symbol: str) -> str:
-            if symbol in _CELL_INERT_SYMBOLS:
-                return "inert"
-            if symbol == "Re":
-                return "reactive" if oxidation else "not_inert"
-            if symbol in _CELL_REACTIVE_SYMBOLS:
-                return "reactive"
-            return "not_inert"
-
-        def formula_classes(symbols: Sequence[str]) -> set[str]:
-            if len(symbols) == 1:
-                return {symbol_class(symbols[0])}
-            symbol_classes = {symbol_class(symbol) for symbol in symbols}
-            if symbol_classes == {"inert"}:
-                return {"inert"}
-            formula_class = {"not_inert"}
-            if "inert" in symbol_classes:
-                formula_class.add("inert")
-            return formula_class
-
-        formula_spans: list[tuple[int, int]] = []
-        for match in _CELL_HYPHENATED_FORMULA_RE.finditer(material):
-            symbols = [
-                part.group(1)
-                for token in re.split(r"[-/]", match.group())
-                if (part := _CELL_ELEMENT_PART_RE.fullmatch(token))
-                and part.group(1) in _CELL_ELEMENT_SYMBOLS
-            ]
-            if len(symbols) == len(re.split(r"[-/]", match.group())):
-                material_classes.update(formula_classes(symbols))
-                formula_spans.append(match.span())
-
-        for match in _CELL_CHEMICAL_TOKEN_RE.finditer(material):
-            if any(start <= match.start() < end for start, end in formula_spans):
-                continue
-            token = match.group()
-            symbols: list[str] = []
-            position = 0
-            while position < len(token):
-                part = _CELL_ELEMENT_PART_RE.match(token, position)
-                if part is None or part.group(1) not in _CELL_ELEMENT_SYMBOLS:
-                    symbols = []
-                    break
-                symbols.append(part.group(1))
-                position = part.end()
-            if not symbols or position != len(token):
-                continue
-            if len(symbols) > 2 and not any(char.islower() or char.isdigit() for char in token):
-                continue
-            material_classes.update(formula_classes(symbols))
-
-        if "inert" in material_classes and material_classes & {"reactive", "not_inert"}:
-            classes.append("mixed")
-        # Without an inert component, a reactive token sets the refusal class;
-        # other detected chemistry alone fails closed as not_inert.
-        elif "reactive" in material_classes:
-            classes.append("reactive")
-        elif "not_inert" in material_classes:
-            classes.append("not_inert")
-        elif "inert" in material_classes:
-            classes.append("inert")
-        else:
-            classes.append("unknown")
-    if "mixed" in classes or (
-        "inert" in classes and ("reactive" in classes or "not_inert" in classes)
+        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
+            return "unknown"
+        values.append(material.state.value)
+    if any(
+        material in {
+            CellMaterial.W,
+            CellMaterial.MO,
+            CellMaterial.TA,
+            CellMaterial.NB,
+            CellMaterial.C_GRAPHITE,
+            CellMaterial.RE,
+        }
+        for material in values
     ):
-        return "mixed"
-    if "unknown" in classes:
-        return "unknown"
-    if "reactive" in classes:
         return "reactive"
-    if "not_inert" in classes:
-        return "not_inert"
-    return classes[0]
+    if all(material in {CellMaterial.PT, CellMaterial.IR} for material in values):
+        return "inert"
+    return "not_inert"
 
 
 def _derived_fo2_condition(observation: Observation) -> bool:
@@ -2503,14 +2372,11 @@ def predict_with_engine(
         else:
             po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     elif oxygen_balance_effusion:
-        material_values = _cell_material_values(experiment, bench)
-        material_class = _cell_material_class(
-            tuple(value for _path, value in material_values)
-        )
+        cell_materials = bench.cell_materials if bench is not None else None
+        material_class = _cell_material_class(cell_materials)
         if material_class != "inert":
             refusal_token = {
                 "reactive": "reactive_cell_oxygen_reservoir",
-                "mixed": "cell_material_not_inert",
                 "not_inert": "cell_material_not_inert",
                 "unknown": "cell_material_unknown",
             }[material_class]
@@ -2528,8 +2394,12 @@ def predict_with_engine(
                 detail={
                     "reason": refusal_token,
                     "cell_material": [
-                        {"field": path, "value": value}
-                        for path, value in material_values
+                        {
+                            "field": "bench.cell_materials",
+                            "value": item.state.value.value,
+                        }
+                        for item in cell_materials or ()
+                        if item.state.is_value
                     ],
                 },
                 notices=tuple(input_notices),
