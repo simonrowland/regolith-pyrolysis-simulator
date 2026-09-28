@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 from simulator.core import PyrolysisSimulator
+from simulator.state import MOLAR_MASS
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
     calphad_ferrous_feo_activity_diagnostic,
@@ -35,6 +36,7 @@ def _sim_with_oxides(
     feo_wt: float,
     fe2o3_wt: float,
     temperature_C: float,
+    mass_kg: float = 1.0,
 ) -> PyrolysisSimulator:
     setpoints = _load_yaml("setpoints.yaml")
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
@@ -57,7 +59,7 @@ def _sim_with_oxides(
         },
         _load_yaml("vapor_pressures.yaml"),
     )
-    sim.load_batch("redox_authority_case", mass_kg=1.0)
+    sim.load_batch("redox_authority_case", mass_kg=mass_kg)
     sim.melt.temperature_C = temperature_C
     sim.melt.p_total_mbar = 10.0
     sim._melt_redox_ledger_initialized = True
@@ -221,6 +223,106 @@ def test_reducing_respeciation_does_not_mint_the_ferric_floor(
     assert diagnostic["respeciation_status"] == "endpoint_not_a_measurement"
     assert _oxide_mol(sim, "Fe2O3") == 0.0
     assert sim.atom_ledger.mol_by_account() == before
+
+
+def _feo_wt_pct_for_mol(n_feo_mol: float, mass_kg: float) -> float:
+    feo_kg = n_feo_mol * MOLAR_MASS["FeO"] / 1000.0
+    return 100.0 * feo_kg / mass_kg
+
+
+def _set_melt_feo_mol(sim: PyrolysisSimulator, n_feo_mol: float) -> None:
+    """Place an exact FeO inventory on the cleaned melt.
+
+    1e-13 mol FeO is 7.18e-15 kg, below the ledger's 1e-12 kg load
+    tolerance, so a feedstock weight percent cannot retain it.  The
+    classifier reads the stored mol.
+    """
+
+    balances = sim.atom_ledger._balances["process.cleaned_melt"]
+    balances["FeO"] = n_feo_mol
+    balances.pop("Fe2O3", None)
+
+
+def test_astra_feo_inventory_keeps_its_own_authority() -> None:
+    """2358.22 mol FeO cannot be exhausted by a 0.2 mol O2 uptake.
+
+    capacity_O2 = n_FeO / 4 = 589.555 mol, which is far above 0.2 mol.
+    """
+
+    n_feo = 2358.22
+    uptake = 0.2
+    mass_kg = 250.0
+    sim = _sim_with_oxides(
+        feo_wt=_feo_wt_pct_for_mol(n_feo, mass_kg),
+        fe2o3_wt=0.0,
+        temperature_C=1220.0,
+        mass_kg=mass_kg,
+    )
+    feo_mol = _oxide_mol(sim, "FeO")
+    capacity_o2 = feo_mol / 4.0
+    assert feo_mol == pytest.approx(n_feo, rel=1.0e-9)
+    assert capacity_o2 == pytest.approx(589.555, rel=1.0e-9)
+    assert capacity_o2 > uptake
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0
+    sim.melt.oxygen_reservoir.exchange_o2_mol = -uptake
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
+    assert f"capacity_O2={capacity_o2:.17g}" in sim._last_redox_domain["reason"]
+    assert f"per_tick_o2_transfer_mol={-uptake:.17g}" in (
+        sim._last_redox_domain["reason"]
+    )
+    assert fO2_log != pytest.approx(math.log10(1.0))
+
+
+def test_trace_feo_finite_uptake_hands_the_melt_to_the_gas() -> None:
+    """1e-13 mol FeO has capacity_O2 = 2.5e-14 mol.
+
+    A finite uptake above that capacity, and above the 1e-15 mol noop,
+    is more O2 than the inventory can take.  The melt follows the gas.
+    """
+
+    n_feo = 1.0e-13
+    uptake = 1.0e-6
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1220.0)
+    _set_melt_feo_mol(sim, n_feo)
+    feo_mol = _oxide_mol(sim, "FeO")
+    capacity_o2 = feo_mol / 4.0
+    assert feo_mol == pytest.approx(n_feo, rel=0.0, abs=1.0e-18)
+    assert capacity_o2 == pytest.approx(n_feo / 4.0, rel=0.0, abs=1.0e-18)
+    assert capacity_o2 > 1.0e-15
+    assert capacity_o2 <= uptake
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0
+    sim.melt.oxygen_reservoir.exchange_o2_mol = -uptake
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert sim._last_redox_domain["basis"] == "no_melt_redox_buffer"
+    assert "kress91_inverse_not_evaluated" in sim._last_redox_domain["reason"]
+    assert f"capacity_O2={capacity_o2:.17g}" in sim._last_redox_domain["reason"]
+    assert fO2_log == pytest.approx(math.log10(1.0))
+
+
+def test_zero_transfer_on_trace_feo_never_follows_the_gas() -> None:
+    """A zero interface transfer does not hand the melt to the gas."""
+
+    n_feo = 1.0e-13
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1220.0)
+    _set_melt_feo_mol(sim, n_feo)
+    feo_mol = _oxide_mol(sim, "FeO")
+    capacity_o2 = feo_mol / 4.0
+    assert feo_mol == pytest.approx(n_feo, rel=0.0, abs=1.0e-18)
+    assert capacity_o2 == pytest.approx(2.5e-14, rel=0.0, abs=1.0e-18)
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0
+    sim.melt.oxygen_reservoir.exchange_o2_mol = 0.0
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
+    assert f"capacity_O2={capacity_o2:.17g}" in sim._last_redox_domain["reason"]
+    assert "per_tick_o2_transfer_mol=0" in sim._last_redox_domain["reason"]
+    assert fO2_log != pytest.approx(math.log10(1.0))
 
 
 def test_unconstrained_respeciation_does_not_mint_from_the_bound(

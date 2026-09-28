@@ -88,15 +88,15 @@ def _trace_fe_transport_sim() -> PyrolysisSimulator:
     sim._melt_redox_ledger_initialized = True
     sim._sync_oxygen_reservoir_mirror()
 
-    # This is a committed previous tick, not a new redox input.  It gives the
-    # capacity classifier the physical delta_n_O2 against which C_m is tested.
+    # No interface transfer this tick.  A latched previous amount is not
+    # the handover magnitude, so the interior ratio still inverts Kress.
     reservoir = sim.melt.oxygen_reservoir
     reservoir.headspace_transport_pO2_bar = 1.0e-6
-    reservoir.exchange_o2_mol = 1.0e-7
+    reservoir.exchange_o2_mol = 0.0
     reservoir.shadow_oxygen_transfer = {
         'status': 'ok',
-        'transfer_o2_mol': 1.0e-7,
-        'committed_o2_mol': 1.0e-7,
+        'transfer_o2_mol': 0.0,
+        'committed_o2_mol': 0.0,
     }
     return sim
 
