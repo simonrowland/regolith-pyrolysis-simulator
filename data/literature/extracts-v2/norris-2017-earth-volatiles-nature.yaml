@@ -19,6 +19,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor'; refusing to pick a number
@@ -43,6 +46,12 @@ observations:
     section: Results
     note: Author-defined ratio used to compare measured volatile loss.
   read_from: unknown:norris-2017-earth-volatiles-nature
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:norris-2017-earth-volatiles-nature
+    parameters: []
+    output_unit: Pa
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure2_time_series
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg7
   identity:
@@ -87,6 +96,9 @@ observations:
         - - K2O
           - '0.0004606441194562125994912063457'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'normalized_trace_element_concentration_time_series';
@@ -149,6 +161,12 @@ observations:
         pdf_page_index: 15
         figure: '2'
         note: Plot of normalized concentrations versus time at 1300 C and log fO2 = -7; no curve values digitised.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:norris-2017-earth-volatiles-nature
+    parameters: []
+    output_unit: Pa
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg11
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg11
   identity:
@@ -169,6 +187,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor_vs_oxygen_fugacity'; refusing
@@ -231,6 +252,12 @@ observations:
         pdf_page_index: 16
         figure: '3'
         note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:norris-2017-earth-volatiles-nature
+    parameters: []
+    output_unit: Pa
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg13
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg13
   identity:
@@ -251,6 +278,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor_vs_oxygen_fugacity'; refusing
@@ -313,6 +343,12 @@ observations:
         pdf_page_index: 16
         figure: '3'
         note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:norris-2017-earth-volatiles-nature
+    parameters: []
+    output_unit: Pa
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg7
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg7
   identity:
@@ -333,6 +369,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor_vs_oxygen_fugacity'; refusing
@@ -395,6 +434,12 @@ observations:
         pdf_page_index: 16
         figure: '3'
         note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:norris-2017-earth-volatiles-nature
+    parameters: []
+    output_unit: Pa
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure3_volatility_factors_neg9
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg9
   identity:
@@ -415,6 +460,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatility_factor_vs_oxygen_fugacity'; refusing
@@ -477,6 +525,12 @@ observations:
         pdf_page_index: 16
         figure: '3'
         note: Volatility-factor plot; values retained as figure-only and not read off the graph.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:norris-2017-earth-volatiles-nature
+    parameters: []
+    output_unit: Pa
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure4_bse_vs_volatility_neg11
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg11
   identity:
@@ -497,6 +551,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'BSE_CI_abundance_vs_measured_volatility_factor';
@@ -559,6 +616,12 @@ observations:
         pdf_page_index: 17
         figure: 4a,b
         note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:norris-2017-earth-volatiles-nature
+    parameters: []
+    output_unit: Pa
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_figure4_bse_vs_volatility_neg13
   experiment_id: 10.1038/nature23645::experiment::volatile-loss-logfo2-neg13
   identity:
@@ -579,6 +642,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'BSE_CI_abundance_vs_measured_volatility_factor';
@@ -641,6 +707,12 @@ observations:
         pdf_page_index: 17
         figure: 4a,b
         note: BSE/CI abundance plotted against measured volatility factors; values retained as figure-only and not digitised.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:norris-2017-earth-volatiles-nature
+    parameters: []
+    output_unit: Pa
 - observation_id: norris-2017-earth-volatiles-nature::norris_2017_volatile_loss_conditions
   experiment_id: 10.1038/nature23645::norris-2017-earth-volatiles-nature
   identity:
@@ -661,6 +733,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'volatile_loss_experiment_conditions'; refusing
@@ -717,3 +792,9 @@ observations:
               section: Experimental vaporisation experiments
               note: Main text conditions; detailed assembly and timing are in Methods on PDF pages 11-14.
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:norris-2017-earth-volatiles-nature
+    parameters: []
+    output_unit: Pa

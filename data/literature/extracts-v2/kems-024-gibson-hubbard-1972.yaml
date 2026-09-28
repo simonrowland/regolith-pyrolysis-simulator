@@ -63,6 +63,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -121,6 +124,12 @@ observations:
               paragraph: Ba row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_11
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     1 hr
@@ -142,6 +151,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -200,6 +212,12 @@ observations:
               paragraph: Ba row; 14163 1050°C 1 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_12
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     6 hr
@@ -221,6 +239,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -279,6 +300,12 @@ observations:
               paragraph: Ba row; 14163 1050°C 6 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_13
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     72 hr
@@ -300,6 +327,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -358,6 +388,12 @@ observations:
               paragraph: Ba row; 14163 1050°C 72 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_9
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
@@ -415,6 +451,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -437,6 +476,12 @@ observations:
     section: Abstract
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_10017_0
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
@@ -578,6 +623,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -636,6 +684,12 @@ observations:
               paragraph: Ce row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ce_volatilization_statement
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
@@ -653,6 +707,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -675,6 +732,12 @@ observations:
     section: Abstract
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_10017_0
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
@@ -816,6 +879,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -874,6 +940,12 @@ observations:
               paragraph: Eu row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_eu_volatilization_statement
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
@@ -891,6 +963,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -913,6 +988,12 @@ observations:
     section: Abstract
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_10017_0
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
@@ -1054,6 +1135,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1112,6 +1196,12 @@ observations:
               paragraph: Gd row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_gd_volatilization_statement
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
@@ -1129,6 +1219,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -1151,6 +1244,12 @@ observations:
     section: Abstract
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10017_0
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
@@ -1212,6 +1311,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1270,6 +1372,12 @@ observations:
               paragraph: K row; 10017 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_10073_2
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
@@ -1331,6 +1439,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1389,6 +1500,12 @@ observations:
               paragraph: K row; 10073 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_4
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
@@ -1450,6 +1567,9 @@ observations:
     temperature_K:
       tag: value
       value: '1223.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1508,6 +1628,12 @@ observations:
               paragraph: K row; 12022 950°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_6
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
     2 hr
@@ -1529,6 +1655,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1587,6 +1716,12 @@ observations:
               paragraph: K row; 12022 1050°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_7
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
     2 hr
@@ -1608,6 +1743,9 @@ observations:
     temperature_K:
       tag: value
       value: '1473.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1666,6 +1804,12 @@ observations:
               paragraph: K row; 12022 1200°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_12022_8
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
     2 hr
@@ -1687,6 +1831,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1745,6 +1892,12 @@ observations:
               paragraph: K row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_10
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     instantaneous
@@ -1766,6 +1919,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1824,6 +1980,12 @@ observations:
               paragraph: K row; 14163 1050°C instantaneous column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_11
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     1 hr
@@ -1845,6 +2007,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1903,6 +2068,12 @@ observations:
               paragraph: K row; 14163 1050°C 1 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_12
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     6 hr
@@ -1924,6 +2095,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -1982,6 +2156,12 @@ observations:
               paragraph: K row; 14163 1050°C 6 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_13
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     72 hr
@@ -2003,6 +2183,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -2061,6 +2244,12 @@ observations:
               paragraph: K row; 14163 1050°C 72 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_9
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
@@ -2163,6 +2352,9 @@ observations:
     temperature_K:
       tag: value
       value: '1223.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -2222,6 +2414,12 @@ observations:
               paragraph: K/Ba row; 12022 950°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_6
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
     2 hr
@@ -2243,6 +2441,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -2302,6 +2503,12 @@ observations:
               paragraph: K/Ba row; 12022 1050°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_7
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
     2 hr
@@ -2323,6 +2530,9 @@ observations:
     temperature_K:
       tag: value
       value: '1473.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -2382,6 +2592,12 @@ observations:
               paragraph: K/Ba row; 12022 1200°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_12022_8
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
     2 hr
@@ -2403,6 +2619,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -2462,6 +2681,12 @@ observations:
               paragraph: K/Ba row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_10
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     instantaneous
@@ -2483,6 +2708,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -2542,6 +2770,12 @@ observations:
               paragraph: K/Ba row; 14163 1050°C instantaneous column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_11
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     1 hr
@@ -2563,6 +2797,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -2622,6 +2859,12 @@ observations:
               paragraph: K/Ba row; 14163 1050°C 1 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_12
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     6 hr
@@ -2643,6 +2886,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -2702,6 +2948,12 @@ observations:
               paragraph: K/Ba row; 14163 1050°C 6 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_13
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     72 hr
@@ -2723,6 +2975,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -2782,6 +3037,12 @@ observations:
               paragraph: K/Ba row; 14163 1050°C 72 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_9
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
@@ -2885,6 +3146,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -2944,6 +3208,12 @@ observations:
               paragraph: K/Rb row; 10017 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_10073_2
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
@@ -3006,6 +3276,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -3065,6 +3338,12 @@ observations:
               paragraph: K/Rb row; 10073 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_4
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
@@ -3127,6 +3406,9 @@ observations:
     temperature_K:
       tag: value
       value: '1223.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -3186,6 +3468,12 @@ observations:
               paragraph: K/Rb row; 12022 950°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_6
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
     2 hr
@@ -3207,6 +3495,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -3266,6 +3557,12 @@ observations:
               paragraph: K/Rb row; 12022 1050°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_7
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
     2 hr
@@ -3287,6 +3584,9 @@ observations:
     temperature_K:
       tag: value
       value: '1473.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -3346,6 +3646,12 @@ observations:
               paragraph: K/Rb row; 12022 1200°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_12022_8
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
     2 hr
@@ -3367,6 +3673,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -3426,6 +3735,12 @@ observations:
               paragraph: K/Rb row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_10
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     instantaneous
@@ -3447,6 +3762,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -3506,6 +3824,12 @@ observations:
               paragraph: K/Rb row; 14163 1050°C instantaneous column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_11
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     1 hr
@@ -3527,6 +3851,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -3586,6 +3913,12 @@ observations:
               paragraph: K/Rb row; 14163 1050°C 1 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_12
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     6 hr
@@ -3607,6 +3940,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -3666,6 +4002,12 @@ observations:
               paragraph: K/Rb row; 14163 1050°C 6 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_13
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     72 hr
@@ -3687,6 +4029,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance_ratio'; refusing to pick a
@@ -3746,6 +4091,12 @@ observations:
               paragraph: K/Rb row; 14163 1050°C 72 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_9
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
@@ -3804,6 +4155,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -3827,6 +4181,12 @@ observations:
     section: Results
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_10017_0
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
@@ -3888,6 +4248,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -3946,6 +4309,12 @@ observations:
               paragraph: Li row; 10017 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_4
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
@@ -4007,6 +4376,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4065,6 +4437,12 @@ observations:
               paragraph: Li row; 12022 1050°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_7
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
     2 hr
@@ -4086,6 +4464,9 @@ observations:
     temperature_K:
       tag: value
       value: '1473.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4144,6 +4525,12 @@ observations:
               paragraph: Li row; 12022 1200°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_12022_8
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
     2 hr
@@ -4165,6 +4552,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4223,6 +4613,12 @@ observations:
               paragraph: Li row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_li_volatilization_statement
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
@@ -4240,6 +4636,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -4262,6 +4661,12 @@ observations:
     section: Abstract
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_10017_0
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
@@ -4323,6 +4728,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4381,6 +4789,12 @@ observations:
               paragraph: Na row; 10017 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_10073_2
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
@@ -4482,6 +4896,9 @@ observations:
     temperature_K:
       tag: value
       value: '1223.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4540,6 +4957,12 @@ observations:
               paragraph: Na row; 12022 950°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_6
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
     2 hr
@@ -4561,6 +4984,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4619,6 +5045,12 @@ observations:
               paragraph: Na row; 12022 1050°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_7
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
     2 hr
@@ -4640,6 +5072,9 @@ observations:
     temperature_K:
       tag: value
       value: '1473.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4698,6 +5133,12 @@ observations:
               paragraph: Na row; 12022 1200°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_12022_8
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
     2 hr
@@ -4719,6 +5160,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4777,6 +5221,12 @@ observations:
               paragraph: Na row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_10
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     instantaneous
@@ -4798,6 +5248,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4856,6 +5309,12 @@ observations:
               paragraph: Na row; 14163 1050°C instantaneous column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_11
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     1 hr
@@ -4877,6 +5336,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -4935,6 +5397,12 @@ observations:
               paragraph: Na row; 14163 1050°C 1 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_12
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     6 hr
@@ -4956,6 +5424,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -5014,6 +5485,12 @@ observations:
               paragraph: Na row; 14163 1050°C 6 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_13
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     72 hr
@@ -5035,6 +5512,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -5093,6 +5573,12 @@ observations:
               paragraph: Na row; 14163 1050°C 72 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_9
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
@@ -5150,6 +5636,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'qualitative_volatilization_bound'; refusing to
@@ -5174,6 +5663,12 @@ observations:
     section: Abstract
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_10017_0
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
@@ -5315,6 +5810,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -5373,6 +5871,12 @@ observations:
               paragraph: Nd row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_nd_volatilization_statement
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
@@ -5390,6 +5894,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -5412,6 +5919,12 @@ observations:
     section: Abstract
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10017_0
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
@@ -5473,6 +5986,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -5531,6 +6047,12 @@ observations:
               paragraph: Rb row; 10017 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_10073_2
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   identity:
@@ -5592,6 +6114,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -5650,6 +6175,12 @@ observations:
               paragraph: Rb row; 10073 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_4
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   identity:
@@ -5711,6 +6242,9 @@ observations:
     temperature_K:
       tag: value
       value: '1223.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -5769,6 +6303,12 @@ observations:
               paragraph: Rb row; 12022 950°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_6
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
     2 hr
@@ -5790,6 +6330,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -5848,6 +6391,12 @@ observations:
               paragraph: Rb row; 12022 1050°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_7
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
     2 hr
@@ -5869,6 +6418,9 @@ observations:
     temperature_K:
       tag: value
       value: '1473.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -5927,6 +6479,12 @@ observations:
               paragraph: Rb row; 12022 1200°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_12022_8
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
     2 hr
@@ -5948,6 +6506,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -6006,6 +6567,12 @@ observations:
               paragraph: Rb row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_10
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     instantaneous
@@ -6027,6 +6594,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -6085,6 +6655,12 @@ observations:
               paragraph: Rb row; 14163 1050°C instantaneous column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_11
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     1 hr
@@ -6106,6 +6682,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -6164,6 +6743,12 @@ observations:
               paragraph: Rb row; 14163 1050°C 1 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_12
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     6 hr
@@ -6185,6 +6770,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -6243,6 +6831,12 @@ observations:
               paragraph: Rb row; 14163 1050°C 6 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_13
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
     72 hr
@@ -6264,6 +6858,9 @@ observations:
     temperature_K:
       tag: value
       value: '1323.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -6322,6 +6919,12 @@ observations:
               paragraph: Rb row; 14163 1050°C 72 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_9
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
@@ -6379,6 +6982,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -6402,6 +7008,12 @@ observations:
     section: Results
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_10017_0
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   identity:
@@ -6543,6 +7155,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
@@ -6601,6 +7216,12 @@ observations:
               paragraph: Sm row; 12022 1400°C 2 hr column
               source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sm_volatilization_statement
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
@@ -6618,6 +7239,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -6640,6 +7264,12 @@ observations:
     section: Abstract
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_sr_volatilization_statement
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
   identity:
@@ -6657,6 +7287,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
   value:
     kind: categorical
     categorical: bound_not_point
@@ -6679,3 +7312,9 @@ observations:
     section: Abstract
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   read_from: unknown:kems-024-gibson-hubbard-1972
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: Pa

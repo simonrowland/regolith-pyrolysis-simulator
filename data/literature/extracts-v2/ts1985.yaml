@@ -22,6 +22,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1373.15, 1573.15]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'infinite_dilution_activity_coefficient_Na_in_Pb';
@@ -50,6 +53,12 @@ observations:
     note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
       header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.
   read_from: pdf:ts1985
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_prose_1200C_range
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -73,6 +82,9 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier range does not name a reference_state
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'activity_range'; refusing to pick a number
@@ -140,6 +152,12 @@ observations:
               note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at
                 X=0.55). 5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1100
   identity:
@@ -149,11 +167,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -205,11 +223,11 @@ observations:
           - '0.6'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000027984086093147045631324272098798262102922900122648'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -298,6 +316,13 @@ observations:
               note: Table 2 X_Na2O=0.4 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1200
   identity:
@@ -307,11 +332,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -363,11 +388,11 @@ observations:
           - '0.6'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.0000033476772995562175104095569602488597629791045143362'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -456,6 +481,13 @@ observations:
               note: Table 2 X_Na2O=0.4 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1300
   identity:
@@ -465,11 +497,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -521,11 +553,11 @@ observations:
           - '0.6'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000029211070875549400442904853285719370369227757394471'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -614,6 +646,13 @@ observations:
               note: Table 2 X_Na2O=0.4 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1100
   identity:
@@ -623,11 +662,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -679,11 +718,11 @@ observations:
           - '0.55'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000027984086093147045631324272098798262102922900122648'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -772,6 +811,13 @@ observations:
               note: Table 2 X_Na2O=0.45 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1200
   identity:
@@ -781,11 +827,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -837,11 +883,11 @@ observations:
           - '0.55'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.0000033476772995562175104095569602488597629791045143362'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -930,6 +976,13 @@ observations:
               note: Table 2 X_Na2O=0.45 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1300
   identity:
@@ -939,11 +992,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -995,11 +1048,11 @@ observations:
           - '0.55'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000029211070875549400442904853285719370369227757394471'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1088,6 +1141,13 @@ observations:
               note: Table 2 X_Na2O=0.45 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1100
   identity:
@@ -1097,11 +1157,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1153,11 +1213,11 @@ observations:
           - '0.5'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000027984086093147045631324272098798262102922900122648'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1246,6 +1306,13 @@ observations:
               note: Table 2 X_Na2O=0.5 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1200
   identity:
@@ -1255,11 +1322,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1311,11 +1378,11 @@ observations:
           - '0.5'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.0000033476772995562175104095569602488597629791045143362'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1404,6 +1471,13 @@ observations:
               note: Table 2 X_Na2O=0.5 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1300
   identity:
@@ -1413,11 +1487,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1469,11 +1543,11 @@ observations:
           - '0.5'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000029211070875549400442904853285719370369227757394471'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1562,6 +1636,13 @@ observations:
               note: Table 2 X_Na2O=0.5 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1100C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1100
   identity:
@@ -1571,11 +1652,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1627,11 +1708,11 @@ observations:
           - '0.45'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.00000027984086093147045631324272098798262102922900122648'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1720,6 +1801,13 @@ observations:
               note: Table 2 X_Na2O=0.55 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1200C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1200
   identity:
@@ -1729,11 +1817,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1785,11 +1873,11 @@ observations:
           - '0.45'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.0000033476772995562175104095569602488597629791045143362'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -1878,6 +1966,13 @@ observations:
               note: Table 2 X_Na2O=0.55 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1300C
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1300
   identity:
@@ -1887,11 +1982,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2_binary_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1943,11 +2038,11 @@ observations:
           - '0.45'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000029211070875549400442904853285719370369227757394471'
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: not_applicable
       reason: profile activity does not use sweep_gas
@@ -2036,6 +2131,13 @@ observations:
               note: Table 2 X_Na2O=0.55 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
                 A, B by reading Fig. 4/7 (p. 820).
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope); identity.fO2_Pa=derived
+      via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=09c92b1c7b22
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -2069,6 +2171,9 @@ observations:
         - - SiO2
           - '0.55'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2157,6 +2262,9 @@ observations:
         - - SiO2
           - '0.45'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2245,6 +2353,9 @@ observations:
         - - SiO2
           - '0.6'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2333,6 +2444,9 @@ observations:
         - - SiO2
           - '0.5'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2453,8 +2567,8 @@ observations:
           - '0.5'
         amount_basis: mole_fraction
     fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
+      tag: value
+      value: '0.000000033476772995562175104095569602488597629791045143362'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -2535,3 +2649,9 @@ observations:
               figure: '8'
               paragraph: Gibbs-Duhem integration of Fig. 4 a_Na2O
         output_unit: K
+  derivation:
+    relation: identity.fO2_Pa=derived via oxygen_condition graphite_c_co_buffer; not a printed measurement; experiment.fO2_control.buffer,experiment.conditions.temperature_K,experiment.pressure_environment.sweep_gas
+    inputs:
+    - pdf:ts1985
+    parameters: []
+    output_unit: Pa

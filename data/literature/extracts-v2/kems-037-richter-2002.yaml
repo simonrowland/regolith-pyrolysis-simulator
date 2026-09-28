@@ -50,8 +50,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '0.0001'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -89,6 +89,12 @@ observations:
     note: γ_Mg evaporation coefficients from vacuum and H2 experiments
     source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
   read_from: unknown:kems-037-richter-2002
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-037-richter-2002
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-037-richter-2002::richter_2002_mg_table1_per_run_areas_b1
   experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::kems-037-richter-2002
   identity:
@@ -137,8 +143,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '18.7'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -172,6 +178,12 @@ observations:
     paragraph: Avg.area (cm2) and γ_Mg per run
     source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
   read_from: unknown:kems-037-richter-2002
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-037-richter-2002
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-037-richter-2002::richter_2002_sio_cai_langmuir_gamma
   experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::experiment::bcai-evaporation
   identity:
@@ -192,6 +204,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1673.0, 1773.0]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '0.0001'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
@@ -214,6 +229,12 @@ observations:
     line_range: 174-178
     source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
   read_from: unknown:kems-037-richter-2002
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-037-richter-2002
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-037-richter-2002::richter_2002_sio_table1_per_run_areas_b1
   experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::kems-037-richter-2002
   identity:
@@ -234,6 +255,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1773.15, 2073.15]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '18.7'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
@@ -255,3 +279,9 @@ observations:
     table: '1'
     source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md
   read_from: unknown:kems-037-richter-2002
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-037-richter-2002
+    parameters: []
+    output_unit: Pa
