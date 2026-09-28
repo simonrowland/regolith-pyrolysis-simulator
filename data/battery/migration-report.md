@@ -4,7 +4,7 @@ rows in: 47306
 records out (observations): 109982
 works: 257
 experiments: 3500
-queue size: 76715
+queue size: 76713
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -18036,7 +18036,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` | 18 | 18 | 107 |
 | `data/literature/extracts/kems-049-kato-1993-ms-review.yaml` | 26 | 26 | 60 |
 | `data/literature/extracts/kems-050-gorokhov-1977.yaml` | 3 | 3 | 12 |
-| `data/literature/extracts/kems-051-allibert-1981.yaml` | 9 | 99 | 76 |
+| `data/literature/extracts/kems-051-allibert-1981.yaml` | 9 | 99 | 74 |
 | `data/literature/extracts/kems-053-stolyarova-1991.yaml` | 17 | 144 | 32 |
 | `data/literature/extracts/kems-057-kambayashi-1985.yaml` | 25 | 145 | 302 |
 | `data/literature/extracts/kems-058-ohara-1987.yaml` | 34 | 110 | 259 |
@@ -18271,8 +18271,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 217221
+advisory issues: 217216
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 217221 |
+| `identity_incomplete` | 217216 |

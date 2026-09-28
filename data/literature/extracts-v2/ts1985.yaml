@@ -2059,6 +2059,16 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.45'
+        - - SiO2
+          - '0.55'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2093,6 +2103,27 @@ observations:
     note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45, 0.50,
       0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
   read_from: pdf:ts1985
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Na2O
+            - '0.45'
+          - - SiO2
+            - '0.55'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        figure: '4'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
+          0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=43ade7a03480
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -2116,6 +2147,16 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.55'
+        - - SiO2
+          - '0.45'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2150,6 +2191,27 @@ observations:
     note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45, 0.50,
       0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
   read_from: pdf:ts1985
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Na2O
+            - '0.55'
+          - - SiO2
+            - '0.45'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        figure: '4'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
+          0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=a4ac252a7641
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -2173,6 +2235,16 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.4'
+        - - SiO2
+          - '0.6'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2207,6 +2279,27 @@ observations:
     note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45, 0.50,
       0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
   read_from: pdf:ts1985
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Na2O
+            - '0.4'
+          - - SiO2
+            - '0.6'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        figure: '4'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
+          0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
 - observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B::rows:h=dad700d53e31
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
   identity:
@@ -2230,6 +2323,16 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.5'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2264,6 +2367,27 @@ observations:
     note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45, 0.50,
       0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
   read_from: pdf:ts1985
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - Na2O
+            - '0.5'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        figure: '4'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45,
+          0.50, 0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
 - observation_id: ts1985::ts1985_sio2_gibbs_duhem_1200C_X0500
   experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-table1-xna2o-0p50-t1200
   identity:

@@ -4917,8 +4917,32 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: sample_catalog_proxy
+        components:
+        - - SiO2
+          - '0.4370300404472189490300406296'
+        - - Al2O3
+          - '0.04992363851472767186779541665'
+        - - FeO
+          - '0.186631857820954309618158003'
+        - - MgO
+          - '0.1832826449540607504498940327'
+        - - CaO
+          - '0.09962773800078939244754301791'
+        - - Na2O
+          - '0.00230361043344815193559034437'
+        - - K2O
+          - '0.0004019960173842589283052064581'
+        - - TiO2
+          - '0.03808571527364136642564305475'
+        - - MnO
+          - '0.002712758537775149297030294361'
+        amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+        analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4953,7 +4977,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp.
+      1254–1255; analysis_selection_rule=source-declared catalogue analysis; no separate selection rule stated'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_quoted_demaria_1971::T=1300.0:row=12022:h=b80cfd40776e
+    source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -4973,30 +5004,11 @@ observations:
         table: '1'
         note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
           (ref 4)
-    printed_composition:
-      state:
-        tag: value
-        value:
-          SiO2: '42.3'
-          Al2O3: '8.2'
-          FeO: '21.6'
-          MgO: '11.9'
-          CaO: '9'
-          Na2O: '0.23'
-          K2O: '0.061'
-          TiO2: '4.9'
-          MnO: '0.31'
-      locator:
-        published_page: 176
-        pdf_page_index: 2
-        table: '1'
-        note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
-          (ref 4)
     composition:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4370300404472189490300406296'
@@ -5017,6 +5029,9 @@ observations:
           - - MnO
             - '0.002712758537775149297030294361'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+          analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -5293,8 +5308,32 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: sample_catalog_proxy
+        components:
+        - - SiO2
+          - '0.485754841306158984158663732'
+        - - Al2O3
+          - '0.05955850128877884928621028379'
+        - - FeO
+          - '0.1724992977246758767918186562'
+        - - MgO
+          - '0.1414449729812560117712002032'
+        - - CaO
+          - '0.1116052030350137196453243164'
+        - - Na2O
+          - '0.002399483401900649054427194723'
+        - - K2O
+          - '0.0004144362854427869574643504743'
+        - - TiO2
+          - '0.02405210204205096252796431513'
+        - - MnO
+          - '0.002271161934722159806926948548'
+        amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+        analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5329,7 +5368,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp.
+      1254–1255; analysis_selection_rule=source-declared catalogue analysis; no separate selection rule stated'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_quoted_demaria_1971::T=1300.0:row=12065:h=21e778e3fa42
+    source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -5349,30 +5395,11 @@ observations:
         table: '1'
         note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
           (ref 4)
-    printed_composition:
-      state:
-        tag: value
-        value:
-          SiO2: '47.1'
-          Al2O3: '9.8'
-          FeO: '20'
-          MgO: '9.2'
-          CaO: '10.1'
-          Na2O: '0.24'
-          K2O: '0.063'
-          TiO2: '3.1'
-          MnO: '0.26'
-      locator:
-        published_page: 176
-        pdf_page_index: 2
-        table: '1'
-        note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
-          (ref 4)
     composition:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.485754841306158984158663732'
@@ -5393,6 +5420,9 @@ observations:
           - - MnO
             - '0.002271161934722159806926948548'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+          analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -5669,8 +5699,32 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: sample_catalog_proxy
+        components:
+        - - SiO2
+          - '0.4370300404472189490300406296'
+        - - Al2O3
+          - '0.04992363851472767186779541665'
+        - - FeO
+          - '0.186631857820954309618158003'
+        - - MgO
+          - '0.1832826449540607504498940327'
+        - - CaO
+          - '0.09962773800078939244754301791'
+        - - Na2O
+          - '0.00230361043344815193559034437'
+        - - K2O
+          - '0.0004019960173842589283052064581'
+        - - TiO2
+          - '0.03808571527364136642564305475'
+        - - MnO
+          - '0.002712758537775149297030294361'
+        amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+        analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5705,7 +5759,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp.
+      1254–1255; analysis_selection_rule=source-declared catalogue analysis; no separate selection rule stated'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_quoted_demaria_1971::T=1400.0:row=12022:h=e73a6626cdd0
+    source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -5725,30 +5786,11 @@ observations:
         table: '1'
         note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
           (ref 4)
-    printed_composition:
-      state:
-        tag: value
-        value:
-          SiO2: '42.3'
-          Al2O3: '8.2'
-          FeO: '21.6'
-          MgO: '11.9'
-          CaO: '9'
-          Na2O: '0.23'
-          K2O: '0.061'
-          TiO2: '4.9'
-          MnO: '0.31'
-      locator:
-        published_page: 176
-        pdf_page_index: 2
-        table: '1'
-        note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
-          (ref 4)
     composition:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.4370300404472189490300406296'
@@ -5769,6 +5811,9 @@ observations:
           - - MnO
             - '0.002712758537775149297030294361'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+          analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -6045,8 +6090,32 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: sample_catalog_proxy
+        components:
+        - - SiO2
+          - '0.485754841306158984158663732'
+        - - Al2O3
+          - '0.05955850128877884928621028379'
+        - - FeO
+          - '0.1724992977246758767918186562'
+        - - MgO
+          - '0.1414449729812560117712002032'
+        - - CaO
+          - '0.1116052030350137196453243164'
+        - - Na2O
+          - '0.002399483401900649054427194723'
+        - - K2O
+          - '0.0004144362854427869574643504743'
+        - - TiO2
+          - '0.02405210204205096252796431513'
+        - - MnO
+          - '0.002271161934722159806926948548'
+        amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+        analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6081,7 +6150,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp.
+      1254–1255; analysis_selection_rule=source-declared catalogue analysis; no separate selection rule stated'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_quoted_demaria_1971::T=1400.0:row=12065:h=e88ed71705eb
+    source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -6101,30 +6177,11 @@ observations:
         table: '1'
         note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
           (ref 4)
-    printed_composition:
-      state:
-        tag: value
-        value:
-          SiO2: '47.1'
-          Al2O3: '9.8'
-          FeO: '20'
-          MgO: '9.2'
-          CaO: '10.1'
-          Na2O: '0.24'
-          K2O: '0.063'
-          TiO2: '3.1'
-          MnO: '0.26'
-      locator:
-        published_page: 176
-        pdf_page_index: 2
-        table: '1'
-        note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
-          (ref 4)
     composition:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.485754841306158984158663732'
@@ -6145,6 +6202,9 @@ observations:
           - - MnO
             - '0.002271161934722159806926948548'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+          analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -6421,8 +6481,32 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: sample_catalog_proxy
+        components:
+        - - SiO2
+          - '0.485754841306158984158663732'
+        - - Al2O3
+          - '0.05955850128877884928621028379'
+        - - FeO
+          - '0.1724992977246758767918186562'
+        - - MgO
+          - '0.1414449729812560117712002032'
+        - - CaO
+          - '0.1116052030350137196453243164'
+        - - Na2O
+          - '0.002399483401900649054427194723'
+        - - K2O
+          - '0.0004144362854427869574643504743'
+        - - TiO2
+          - '0.02405210204205096252796431513'
+        - - MnO
+          - '0.002271161934722159806926948548'
+        amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+        analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6457,7 +6541,14 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp.
+      1254–1255; analysis_selection_rule=source-declared catalogue analysis; no separate selection rule stated'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_quoted_demaria_1971::T=1500.0:row=12065:h=1ab8768e29c2
+    source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -6477,30 +6568,11 @@ observations:
         table: '1'
         note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
           (ref 4)
-    printed_composition:
-      state:
-        tag: value
-        value:
-          SiO2: '47.1'
-          Al2O3: '9.8'
-          FeO: '20'
-          MgO: '9.2'
-          CaO: '10.1'
-          Na2O: '0.24'
-          K2O: '0.063'
-          TiO2: '3.1'
-          MnO: '0.26'
-      locator:
-        published_page: 176
-        pdf_page_index: 2
-        table: '1'
-        note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
-          (ref 4)
     composition:
       state:
         tag: value
         value:
-          basis: printed_oxides
+          basis: sample_catalog_proxy
           components:
           - - SiO2
             - '0.485754841306158984158663732'
@@ -6521,6 +6593,9 @@ observations:
           - - MnO
             - '0.002271161934722159806926948548'
           amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
+          analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
       locator:
         published_page: 176
         pdf_page_index: 2
@@ -6799,7 +6874,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4311471091931851005512625625'
@@ -6822,6 +6897,13 @@ observations:
         - - P2O5
           - '0.0005817825557497747304128963893'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+          component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+          a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+          excluding component and clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6864,7 +6946,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I Na rows; sample 10017 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70
+      GSC complete bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after the
+      reference summary, excluding component and clast analyses; do not average analyses. This composition is a cross-source
+      same-sample proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use the first complete named
+      whole-sample bulk-analysis column after the reference summary, excluding component and clast analyses; do not average
+      analyses'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1400.0:row=10017:h=60df169fee87
+    source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding component
+      and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not a composition
+      printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -6873,6 +6969,232 @@ observations:
     note: Table I Na rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: sample_catalog_proxy
+          components:
+          - - SiO2
+            - '0.4311471091931851005512625625'
+          - - TiO2
+            - '0.0931387200602371283425576716'
+          - - Al2O3
+            - '0.05058895877492316107811212988'
+          - - FeO
+            - '0.1752439414041254084196055855'
+          - - MnO
+            - '0.001970060031040465601226515821'
+          - - MgO
+            - '0.1205710800811418883677677291'
+          - - CaO
+            - '0.1195081584536437715237347561'
+          - - Na2O
+            - '0.005227074752535481915639870165'
+          - - K2O
+            - '0.002023114693417819469680283369'
+          - - P2O5
+            - '0.0005817825557497747304128963893'
+          amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+            component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+            a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+            excluding component and clast analyses; do not average analyses
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 10017 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.78'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '11.71'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.12'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.82'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.22'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.65'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.51'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -6965,7 +7287,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4311471091931851005512625625'
@@ -6988,6 +7310,13 @@ observations:
         - - P2O5
           - '0.0005817825557497747304128963893'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+          component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+          a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+          excluding component and clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7030,7 +7359,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I Na rows; sample 10017 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70
+      GSC complete bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after the
+      reference summary, excluding component and clast analyses; do not average analyses. This composition is a cross-source
+      same-sample proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use the first complete named
+      whole-sample bulk-analysis column after the reference summary, excluding component and clast analyses; do not average
+      analyses'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1500.0:row=10017:h=279efc049af6
+    source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding component
+      and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not a composition
+      printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -7039,6 +7382,232 @@ observations:
     note: Table I Na rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: sample_catalog_proxy
+          components:
+          - - SiO2
+            - '0.4311471091931851005512625625'
+          - - TiO2
+            - '0.0931387200602371283425576716'
+          - - Al2O3
+            - '0.05058895877492316107811212988'
+          - - FeO
+            - '0.1752439414041254084196055855'
+          - - MnO
+            - '0.001970060031040465601226515821'
+          - - MgO
+            - '0.1205710800811418883677677291'
+          - - CaO
+            - '0.1195081584536437715237347561'
+          - - Na2O
+            - '0.005227074752535481915639870165'
+          - - K2O
+            - '0.002023114693417819469680283369'
+          - - P2O5
+            - '0.0005817825557497747304128963893'
+          amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+            component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+            a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+            excluding component and clast analyses; do not average analyses
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 10017 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.78'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '11.71'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.12'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.82'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.22'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.65'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.51'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 10017 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -7131,7 +7700,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4276962562759165078431124469'
@@ -7152,6 +7721,13 @@ observations:
         - - K2O
           - '0.001663460884936076679979674698'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this
+          is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7194,7 +7770,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I Na rows; sample 12073 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70
+      complete whole-sample bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column
+      after partial/component columns, excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous
+      regolith breccia, so this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use
+      the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast analyses;
+      do not average analyses'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work_12073::T=1400.0:row=12073:h=e710b7f1433b
+    source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast
+      analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this is a cross-source same-sample
+      bulk proxy, not a composition printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -7203,6 +7793,212 @@ observations:
     note: Table I Na rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: sample_catalog_proxy
+          components:
+          - - SiO2
+            - '0.4276962562759165078431124469'
+          - - TiO2
+            - '0.02432811158893445609474737032'
+          - - Al2O3
+            - '0.09220708776029153323414621159'
+          - - FeO
+            - '0.148306989269107509425075919'
+          - - MnO
+            - '0.001148612310222625661546886446'
+          - - MgO
+            - '0.1710597119356819918304513602'
+          - - CaO
+            - '0.1285334811441748981775147172'
+          - - Na2O
+            - '0.005056288830734401053425412828'
+          - - K2O
+            - '0.001663460884936076679979674698'
+          amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+            excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so
+            this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component
+            columns, excluding basalt-clast analyses; do not average analyses
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 12073 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '17'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -7295,7 +8091,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4276962562759165078431124469'
@@ -7316,6 +8112,13 @@ observations:
         - - K2O
           - '0.001663460884936076679979674698'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this
+          is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7358,7 +8161,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I Na rows; sample 12073 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70
+      complete whole-sample bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column
+      after partial/component columns, excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous
+      regolith breccia, so this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use
+      the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast analyses;
+      do not average analyses'
+    origin: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work_12073::T=1500.0:row=12073:h=0cdb3eba1f97
+    source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast
+      analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this is a cross-source same-sample
+      bulk proxy, not a composition printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -7367,6 +8184,212 @@ observations:
     note: Table I Na rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: sample_catalog_proxy
+          components:
+          - - SiO2
+            - '0.4276962562759165078431124469'
+          - - TiO2
+            - '0.02432811158893445609474737032'
+          - - Al2O3
+            - '0.09220708776029153323414621159'
+          - - FeO
+            - '0.148306989269107509425075919'
+          - - MnO
+            - '0.001148612310222625661546886446'
+          - - MgO
+            - '0.1710597119356819918304513602'
+          - - CaO
+            - '0.1285334811441748981775147172'
+          - - Na2O
+            - '0.005056288830734401053425412828'
+          - - K2O
+            - '0.001663460884936076679979674698'
+          amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+            excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so
+            this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component
+            columns, excluding basalt-clast analyses; do not average analyses
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 12073 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '17'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I Na rows; sample 12073 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -9709,7 +10732,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4311471091931851005512625625'
@@ -9732,6 +10755,13 @@ observations:
         - - P2O5
           - '0.0005817825557497747304128963893'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+          component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+          a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+          excluding component and clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9774,7 +10804,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I TiO rows; sample 10017 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70
+      GSC complete bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after the
+      reference summary, excluding component and clast analyses; do not average analyses. This composition is a cross-source
+      same-sample proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use the first complete named
+      whole-sample bulk-analysis column after the reference summary, excluding component and clast analyses; do not average
+      analyses'
+    origin: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work::T=2100.0:row=10017:h=bc0d169f5782
+    source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding component
+      and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not a composition
+      printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -9783,6 +10827,232 @@ observations:
     note: Table I TiO rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: sample_catalog_proxy
+          components:
+          - - SiO2
+            - '0.4311471091931851005512625625'
+          - - TiO2
+            - '0.0931387200602371283425576716'
+          - - Al2O3
+            - '0.05058895877492316107811212988'
+          - - FeO
+            - '0.1752439414041254084196055855'
+          - - MnO
+            - '0.001970060031040465601226515821'
+          - - MgO
+            - '0.1205710800811418883677677291'
+          - - CaO
+            - '0.1195081584536437715237347561'
+          - - Na2O
+            - '0.005227074752535481915639870165'
+          - - K2O
+            - '0.002023114693417819469680283369'
+          - - P2O5
+            - '0.0005817825557497747304128963893'
+          amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+            component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+            a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+            excluding component and clast analyses; do not average analyses
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 10017 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.78'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '11.71'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.12'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.82'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.22'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.65'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.51'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -9875,7 +11145,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4311471091931851005512625625'
@@ -9898,6 +11168,13 @@ observations:
         - - P2O5
           - '0.0005817825557497747304128963893'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+          component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+          a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+          excluding component and clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9940,7 +11217,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I TiO rows; sample 10017 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70
+      GSC complete bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after the
+      reference summary, excluding component and clast analyses; do not average analyses. This composition is a cross-source
+      same-sample proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use the first complete named
+      whole-sample bulk-analysis column after the reference summary, excluding component and clast analyses; do not average
+      analyses'
+    origin: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work::T=2200.0:row=10017:h=02e402d12d9e
+    source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding component
+      and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not a composition
+      printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -9949,6 +11240,232 @@ observations:
     note: Table I TiO rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: sample_catalog_proxy
+          components:
+          - - SiO2
+            - '0.4311471091931851005512625625'
+          - - TiO2
+            - '0.0931387200602371283425576716'
+          - - Al2O3
+            - '0.05058895877492316107811212988'
+          - - FeO
+            - '0.1752439414041254084196055855'
+          - - MnO
+            - '0.001970060031040465601226515821'
+          - - MgO
+            - '0.1205710800811418883677677291'
+          - - CaO
+            - '0.1195081584536437715237347561'
+          - - Na2O
+            - '0.005227074752535481915639870165'
+          - - K2O
+            - '0.002023114693417819469680283369'
+          - - P2O5
+            - '0.0005817825557497747304128963893'
+          amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-10017, Table 1a, Maxwell70 GSC complete bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after the reference summary, excluding
+            component and clast analyses; do not average analyses. This composition is a cross-source same-sample proxy, not
+            a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+            excluding component and clast analyses; do not average analyses
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 10017 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.78'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '11.71'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.12'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '19.82'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.22'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '7.65'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.55'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.51'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 10017 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -10041,7 +11558,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4276962562759165078431124469'
@@ -10062,6 +11579,13 @@ observations:
         - - K2O
           - '0.001663460884936076679979674698'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this
+          is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10104,7 +11628,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I TiO rows; sample 12073 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70
+      complete whole-sample bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column
+      after partial/component columns, excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous
+      regolith breccia, so this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use
+      the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast analyses;
+      do not average analyses'
+    origin: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work_12073::T=2100.0:row=12073:h=dc8a5bc530df
+    source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast
+      analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this is a cross-source same-sample
+      bulk proxy, not a composition printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -10113,6 +11651,212 @@ observations:
     note: Table I TiO rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: sample_catalog_proxy
+          components:
+          - - SiO2
+            - '0.4276962562759165078431124469'
+          - - TiO2
+            - '0.02432811158893445609474737032'
+          - - Al2O3
+            - '0.09220708776029153323414621159'
+          - - FeO
+            - '0.148306989269107509425075919'
+          - - MnO
+            - '0.001148612310222625661546886446'
+          - - MgO
+            - '0.1710597119356819918304513602'
+          - - CaO
+            - '0.1285334811441748981775147172'
+          - - Na2O
+            - '0.005056288830734401053425412828'
+          - - K2O
+            - '0.001663460884936076679979674698'
+          amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+            excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so
+            this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component
+            columns, excluding basalt-clast analyses; do not average analyses
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 12073 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '17'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
@@ -10205,7 +11949,7 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_oxides
+        basis: sample_catalog_proxy
         components:
         - - SiO2
           - '0.4276962562759165078431124469'
@@ -10226,6 +11970,13 @@ observations:
         - - K2O
           - '0.001663460884936076679979674698'
         amount_basis: mole_fraction
+        proxy_flag: composition_from_sample_catalog
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+          Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this
+          is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+          excluding basalt-clast analyses; do not average analyses
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10268,7 +12019,21 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table I TiO rows; sample 12073 is this-work data
-  notices: []
+  notices:
+  - kind: composition_from_sample_catalog
+    affected_quantities:
+    - p_partial
+    reason: 'composition_from_sample_catalog: source=Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70
+      complete whole-sample bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column
+      after partial/component columns, excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous
+      regolith breccia, so this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.; analysis_selection_rule=use
+      the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast analyses;
+      do not average analyses'
+    origin: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work_12073::T=2200.0:row=12073:h=80decee22021
+    source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis. Selection
+      rule: use the first complete named whole-sample bulk-analysis column after partial/component columns, excluding basalt-clast
+      analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so this is a cross-source same-sample
+      bulk proxy, not a composition printed by DeMaria 1973.'
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
@@ -10277,6 +12042,212 @@ observations:
     note: Table I TiO rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: sample_catalog_proxy
+          components:
+          - - SiO2
+            - '0.4276962562759165078431124469'
+          - - TiO2
+            - '0.02432811158893445609474737032'
+          - - Al2O3
+            - '0.09220708776029153323414621159'
+          - - FeO
+            - '0.148306989269107509425075919'
+          - - MnO
+            - '0.001148612310222625661546886446'
+          - - MgO
+            - '0.1710597119356819918304513602'
+          - - CaO
+            - '0.1285334811441748981775147172'
+          - - Na2O
+            - '0.005056288830734401053425412828'
+          - - K2O
+            - '0.001663460884936076679979674698'
+          amount_basis: mole_fraction
+          proxy_flag: composition_from_sample_catalog
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12073, Table 1, LSPET70 complete whole-sample bulk analysis.
+            Selection rule: use the first complete named whole-sample bulk-analysis column after partial/component columns,
+            excluding basalt-clast analyses; do not average analyses. Sample 12073 is a heterogeneous regolith breccia, so
+            this is a cross-source same-sample bulk proxy, not a composition printed by DeMaria 1973.'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after partial/component
+            columns, excluding basalt-clast analyses; do not average analyses
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 12073 is this-work data
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '41'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.1'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '17'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.13'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '11.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.25'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              published_page: 176
+              pdf_page_index: 2
+              table: '1'
+              note: Table I TiO rows; sample 12073 is this-work data
+        output_unit: mole_fraction
     temperature_K:
       state:
         tag: value
