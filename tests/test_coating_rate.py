@@ -692,10 +692,18 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     #     changes shape here because the cache-sensitive engagement block
     #     moved out of the hashed payload (b-238, above).
     #     Recomputed on the CI machine class (mac-studio-256-1, ci-jobs tree).
-    # Rebaselined after 644fac1a changed out-of-domain C0/C0b transport from
-    # broad refusal to compute-and-mark. The C2A/C4 Knudsen safety gate is
-    # retained; this digest still excludes only the cache-sensitive block
-    # above.
+    # There is no standalone diagnostic JSON golden; comparing the serialized
+    # report at 113b with this stack attributes the moved digest by key:
+    # K/Mg/Na/SiO changed P_eq_Pa, P_bulk_Pa, max/current flux, and sweep flux;
+    # in the same-environment 113b/current payload diff these pressure and
+    # flux fields are about 0.8647 of their prior values. simulator/diagnostics.py
+    # replays them from each species' latest evaporation-series resistance
+    # record. Fe changed from a 1.9437e-5 kg cumulative deposit with no latest
+    # series state to an upper-bound row whose deposit quantity is unavailable
+    # for missing melt-transfer inputs, and the refused CrO2 row disappeared.
+    # The digest therefore includes the stack's changed redox/transport and
+    # wall-deposit report semantics, not a replacement number copied from a
+    # failing run. C2A/C4's load-bearing Knudsen refusal remains.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
         "733e466b474b44178b5346764f782e971da71d48b22084c73fdd9e2e5cf54a0d"
     )

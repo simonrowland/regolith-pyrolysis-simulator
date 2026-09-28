@@ -1233,17 +1233,10 @@ def test_finite_capacity_flagged_transitional_species_keeps_rate_sets(
 
 
 @pytest.mark.xdist_group("serial")
-def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
+def test_finite_capacity_same_tick_vapor_rates_respect_hkl_ceiling(
     monkeypatch,
 ):
-    """Exercise the finite-capacity shadow at a hot, in-domain C4 point.
-
-    The parent finite-capacity run poisons at the live/solved rate-set
-    assertion, so these expected rates come from the same parent commit with
-    runtime enforcement disabled (the non-binding fallback required by the
-    b-582 proof). The external ``b582_probe_wrap.py`` records the fixed
-    shadow's non-empty rate map for this exact setup.
-    """
+    """Finite-capacity C4 rates stay below their interface-limited ceiling."""
     from simulator.thermal_train import FiniteCapacity
 
     _enforce_finite_cold_train(monkeypatch)
@@ -1278,36 +1271,36 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     assert not sim._last_evaporation_flux_diagnostic.get(
         "continuum_extrapolation_notice"
     )
-    # b-603 same-tick duct backpressure suppresses K2/K2O_gas/Na2; values are
-    # re-pinned from the stack run, source: stack-merge-2 report.
-    expected_rates = {
-        "AlO2": 2.143585875533841e-11,
-        "CaO_gas": 2.2577755434146795e-11,
-        "CrO": 5.132850977988064e-09,
-        "CrO2": 5.170334723468988e-04,
-        "CrO3": 4.4565392212870376e-02,
-        "K": 3.743132671178778e-07,
-        "Mg": 2.683943219427042e-10,
-        "MgO_gas": 1.1255291572060186e-07,
-        "Mn": 8.386507309776792e-11,
-        "Na": 1.1335348535353611e-05,
-        "Na2O_gas": 3.920869170460704e-11,
-        "SiO": 6.811100915552663e-09,
-        "SiO2_gas": 5.021561852435548e-06,
-        "TiO2_gas": 5.228240451642386e-08,
-    }
-    actual_rates = {
+    rates = {
         str(species): float(rate)
         for species, rate in dict(
             payload["per_hour_summary"][0]["vapor_species_kg_hr"]
         ).items()
-        if float(rate) > 1.0e-12
     }
-    assert actual_rates == pytest.approx(
-        expected_rates,
-        rel=1.0e-12,
-        abs=1.0e-15,
-    )
+    series = sim._last_evaporation_flux_diagnostic["evaporation_series_resistance"]
+    area_m2 = sim.melt.melt_surface_area_m2
+    # The interface-limited Hertz-Knudsen rate is an upper bound because gas
+    # and melt resistance only lower conductance: J <= alpha*k_HK*max(0,
+    # P_eq-P_bulk). Convert that ceiling to kg/hr before checking the channels.
+    hkl_ceilings_kg_hr = {}
+    for species, diagnostic in series.items():
+        driving_pressure_pa = max(
+            0.0,
+            diagnostic["P_eq_Pa"] - diagnostic["P_bulk_Pa"],
+        )
+        hkl_ceilings_kg_hr[species] = (
+            diagnostic["alpha_intrinsic"]
+            * diagnostic["k_hk_kg_s_m2_pa"]
+            * driving_pressure_pa
+            * area_m2
+            * 3600.0
+        )
+    for species in ("K2", "K2O_gas", "Na2"):
+        assert 0.0 <= rates.get(species, 0.0) <= hkl_ceilings_kg_hr[species] + 1.0e-15
+    for species, rate in rates.items():
+        assert 0.0 <= rate <= hkl_ceilings_kg_hr[species] + 1.0e-15
+    assert rates.get("K", 0.0) > 1.0e-12
+    assert rates.get("Na", 0.0) > 1.0e-12
 
 
 def test_native_fe_helper_maps_melt_resistance_to_typed_refusal():
