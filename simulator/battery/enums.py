@@ -171,6 +171,7 @@ class NoticeKind(StrEnum):
     PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
+    IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 
 
 class ReferenceStateConvention(StrEnum):
