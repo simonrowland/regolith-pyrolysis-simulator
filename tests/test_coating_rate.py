@@ -679,11 +679,10 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # byte-identical, and checking out the pin commit in this same tree
     # reproduces 6e75e35e... exactly.
     #
-    # ★ WHAT THIS DIGEST NOW PINS: the default C0 recipe DIES AT HOUR 14
-    # because overhead pressure falls through the viscous-flow band that
-    # mandate section 4 requires (Kn well below 0.01). That is a recipe
-    # question -- raise pN2 before Kn crosses -- not a golden question, and it
-    # is tracked separately. This pin records what the code does; it does not
+    # ★ WHAT THIS DIGEST NOW PINS: the default C0 fixture completes the
+    # requested 24 hours. per_hour_summary has an hour-24 row (receipt-r5).
+    # The hour-14 Knudsen stop in the bisect above is the dd62edf0-era run,
+    # not this payload. This pin records what the code does; it does not
     # bless the recipe.
     #   sc130 wave 2 (2026-08-26) — THIRD intentional mover, prose-only.
     #     1487 string leaves changed and ZERO numeric leaves (verified by a
