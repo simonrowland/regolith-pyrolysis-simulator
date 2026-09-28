@@ -87,6 +87,9 @@ from simulator.battery.records import (
     phase_token,
     union_notices,
 )
+from simulator.battery.oxygen_balance import (
+    has_own_engine_solved_oxygen_balance,
+)
 from simulator.battery.source_lineage import coefficient_lineage_sources
 from simulator.accounting.formulas import parse_formula
 from simulator.battery.validity import run_validity_gates
@@ -390,16 +393,23 @@ def _table_payloads(
     return tuple(payloads)
 
 
-def _pressure_blocking_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
+def _pressure_blocking_notices(
+    *groups: tuple[Notice, ...] | None,
+    oxygen_balance_effusion_solved: bool = False,
+) -> tuple[Notice, ...]:
+    notices = tuple(notice for group in groups if group for notice in group)
     found: list[Notice] = []
-    for group in groups:
-        if not group:
+    for notice in notices:
+        if notice.kind not in _PRESSURE_BLOCKING_NOTICES:
             continue
-        for notice in group:
-            if notice.kind not in _PRESSURE_BLOCKING_NOTICES:
-                continue
-            if any(q in _VAPOUR_EQUILIBRIUM for q in notice.affected_quantities):
-                found.append(notice)
+        if (
+            oxygen_balance_effusion_solved
+            and notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            and notice.reason.startswith("fO2_Pa is a DERIVED condition")
+        ):
+            continue
+        if any(q in _VAPOUR_EQUILIBRIUM for q in notice.affected_quantities):
+            found.append(notice)
     return tuple(found)
 
 
@@ -1595,10 +1605,17 @@ def validate_residual(
             if isinstance(reference.identity, Identity):
                 quantity = quantity_token(reference.identity)
             if quantity in _VAPOUR_EQUILIBRIUM:
+                oxygen_balance_effusion_solved = has_own_engine_solved_oxygen_balance(
+                    None
+                    if candidate is None or candidate.engine is None
+                    else candidate.engine.name,
+                    () if candidate is None else candidate.notices,
+                )
                 blocking = _pressure_blocking_notices(
                     residual.notices,
                     reference.notices,
                     None if candidate is None else candidate.notices,
+                    oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
                 )
                 if blocking:
                     issues.append(

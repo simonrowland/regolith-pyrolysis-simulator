@@ -287,6 +287,15 @@ benches:
   apparatus_family:
     state: {tag: value, value: Knudsen mass spectrometry}
     locator: {page: 9, paragraph: primary experimental methods KMS and TMS}
+  cell_materials:
+    - state:
+        tag: value
+        value: Pt
+      locator:
+        page: 53
+        figure: '20'
+        pdf_page_index: 59
+        note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
   cell_material_and_liner:
     state: {tag: value, value: platinum KMS cell}
     locator:

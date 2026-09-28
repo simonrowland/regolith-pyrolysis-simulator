@@ -62,6 +62,14 @@ benches:
   method:
     state: {tag: value, value: Knudsen effusion mass spectrometry}
     locator: *apparatus_locator
+  cell_materials:
+    - state:
+        tag: value
+        value: ThO2
+      locator:
+        published_page: 383
+        pdf_page_index: 2
+        section: III.1 Experimental Apparatus
   cell_material_and_liner:
     state: {tag: value, value: Laboratory-made thoria Knudsen cell}
     locator: *apparatus_locator

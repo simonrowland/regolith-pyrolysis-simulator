@@ -133,7 +133,7 @@ from simulator.battery.records import (
     _is_source_internally_inconsistent,
     as_decimal,
 )
-from simulator.battery.enums import BenchIdentityBasis
+from simulator.battery.enums import BenchIdentityBasis, CellMaterial
 from simulator.battery.validate import (
     ValidationIssue,
     ValidationReport,
@@ -1547,6 +1547,15 @@ def bench_from_plain(payload: object) -> Bench:
         raw = payload.get(name)
         return None if raw is None else _located_from_plain(raw, str)
 
+    raw_cell_materials = payload.get("cell_materials")
+    if raw_cell_materials is not None and not isinstance(raw_cell_materials, (list, tuple)):
+        raise TypeError("bench cell_materials must be a list")
+    cell_materials = (
+        None
+        if raw_cell_materials is None
+        else tuple(_located_from_plain(item, CellMaterial) for item in raw_cell_materials)
+    )
+
     def value_or_text(raw: object) -> object:
         if isinstance(raw, Mapping) and raw.get("kind") is not None:
             return _value_or_point_from_plain(raw)
@@ -1573,6 +1582,7 @@ def bench_from_plain(payload: object) -> Bench:
         apparatus_family=located_text("apparatus_family"),
         method=located_text("method"),
         cell_material_and_liner=located_text("cell_material_and_liner"),
+        cell_materials=cell_materials,
         geometry=_geometry_from_plain(payload.get("geometry")),
         pumping_type=located_text("pumping_type"),
         pumping_speed_m3_s=None

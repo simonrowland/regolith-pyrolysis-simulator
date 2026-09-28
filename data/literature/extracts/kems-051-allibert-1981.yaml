@@ -78,6 +78,15 @@ benches:
   apparatus_family:
     state: {tag: value, value: differential Knudsen-effusion mass spectrometry}
     locator: {published_page: 308, pdf_page_index: 2, section: II Mass-Spectrometric Measurements}
+  cell_materials:
+    - state:
+        tag: value
+        value: Mo
+      locator:
+        published_page: 308
+        pdf_page_index: 2
+        section: II Mass-Spectrometric Measurements
+        note: 'Section II: “Six effusion cells were drilled in a molybdenum block.”'
   cell_material_and_liner:
     state: {tag: value, value: molybdenum}
     locator:
