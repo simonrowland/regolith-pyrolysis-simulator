@@ -1892,75 +1892,126 @@ def _cell_material_values(
     return tuple(values)
 
 
+_CELL_ELEMENT_SYMBOLS = frozenset(
+    "H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co "
+    "Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb "
+    "Te I Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re "
+    "Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es "
+    "Fm Md No Lr Rf Db Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv Ts Og".split()
+)
+_CELL_INERT_SYMBOLS = frozenset({"Pt", "Ir"})
+_CELL_REACTIVE_SYMBOLS = frozenset({"W", "Mo", "Ta", "Nb", "Ni", "Fe", "C"})
+_CELL_INERT_NAME_RE = re.compile(r"\b(?:platinum|iridium)\b", re.IGNORECASE)
+_CELL_REACTIVE_NAME_RE = re.compile(
+    r"\b(?:tungsten|molybdenum|tantalum|niobium|nickel|iron|steel|graphite|carbon|c)\b",
+    re.IGNORECASE,
+)
+_CELL_RHENIUM_NAME_RE = re.compile(r"\brhenium\b", re.IGNORECASE)
+_CELL_NOT_INERT_NAME_RE = re.compile(
+    r"\b(?:alumina|al2o3|sapphire|quartz|silica|sio2|y2o3|yttria|thoria|tho2|"
+    r"beo|beryllia|mgo|magnesia|zro2|zirconia|bn|boron\s+nitride|sic|"
+    r"aluminium|aluminum|rhodium)\b",
+    re.IGNORECASE,
+)
+_CELL_UNKNOWN_RE = re.compile(
+    r"\b(?:unknown|unspecified|unreported|not reported|not specified)\b",
+    re.IGNORECASE,
+)
+_CELL_OXIDATION_RE = re.compile(
+    r"\b(?:oxide|oxidized|oxidised|passivation|passivated)\b", re.IGNORECASE
+)
+_CELL_CHEMICAL_TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
+_CELL_HYPHENATED_FORMULA_RE = re.compile(
+    r"(?<![A-Za-z0-9])(?:[A-Z][a-z]?\d*)(?:[-/](?:[A-Z][a-z]?\d*))+"
+    r"(?![A-Za-z0-9])"
+)
+_CELL_ELEMENT_PART_RE = re.compile(r"([A-Z][a-z]?)(\d*)")
+
+
 def _cell_material_class(materials: Sequence[str]) -> str:
     if not materials:
         return "unknown"
-    platinum_re = re.compile(r"(?<![a-z])(?:pt|platinum)(?![a-z])", re.IGNORECASE)
-    iridium_re = re.compile(r"(?<![a-z])(?:ir|iridium)(?![a-z])", re.IGNORECASE)
-    pt_ir_composition = (
-        r"(?:(?:pt|platinum)[\s/-]*(?:ir|iridium)|"
-        r"(?:ir|iridium)[\s/-]*(?:pt|platinum)|ptir|irpt)"
-    )
-    pt_ir_pair_re = re.compile(
-        rf"(?<![a-z]){pt_ir_composition}(?![a-z])",
-        re.IGNORECASE,
-    )
-    pt_ir_alloy_re = re.compile(
-        rf"(?<![a-z]){pt_ir_composition}[\s/-]+alloys?\b",
-        re.IGNORECASE,
-    )
-    inert_re = re.compile(
-        rf"{pt_ir_pair_re.pattern}|{platinum_re.pattern}|{iridium_re.pattern}",
-        re.IGNORECASE,
-    )
-    alloy_re = re.compile(r"\balloys?\b", re.IGNORECASE)
-    reactive_re = re.compile(
-        r"\b(?:w|tungsten|mo|molybdenum|ta|tantalum|graphite|carbon)\b",
-        re.IGNORECASE,
-    )
-    rhenium_re = re.compile(r"\b(?:re|rhenium)\b", re.IGNORECASE)
-    oxidation_re = re.compile(r"\b(?:oxide|oxidized|oxidised|passivation|passivated)\b", re.IGNORECASE)
-    unknown_re = re.compile(
-        r"\b(?:unknown|unspecified|unreported|not reported|not specified)\b",
-        re.IGNORECASE,
-    )
-    description_re = re.compile(
-        r"\b(?:cell|cells|liner|liners|crucible|crucibles|effusion|knudsen|"
-        r"cup|cups|vessel|vessels|container|containers|tube|tubes|apparatus|"
-        r"alloy|alloys|metal|material|materials|pure|foil|wire|powder|pellet|"
-        r"sheet|strip|rod|ring|with|the|a|an|of|and|or|in|made|from|coated|"
-        r"coat|lid|disc|later|using|used|was|were|is|are|as|for|to|by)\b",
-        re.IGNORECASE,
-    )
     classes: list[str] = []
     for material in materials:
-        text = material.casefold()
-        if re.search(r"\bmixed\b", text):
-            classes.append("mixed")
-            continue
-        if unknown_re.search(text):
+        if _CELL_UNKNOWN_RE.search(material):
             classes.append("unknown")
             continue
-        inert = bool(inert_re.search(text))
-        reactive = bool(reactive_re.search(text)) or bool(
-            rhenium_re.search(text) and oxidation_re.search(text)
-        )
-        other_text = inert_re.sub(" ", text)
-        other_material = re.sub(
-            r"\b\d+(?:\.\d+)?\b|[\W_]+",
-            "",
-            description_re.sub(" ", other_text),
-        )
-        if len(alloy_re.findall(text)) > len(pt_ir_alloy_re.findall(text)):
-            other_material += "alloy"
-        if inert and (reactive or other_material):
+
+        oxidation = bool(_CELL_OXIDATION_RE.search(material))
+        material_classes: set[str] = set()
+        if _CELL_INERT_NAME_RE.search(material):
+            material_classes.add("inert")
+        if _CELL_REACTIVE_NAME_RE.search(material):
+            material_classes.add("reactive")
+        if _CELL_RHENIUM_NAME_RE.search(material):
+            material_classes.add("reactive" if oxidation else "not_inert")
+        if _CELL_NOT_INERT_NAME_RE.search(material):
+            material_classes.add("not_inert")
+
+        # Symbols use canonical case and whole tokens, so words like "in", "as",
+        # "no", and "at" do not become elements; the c in "0.025 cm" is not C.
+        # Element names above remain case-insensitive.
+        def symbol_class(symbol: str) -> str:
+            if symbol in _CELL_INERT_SYMBOLS:
+                return "inert"
+            if symbol == "Re":
+                return "reactive" if oxidation else "not_inert"
+            if symbol in _CELL_REACTIVE_SYMBOLS:
+                return "reactive"
+            return "not_inert"
+
+        def formula_classes(symbols: Sequence[str]) -> set[str]:
+            if len(symbols) == 1:
+                return {symbol_class(symbols[0])}
+            symbol_classes = {symbol_class(symbol) for symbol in symbols}
+            if symbol_classes == {"inert"}:
+                return {"inert"}
+            formula_class = {"not_inert"}
+            if "inert" in symbol_classes:
+                formula_class.add("inert")
+            return formula_class
+
+        formula_spans: list[tuple[int, int]] = []
+        for match in _CELL_HYPHENATED_FORMULA_RE.finditer(material):
+            symbols = [
+                part.group(1)
+                for token in re.split(r"[-/]", match.group())
+                if (part := _CELL_ELEMENT_PART_RE.fullmatch(token))
+                and part.group(1) in _CELL_ELEMENT_SYMBOLS
+            ]
+            if len(symbols) == len(re.split(r"[-/]", match.group())):
+                material_classes.update(formula_classes(symbols))
+                formula_spans.append(match.span())
+
+        for match in _CELL_CHEMICAL_TOKEN_RE.finditer(material):
+            if any(start <= match.start() < end for start, end in formula_spans):
+                continue
+            token = match.group()
+            symbols: list[str] = []
+            position = 0
+            while position < len(token):
+                part = _CELL_ELEMENT_PART_RE.match(token, position)
+                if part is None or part.group(1) not in _CELL_ELEMENT_SYMBOLS:
+                    symbols = []
+                    break
+                symbols.append(part.group(1))
+                position = part.end()
+            if not symbols or position != len(token):
+                continue
+            if len(symbols) > 2 and not any(char.islower() or char.isdigit() for char in token):
+                continue
+            material_classes.update(formula_classes(symbols))
+
+        if "inert" in material_classes and material_classes & {"reactive", "not_inert"}:
             classes.append("mixed")
-        elif reactive:
+        # Without an inert component, a reactive token sets the refusal class;
+        # other detected chemistry alone fails closed as not_inert.
+        elif "reactive" in material_classes:
             classes.append("reactive")
-        elif inert:
-            classes.append("inert")
-        elif other_material:
+        elif "not_inert" in material_classes:
             classes.append("not_inert")
+        elif "inert" in material_classes:
+            classes.append("inert")
         else:
             classes.append("unknown")
     if "mixed" in classes or (

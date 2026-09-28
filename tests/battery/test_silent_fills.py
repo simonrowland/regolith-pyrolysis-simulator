@@ -28,7 +28,11 @@ from simulator.battery.records import (
     State,
     Value,
 )
-from simulator.battery.score import cell_notices, predict_with_engine
+from simulator.battery.score import (
+    _cell_material_class,
+    cell_notices,
+    predict_with_engine,
+)
 from simulator.diagnostic_helpers.binary_pot_battery import (
     PO2_COMMANDED,
     PO2_ENGINE_DEFAULT,
@@ -270,13 +274,142 @@ def test_printed_oxygen_is_commanded(monkeypatch) -> None:
 
 
 @pytest.mark.parametrize(
+    ("cell_material", "expected_class"),
+    [
+        # Material-bearing rows from the confirm verdict's 31-bench KEMS census.
+        ("Platinum effusion cell", "inert"),
+        (
+            "Iridium Knudsen cell in a molybdenum container with tantalum radiation shields",
+            "mixed",
+        ),
+        (
+            "Iridium Knudsen cell in tungsten container with three tantalum heat shields",
+            "mixed",
+        ),
+        (
+            "Iridium Knudsen cell in tungsten housing with three nested tantalum heat shields",
+            "mixed",
+        ),
+        ("tungsten cell with iridium inner cup", "mixed"),
+        ("Welded platinum cell; 0.025 cm Pt sheet", "inert"),
+        (
+            "Platinum transpiration reactor; alumina thermocouple insulator",
+            "mixed",
+        ),
+        (
+            "Nb, Ta, Mo, or Ni cell material; aluminium powder sometimes mixed with test substance",
+            "reactive",
+        ),
+        ("Alumina Knudsen cell", "not_inert"),
+        ("Sintered alumina crucible", "not_inert"),
+        ("Quartz Knudsen cell", "not_inert"),
+        ("High-purity alumina SSA-S Knudsen cell", "not_inert"),
+        (
+            "Beryllia Knudsen cells for Fe-P-Al and Fe-P-Ti; alumina Knudsen cells for other Fe-P-i systems",
+            "not_inert",
+        ),
+        ("Y2O3", "not_inert"),
+        ("Laboratory-made thoria Knudsen cell", "not_inert"),
+        ("High-purity alumina SSA-S Knudsen-cell crucible", "not_inert"),
+        ("Tungsten effusion cell with rhenium boat", "reactive"),
+        ("High-purity alumina SSA-S cell; tantalum susceptor", "reactive"),
+        ("sintered alumina crucible and tantalum holder", "reactive"),
+        ("Alumina Knudsen cell and tantalum cell holder", "reactive"),
+        (
+            "Molybdenum lid, container, and orifice plate; alumina inner crucible",
+            "reactive",
+        ),
+        ("Alumina Knudsen cell with electrolytic-iron inner crucible", "reactive"),
+        ("Alumina Knudsen cell; tantalum cell holder", "reactive"),
+        (
+            "High-purity alumina Knudsen cell with tantalum susceptor and radiation shields",
+            "reactive",
+        ),
+        (
+            "Gas-tight high-purity Al2O3 crucible (Nippon Kagaku Togyo SSA-S) in a Ta container",
+            "reactive",
+        ),
+        ("High-purity alumina SSA-S; tantalum susceptor", "reactive"),
+        # Experiment and extract strings listed by the verdicts.
+        ("Pt (0.025 cm sheet welded; lid 0.015 cm Pt sheet)", "inert"),
+        ("platinum TMS/KMS (Bonnell and Hastie 1979)", "inert"),
+        (
+            "Pt Knudsen cell (KMS) and Pt transpiration boat/capillary (TMS)",
+            "inert",
+        ),
+        ("platinum KMS cell", "inert"),
+        ("platinum TMS reactor (boat, carrier, probe)", "inert"),
+        ("platinum Knudsen cell", "inert"),
+        ("iridium cell with graphite-coated lid; later graphite disc", "mixed"),
+        ("Ir liners in graphite cell", "mixed"),
+        ("Ir liners in graphite cell required for equilibrium", "mixed"),
+        (
+            "Mo cells for multi-orifice α series; Ir liners in graphite cell required for equilibrium (Mo reacts with olivine)",
+            "mixed",
+        ),
+        (
+            "Mo (multi-orifice α series); Ir liners in graphite required for equilibrium (Mo reacts with olivine)",
+            "mixed",
+        ),
+        ("Mo multi-orifice α series; Ir liners in graphite for equilibrium", "mixed"),
+        ("Mo", "reactive"),
+        ("graphite", "reactive"),
+        ("alumina", "not_inert"),
+        ("unknown", "unknown"),
+        ("unreported", "unknown"),
+        ("not reported", "unknown"),
+        # Element/formula closure and canonical-symbol collision probes.
+        ("Pt-Ir alloy Knudsen cell", "inert"),
+        ("PtIr alloy Knudsen cell", "inert"),
+        ("Pt-Rh alloy Knudsen cell", "mixed"),
+        ("platinum alloy Knudsen cell", "inert"),
+        ("iridium alloy Knudsen cell", "inert"),
+        ("Pt-Ir alloy cell with an alloy liner", "inert"),
+        ("Pt/10% Rh boat in horizontal Al2O3 tube furnace", "mixed"),
+        ("Re", "not_inert"),
+        ("rhenium", "not_inert"),
+        ("Re oxide passivated cell", "reactive"),
+        ("rhenium oxide", "reactive"),
+        ("rhenium passivated", "reactive"),
+        ("NaCl", "not_inert"),
+        ("In", "not_inert"),
+        ("As", "not_inert"),
+        ("No", "not_inert"),
+        ("At", "not_inert"),
+        ("Au", "not_inert"),
+        ("in as no at 0.025 cm", "unknown"),
+    ],
+)
+def test_cell_material_class_golden_store_vocabulary(
+    cell_material: str,
+    expected_class: str,
+) -> None:
+    assert _cell_material_class((cell_material,)) == expected_class
+
+
+def test_cell_material_class_absent_bench_field_is_unknown() -> None:
+    # The confirm verdict's five empty KEMS bench fields have no material string.
+    assert _cell_material_class(()) == "unknown"
+
+
+@pytest.mark.parametrize(
     "cell_material",
     (
         "platinum Knudsen cell",
         "Pt-Ir alloy Knudsen cell",
         "PtIr alloy Knudsen cell",
+        "platinum alloy Knudsen cell",
+        "iridium alloy Knudsen cell",
+        "Pt-Ir alloy cell with an alloy liner",
     ),
-    ids=("platinum", "platinum-iridium-alloy", "compact-platinum-iridium-alloy"),
+    ids=(
+        "platinum",
+        "platinum-iridium-alloy",
+        "compact-platinum-iridium-alloy",
+        "platinum-alloy-word-ignored",
+        "iridium-alloy-word-ignored",
+        "inert-pair-with-alloy-liner-word-ignored",
+    ),
 )
 def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
     cell_material: str,
@@ -345,9 +478,6 @@ def test_bench_cell_material_is_combined_with_experiment_material(
         ("pure graphite Knudsen cell", "reactive_cell_oxygen_reservoir"),
         ("alumina-only Knudsen cell", "cell_material_not_inert"),
         ("platinum cell with alumina liner", "cell_material_not_inert"),
-        ("platinum alloy Knudsen cell", "cell_material_not_inert"),
-        ("iridium alloy Knudsen cell", "cell_material_not_inert"),
-        ("Pt-Ir alloy cell with an alloy liner", "cell_material_not_inert"),
         ("platinum cell with tungsten liner", "cell_material_not_inert"),
         ("platinum cell with unknown liner", "cell_material_unknown"),
     ],
