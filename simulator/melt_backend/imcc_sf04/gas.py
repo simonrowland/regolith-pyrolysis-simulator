@@ -20,7 +20,7 @@ from typing import Mapping, Sequence
 import numpy as np
 import pandas as pd
 
-from simulator.melt_backend.imcc_sf04.kernel import ImccRefusal
+from openimcc.kernel import ImccRefusal
 
 
 # --------------------------------------------------------------------------- #

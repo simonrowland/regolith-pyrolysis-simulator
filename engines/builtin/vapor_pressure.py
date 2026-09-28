@@ -744,7 +744,7 @@ def _build_high_t_melt_activity_authority(
         )
 
     try:
-        from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
+        from simulator.melt_backend.openimcc_bridge import (
             evaluate_cleaned_melt,
         )
 
@@ -794,6 +794,17 @@ def _build_high_t_melt_activity_authority(
     relaxed_projection = cleaned.policy.get("openimcc_projection_crmn_relaxed")
     if isinstance(relaxed_projection, Mapping):
         policy_notices.append(dict(relaxed_projection))
+    from simulator.melt_backend.openimcc_bridge import (
+        imcc_complex_saturation_notice,
+    )
+
+    saturation_notice = imcc_complex_saturation_notice(
+        bridge.flags, bridge.acid_sink_ratio
+    )
+    typed_openimcc_notices = (
+        [] if saturation_notice is None else [saturation_notice]
+    )
+    base["notices"].extend(typed_openimcc_notices)
     base.update(
         {
             "activities_by_oxide": dict(cleaned.single_cation_activities),
@@ -809,7 +820,10 @@ def _build_high_t_melt_activity_authority(
             "openimcc_pack_version": bridge.pack_version,
             "openimcc_pack_digest": bridge.pack_digest,
             "openimcc_flags": list(bridge.flags),
-            "openimcc_notices": list(bridge.notices) + policy_notices,
+            "openimcc_notices": (
+                list(bridge.notices) + policy_notices + typed_openimcc_notices
+            ),
+            "openimcc_typed_notices": typed_openimcc_notices,
             "openimcc_policy_notices": policy_notices,
             "openimcc_envelope_status": bridge.envelope_status,
             "openimcc_extrapolated": bool(bridge.extrapolated),

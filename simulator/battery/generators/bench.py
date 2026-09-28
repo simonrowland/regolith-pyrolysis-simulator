@@ -128,6 +128,7 @@ MULTIVALENT_MELT_ELEMENTS: dict[str, str] = {
 # Parent-oxide basis tokens already printed on rows. single_cation is a
 # different activity and is not converted into this set.
 _PARENT_OXIDE_COMPONENT_BASES = frozenset({"oxide", "parent", "parent_oxide"})
+_IMCC_SINGLE_CATION_COMPONENTS = frozenset({"NaO0.5", "KO0.5"})
 
 
 @dataclass(frozen=True)
@@ -261,7 +262,7 @@ def _melts_reports_oxide_endmember(formula: str) -> tuple[bool, str]:
 def _imcc_reports_parent_oxide(formula: str) -> tuple[bool, str]:
     """IMCC ``parent_activity`` is x* on ``IMCC_PARENT_OXIDES``. Pure limit is 1."""
 
-    from simulator.melt_backend.imcc_sf04.gas import IMCC_PARENT_OXIDES
+    from openimcc import IMCC_PARENT_OXIDES
 
     if formula in IMCC_PARENT_OXIDES:
         return True, "raoultian_pure_liquid_oxide_parent"
@@ -499,10 +500,27 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
     results = []
     for engine in MELT_ACTIVITY_ENGINES:
         reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
-        matches, engine_side = _reference_matches(state, reported_activity, engine)
+        single_cation = (
+            inputs.activity_quantity == "activity_coefficient"
+            and engine in {"imcc_sf04", "imcc_sf04_ext", "openimcc"}
+            and state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            and phase_token(state.endmember) is Phase.L
+            and state.component_basis == state.endmember.formula
+            and state.endmember.formula in _IMCC_SINGLE_CATION_COMPONENTS
+        )
+        if single_cation:
+            reported_activity = replace(
+                reported_activity,
+                reported="raoultian_pure_liquid_endmember",
+                component_bases=frozenset({state.component_basis}),
+            )
+            matches = True
+            engine_side = reported_activity.reported
+        else:
+            matches, engine_side = _reference_matches(state, reported_activity, engine)
         if not matches:
-            # Henrian, 1 wt%, a pure solid, a gas endmember, a single-cation
-            # basis, or an endmember formula this engine does not report.
+            # Henrian, 1 wt%, a pure solid, a gas endmember, an unadmitted
+            # single-cation basis, or an endmember formula this engine does not report.
             # Name both sides. Do not convert.
             results.append(_not_applicable(
                 provenance,

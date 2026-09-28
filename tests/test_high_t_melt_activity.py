@@ -21,13 +21,13 @@ from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
+from simulator.melt_backend.openimcc_bridge import (
     FE2O3_TO_FEO_TOTAL_WT_FACTOR,
     OpenImccBridgeResult,
     OpenImccCompositionPolicyRefusal,
     evaluate_cleaned_melt,
 )
-import simulator.melt_backend.imcc_sf04.openimcc_bridge as openimcc_bridge_module
+import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.runner import PyrolysisRun, build_per_hour_summary
 
@@ -289,6 +289,28 @@ def test_above_cap_openimcc_route_feeds_flux_with_provenance() -> None:
     ]
     assert fe_provenance
     assert all(row["activity_basis"] != "kress91_ferrous" for row in fe_provenance)
+
+
+def test_above_cap_openimcc_provenance_carries_complex_saturation_notice() -> None:
+    result = vapor_pressure_module._build_high_t_melt_activity_authority(
+        composition_mol={"K2O": 0.497, "SiO2": 0.503},
+        temperature_K=CAP_PLUS_T_K,
+        controls={"high_t_melt_activity": "openimcc"},
+        below_cap_fe_activity=1.0,
+        below_cap_fe_activity_basis="test",
+    )
+
+    assert result is not None
+    assert result["provider"] == "openimcc", result["fallback_reason"]
+    typed = result["openimcc_typed_notices"]
+    assert len(typed) == 1
+    assert typed[0]["kind"] == "imcc_complex_saturation"
+    assert typed[0]["flag"].startswith("species-coverage-edge")
+    assert typed[0]["acid_sink_ratio"] == result["openimcc_acid_sink_ratio"]
+    assert typed[0] in result["notices"]
+    assert typed[0] in result["openimcc_notices"]
+    assert result["openimcc_envelope_status"] == "inside"
+    assert result["openimcc_extrapolated"] is False
 
 
 def test_relaxed_openimcc_preserves_constant_gamma_carrier_set() -> None:

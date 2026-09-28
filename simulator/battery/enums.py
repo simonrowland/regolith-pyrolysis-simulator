@@ -62,6 +62,7 @@ class Quantity(StrEnum):
     FUGACITY = "fugacity"
     P_REFERENCE = "p_reference"
     LOG10_KF = "log10_Kf"
+    LOG10_K_STAR = "log10_K_star"
     ACTIVITY = "activity"
     ACTIVITY_COEFFICIENT = "activity_coefficient"
     EVAPORATION_COEFFICIENT_ALPHA = "evaporation_coefficient_alpha"
@@ -136,6 +137,7 @@ class RefusalReason(StrEnum):
     BULK_NOT_LIQUID_COMPOSITION = "bulk_not_liquid_composition"
     OPENIMCC_NOT_IMPORTABLE = "openimcc_not_importable"
     OUTSIDE_SUPPORTED_SPECIES = "outside_supported_species"
+    COEFFICIENT_BASIS_MISMATCH = "coefficient_basis_mismatch"
 
 
 class BenchAbsenceReason(StrEnum):
@@ -411,6 +413,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.FUGACITY: "Pa",
     Quantity.P_REFERENCE: "Pa",
     Quantity.LOG10_KF: "dimensionless",
+    Quantity.LOG10_K_STAR: "dimensionless",
     Quantity.ACTIVITY: "dimensionless",
     Quantity.ACTIVITY_COEFFICIENT: "dimensionless",
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: "dimensionless",
@@ -455,6 +458,7 @@ MEASURED_EVIDENCE = frozenset(
 FORMATION_QUANTITIES = frozenset(
     {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
 )
+EQUILIBRIUM_FIT_QUANTITIES = frozenset({Quantity.LOG10_K_STAR})
 PURE_STANDARD_THERMO = frozenset(
     {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
 )

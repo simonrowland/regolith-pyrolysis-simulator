@@ -8,6 +8,7 @@ without importing engine code.
 from __future__ import annotations
 
 import math
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
@@ -398,6 +399,45 @@ def single_cation_mole_fractions(
             "single-cation mole fractions must be finite after normalization"
         )
     return fractions
+
+
+def single_cation_activity_and_fraction(
+    parent_oxide: str,
+    parent_activity: float,
+    account_mol: Mapping[str, float],
+) -> tuple[float, float]:
+    """Return single-cation activity a(MO) and fraction x(MO).
+
+    Derivation: with pure-liquid references, the premise is
+    ``mu(MO_{v/2}) = (1/c) * mu(M_c O_v)``; therefore
+    ``a(MO) = a(parent) ** (1/c)``, where ``c`` is the parent formula's
+    cation count. The single-cation mole fraction is
+    ``n_M / sum(n_M)`` across the melt, counting each parent formula by its
+    cation count. Gamma is ``a(MO) / x(MO)``. Units: activity, fraction, and
+    Gamma are dimensionless. Sanity: an ideal melt gives Gamma = 1 and the
+    cation fractions sum to 1.
+    """
+
+    parent = str(parent_oxide)
+    cations = float(MELT_OXIDE_CATIONS_PER_FORMULA.get(parent, 1.0))
+    activity = float(parent_activity) ** (1.0 / cations)
+    fraction = single_cation_mole_fractions(account_mol).get(parent, 0.0)
+    return activity, fraction
+
+
+def single_cation_component_formula(parent_oxide: str) -> str:
+    """Return the one-cation endmember formula corresponding to an oxide."""
+
+    parent = str(parent_oxide)
+    cations = float(MELT_OXIDE_CATIONS_PER_FORMULA.get(parent, 1.0))
+    if cations == 1.0:
+        return parent
+    match = re.fullmatch(r"([A-Z][a-z]?)[0-9]*O([0-9]*)", parent)
+    if match is None:
+        return parent
+    oxygen = float(match.group(2) or 1.0) / cations
+    oxygen_text = str(int(oxygen)) if oxygen.is_integer() else str(oxygen)
+    return f"{match.group(1)}O{oxygen_text}"
 
 
 def melt_oxide_activity_coefficient(

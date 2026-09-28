@@ -155,6 +155,24 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _missing_builtin_pack_name(path: Path) -> str | None:
+    names = {"imcc-sf04-v1.0.2.json", "imcc-sf04-ext-v4.json"}
+    if os.path.lexists(path) or path.name not in names:
+        return None
+    if str(path) == path.name or path == REPO_ROOT / "data/melt_activity/imcc" / path.name:
+        return path.name
+    return None
+
+
+def _imcc_pack_sha256(path: Path) -> str:
+    if _missing_builtin_pack_name(path) is not None:
+        from importlib import resources
+
+        resource = resources.files("openimcc").joinpath("data", "packs", path.name)
+        return hashlib.sha256(resource.read_bytes()).hexdigest()
+    return _sha256(path)
+
+
 def _positive_finite(values: Mapping[str, Any]) -> dict[str, float]:
     result: dict[str, float] = {}
     nonfinite: list[str] = []
@@ -398,14 +416,28 @@ class ImccEngine:
     def _load(self) -> Any:
         if self._pack is not None:
             return self._pack
-        from simulator.melt_backend.imcc_sf04 import (
+        from openimcc import (
             ImccDatapack,
             label_research_datapack,
             load_datapack,
         )
 
         if self.published:
-            self._pack = load_datapack(self.pack_path)
+            from importlib import resources
+
+            pack_name = self.pack_path.name
+            package_names = {
+                "imcc-sf04-v1.0.2.json",
+                "imcc-sf04-ext-v4.json",
+            }
+            if _missing_builtin_pack_name(self.pack_path) in package_names:
+                resource = resources.files("openimcc").joinpath(
+                    "data", "packs", pack_name
+                )
+                with resources.as_file(resource) as path:
+                    self._pack = load_datapack(path)
+            else:
+                self._pack = load_datapack(self.pack_path)
             return self._pack
         raw = json.loads(self.pack_path.read_text(encoding="utf-8"))
         parents = tuple(str(value) for value in raw["parents"])
@@ -439,7 +471,7 @@ class ImccEngine:
         fO2_bar: float | None,
     ) -> EngineResult:
         del fO2_bar
-        from simulator.melt_backend.imcc_sf04 import (
+        from openimcc import (
             ImccCompositionOutsideValidatedEnvelopeError,
             ImccComponentOutsideDomainError,
             ImccCompositionIncompleteError,
@@ -447,8 +479,8 @@ class ImccEngine:
             ImccNonconvergenceError,
             ImccRefusal,
             ImccTOutsideDatapackDomainError,
-            evaluate,
         )
+        from simulator.melt_backend.imcc_sf04.adapter import evaluate
 
         pack = self._load()
         try:
@@ -487,7 +519,7 @@ class ImccEngine:
             "datapack_version": labels.identity["datapack_version"],
             "trust": labels.trust,
             "envelope_status": labels.envelope_status,
-            "pack_sha256": _sha256(self.pack_path),
+            "pack_sha256": _imcc_pack_sha256(self.pack_path),
             "observable_family": "activity",
         }
         if self.allow_extrapolation or self.allow_out_of_envelope:

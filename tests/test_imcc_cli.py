@@ -5,11 +5,8 @@ Two things are pinned here:
 1. The CLI contract -- exit 0 solved, exit 2 typed refusal, exit 1 usage error.
    The refusal code matters: a caller scripting against this needs to tell
    "the model declined" apart from "the invocation was wrong".
-2. The MODEL/GLUE split itself. ``adapter.py`` + ``kernel.py`` + ``gas.py`` +
-   ``cli.py`` must not import simulator policy. That is the property that makes
-   the package extractable, and it is invisible to every other test -- nothing
-   fails if someone re-adds a ``simulator.backend_names`` import to the model
-   half, it just quietly re-welds the seam.
+2. The extraction seam: this package contains simulator glue and the legacy
+   JANAF gas layer only. The model API comes from the ``openimcc`` dependency.
 """
 
 from __future__ import annotations
@@ -19,10 +16,11 @@ import json
 from pathlib import Path
 
 import pytest
+import openimcc
 
 from simulator.melt_backend.imcc_sf04 import cli
 
-PACK = Path("data/melt_activity/imcc/imcc-sf04-v1.0.2.json")
+PACK = Path(openimcc.__file__).parent / "data/packs/imcc-sf04-v1.0.2.json"
 
 BASALT = [
     "--oxide", "SiO2=45.4",
@@ -91,6 +89,21 @@ def test_out_of_domain_is_a_typed_refusal_not_a_crash(capsys):
     assert payload["status"] == "refused"
     assert payload["code"] == "imcc_T_outside_datapack_domain"
     assert "900" in payload["reason"]
+
+
+def test_cli_keeps_strict_envelope_at_vendored_boundary(capsys):
+    code = cli.main(
+        [
+            "solve", "--pack", str(PACK), "--temperature", "1800",
+            "--basis-type", "mol", "--oxide", "K2O=0.500002",
+            "--oxide", "SiO2=0.499998", "--json",
+        ]
+    )
+
+    assert code == cli.EXIT_REFUSED
+    assert json.loads(capsys.readouterr().out)["code"] == (
+        "imcc_composition_outside_validated_envelope"
+    )
 
 
 def test_extrapolation_flag_turns_the_refusal_into_a_flagged_answer(capsys):
@@ -196,17 +209,15 @@ def _simulator_imports(module_path: Path) -> set[str]:
 # The model half may depend on its own package and on scalar_boundary -- a
 # 30-line stdlib-only leaf that travels with the package on extraction.
 _MODEL_ALLOWED = {
-    "simulator.melt_backend.imcc_sf04",
-    "simulator.melt_backend.imcc_sf04.adapter",
-    "simulator.melt_backend.imcc_sf04.kernel",
     "simulator.melt_backend.imcc_sf04.gas",
-    "simulator.scalar_boundary",
+    # Strict-envelope callers explicitly cross into the simulator adapter.
+    "simulator.melt_backend.imcc_sf04.adapter",
 }
 
 _PKG = Path("simulator/melt_backend/imcc_sf04")
 
 
-@pytest.mark.parametrize("module", ["kernel.py", "adapter.py", "gas.py", "cli.py"])
+@pytest.mark.parametrize("module", ["gas.py", "cli.py"])
 def test_model_half_stays_free_of_simulator_policy(module):
     """The extraction seam. If this fails, someone re-welded the model half to
     simulator policy (backend naming, fidelity vocabulary, MeltBackend) and the
@@ -261,9 +272,7 @@ def _glue_reaches(module_path: Path) -> list[str]:
     return reaches
 
 
-@pytest.mark.parametrize(
-    "module", ["kernel.py", "adapter.py", "gas.py", "cli.py", "bench.py"]
-)
+@pytest.mark.parametrize("module", ["gas.py", "cli.py", "bench.py"])
 def test_model_half_does_not_import_the_glue(module):
     """Direction matters: glue -> model is fine, model -> glue would make the
     seam circular and unliftable."""
@@ -328,6 +337,8 @@ def test_the_glue_direction_check_catches_relative_and_facade_imports(tmp_path):
 # checking the runner degrades instead of crashing -- lives in
 # tests/test_imcc_bench.py::test_bench_still_runs_without_the_simulator_gas_layer.
 _BENCH_DEFERRED_ALLOWED = {
+    # The standalone bench shares the strict simulator envelope boundary.
+    "simulator.melt_backend.imcc_sf04.adapter",
     # Formula parsing for the single-cation basis conversion. Reached only from
     # _single_cation_gas_activities, which is called only from the gas branch.
     "simulator.accounting.formulas",

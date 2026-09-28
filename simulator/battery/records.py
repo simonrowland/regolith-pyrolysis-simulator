@@ -1107,6 +1107,7 @@ class ResidualNumeric:
     value: Decimal
     decision_band: DecisionBand | None
     metric_uncertainty: Uncertainty | None = None
+    verdict: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "value", as_decimal(self.value))

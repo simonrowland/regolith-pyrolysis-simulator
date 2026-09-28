@@ -31,6 +31,8 @@ from simulator.battery.enums import (
     MethodToken,
     MetricOperation,
     NoticeKind,
+    PerBasis,
+    Phase,
     Quantity,
     Rail,
     RefusalReason,
@@ -45,10 +47,12 @@ from simulator.battery.pins import (
     pin_failures,
     tombstone_for_changed_identity,
 )
+from simulator.battery.identity import Exposure, SweepIdentity
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
     Derivation,
+    EngineTrace,
     Execution,
     Located,
     Notice,
@@ -65,13 +69,16 @@ from simulator.battery.score import (
     EligibleConjuncts,
     EnginePrediction,
     ScoreContext,
+    SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
     compile_residual,
     compute_metric,
+    derive_kems_partial_pressure_band,
     dumps_residual_line,
     engines_from_names,
     load_score_context,
     parse_species_formula,
+    pooled_log_pressure_sd,
     resolve_source_relation,
     score_eligible_from_conjuncts,
     score_store,
@@ -212,6 +219,292 @@ def _partial_prediction(engine, observation, **_kwargs):
         lineage_complete=True,
         identity=observation.identity,
     )
+
+
+def test_pooled_log_pressure_sd_known_replicates() -> None:
+    assert pooled_log_pressure_sd(((-1, 0, 1), (9, 10, 11))) == Decimal("1")
+
+
+def test_kems_band_derives_known_replicate_scatter() -> None:
+    experiment = F.kems_experiment()
+    identity = _partial_identity()
+    first = F.observation(
+        "kems-replicate-1",
+        experiment.experiment_id,
+        identity,
+        Decimal("10"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    second = F.observation(
+        "kems-replicate-2",
+        experiment.experiment_id,
+        identity,
+        Decimal("100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    band = derive_kems_partial_pressure_band(
+        {first.observation_id: first, second.observation_id: second},
+        {experiment.experiment_id: experiment},
+    )
+    assert band is not None
+    assert band.unit == "dimensionless"
+    assert band.value == Decimal("0.5").sqrt()
+    assert "replicate scatter" in band.rule
+    assert "pooled replicate" in band.rule
+
+
+def test_kems_band_uses_source_printed_pressure_uncertainty() -> None:
+    experiment = F.kems_experiment()
+    reference = replace(
+        F.observation(
+            "kems-printed-pressure",
+            experiment.experiment_id,
+            _partial_identity(),
+            Decimal("10"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="kems-042-plante-1979",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "temperature_quote": (
+                    "At 1500 K, the estimated 20 K error yields an error "
+                    "in K pressure of about 40 percent."
+                )
+            },
+        ),
+    )
+    band = derive_kems_partial_pressure_band(
+        {reference.observation_id: reference},
+        {experiment.experiment_id: experiment},
+    )
+    assert band is not None
+    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
+    assert "source-printed" in band.rule
+    assert "log10(1.40)" in band.rule
+    assert "page-280 1500 K sentence" in band.rule
+    assert "upper multiplicative edge" in band.rule
+    assert "[1/1.40, 1.40] (-28.6%..+40%)" in band.rule
+    assert "+/-40% relative band" in band.rule
+    assert "single 1500 K figure is applied across the tabulated T range" in band.rule
+
+
+def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
+    experiment = F.kems_experiment()
+    identity = _partial_identity()
+    printed = replace(
+        F.observation(
+            "kems-printed-with-replicates",
+            experiment.experiment_id,
+            identity,
+            Decimal("10"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="kems-042-plante-1979",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "temperature_quote": (
+                    "At 1500 K, the estimated 20 K error yields an error "
+                    "in K pressure of about 40 percent."
+                )
+            },
+        ),
+    )
+    replicate_low = F.observation(
+        "kems-replicate-low",
+        experiment.experiment_id,
+        identity,
+        Decimal("10"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    replicate_high = F.observation(
+        "kems-replicate-high",
+        experiment.experiment_id,
+        identity,
+        Decimal("100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    band = derive_kems_partial_pressure_band(
+        {
+            item.observation_id: item
+            for item in (printed, replicate_low, replicate_high)
+        },
+        {experiment.experiment_id: experiment},
+    )
+    assert band is not None
+    assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
+    assert "source-printed" in band.rule
+    assert "pooled replicate" not in band.rule
+
+
+def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
+    exp = F.kems_experiment()
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        species=Species("Na", Phase.L),
+        subtype=State.of("langmuir_alpha"),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.not_applicable("alpha row does not carry activity standard state"),
+        reservoir=State.of(Species("Na", Phase.G)),
+        sweep_gas=State.of(
+            SweepIdentity(
+                species="N2",
+                flow_sccm=State.of(Decimal("1")),
+                partial_pressure_Pa=State.of(Decimal("1")),
+            )
+        ),
+        exposure=State.of(
+            Exposure(area_m2=State.of(Decimal("1")), duration_s=State.of(Decimal("1")))
+        ),
+    )
+    reference = F.observation(
+        "zhang-bound",
+        exp.experiment_id,
+        identity,
+        Decimal("1e-6"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="work-1",
+    )
+    reference = replace(
+        reference,
+        provenance={
+            "scoring": {
+                "kind": "implied_alpha_from_alpha_times_Gamma",
+                "oxide_formula": "Na2O",
+            }
+        },
+    )
+    ctx = _context(F.work(), exp, reference)
+
+    def predict(engine, observation, **_kwargs):
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:gamma"),
+            value=Decimal("1e-5"),
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("nasa-cea-thermo",),
+            lineage_complete=True,
+            identity=observation.identity,
+            coefficient_basis=SINGLE_CATION_COEFFICIENT_BASIS,
+        )
+
+    residual, candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        predict=predict,
+    )
+    assert candidate is not None
+    assert residual.numeric is not None
+    assert residual.numeric.verdict == "consistent"
+    assert residual.numeric.value == Decimal("-1")
+    assert residual.status is ResidualStatus.MATCH
+
+    def impossible_predict(engine, observation, **_kwargs):
+        return replace(predict(engine, observation), value=Decimal("1e-7"))
+
+    impossible_residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        predict=impossible_predict,
+    )
+    assert impossible_residual.numeric is not None
+    assert impossible_residual.numeric.verdict == "physically_impossible"
+    assert impossible_residual.numeric.value == Decimal("1")
+    assert impossible_residual.status is ResidualStatus.MISMATCH
+
+    def outside_band_predict(engine, observation, **_kwargs):
+        return replace(predict(engine, observation), value=Decimal("1e-4"))
+
+    outside_band_residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        predict=outside_band_predict,
+    )
+    assert outside_band_residual.numeric is not None
+    assert outside_band_residual.numeric.verdict == "outside_literature_band"
+    assert outside_band_residual.numeric.value == Decimal("-2")
+    assert outside_band_residual.status is ResidualStatus.NO_BAND
+
+
+@pytest.mark.parametrize("reported_basis", ["parent_oxide", None])
+def test_zhang_alpha_gamma_bound_refuses_parent_oxide_coefficient(
+    reported_basis: str | None,
+) -> None:
+    exp = F.kems_experiment()
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        species=Species("Na", Phase.L),
+        subtype=State.of("langmuir_alpha"),
+        per=State.of(PerBasis.DIMENSIONLESS),
+        reference_state=State.not_applicable(
+            "alpha row does not carry activity standard state"
+        ),
+        reservoir=State.of(Species("Na", Phase.G)),
+        sweep_gas=State.of(
+            SweepIdentity(
+                species="N2",
+                flow_sccm=State.of(Decimal("1")),
+                partial_pressure_Pa=State.of(Decimal("1")),
+            )
+        ),
+        exposure=State.of(
+            Exposure(area_m2=State.of(Decimal("1")), duration_s=State.of(Decimal("1")))
+        ),
+    )
+    reference = replace(
+        F.observation(
+            "zhang-parent-gamma",
+            exp.experiment_id,
+            identity,
+            Decimal("1e-6"),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            source_id="work-1",
+        ),
+        provenance={
+            "scoring": {
+                "kind": "implied_alpha_from_alpha_times_Gamma",
+                "oxide_formula": "Na2O",
+            }
+        },
+    )
+    ctx = _context(F.work(), exp, reference)
+
+    def parent_predict(engine, observation, **_kwargs):
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="test:parent-gamma",
+            ),
+            value=Decimal("1e-5"),
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("nasa-cea-thermo",),
+            lineage_complete=True,
+            identity=observation.identity,
+            coefficient_basis=reported_basis,
+        )
+
+    residual, candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        predict=parent_predict,
+    )
+    assert candidate is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
 
 
 def test_derived_oxygen_condition_notice_reaches_residual() -> None:
@@ -1284,6 +1577,7 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
         key="headline-no-band::p_sat::vapour::internal-analytical",
         reference=measured_obs.observation_id,
         status=ResidualStatus.NO_BAND,
+        score_eligible=False,
         numeric=ResidualNumeric(
             operation=MetricOperation.DEX,
             unit="dimensionless",
@@ -1317,6 +1611,9 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
         and row["engine"] == Engine.INTERNAL_ANALYTICAL.value
     }
     assert by_tier["measured"]["n"] == 2
+    assert by_tier["measured"]["n_score_eligible"] == 1
+    assert by_tier["measured"]["n_inside_band"] == 1
+    assert by_tier["measured"]["band_width_dex"] == "0.1"
     assert by_tier["measured"]["n_no_band"] == 1
     assert by_tier["measured"]["match_rate"] == 1.0
     assert by_tier["compilation"]["n"] == 1
@@ -1650,6 +1947,187 @@ def test_mapped_coefficient_sources_decide_circularity() -> None:
     assert independent is SourceRelation.INDEPENDENT
 
 
+def test_openimcc_candidate_alias_has_complete_lineage_mapping() -> None:
+    from simulator.battery.score import (
+        ENGINE_COEFFICIENT_SOURCES,
+        expand_coefficient_sources,
+        lineage_complete_for,
+    )
+
+    candidate_sources = (
+        *ENGINE_COEFFICIENT_SOURCES[Engine.OPENIMCC],
+        "openimcc-pack-version:1.0.2",
+        "openimcc-pack-digest:sha256:test",
+    )
+    expanded = expand_coefficient_sources(candidate_sources)
+    assert "openimcc-v1.0.2" in candidate_sources
+    assert "sf04-magma-companion-workbook" in expanded
+    assert lineage_complete_for(candidate_sources) is True
+
+
+@pytest.mark.parametrize(
+    "candidate_sources",
+    [
+        pytest.param(
+            ("openimcc-pack-version:1.0.2",),
+            id="metadata-only",
+        ),
+        pytest.param(
+            ("openimcc-gas-table:sf04-magma-companion-workbook",),
+            id="prefix-concealed",
+        ),
+        pytest.param(
+            (
+                "openimcc-pack-version:1.0.2",
+                "openimcc-pack-digest:sha256:test",
+                "openimcc-gas-table:gas.csv",
+            ),
+            id="empty-after-strip",
+        ),
+    ],
+)
+def test_openimcc_metadata_lineage_fails_closed(
+    candidate_sources: tuple[str, ...],
+) -> None:
+    from simulator.battery.score import lineage_complete_for
+
+    reference = F.observation(
+        "metadata-lineage-reference",
+        "metadata-lineage-exp",
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    observations = {reference.observation_id: reference}
+    experiments = {
+        reference.experiment_id: F.tabulation_experiment(
+            experiment_id=reference.experiment_id,
+        )
+    }
+    assert lineage_complete_for(candidate_sources) is False
+    assert (
+        resolve_source_relation(
+            reference,
+            candidate_sources,
+            True,
+            works={},
+            observations=observations,
+            experiments=experiments,
+        )
+        is SourceRelation.UNKNOWN
+    )
+
+
+def _openimcc_lineage_validation_case(coefficient_sources: tuple[str, ...]):
+    reference_work = F.work("reference-work")
+    reference_experiment = F.tabulation_experiment(
+        experiment_id="reference-exp", work_id=reference_work.work_id
+    )
+    identity = F.o2_identity()
+    reference = F.observation(
+        "lineage-reference",
+        reference_experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=reference_work.work_id,
+    )
+    source_work = replace(
+        F.work("sf04-work"),
+        source_ids=("sf04-work", "sf04-magma-companion-workbook"),
+    )
+    source_experiment = F.tabulation_experiment(
+        experiment_id="sf04-exp", work_id=source_work.work_id
+    )
+    source_observation = F.observation(
+        "sf04-input",
+        source_experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        source_id=source_work.work_id,
+    )
+    candidate = F.observation(
+        "engine:openimcc:lineage-reference",
+        reference_experiment.experiment_id,
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.ENGINE_PREDICTION,
+        source_id=reference.source_id or "reference-work",
+        engine=EngineTrace(
+            name=Engine.OPENIMCC,
+            channel="openimcc",
+            run_id="openimcc:test",
+            coefficient_sources=coefficient_sources,
+            lineage_complete=True,
+        ),
+        authority=Authority.CERTIFIED,
+    )
+    numeric = ResidualNumeric(
+        operation=MetricOperation.ABSOLUTE,
+        unit="kJ_per_declared_mol_basis",
+        value=Decimal("0"),
+        decision_band=DecisionBand(Decimal("1"), "kJ_per_declared_mol_basis", "test"),
+    )
+    residual = F.residual(
+        "lineage-validation",
+        reference.observation_id,
+        candidate=candidate.observation_id,
+        status=ResidualStatus.MATCH,
+        rail=Rail.THERMOCHEMISTRY,
+        score_eligible=True,
+        numeric=numeric,
+        source_relation=SourceRelation.INDEPENDENT,
+        experiment_id=reference_experiment.experiment_id,
+        quantity=Quantity.DELTA_FG,
+    )
+    return (
+        residual,
+        {
+            reference.observation_id: reference,
+            candidate.observation_id: candidate,
+            source_observation.observation_id: source_observation,
+        },
+        {
+            reference_experiment.experiment_id: reference_experiment,
+            source_experiment.experiment_id: source_experiment,
+        },
+        {reference_work.work_id: reference_work, source_work.work_id: source_work},
+    )
+
+
+def test_openimcc_lineage_metadata_passes_residual_validation() -> None:
+    residual, observations, experiments, works = _openimcc_lineage_validation_case(
+        (
+            "sf04-magma-companion-workbook",
+            "openimcc-pack-version:1.0.2",
+            "openimcc-pack-digest:sha256:test",
+            "openimcc-gas-table:test.csv",
+        )
+    )
+    assert validate_residual(
+        residual,
+        observations,
+        experiments,
+        works,
+    ) == []
+
+
+def test_openimcc_metadata_only_lineage_fails_residual_validation() -> None:
+    residual, observations, experiments, works = _openimcc_lineage_validation_case(
+        (
+            "openimcc-pack-version:1.0.2",
+            "openimcc-pack-digest:sha256:test",
+            "openimcc-gas-table:test.csv",
+        )
+    )
+    issues = validate_residual(residual, observations, experiments, works)
+    assert any(
+        issue.path == "residual.source_relation"
+        and issue.reason is RefusalReason.LINEAGE_UNKNOWN
+        for issue in issues
+    )
+
+
 def test_missing_live_result_is_coverage_failure() -> None:
     record = PinBandRecord(
         key="missing",
@@ -1832,6 +2310,8 @@ def test_score_report_names_the_measured_store() -> None:
     assert f"{stamp['hard_issues']} hard issues" in report
     assert "RMS dex" in report
     assert "median abs dex" in report
+    assert "n score eligible" in report
+    assert "n inside band" in report
     assert "n no band" in report
     assert "Warning:" not in report
 

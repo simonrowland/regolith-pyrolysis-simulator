@@ -90,12 +90,8 @@ from simulator.melt_backend.alphamelts import (
     AlphaMELTSConfigurationError,
     _validated_timeout_s,
 )
-from simulator.melt_backend.imcc_sf04.adapter import (
-    _EXPECTED_PARENT_OXIDES,
-    ImccMalformedDatapackError,
-    _as_fraction,
-    load_datapack,
-)
+from openimcc import ImccMalformedDatapackError, load_datapack
+from openimcc.model import _EXPECTED_PARENT_OXIDES, _as_fraction
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.melt_backend.sulfsat import SulfSatGate
 from simulator.melt_backend.thermoengine import ThermoEngineBackend

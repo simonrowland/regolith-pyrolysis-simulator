@@ -1,8 +1,9 @@
-"""C1 openimcc bridge and vendored-kernel parity checks."""
+"""C1 openimcc bridge and package-kernel parity checks."""
 
 from __future__ import annotations
 
 import os
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -10,9 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from simulator.melt_backend.imcc_sf04 import evaluate as vendored_evaluate
-from simulator.melt_backend.imcc_sf04 import load_datapack as vendored_load_datapack
-from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
+from simulator.melt_backend.openimcc_bridge import (
     OpenImccCompositionPolicyRefusal,
     OpenImccBridgeResult,
     OpenImccUnavailableError,
@@ -24,9 +23,10 @@ from simulator.melt_backend.imcc_sf04.openimcc_bridge import (
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-VENDORED_PACKS = {
-    "v1.0.2": REPO_ROOT / "data/melt_activity/imcc/imcc-sf04-v1.0.2.json",
-    "ext-v4": REPO_ROOT / "data/melt_activity/imcc/imcc-sf04-ext-v4.json",
+GREEN_ACTIVITY_FIXTURE = REPO_ROOT / "tests/fixtures/imcc_green_d9bd25f0b_activities.json"
+PACKS = {
+    "v1.0.2": None,
+    "ext-v4": "imcc-sf04-ext-v4.json",
 }
 TEMPERATURES_K = (1700.0, 1950.0, 2200.0, 2500.0, 3000.0)
 
@@ -131,7 +131,7 @@ def test_cleaned_melt_omits_absent_parent_activity() -> None:
 def test_cleaned_melt_refuses_missing_present_parent_activity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import simulator.melt_backend.imcc_sf04.openimcc_bridge as bridge
+    import simulator.melt_backend.openimcc_bridge as bridge
 
     monkeypatch.setattr(
         bridge,
@@ -166,7 +166,7 @@ def test_cleaned_melt_refuses_invalid_present_parent_activity(
     monkeypatch: pytest.MonkeyPatch,
     invalid_activity: float,
 ) -> None:
-    import simulator.melt_backend.imcc_sf04.openimcc_bridge as bridge
+    import simulator.melt_backend.openimcc_bridge as bridge
 
     activities = {oxide: 1.0 for oxide in OPENIMCC_PARENT_OXIDES}
     activities["Na2O"] = invalid_activity
@@ -200,7 +200,7 @@ def test_cleaned_melt_refuses_invalid_present_parent_activity(
 
 
 def test_missing_openimcc_is_a_typed_refusal(monkeypatch: pytest.MonkeyPatch) -> None:
-    import simulator.melt_backend.imcc_sf04.openimcc_bridge as bridge
+    import simulator.melt_backend.openimcc_bridge as bridge
 
     monkeypatch.setattr(bridge, "_openimcc", None)
     monkeypatch.setattr(bridge, "_OPENIMCC_IMPORT_ERROR", ModuleNotFoundError("openimcc"))
@@ -229,7 +229,7 @@ class _BlockOpenImcc(importlib.abc.MetaPathFinder):
 
 
 sys.meta_path.insert(0, _BlockOpenImcc())
-from simulator.melt_backend.imcc_sf04.openimcc_bridge import evaluate
+from simulator.melt_backend.openimcc_bridge import evaluate
 
 try:
     evaluate(composition_mol={'SiO2': 1.0}, temperature_K=2200.0)
@@ -284,65 +284,153 @@ def test_bridge_maps_mol_kg_and_returns_labels() -> None:
     assert mol_result.acid_sink_ratio is not None
 
 
-@pytest.mark.parametrize("pack_name", tuple(VENDORED_PACKS))
+@pytest.mark.parametrize("pack_name", tuple(PACKS))
 def test_openimcc_parent_activity_parity(pack_name: str) -> None:
     _openimcc_or_skip()
-    vendored_pack = vendored_load_datapack(VENDORED_PACKS[pack_name])
+    fixture = json.loads("\n".join(
+        line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
+        if not line.startswith("#")
+    ))
+    rows = [row for row in fixture["rows"] if row["pack"] == pack_name]
+    assert len(rows) >= 20
+    assert len({row["composition"] for row in rows}) >= 5
+    assert len({row["temperature_K"] for row in rows}) >= 4
+    for row in rows:
+        composition, basis_type = COMPOSITIONS[row["composition"]]
+        bridge_kwargs = {"temperature_K": row["temperature_K"], "pack": pack_name}
+        bridge_kwargs["composition_kg" if basis_type == "wt" else "composition_mol"] = composition
+        bridge_result = bridge_evaluate(**bridge_kwargs)
+        actual = bridge_result.parent_oxide_activities
+        expected_parent_oxides = (
+            "SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2", "Na2O", "K2O"
+        ) + (("S", "P2O5") if pack_name == "ext-v4" else ())
+        assert tuple(bridge_result.parent_oxides) == expected_parent_oxides
+        assert {name: float(value).hex() for name, value in actual.items()} == row["activities_hex"]
+        expected_labels = row["labels_legacy"]
+        labels = bridge_result.labels
+        assert dict(labels.coverage) == expected_labels["coverage"]
+        assert labels.trust == expected_labels["trust"]
+        assert labels.envelope_status == expected_labels["envelope_status"]
+        identity = dict(labels.identity)
+        expected_identity = dict(expected_labels["identity"])
+        if pack_name == "ext-v4":
+            # The package's ext-v4 is sp-2; green carried sp-1. Version remains
+            # package-owned and honest while all other green identity fields match.
+            expected_identity.pop("datapack_version")
+        assert {key: identity[key] for key in expected_identity} == expected_identity
 
-    differences: list[str] = []
-    for composition_name, (composition, basis_type) in COMPOSITIONS.items():
-        for temperature_K in TEMPERATURES_K:
-            enable_sp_extension = pack_name == "ext-v4"
-            vendored = vendored_evaluate(
-                composition,
-                temperature_K,
-                vendored_pack,
-                basis_type=basis_type,
-                enable_sp_extension=enable_sp_extension,
-            )
-            bridge_kwargs = {
-                "temperature_K": temperature_K,
-                "pack": pack_name,
-            }
-            if basis_type == "wt":
-                bridge_kwargs["composition_kg"] = composition
-            else:
-                bridge_kwargs["composition_mol"] = composition
-            standalone = bridge_evaluate(**bridge_kwargs)
-            if tuple(vendored.parent_oxides) != tuple(standalone.parent_oxides):
-                differences.append(
-                    f"{pack_name} {composition_name} {temperature_K:g} K "
-                    f"parent-oxide labels: vendored={tuple(vendored.parent_oxides)!r} "
-                    f"bridge={tuple(standalone.parent_oxides)!r}"
-                )
-                continue
-            if set(standalone.parent_oxide_activities) != set(vendored.parent_oxides):
-                differences.append(
-                    f"{pack_name} {composition_name} {temperature_K:g} K "
-                    "bridge parent-oxide activity labels do not match"
-                )
-                continue
-            for oxide, expected, _ in zip(
-                vendored.parent_oxides,
-                vendored.parent_activity,
-                standalone.parent_oxides,
-                strict=True,
-            ):
-                expected = float(expected)
-                actual = float(standalone.parent_oxide_activities[oxide])
-                absolute = abs(expected - actual)
-                relative = absolute / max(abs(expected), abs(actual), 1.0e-300)
-                if relative > 1.0e-10:
-                    differences.append(
-                        f"{pack_name} {composition_name} {temperature_K:g} K "
-                        f"{oxide}: vendored={expected:.17g} "
-                        f"openimcc={actual:.17g} abs={absolute:.3g} "
-                        f"rel={relative:.3g}"
-                    )
 
-    assert not differences, "openimcc activity parity differences:\n" + "\n".join(
-        differences
+def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
+    _openimcc_or_skip()
+    from dataclasses import replace
+    from openimcc import label_research_datapack, load_datapack
+    from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
+
+    fixture = json.loads("\n".join(
+        line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
+        if not line.startswith("#")
+    ))
+    row = fixture["rows"][0]
+    composition, basis_type = COMPOSITIONS[row["composition"]]
+    pack = load_datapack()
+    baseline = evaluate_imcc(
+        composition, row["temperature_K"], pack, basis_type=basis_type
     )
+    baseline_hex = {
+        str(name): float(value).hex()
+        for name, value in zip(baseline.parent_oxides, baseline.parent_activity, strict=True)
+    }
+    assert baseline_hex == row["activities_hex"]
+    kernel = replace(pack.kernel_datapack, A=pack.kernel_datapack.A.copy())
+    kernel.A[0] += 0.01
+    mutated_pack = label_research_datapack(
+        kernel, model_id="IMCC-SF04-mutation", coverage="mutation-probe"
+    )
+    mutated = evaluate_imcc(
+        composition, row["temperature_K"], mutated_pack, basis_type=basis_type
+    )
+    mutated_hex = {
+        str(name): float(value).hex()
+        for name, value in zip(mutated.parent_oxides, mutated.parent_activity, strict=True)
+    }
+    assert mutated_hex != row["activities_hex"]
+
+
+def test_bridge_envelope_matches_green_edge_decisions() -> None:
+    _openimcc_or_skip()
+    from openimcc import ImccCompositionOutsideValidatedEnvelopeError
+
+    fixture = json.loads("\n".join(
+        line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
+        if not line.startswith("#")
+    ))
+    assert fixture["edge_row"]["code"] == "imcc_composition_outside_validated_envelope"
+    inside_slack = bridge_evaluate(
+        composition_mol={"K2O": 0.500002, "SiO2": 0.499998},
+        temperature_K=1800.0,
+    )
+    assert inside_slack.envelope_status == "inside"
+    inside = bridge_evaluate(
+        composition_mol={"K2O": 0.5, "SiO2": 0.5}, temperature_K=1800.0
+    )
+    assert inside.envelope_status == "inside"
+    within_package_slack = bridge_evaluate(
+        composition_mol={"K2O": 0.500005, "SiO2": 0.499995},
+        temperature_K=1800.0,
+    )
+    assert within_package_slack.envelope_status == "inside"
+    with pytest.raises(ImccCompositionOutsideValidatedEnvelopeError):
+        bridge_evaluate(
+            composition_mol={"K2O": 0.500006, "SiO2": 0.499994},
+            temperature_K=1800.0,
+        )
+
+
+def test_species_coverage_edge_flag_contract_and_typed_notice() -> None:
+    _openimcc_or_skip()
+    from simulator.melt_backend.openimcc_bridge import imcc_complex_saturation_notice
+
+    for alkali in ("Na2O", "K2O"):
+        for fraction in (0.50, 0.55):
+            result = bridge_evaluate(
+                composition_mol={alkali: fraction, "SiO2": 1.0 - fraction},
+                temperature_K=1800.0,
+                allow_out_of_envelope=True,
+            )
+            notice = imcc_complex_saturation_notice(
+                result.flags, result.acid_sink_ratio
+            )
+            assert notice is not None
+            assert notice["kind"] == "imcc_complex_saturation"
+            assert notice["flag"].startswith("species-coverage-edge")
+            assert notice["acid_sink_ratio"] == result.acid_sink_ratio
+
+    pinned = bridge_evaluate(
+        composition_mol={"K2O": 0.55, "SiO2": 0.45},
+        temperature_K=1800.0,
+        allow_out_of_envelope=True,
+    )
+    assert any(flag.startswith("species-coverage-edge") for flag in pinned.flags)
+
+    lunar = {
+        "SiO2": 44.5,
+        "TiO2": 1.5,
+        "Al2O3": 13.5,
+        "FeO": 16.5,
+        "MgO": 9.0,
+        "CaO": 11.0,
+        "Na2O": 0.4,
+        "K2O": 0.1,
+    }
+    for temperature_K in (1700.0, 2200.0):
+        result = bridge_evaluate(
+            composition_kg=lunar,
+            temperature_K=temperature_K,
+            allow_extrapolation=True,
+        )
+        assert imcc_complex_saturation_notice(
+            result.flags, result.acid_sink_ratio
+        ) is None
 
 
 def test_bridge_extrapolation_and_envelope_flags_are_explicit() -> None:
@@ -376,3 +464,44 @@ def test_bridge_extrapolation_and_envelope_flags_are_explicit() -> None:
         allow_out_of_envelope=True,
     )
     assert outside.envelope_status == "outside_validated"
+
+
+def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
+    _openimcc_or_skip()
+    composition = {
+        "SiO2": 45.94,
+        "Al2O3": 16.0,
+        "FeO": 10.67,
+        "MgO": 7.09,
+        "CaO": 11.21,
+        "TiO2": 1.79,
+        "Na2O": 2.27,
+        "K2O": 2.49,
+    }
+    expected = {
+        1473.15: {"KO0.5": 3.49e-9, "NaO0.5": 6.87e-5},
+        1673.15: {"KO0.5": 2.45e-8, "NaO0.5": 2.76e-4},
+    }
+    for temperature_K, anchors in expected.items():
+        result = bridge_evaluate(
+            composition_kg=composition,
+            temperature_K=temperature_K,
+            allow_extrapolation=True,
+        )
+        for component, anchor in anchors.items():
+            row = result.activity_coefficients[component]
+            assert row["value"] == pytest.approx(anchor, rel=1e-2)
+            assert row["coefficient_basis"] == "single_cation"
+            assert row["standard_state"] == {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": component,
+            }
+
+
+def test_single_cation_gamma_ideal_pure_oxide_limit() -> None:
+    _openimcc_or_skip()
+    result = bridge_evaluate(
+        composition_mol={"SiO2": 1.0}, temperature_K=1800.0
+    )
+    assert result.activity_coefficients["SiO2"]["value"] == 1.0

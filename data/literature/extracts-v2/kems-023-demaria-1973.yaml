@@ -6741,14 +6741,14 @@ observations:
           note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt vaporization studies
             (ref 4)
     output_unit: Pa
-- observation_id: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1400.0:row=10017:h=76f5d8523d35
+- observation_id: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1400.0:row=10017:h=60df169fee87
   experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
   identity:
     quantity:
       tag: value
       value: p_partial
     species:
-      formula: '10017'
+      formula: Na
       phase:
         tag: value
         value: g
@@ -6797,8 +6797,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4311471091931851005512625625'
+        - - TiO2
+          - '0.0931387200602371283425576716'
+        - - Al2O3
+          - '0.05058895877492316107811212988'
+        - - FeO
+          - '0.1752439414041254084196055855'
+        - - MnO
+          - '0.001970060031040465601226515821'
+        - - MgO
+          - '0.1205710800811418883677677291'
+        - - CaO
+          - '0.1195081584536437715237347561'
+        - - Na2O
+          - '0.005227074752535481915639870165'
+        - - K2O
+          - '0.002023114693417819469680283369'
+        - - P2O5
+          - '0.0005817825557497747304128963893'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6831,15 +6854,23 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-023
+      date: '2026-09-12'
+      evidence:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 10017 is this-work data
   notices: []
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
     pdf_page_index: 2
     table: '1'
-    note: Table I Na rows; samples 10017 and 12073 are this work
+    note: Table I Na rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
     temperature_K:
@@ -6850,7 +6881,7 @@ observations:
         published_page: 176
         pdf_page_index: 2
         table: '1'
-        note: Table I Na rows; samples 10017 and 12073 are this work
+        note: Table I Na rows; sample 10017 is this-work data
   derivation:
     relation: atm_to_Pa; species.phase=gas declared by source standard_state Na(g); identity.reference_state=ideal-gas Na(g)
       at 1 bar from source-declared partial pressure
@@ -6865,7 +6896,7 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I Na rows; samples 10017 and 12073 are this work
+          note: Table I Na rows; sample 10017 is this-work data
     - - factor
       - state:
           tag: value
@@ -6874,16 +6905,182 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I Na rows; samples 10017 and 12073 are this work
+          note: Table I Na rows; sample 10017 is this-work data
     output_unit: Pa
-- observation_id: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1400.0:row=12073:h=023a1d1d807d
+- observation_id: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1500.0:row=10017:h=279efc049af6
   experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
   identity:
     quantity:
       tag: value
       value: p_partial
     species:
-      formula: '12073'
+      formula: Na
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1500'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4311471091931851005512625625'
+        - - TiO2
+          - '0.0931387200602371283425576716'
+        - - Al2O3
+          - '0.05058895877492316107811212988'
+        - - FeO
+          - '0.1752439414041254084196055855'
+        - - MnO
+          - '0.001970060031040465601226515821'
+        - - MgO
+          - '0.1205710800811418883677677291'
+        - - CaO
+          - '0.1195081584536437715237347561'
+        - - Na2O
+          - '0.005227074752535481915639870165'
+        - - K2O
+          - '0.002023114693417819469680283369'
+        - - P2O5
+          - '0.0005817825557497747304128963893'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.16212'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-023
+      date: '2026-09-12'
+      evidence:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 10017 is this-work data
+  notices: []
+  source_id: kems-023-demaria-1973
+  locator:
+    published_page: 176
+    pdf_page_index: 2
+    table: '1'
+    note: Table I Na rows; sample 10017 is this-work data
+  read_from: pdf:kems-023-demaria-1973
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1500'
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 10017 is this-work data
+  derivation:
+    relation: atm_to_Pa; species.phase=gas declared by source standard_state Na(g); identity.reference_state=ideal-gas Na(g)
+      at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-023-demaria-1973
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000016'
+        locator:
+          published_page: 176
+          pdf_page_index: 2
+          table: '1'
+          note: Table I Na rows; sample 10017 is this-work data
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 176
+          pdf_page_index: 2
+          table: '1'
+          note: Table I Na rows; sample 10017 is this-work data
+    output_unit: Pa
+- observation_id: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work_12073::T=1400.0:row=12073:h=e710b7f1433b
+  experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Na
       phase:
         tag: value
         value: g
@@ -6932,8 +7129,29 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4276962562759165078431124469'
+        - - TiO2
+          - '0.02432811158893445609474737032'
+        - - Al2O3
+          - '0.09220708776029153323414621159'
+        - - FeO
+          - '0.148306989269107509425075919'
+        - - MnO
+          - '0.001148612310222625661546886446'
+        - - MgO
+          - '0.1710597119356819918304513602'
+        - - CaO
+          - '0.1285334811441748981775147172'
+        - - Na2O
+          - '0.005056288830734401053425412828'
+        - - K2O
+          - '0.001663460884936076679979674698'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6966,15 +7184,23 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-023
+      date: '2026-09-12'
+      evidence:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 12073 is this-work data
   notices: []
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
     pdf_page_index: 2
     table: '1'
-    note: Table I Na rows; samples 10017 and 12073 are this work
+    note: Table I Na rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
     temperature_K:
@@ -6985,7 +7211,7 @@ observations:
         published_page: 176
         pdf_page_index: 2
         table: '1'
-        note: Table I Na rows; samples 10017 and 12073 are this work
+        note: Table I Na rows; sample 12073 is this-work data
   derivation:
     relation: atm_to_Pa; species.phase=gas declared by source standard_state Na(g); identity.reference_state=ideal-gas Na(g)
       at 1 bar from source-declared partial pressure
@@ -7000,7 +7226,7 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I Na rows; samples 10017 and 12073 are this work
+          note: Table I Na rows; sample 12073 is this-work data
     - - factor
       - state:
           tag: value
@@ -7009,16 +7235,16 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I Na rows; samples 10017 and 12073 are this work
+          note: Table I Na rows; sample 12073 is this-work data
     output_unit: Pa
-- observation_id: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1500.0:row=10017:h=19a1656d322d
+- observation_id: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work_12073::T=1500.0:row=12073:h=0cdb3eba1f97
   experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
   identity:
     quantity:
       tag: value
       value: p_partial
     species:
-      formula: '10017'
+      formula: Na
       phase:
         tag: value
         value: g
@@ -7067,143 +7293,29 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: point
-    point: '0.16212'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-023-demaria-1973
-  locator:
-    published_page: 176
-    pdf_page_index: 2
-    table: '1'
-    note: Table I Na rows; samples 10017 and 12073 are this work
-  read_from: pdf:kems-023-demaria-1973
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1500'
-      locator:
-        published_page: 176
-        pdf_page_index: 2
-        table: '1'
-        note: Table I Na rows; samples 10017 and 12073 are this work
-  derivation:
-    relation: atm_to_Pa; species.phase=gas declared by source standard_state Na(g); identity.reference_state=ideal-gas Na(g)
-      at 1 bar from source-declared partial pressure
-    inputs:
-    - pdf:kems-023-demaria-1973
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '0.0000016'
-        locator:
-          published_page: 176
-          pdf_page_index: 2
-          table: '1'
-          note: Table I Na rows; samples 10017 and 12073 are this work
-    - - factor
-      - state:
-          tag: value
-          value: '101325'
-        locator:
-          published_page: 176
-          pdf_page_index: 2
-          table: '1'
-          note: Table I Na rows; samples 10017 and 12073 are this work
-    output_unit: Pa
-- observation_id: kems-023-demaria-1973::demaria_1973_na_psat_table1_this_work::T=1500.0:row=12073:h=e5e9e4a8fb2f
-  experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: '12073'
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: value
-      value: '1500'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
       tag: value
       value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Na
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Na
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4276962562759165078431124469'
+        - - TiO2
+          - '0.02432811158893445609474737032'
+        - - Al2O3
+          - '0.09220708776029153323414621159'
+        - - FeO
+          - '0.148306989269107509425075919'
+        - - MnO
+          - '0.001148612310222625661546886446'
+        - - MgO
+          - '0.1710597119356819918304513602'
+        - - CaO
+          - '0.1285334811441748981775147172'
+        - - Na2O
+          - '0.005056288830734401053425412828'
+        - - K2O
+          - '0.001663460884936076679979674698'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7236,15 +7348,23 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-023
+      date: '2026-09-12'
+      evidence:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I Na rows; sample 12073 is this-work data
   notices: []
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
     pdf_page_index: 2
     table: '1'
-    note: Table I Na rows; samples 10017 and 12073 are this work
+    note: Table I Na rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
     temperature_K:
@@ -7255,7 +7375,7 @@ observations:
         published_page: 176
         pdf_page_index: 2
         table: '1'
-        note: Table I Na rows; samples 10017 and 12073 are this work
+        note: Table I Na rows; sample 12073 is this-work data
   derivation:
     relation: atm_to_Pa; species.phase=gas declared by source standard_state Na(g); identity.reference_state=ideal-gas Na(g)
       at 1 bar from source-declared partial pressure
@@ -7270,7 +7390,7 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I Na rows; samples 10017 and 12073 are this work
+          note: Table I Na rows; sample 12073 is this-work data
     - - factor
       - state:
           tag: value
@@ -7279,7 +7399,7 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I Na rows; samples 10017 and 12073 are this work
+          note: Table I Na rows; sample 12073 is this-work data
     output_unit: Pa
 - observation_id: kems-023-demaria-1973::demaria_1973_o2_detected_not_tabulated
   experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
@@ -9587,8 +9707,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4311471091931851005512625625'
+        - - TiO2
+          - '0.0931387200602371283425576716'
+        - - Al2O3
+          - '0.05058895877492316107811212988'
+        - - FeO
+          - '0.1752439414041254084196055855'
+        - - MnO
+          - '0.001970060031040465601226515821'
+        - - MgO
+          - '0.1205710800811418883677677291'
+        - - CaO
+          - '0.1195081584536437715237347561'
+        - - Na2O
+          - '0.005227074752535481915639870165'
+        - - K2O
+          - '0.002023114693417819469680283369'
+        - - P2O5
+          - '0.0005817825557497747304128963893'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9621,15 +9764,23 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-023
+      date: '2026-09-12'
+      evidence:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 10017 is this-work data
   notices: []
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
     pdf_page_index: 2
     table: '1'
-    note: Table I TiO rows; samples 10017 and 12073 are this work
+    note: Table I TiO rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
     temperature_K:
@@ -9640,7 +9791,7 @@ observations:
         published_page: 176
         pdf_page_index: 2
         table: '1'
-        note: Table I TiO rows; samples 10017 and 12073 are this work
+        note: Table I TiO rows; sample 10017 is this-work data
   derivation:
     relation: atm_to_Pa; species.phase=gas declared by source standard_state TiO(g); identity.reference_state=ideal-gas TiO(g)
       at 1 bar from source-declared partial pressure
@@ -9655,7 +9806,7 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I TiO rows; samples 10017 and 12073 are this work
+          note: Table I TiO rows; sample 10017 is this-work data
     - - factor
       - state:
           tag: value
@@ -9664,142 +9815,7 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I TiO rows; samples 10017 and 12073 are this work
-    output_unit: Pa
-- observation_id: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work::T=2100.0:row=12073:h=dc8a5bc530df
-  experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
-  identity:
-    quantity:
-      tag: value
-      value: p_partial
-    species:
-      formula: TiO
-      phase:
-        tag: value
-        value: g
-      polymorph:
-        tag: not_applicable
-        reason: not crystal
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
-    temperature_K:
-      tag: value
-      value: '2100'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: TiO
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: TiO
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
-  value:
-    kind: point
-    point: '0.007194075'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-023-demaria-1973
-  locator:
-    published_page: 176
-    pdf_page_index: 2
-    table: '1'
-    note: Table I TiO rows; samples 10017 and 12073 are this work
-  read_from: pdf:kems-023-demaria-1973
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '2100'
-      locator:
-        published_page: 176
-        pdf_page_index: 2
-        table: '1'
-        note: Table I TiO rows; samples 10017 and 12073 are this work
-  derivation:
-    relation: atm_to_Pa; species.phase=gas declared by source standard_state TiO(g); identity.reference_state=ideal-gas TiO(g)
-      at 1 bar from source-declared partial pressure
-    inputs:
-    - pdf:kems-023-demaria-1973
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '0.000000071'
-        locator:
-          published_page: 176
-          pdf_page_index: 2
-          table: '1'
-          note: Table I TiO rows; samples 10017 and 12073 are this work
-    - - factor
-      - state:
-          tag: value
-          value: '101325'
-        locator:
-          published_page: 176
-          pdf_page_index: 2
-          table: '1'
-          note: Table I TiO rows; samples 10017 and 12073 are this work
+          note: Table I TiO rows; sample 10017 is this-work data
     output_unit: Pa
 - observation_id: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work::T=2200.0:row=10017:h=02e402d12d9e
   experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
@@ -9857,8 +9873,31 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4311471091931851005512625625'
+        - - TiO2
+          - '0.0931387200602371283425576716'
+        - - Al2O3
+          - '0.05058895877492316107811212988'
+        - - FeO
+          - '0.1752439414041254084196055855'
+        - - MnO
+          - '0.001970060031040465601226515821'
+        - - MgO
+          - '0.1205710800811418883677677291'
+        - - CaO
+          - '0.1195081584536437715237347561'
+        - - Na2O
+          - '0.005227074752535481915639870165'
+        - - K2O
+          - '0.002023114693417819469680283369'
+        - - P2O5
+          - '0.0005817825557497747304128963893'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9891,15 +9930,23 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-023
+      date: '2026-09-12'
+      evidence:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 10017 is this-work data
   notices: []
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
     pdf_page_index: 2
     table: '1'
-    note: Table I TiO rows; samples 10017 and 12073 are this work
+    note: Table I TiO rows; sample 10017 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
     temperature_K:
@@ -9910,7 +9957,7 @@ observations:
         published_page: 176
         pdf_page_index: 2
         table: '1'
-        note: Table I TiO rows; samples 10017 and 12073 are this work
+        note: Table I TiO rows; sample 10017 is this-work data
   derivation:
     relation: atm_to_Pa; species.phase=gas declared by source standard_state TiO(g); identity.reference_state=ideal-gas TiO(g)
       at 1 bar from source-declared partial pressure
@@ -9925,7 +9972,7 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I TiO rows; samples 10017 and 12073 are this work
+          note: Table I TiO rows; sample 10017 is this-work data
     - - factor
       - state:
           tag: value
@@ -9934,9 +9981,173 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I TiO rows; samples 10017 and 12073 are this work
+          note: Table I TiO rows; sample 10017 is this-work data
     output_unit: Pa
-- observation_id: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work::T=2200.0:row=12073:h=80decee22021
+- observation_id: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work_12073::T=2100.0:row=12073:h=dc8a5bc530df
+  experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: TiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: TiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: TiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4276962562759165078431124469'
+        - - TiO2
+          - '0.02432811158893445609474737032'
+        - - Al2O3
+          - '0.09220708776029153323414621159'
+        - - FeO
+          - '0.148306989269107509425075919'
+        - - MnO
+          - '0.001148612310222625661546886446'
+        - - MgO
+          - '0.1710597119356819918304513602'
+        - - CaO
+          - '0.1285334811441748981775147172'
+        - - Na2O
+          - '0.005056288830734401053425412828'
+        - - K2O
+          - '0.001663460884936076679979674698'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.007194075'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-023
+      date: '2026-09-12'
+      evidence:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 12073 is this-work data
+  notices: []
+  source_id: kems-023-demaria-1973
+  locator:
+    published_page: 176
+    pdf_page_index: 2
+    table: '1'
+    note: Table I TiO rows; sample 12073 is this-work data
+  read_from: pdf:kems-023-demaria-1973
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 12073 is this-work data
+  derivation:
+    relation: atm_to_Pa; species.phase=gas declared by source standard_state TiO(g); identity.reference_state=ideal-gas TiO(g)
+      at 1 bar from source-declared partial pressure
+    inputs:
+    - pdf:kems-023-demaria-1973
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000071'
+        locator:
+          published_page: 176
+          pdf_page_index: 2
+          table: '1'
+          note: Table I TiO rows; sample 12073 is this-work data
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 176
+          pdf_page_index: 2
+          table: '1'
+          note: Table I TiO rows; sample 12073 is this-work data
+    output_unit: Pa
+- observation_id: kems-023-demaria-1973::demaria_1973_tio_psat_table1_this_work_12073::T=2200.0:row=12073:h=80decee22021
   experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
   identity:
     quantity:
@@ -9992,8 +10203,29 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4276962562759165078431124469'
+        - - TiO2
+          - '0.02432811158893445609474737032'
+        - - Al2O3
+          - '0.09220708776029153323414621159'
+        - - FeO
+          - '0.148306989269107509425075919'
+        - - MnO
+          - '0.001148612310222625661546886446'
+        - - MgO
+          - '0.1710597119356819918304513602'
+        - - CaO
+          - '0.1285334811441748981775147172'
+        - - Na2O
+          - '0.005056288830734401053425412828'
+        - - K2O
+          - '0.001663460884936076679979674698'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10026,15 +10258,23 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-023
+      date: '2026-09-12'
+      evidence:
+        published_page: 176
+        pdf_page_index: 2
+        table: '1'
+        note: Table I TiO rows; sample 12073 is this-work data
   notices: []
   source_id: kems-023-demaria-1973
   locator:
     published_page: 176
     pdf_page_index: 2
     table: '1'
-    note: Table I TiO rows; samples 10017 and 12073 are this work
+    note: Table I TiO rows; sample 12073 is this-work data
   read_from: pdf:kems-023-demaria-1973
   point_conditions:
     temperature_K:
@@ -10045,7 +10285,7 @@ observations:
         published_page: 176
         pdf_page_index: 2
         table: '1'
-        note: Table I TiO rows; samples 10017 and 12073 are this work
+        note: Table I TiO rows; sample 12073 is this-work data
   derivation:
     relation: atm_to_Pa; species.phase=gas declared by source standard_state TiO(g); identity.reference_state=ideal-gas TiO(g)
       at 1 bar from source-declared partial pressure
@@ -10060,7 +10300,7 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I TiO rows; samples 10017 and 12073 are this work
+          note: Table I TiO rows; sample 12073 is this-work data
     - - factor
       - state:
           tag: value
@@ -10069,5 +10309,5 @@ observations:
           published_page: 176
           pdf_page_index: 2
           table: '1'
-          note: Table I TiO rows; samples 10017 and 12073 are this work
+          note: Table I TiO rows; sample 12073 is this-work data
     output_unit: Pa

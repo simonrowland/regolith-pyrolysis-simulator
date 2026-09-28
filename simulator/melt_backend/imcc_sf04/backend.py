@@ -4,11 +4,9 @@ The simulator-facing half of the IMCC-SF04 adapter: the two ``MeltBackend``
 implementations that ``resolve_backend`` selects, plus the trust-vocabulary
 assertions that bind them to this repository's certification denylist.
 
-Split out of ``adapter.py`` so the model half stays free of simulator policy.
-Everything here is *this project's* concern — backend naming, evidence class,
-``EquilibriumResult`` shape — and none of it is part of the IMCC model. The
-model half (``adapter.py`` + ``kernel.py`` + ``gas.py``) imports nothing from
-this module, which is what makes the package extractable.
+The openimcc dependency owns the model kernel and datapack adapter. The local
+adapter and gas module retain simulator trust labels and VapoRock-JANAF tables;
+this module maps model results into the simulator's ``MeltBackend`` contract.
 
 Shadow / diagnostic only. Promotion into ``REAL_MELT_BACKEND_NAMES`` and active
 recipe eligibility is a separate owner-gated change after the battery result
@@ -33,18 +31,14 @@ from simulator.melt_backend.base import (
     MeltBackend,
     split_cleaned_melt_account,
 )
-from simulator.melt_backend.imcc_sf04.adapter import (
-    ImccLoadedDatapack,
-    _EXT_DATAPACK_PATH,
-    _KELVIN_OFFSET,
-    _PUBLISHED_DATAPACK_PATH,
-    evaluate,
-    load_datapack,
-)
-from simulator.melt_backend.imcc_sf04.kernel import (
-    ImccNonconvergenceError,
-    ImccRefusal,
-)
+import openimcc
+from openimcc import ImccLoadedDatapack
+from openimcc.kernel import ImccNonconvergenceError, ImccRefusal
+from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
+
+from importlib import resources
+
+_KELVIN_OFFSET = 273.15
 
 
 # Canonical trust vocabulary for the IMCC-SF04 diagnostic shadow.
@@ -61,7 +55,7 @@ assert backend_name_denies_authority(_IMCC_EVIDENCE_CLASS_CANONICAL)
 
 
 class ImccSf04Backend(MeltBackend):
-    """Thin MeltBackend wrapper around the published IMCC-SF04 adapter.
+    """Thin MeltBackend wrapper around the openimcc package model.
 
     Diagnostic / shadow only. ``equilibrate`` reports parent activities on
     the legacy ``activity_coefficients`` field and does not emit a ledger
@@ -70,7 +64,7 @@ class ImccSf04Backend(MeltBackend):
 
     name = IMCC_SF04_BACKEND_NAME
     backend_name = IMCC_SF04_BACKEND_NAME
-    _default_datapack_path = _PUBLISHED_DATAPACK_PATH
+    _default_datapack_name = "imcc-sf04-v1.0.2.json"
     _enable_sp_extension = False
 
     def __init__(self) -> None:
@@ -85,9 +79,15 @@ class ImccSf04Backend(MeltBackend):
         self._last_error = None
         self._config = dict(config or {})
         raw_path = self._config.get("datapack_path")
-        path = Path(raw_path) if raw_path else self._default_datapack_path
         try:
-            self._pack = load_datapack(path)
+            if raw_path:
+                self._pack = openimcc.load_datapack(Path(raw_path))
+            else:
+                resource = resources.files("openimcc").joinpath(
+                    "data", "packs", self._default_datapack_name
+                )
+                with resources.as_file(resource) as path:
+                    self._pack = openimcc.load_datapack(path)
         except ImccRefusal as exc:
             self._last_error = str(exc)
             return False
@@ -162,7 +162,7 @@ class ImccSf04Backend(MeltBackend):
 
         temperature_K = float(temperature_C) + _KELVIN_OFFSET
         try:
-            result = evaluate(
+            result = evaluate_imcc(
                 composition,
                 temperature_K,
                 self._pack,
@@ -210,5 +210,5 @@ class ImccSf04ExtBackend(ImccSf04Backend):
 
     name = IMCC_SF04_EXT_BACKEND_NAME
     backend_name = IMCC_SF04_EXT_BACKEND_NAME
-    _default_datapack_path = _EXT_DATAPACK_PATH
+    _default_datapack_name = "imcc-sf04-ext-v4.json"
     _enable_sp_extension = True

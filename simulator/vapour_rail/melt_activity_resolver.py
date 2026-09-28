@@ -2714,7 +2714,7 @@ def build_imcc_activity_shadow(
         return payload
 
     try:
-        from simulator.melt_backend.imcc_sf04.openimcc_bridge import evaluate
+        from simulator.melt_backend.openimcc_bridge import evaluate
 
         result = evaluate(
             composition_mol=composition_mol,

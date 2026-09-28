@@ -823,6 +823,19 @@ def _repo_observation(filename: str, observation_id: str) -> dict:
     raise AssertionError(f"observation not found: {filename}::{observation_id}")
 
 
+def _repo_point_rows(filename: str) -> list[tuple[dict, dict]]:
+    doc = load_cached_safe_yaml((EXTRACTS / filename).read_text())
+    rows = []
+    for species in doc["species"].values():
+        for observation in species["observations"]:
+            values = observation.get("values") or {}
+            for container in ("points", "rows"):
+                for row in values.get(container) or []:
+                    if isinstance(row, dict):
+                        rows.append((observation, row))
+    return rows
+
+
 def test_sossi_na_inference_and_ceiling_never_recreate_alpha_range():
     """Na's disagreeing inference and adopted ceiling are not measured ranges."""
     gamma = _repo_observation(
@@ -944,6 +957,177 @@ def test_stolyarova_wilson_numbers_are_gibbs_model_parameters_only():
     assert observation["values"]["evidence_class"] == "thermodynamic_model_parameter"
     assert observation["values"]["activity_pin_eligible"] is False
     assert al_si["l210"] == 316.3
+
+
+def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    atomic_source = _repo_observation(
+        "kems-053-stolyarova-1991.yaml",
+        "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium",
+    )
+    assert atomic_source["values"]["method_class"] == "derived"
+    assert atomic_source["reaction_as_printed"] == "(WO3)(g) = (WO2)(g) + (O)(g)"
+    assert "reservoir" not in atomic_source
+    assert "reservoir_formula" not in atomic_source
+
+    figure_source = _repo_observation(
+        "kems-053-stolyarova-1991.yaml",
+        "stolyarova_1991_o2_pressure_fig4",
+    )
+    assert figure_source["values"]["calculation_method"] == "Eq. [15]"
+    assert figure_source["values"]["admission_status"] == "figure_only"
+    assert figure_source["values"]["status"] == "typed_refusal"
+    assert "[15]" in figure_source["derivation"]["relation"]
+    assert "reaction" not in figure_source
+    assert "reaction_as_printed" not in figure_source
+
+    result = _migrate_real_extract(
+        tmp_path, "kems-053-stolyarova-1991.yaml"
+    )
+    source = "kems-053-stolyarova-1991"
+    atomic_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source
+        and observation.observation_id.startswith(
+            f"{source}::stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium::"
+        )
+    ]
+    figure_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source
+        and observation.observation_id.startswith(
+            f"{source}::stolyarova_1991_o2_pressure_fig4::"
+        )
+    ]
+    assert len(atomic_rows) == 9
+    assert len(figure_rows) == 8
+
+    for observation in atomic_rows:
+        reaction = observation.identity.reaction
+        assert reaction is not None and reaction.is_value
+        assert [
+            (term.species.formula, term.species.phase.value, str(term.coefficient))
+            for term in reaction.value.terms
+        ] == [("WO3", "g", "-1"), ("WO2", "g", "1"), ("O", "g", "1")]
+        reservoir = observation.identity.reservoir
+        assert reservoir is not None and reservoir.is_unknown
+
+    for observation in figure_rows:
+        reaction = observation.identity.reaction
+        assert reaction is not None and reaction.is_unknown
+        assert observation.admission.status.value == "rejected"
+
+
+def test_stolyarova_printed_binary_compositions_survive_migration(tmp_path: Path):
+    """Suppose my change is wrong in the way that matters most — what shows it?
+
+    Removing one structured row composition must reduce the typed-row census;
+    digitized-only Figure 3 and Figure 4 points must remain composition-unknown.
+    """
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    rows = _repo_point_rows("kems-053-stolyarova-1991.yaml")
+    typed_source = [
+        (observation, row)
+        for observation, row in rows
+        if "composition" in (row.get("point_conditions") or {})
+    ]
+    assert len(typed_source) == 130
+    for observation, row in typed_source:
+        composition = row["point_conditions"]["composition"]
+        value = composition["state"]["value"]
+        assert value["basis"] == "printed_mole_fraction"
+        assert value["amount_basis"] == "mole_fraction"
+        assert len(value["components"]) == 2
+        assert "documented complement" in composition["locator"]["note"]
+        assert "not printed" in composition["locator"]["note"]
+        assert composition["locator"].get("table") in {"Ia", "Ib", "IIa", "IIb"}
+
+    figure_rows = [
+        row
+        for observation, row in rows
+        if observation["observation_id"]
+        in {
+            "stolyarova_1991_gibbs_integral_energy_fig3",
+            "stolyarova_1991_o2_pressure_fig4",
+        }
+    ]
+    assert figure_rows
+    assert all("composition" not in (row.get("point_conditions") or {}) for row in figure_rows)
+
+    result = _migrate_real_extract(tmp_path, "kems-053-stolyarova-1991.yaml")
+    typed_migrated = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-053-stolyarova-1991"
+        and (observation.point_conditions or {}).get("composition") is not None
+        and observation.point_conditions["composition"].state.is_value
+    ]
+    assert len(typed_migrated) == 130
+    assert all(
+        observation.point_conditions["composition"].state.value.amount_basis.value
+        == "mole_fraction"
+        for observation in typed_migrated
+    )
+
+
+def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    rows = _repo_point_rows("kems-051-allibert-1981.yaml")
+    typed_source = [
+        (observation, row)
+        for observation, row in rows
+        if "composition" in (row.get("point_conditions") or {})
+    ]
+    assert len(typed_source) == 76
+    for observation, row in typed_source:
+        composition = row["point_conditions"]["composition"]
+        value = composition["state"]["value"]
+        assert value["basis"] == "printed_mole_fraction"
+        assert value["amount_basis"] == "mole_fraction"
+        assert len(value["components"]) == 2
+        assert "documented complement" in composition["locator"]["note"]
+        assert "not printed" in composition["locator"]["note"]
+        assert composition["locator"].get("table") in {"II", "V"} or composition[
+            "locator"
+        ].get("figure") in {6, "6"}
+
+    table2 = next(
+        row
+        for observation, row in rows
+        if observation["observation_id"] == "allibert_1981_table2_cao_activity_kems"
+    )
+    assert table2["point_conditions"]["composition"]["state"]["value"]["components"] == [
+        ["CaO", "0.645"],
+        ["Al2O3", "0.355"],
+    ]
+    figure2_rows = [
+        row
+        for observation, row in rows
+        if observation["observation_id"]
+        == "allibert_1981_fig2_alumina_activity_gibbs_duhem"
+    ]
+    assert figure2_rows
+    assert all("composition" not in (row.get("point_conditions") or {}) for row in figure2_rows)
+
+    result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    typed_migrated = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-051-allibert-1981"
+        and (observation.point_conditions or {}).get("composition") is not None
+        and observation.point_conditions["composition"].state.is_value
+    ]
+    assert len(typed_migrated) == 76
+    assert all(
+        observation.point_conditions["composition"].state.value.amount_basis.value
+        == "mole_fraction"
+        for observation in typed_migrated
+    )
 
 
 def test_halwax_pure_solid_formation_enthalpies_are_symmetric():

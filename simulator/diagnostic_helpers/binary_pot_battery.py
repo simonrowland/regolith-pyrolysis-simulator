@@ -69,12 +69,12 @@ IMCC_MODEL_IDS: dict[str, str] = {
     "imcc_sf04": "IMCC-SF04",
     "imcc_sf04_ext": "IMCC-SF04-EXT",
 }
-OPENIMCC_MODEL_IDS: dict[str, str] = {"openimcc": "IMCC-SF04"}
-ALL_IMCC_MODEL_IDS: dict[str, str] = {**IMCC_MODEL_IDS, **OPENIMCC_MODEL_IDS}
-IMCC_DATAPACK_RELATIVE: dict[str, str] = {
+IMCC_DATAPACK_LABELS: dict[str, str] = {
     "imcc_sf04": "data/melt_activity/imcc/imcc-sf04-v1.0.2.json",
     "imcc_sf04_ext": "data/melt_activity/imcc/imcc-sf04-ext-v4.json",
 }
+OPENIMCC_MODEL_IDS: dict[str, str] = {"openimcc": "IMCC-SF04"}
+ALL_IMCC_MODEL_IDS: dict[str, str] = {**IMCC_MODEL_IDS, **OPENIMCC_MODEL_IDS}
 MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
 ARM_HEADLINE = "headline"
 ARM_QUALIFICATION = "qualification"
@@ -257,6 +257,9 @@ class EquilibrateCell:
     # gamma, where the engine reports it. Activity stays on melt_activities.
     # a = gamma * x. An empty map is not activity reused as a coefficient.
     melt_activity_coefficients: dict[str, float] = field(default_factory=dict)
+    melt_activity_coefficient_details: dict[str, dict[str, Any]] = field(
+        default_factory=dict
+    )
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -271,6 +274,10 @@ class EquilibrateCell:
             "engine_annotation": self.engine_annotation,
             "melt_activities": dict(self.melt_activities),
             "melt_activity_coefficients": dict(self.melt_activity_coefficients),
+            "melt_activity_coefficient_details": {
+                str(name): dict(row)
+                for name, row in self.melt_activity_coefficient_details.items()
+            },
             "gas_partial_pressures_Pa": dict(self.gas_partial_pressures_Pa),
             "liquid_fraction": self.liquid_fraction,
             "wall_s": self.wall_s,
@@ -329,6 +336,13 @@ class EquilibrateCell:
                 for name, value in dict(
                     payload.get("melt_activity_coefficients") or {}
                 ).items()
+            },
+            melt_activity_coefficient_details={
+                str(name): dict(value)
+                for name, value in dict(
+                    payload.get("melt_activity_coefficient_details") or {}
+                ).items()
+                if isinstance(value, Mapping)
             },
             liquid_fraction=_finite_float(payload.get("liquid_fraction")),
             wall_s=float(payload.get("wall_s") or 0.0),
@@ -894,6 +908,39 @@ def reported_activity_coefficients(result: Any) -> dict[str, float]:
     return gammas
 
 
+def _imcc_activity_coefficient_reports(
+    parent_activities: Mapping[str, float], composition_mol: Mapping[str, float]
+) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
+    """Build single-cation Gamma values and their reference-state labels."""
+
+    from simulator.chemistry.melt_activity import (
+        single_cation_activity_and_fraction,
+        single_cation_component_formula,
+    )
+
+    values: dict[str, float] = {}
+    details: dict[str, dict[str, Any]] = {}
+    for oxide, parent_activity in parent_activities.items():
+        single_activity, fraction = single_cation_activity_and_fraction(
+            str(oxide), float(parent_activity), composition_mol
+        )
+        if fraction <= 0.0:
+            continue
+        component = single_cation_component_formula(str(oxide))
+        gamma = single_activity / fraction
+        values[component] = gamma
+        details[component] = {
+            "value": gamma,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": component,
+            },
+        }
+    return values, details
+
+
 def _plain_data(value: Any) -> Any:
     """JSON-safe copy. Commissioning notices carry tuples; report dumps do not."""
 
@@ -1361,7 +1408,7 @@ def reclassify_projected_composition_cells(
 
 
 class _ImccBatteryBackend:
-    """Thin MeltBackend-shaped wrapper around ``imcc_sf04.adapter.evaluate``.
+    """Thin MeltBackend-shaped wrapper around ``openimcc.evaluate``.
 
     Not registered in ``simulator.backends``: IMCC is a diagnostic shadow
     and has no ledger authority. The engine arm is the first caller.
@@ -1384,13 +1431,22 @@ class _ImccBatteryBackend:
         }
         self._load()
 
-    def _datapack_path(self) -> Path:
-        return REPO_ROOT / IMCC_DATAPACK_RELATIVE[self.engine_name]
-
     def _load(self) -> None:
-        from simulator.melt_backend.imcc_sf04 import load_datapack
+        from simulator.melt_backend.openimcc_bridge import _require_openimcc
 
-        pack = load_datapack(self._datapack_path())
+        openimcc = _require_openimcc()
+        from importlib import resources
+
+        pack_name = (
+            "imcc-sf04-v1.0.2.json"
+            if self.engine_name == "imcc_sf04"
+            else "imcc-sf04-ext-v4.json"
+        )
+        pack_resource = resources.files("openimcc").joinpath(
+            "data", "packs", pack_name
+        )
+        with resources.as_file(pack_resource) as pack_path:
+            pack = openimcc.load_datapack(pack_path)
         self._pack = pack
         self._identity = {
             "name": str(pack.model_id),
@@ -1399,7 +1455,7 @@ class _ImccBatteryBackend:
                 getattr(pack.kernel_datapack, "published_manifest_sha256", "") or ""
             ),
             "model_id": str(pack.model_id),
-            "datapack": str(self._datapack_path().relative_to(REPO_ROOT)),
+                "datapack": IMCC_DATAPACK_LABELS[self.engine_name],
         }
         try:
             from simulator.melt_backend.imcc_sf04.gas import load_gas_datapack
@@ -1422,10 +1478,10 @@ class _ImccBatteryBackend:
     ) -> Any:
         from types import SimpleNamespace
 
-        from simulator.melt_backend.imcc_sf04 import evaluate
-        from simulator.melt_backend.imcc_sf04.kernel import ImccRefusal
+        import openimcc
+        from openimcc.kernel import ImccRefusal
 
-        del composition_mol, pressure_bar
+        del pressure_bar
         if self._pack is None:
             raise RuntimeError("IMCC datapack failed to load")
         composition_wt = {
@@ -1436,7 +1492,9 @@ class _ImccBatteryBackend:
         total = sum(composition_wt.values())
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         enable_sp = self.engine_name == "imcc_sf04_ext"
-        result = evaluate(
+        from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
+
+        result = evaluate_imcc(
             composition_wt,
             temperature_K,
             self._pack,
@@ -1447,16 +1505,23 @@ class _ImccBatteryBackend:
             allow_out_of_envelope=True,
         )
         activities: dict[str, float] = {}
-        gammas: dict[str, float] = {}
-        for name, value, gamma in zip(
-            result.parent_oxides, result.parent_activity, result.parent_gamma
+        for name, value in zip(
+            result.parent_oxides, result.parent_activity, strict=True
         ):
             number = _finite_float(value)
             if number is not None and number > 0.0:
                 activities[str(name)] = number
-            gamma_number = _finite_float(gamma)
-            if gamma_number is not None and gamma_number > 0.0:
-                gammas[str(name)] = gamma_number
+        if composition_mol is None:
+            from simulator.accounting.formulas import resolve_species_formula
+
+            composition_mol = {
+                name: mass / resolve_species_formula(name).molar_mass_kg_per_mol()
+                for name, mass in (composition_kg or {}).items()
+                if float(mass) > 0.0
+            }
+        gammas, gamma_details = _imcc_activity_coefficient_reports(
+            activities, composition_mol
+        )
         notices: list[dict[str, Any]] = []
         if result.extrapolated:
             notices.append(
@@ -1475,6 +1540,16 @@ class _ImccBatteryBackend:
                     "reason": "X_Me2O above the validated 0.5 bound; evaluate(allow_out_of_envelope=True)",
                 }
             )
+        from simulator.melt_backend.openimcc_bridge import (
+            imcc_complex_saturation_notice,
+        )
+
+        saturation_notice = imcc_complex_saturation_notice(
+            tuple(getattr(getattr(result, "labels", None), "flags", ()) or ()),
+            getattr(getattr(result, "labels", None), "acid_sink_ratio", None),
+        )
+        if saturation_notice is not None:
+            notices.append(saturation_notice)
         pressures: dict[str, float] = {}
         gas_error: str | None = None
         if self._gas is None:
@@ -1528,6 +1603,7 @@ class _ImccBatteryBackend:
             warnings=[],
             activity_coefficients=activities,
             reported_activity_coefficients=gammas,
+            activity_coefficient_details=gamma_details,
             vapor_pressures_Pa=pressures,
             liquid_fraction=1.0,
             phase_assemblage_available=True,
@@ -1545,8 +1621,8 @@ class _OpenImccBatteryBackend:
     """Battery-only producer for the optional openimcc package.
 
     The melt rail goes through the C1 bridge.  The vapour rail deliberately
-    calls openimcc's gas layer directly, so it cannot silently inherit the
-    vendored IMCC adapter's VapoRock-backed JANAF tables.
+    calls openimcc's gas layer directly, so it does not use the simulator's
+    VapoRock-backed JANAF tables.
     """
 
     supports_intrinsic_fO2 = False
@@ -1556,7 +1632,7 @@ class _OpenImccBatteryBackend:
             raise BinaryPotBatteryError(f"unknown openimcc engine {engine_name!r}")
         self.engine_name = engine_name
         self.model_id = OPENIMCC_MODEL_IDS[engine_name]
-        from simulator.melt_backend.imcc_sf04 import openimcc_bridge
+        from simulator.melt_backend import openimcc_bridge
 
         self._bridge = openimcc_bridge
         self._package = openimcc_bridge._require_openimcc()
@@ -1635,6 +1711,15 @@ class _OpenImccBatteryBackend:
             )
             if outside_domain:
                 authority = AUTHORITY_EXTRAPOLATED
+        from simulator.melt_backend.openimcc_bridge import (
+            imcc_complex_saturation_notice,
+        )
+
+        saturation_notice = imcc_complex_saturation_notice(
+            result.flags, result.acid_sink_ratio
+        )
+        if saturation_notice is not None:
+            notices.append(saturation_notice)
         if result.extrapolated:
             notices.append(
                 {
@@ -1730,12 +1815,20 @@ class _OpenImccBatteryBackend:
             "vapor_pressure_backend_status": "openimcc",
             "authoritative_for_requested_vapor_pressure": True,
         }
+        reported_gammas = {
+            str(name): float(row["value"])
+            for name, row in result.activity_coefficients.items()
+        }
         return SimpleNamespace(
             status="ok",
             diagnostics=diagnostics,
             warnings=[],
             activity_coefficients=dict(result.parent_oxide_activities),
-            reported_activity_coefficients={},
+            reported_activity_coefficients=reported_gammas,
+            activity_coefficient_details={
+                str(name): dict(row)
+                for name, row in result.activity_coefficients.items()
+            },
             vapor_pressures_Pa=pressures,
             vapor_pressures_source=vapor_sources,
             vapor_pressure_backend_status="openimcc",
@@ -2548,6 +2641,9 @@ def equilibrate_cell(
             engine_annotation = None
         activities, pressures = extract_reported_quantities(result)
         coefficients = reported_activity_coefficients(result)
+        coefficient_details = dict(
+            getattr(result, "activity_coefficient_details", None) or {}
+        )
         vapor_authority = extract_vapor_authority(result)
         flag_notices, flag_authority, flag_band = engine_flags_from_result(result)
         crash_diag = diagnostics.get("subprocess_failure") or {}
@@ -2565,6 +2661,7 @@ def equilibrate_cell(
             engine_annotation=engine_annotation,
             melt_activities=activities,
             melt_activity_coefficients=coefficients,
+            melt_activity_coefficient_details=coefficient_details,
             gas_partial_pressures_Pa=pressures,
             liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),
             vapor_pressures_source=dict(vapor_authority["vapor_pressures_source"]),
