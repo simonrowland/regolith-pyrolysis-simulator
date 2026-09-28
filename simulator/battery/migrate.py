@@ -84,6 +84,7 @@ from simulator.battery.identity import (
     atm_to_pa,
     bar_to_pa,
     celsius_to_kelvin,
+    _melt_activity_uncompared_axes,
     profile_for,
 )
 from simulator.battery.stable_ids import (
@@ -6356,10 +6357,11 @@ def fill_identity(
     species: Species,
     **known: Any,
 ) -> Identity:
-    """Fill required axes as unknown and permitted-N/A as not_applicable.
+    """Fill required/uncompared axes as unknown, permitted-not-applicable axes as N/A.
 
-    A VALUE on an axis the profile does not require is invalid (v2.1), not an
-    extra key. Transition temperatures store T as the observable, never as
+    A VALUE on an axis the profile does not require is invalid (v2.1), except
+    for physically omitted melt-activity axes, whose known values are retained.
+    Transition temperatures store T as the observable, never as
     ``identity.temperature_K``.
     """
 
@@ -6374,6 +6376,7 @@ def fill_identity(
 
     for _ in range(4):
         profile = profile_for(identity)
+        uncompared_axes = _melt_activity_uncompared_axes((identity,))
         payload = {item.name: getattr(identity, item.name) for item in fields(identity)}
         changed = False
         for name in profile.required:
@@ -6396,8 +6399,16 @@ def fill_identity(
                     f"profile {token.value} does not use {name}"
                 )
                 changed = True
+        for name in uncompared_axes:
+            if payload.get(name) is None:
+                payload[name] = State.unknown(f"no {name} mapped from source")
+                changed = True
         for name in _AXIS_NAMES:
-            if name in profile.required or name in profile.permitted_not_applicable:
+            if (
+                name in profile.required
+                or name in profile.permitted_not_applicable
+                or name in uncompared_axes
+            ):
                 continue
             state = payload.get(name)
             if isinstance(state, State) and state.is_value:
@@ -11288,20 +11299,32 @@ class Migrator:
             ident_kwargs,
             method=method,
         )
-        identity_profile = (
-            profile_for(
-                Identity(
-                    quantity=State.of(q_token),
-                    species=species,
-                    **ident_kwargs,
-                )
+        identity_for_profile = (
+            Identity(
+                quantity=State.of(q_token),
+                species=species,
+                **ident_kwargs,
             )
             if isinstance(q_token, Quantity)
             else None
         )
+        identity_profile = (
+            profile_for(identity_for_profile)
+            if identity_for_profile is not None
+            else None
+        )
+        uncompared_identity_axes = (
+            _melt_activity_uncompared_axes((identity_for_profile,))
+            if identity_for_profile is not None
+            else frozenset()
+        )
         inherited_identity_fields: set[str] = set()
         for name, state in experiment_identity.items():
-            if identity_profile is not None and name not in identity_profile.required:
+            if (
+                identity_profile is not None
+                and name not in identity_profile.required
+                and name not in uncompared_identity_axes
+            ):
                 continue
             if name not in ident_kwargs or (
                 name == "total_pressure_Pa"

@@ -230,6 +230,27 @@ def test_missing_cco_waypoint_keeps_fo2_refused(tmp_path) -> None:
     )
 
 
+def test_migrated_activity_records_unknown_uncompared_axes(tmp_path) -> None:
+    doc = _ts1985_single_activity_doc()
+    experiment = doc["experiments"][0]
+    experiment.pop("fO2_control", None)
+    experiment["pressure_environment"]["total_pressure_Pa"] = UNKNOWN.copy()
+    experiment["pressure_environment"]["sweep_gas"]["state"]["value"][
+        "partial_pressure_Pa"
+    ] = UNKNOWN.copy()
+    doc["species"]["Na2O"]["observations"][0].pop("equipment", None)
+
+    result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
+    identity = next(iter(result.observations.values())).identity
+
+    assert identity.fO2_Pa.is_unknown
+    assert identity.fO2_Pa.reason == "no fO2_Pa mapped from source"
+    assert identity.total_pressure_Pa.is_unknown
+    assert identity.total_pressure_Pa.reason == (
+        "no total_pressure_Pa mapped from source"
+    )
+
+
 def test_hastie_model_pressure_does_not_inherit_to_kems_points(tmp_path) -> None:
     result = _migrate_real_extract(
         tmp_path, "kems-020-hastie-1981-nbsir.yaml"
