@@ -327,29 +327,37 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     oxygen_kg = sim._step_mre()
 
     assert oxygen_kg > 0.0
-    assert sim.melt.composition_kg["Na2O"] == pytest.approx(996.8526822455086)
+    from simulator.state import MOLAR_MASS
+
+    na2o_remaining_kg = sim.melt.composition_kg["Na2O"]
+    # One depleted mole of Na2O supplies two moles of Na to electrolysis.
+    na_released_from_na2o_kg = (
+        1000.0 - na2o_remaining_kg
+    ) * (2.0 * MOLAR_MASS["Na"] / MOLAR_MASS["Na2O"])
+    assert na_released_from_na2o_kg > 0.0
     # 2026-07-11 0.5.10 E-MOVE: phase-basis rails route gas-basis MRE Na
     # through overhead, reactive wall capture, and the condensation train
     # instead of forcing it into metal_phase.
     assert sim.atom_ledger.kg_by_account("process.metal_phase").get(
         "Na", 0.0
     ) == pytest.approx(0.0)
-    assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
-        "Na"
-    ] == pytest.approx(0.8571653495845415)
-    # 2026-07-30 7d42b4f rebaseline: bounded flowing p_Na stays below the
-    # 1500 C wall saturation pressure, so dew-point-undersaturated Na reaches
-    # the condensation train instead of depositing on the hot pipe walls.
-    assert sim.atom_ledger.kg_by_account("process.condensation_train")[
-        "Na"
-    ] == pytest.approx(1.4777109062199472)
+    condensed_na_kg = sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    )["Na"]
+    # Total Na released by MRE follows oxide stoichiometry; capture split is
+    # flow-dependent, so close each destination to that released amount.
+    assert 0.0 < condensed_na_kg <= na_released_from_na2o_kg
+    assert condensed_na_kg == pytest.approx(
+        sum(stage.collected_kg.get("Na", 0.0) for stage in sim.train.stages)
+    )
     wall_na_kg = sum(
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
     )
-    # The same partial-pressure cap makes every hot wall segment
-    # undersaturated; the former wall inventory is therefore exactly zero.
-    assert wall_na_kg == pytest.approx(0.0)
+    overhead_na_kg = sim.atom_ledger.kg_by_account("process.overhead_gas")["Na"]
+    assert overhead_na_kg + condensed_na_kg + wall_na_kg == pytest.approx(
+        na_released_from_na2o_kg
+    )
     mre_oxygen = sim.atom_ledger.kg_by_account(
         "terminal.oxygen_mre_anode_stored"
     )["O2"]

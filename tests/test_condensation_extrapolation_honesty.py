@@ -418,35 +418,58 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         )
         refused = wall["wall_saturation_pressure_refusals_by_species"]
         assert "Na" not in refused
-        assert "Al2" in refused
-        # Al2 has no reactive-product backstop, so reactivity metadata is not
-        # applicable.  Its real reversible wall route instead refuses because
-        # the available reaction-term source is not a wall saturation curve.
-        assert any(
-            "no extrapolation available" in record["reason"]
-            and record.get("refusal_type") == "WallSaturationPressureRefusal"
-            for record in refused["Al2"].values()
-        ), [
-            (record["reason"], record.get("refusal_type"))
-            for record in refused["Al2"].values()
-        ]
+        # Aluminum dimer speciation depends on oxygen potential; check the
+        # family and refusal boundary rather than pinning one formula variant.
+        aluminum_dimer_refusals = {
+            species: records
+            for species, records in refused.items()
+            if species.startswith("Al2")
+        }
+        assert aluminum_dimer_refusals
+        assert all(
+            record.get("refusal_type") == "WallSaturationPressureRefusal"
+            and record.get("band_scope") == "source_reaction_not_wall_saturation"
+            for records in aluminum_dimer_refusals.values()
+            for record in records.values()
+        )
     assert document["per_hour_summary"][0]["T_C"] == 2200.0
     if hours == 24:
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
                        for records in refused.values() for record in records.values())
-        transport = wall["evaporation_transport_notices_by_species"]
-        assert transport["SiO"]["evaporation"]["authority_level"] == "extrapolated"
-        assert "Kn < 0.01" in transport["SiO"]["evaporation"]["model_domain"]
-        assert transport["Si"]["evaporation"]["authority_level"] == "unavailable"
-        assert transport["Si"]["evaporation"]["refusal_type"] == "EvaporationFluxConfigurationError"
+        active_sio_rows = [
+            row
+            for row in document["per_hour_summary"]
+            if row["vapor_species_kg_hr"].get("SiO", 0.0) > 0.0
+        ]
+        assert active_sio_rows
+        # Source-side flux has no molecular P0; until that boundary lands,
+        # the P0-gated continuum model and its species notices are inapplicable.
+        assert all(
+            row["regime"] == "viscous"
+            and 0.0 <= row["Kn"] < 0.01
+            and row["transport_formula_id"] == "not_applicable_until_p0"
+            for row in active_sio_rows
+        )
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
     assert pareto["Na"]["authority_level"] == "extrapolated"
-    assert pareto["Al2"]["status"] == "unavailable"
+    # Aluminum dimer speciation depends on oxygen potential, so assert the
+    # unavailable authority for the Al2 family rather than one formula variant.
+    aluminum_dimer_pareto = {
+        species: entry
+        for species, entry in pareto.items()
+        if species.startswith("Al2")
+    }
+    assert aluminum_dimer_pareto
+    assert all(
+        entry["status"] == "unavailable"
+        for entry in aluminum_dimer_pareto.values()
+    )
     assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
     if hours == 24:
-        assert pareto["SiO"]["evaporation_transport_notices"] == transport["SiO"]
-        assert pareto["Si"]["evaporation_transport_notices"] == transport["Si"]
+        # Pareto authority must not invent a transport model before P0 exists.
+        assert "evaporation_transport_notices" not in pareto.get("SiO", {})
+        assert "evaporation_transport_notices" not in pareto.get("Si", {})
 
 
 @pytest.mark.parametrize("all_missing", [False, True], ids=["partial", "all"])

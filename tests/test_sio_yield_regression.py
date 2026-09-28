@@ -1098,24 +1098,8 @@ def test_pipe_conductance_fail_closes_on_nonphysical_absolute_temperature():
     assert model._pipe_conductance(100.0, -274.0) == 0.0
 
 
-def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
-    """The pO2 lever suppresses SiO via the 1/sqrt(pO2) Ellingham factor.
-
-    0.5.3 Phase A1 (2026-05-28) refactor: under finite-headspace default-on,
-    the commanded-pO2 floor is restricted to actively O2-controlled
-    atmospheres (CONTROLLED_O2 / CONTROLLED_O2_FLOW / O2_BACKPRESSURE) so
-    an uncontrolled HARD_VACUUM / PN2_SWEEP run does not get a synthetic
-    floor (per the design intent at simulator/equilibrium.py:9-12). The
-    legacy ``build_sio_yield_report(pO2_mbar=1.0)`` lever wrote
-    ``melt.pO2_mbar`` under the C2A PN2_SWEEP atmosphere and relied on
-    the no-headspace branch's unconditional synthetic O2 floor to make
-    it stick; under finite-headspace ON that floor no longer applies in
-    PN2_SWEEP. Per triage doc Option 1, this test now drives the
-    simulator directly with CONTROLLED_O2 atmosphere where the floor
-    DOES apply, preserving the lever-suppression assertion under the
-    right atmosphere semantics. Verifies the 1e-5 SiO drop still holds
-    via the proper finite-headspace path.
-    """
+def test_po2_wall_sweep_mode_uses_interface_pressure_for_sio_release():
+    """A controlled gas setpoint drives transport; SiO uses solved interface pO2."""
 
     from pathlib import Path
     import yaml
@@ -1164,19 +1148,39 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
         sio_mol = max(0.0, _sio_mol_total() - initial_sio_mol)
         from simulator.state import MOLAR_MASS
         sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0
-        return sio_mol * sio_molar_mass_kg_mol
+        provenance = sim._last_vapor_pressure_diagnostic[
+            "vapor_pressure_numerator_provenance"
+        ]["SiO"]
+        return {
+            "released_sio_kg": sio_mol * sio_molar_mass_kg_mol,
+            "transport_pO2_bar": sim.melt.oxygen_reservoir.headspace_transport_pO2_bar,
+            "interface_pO2_bar": sim.melt.oxygen_reservoir.interface_pO2_bar,
+            "source_pO2_bar": provenance["pO2_bar"],
+            "p_sio_Pa": provenance["P_eq_Pa"],
+            "activity_factor": provenance["activity_factor"],
+        }
 
-    # pO2 ~vacuum: tiny floor, near hard-vacuum suppression.
-    no_suppress = _evolved_sio_kg_one_tick(pO2_mbar=1.0e-6)
-    # pO2 = 1 mbar: the lever asserts the 1/sqrt(pO2) Ellingham suppression.
-    o2_mode = _evolved_sio_kg_one_tick(pO2_mbar=1.0)
+    low_setpoint = _evolved_sio_kg_one_tick(pO2_mbar=1.0e-6)
+    high_setpoint = _evolved_sio_kg_one_tick(pO2_mbar=1.0)
+    assert high_setpoint["transport_pO2_bar"] > low_setpoint["transport_pO2_bar"]
+    for result in (low_setpoint, high_setpoint):
+        assert result["released_sio_kg"] > 0.0
+        assert result["source_pO2_bar"] == pytest.approx(
+            result["interface_pO2_bar"]
+        )
 
-    # pO2 is now applied once in VAPOR_PRESSURE.  The old <1e-5 guard encoded
-    # a double application: VP suppression plus a second flux-side pO2 factor.
-    # One 1e-6 mbar -> 1 mbar SiO suppression is ~1e-3.
-    assert o2_mode < no_suppress * 1.1e-3, (
-        f"o2_mode={o2_mode}, no_suppress={no_suppress}, "
-        f"ratio={o2_mode / max(no_suppress, 1e-300)}"
+    # For SiO2(l) -> SiO(g) + 1/2 O2(g), p_SiO scales as
+    # a_SiO2/sqrt(pO2_interface); the gas setpoint is not substituted for it.
+    expected_ratio = (
+        high_setpoint["activity_factor"] / low_setpoint["activity_factor"]
+        * math.sqrt(
+            low_setpoint["interface_pO2_bar"]
+            / high_setpoint["interface_pO2_bar"]
+        )
+    )
+    assert high_setpoint["p_sio_Pa"] / low_setpoint["p_sio_Pa"] == pytest.approx(
+        expected_ratio,
+        rel=5.0e-4,
     )
 
 

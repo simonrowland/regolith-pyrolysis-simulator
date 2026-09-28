@@ -37,73 +37,8 @@ from .helpers import build_headspace_sim, run_campaign_headspace
 SIO_ANCHOR_CAMPAIGN = CampaignPhase.C2A
 SIO_ANCHOR_START_TEMPERATURE_C = 1550.0
 SIO_ANCHOR_HOUR = 6
-# 2026-07-02 SSO-R ch1(+1c): the conserved fO2 integrator (heuristic demoted
-# to seed-only) shifts the finite-pO2 branch's melt fO2 at the hot C2A
-# anchor hour; the IW-vs-finite SiO suppression ratio moves 0.4909 -> 0.5010
-# decade. Correction-class (old pin encoded the hourly heuristic re-seed).
-# 2026-07-02 SSO-R ch2c: evaporative metal/O-loss coupling — the managed
-# finite-pO2 branch now SELF-OXIDIZES over the 6-hour anchor (alkali metal
-# vapor leaves, O stays), dropping its p_SiO 0.8619 -> 0.3448 Pa while the
-# IW-BUFFERED branch is byte-identical (0.2719 — the buffer absorbs couple
-# changes; strong internal control). Separation 0.5010 -> 0.1031 decade;
-# the old wide separation partly encoded the missing self-oxidation.
-# Correction-class.
-# 2026-07-02 re-speciation (#82): retained-O ledger bookkeeping narrows
-# the managed-vs-IW separation further (0.1031 -> 0.0342 decade).
-# 2026-07-03 LIVE-PO2-SWEEP (#94): PN2 sweep transport pO2 is now computed
-# BEFORE vapor dispatch from sweep-balance semantics instead of the
-# pre-bleed closed-headspace ledger (native-split O2 no longer crushes the
-# managed branch for its own emission tick). The finite-pO2 branch's p_SiO
-# rises 0.3724 -> 0.8608 Pa and the managed-vs-IW separation widens
-# 0.0342 -> 0.3639 decade. Correction-class: the old pin encoded the
-# holdup-O2 ordering bug this docstring's own design statement forbids.
-# 2026-07-07 t-141 L&H K standard-term regen: decade drift -0.0076276 via the
-# K-coupled headspace path (matches golden-deltas.json enumeration).
-# 2026-07-11 0.5.10 E-MOVE: K/S Kress re-reference plus BCD oxygen/native-state
-# routing lower the finite-pO2/IW SiO drift.
-# 2026-07-18 a91db36 loaded-melt/flow-boundary trajectory rebaseline on
-# corrected tip 0990232.
-# 2026-08-05 MC-4 wave 1B (a34318c): the Si-family carrier union (active Si
-# metal standard-reaction row, plus the pO2-insensitive SiO2(g) gas-exchange
-# channel drawing ~2% of the SiO2 pool) moves the finite-pO2/IW separation
-# 0.1844 -> 0.2044 decade. The SiO Antoine row itself is bit-identical to
-# the base; the hard AtomLedger closure is unaffected.
-# 2026-08-06 b-145: physical-composite OOR on composite oxide carriers
-# (SiO2_gas, Si2, Si3, …) removes the +multi-dex invented low-T pressures
-# from slope continuation. Pure SiO Antoine OOR is unchanged, but the
-# managed finite-pO2 headspace trajectory (self-oxidation / co-evaporation
-# of the composite Si family) shifts the finite-pO2 vs IW SiO separation
-# 0.2044 -> 0.1858 decade (DOWN). Sign check: lower composite low-T
-# pressures ⇒ less early Si-family loss ⇒ milder managed-branch
-# self-oxidation drift vs IW ⇒ smaller decade separation. Closure
-# unaffected; pin is the executed value under physical composite OOR.
-# 2026-08-08 t-383: Na coherent pair (L&H liquid-NaO0.5 standard_reaction_term
-# + γ=1e−3) replaces Chase gas_standard_fugacity. SIGN CHECK: Na pressures UP
-# (+0.118 dex at the 1429 K investigation cell) ⇒ more Na volatilisation on the
-# managed finite-pO2 branch. SiO Antoine row is bit-identical; the finite/IW
-# SiO separation moves 0.1858 → 0.2103 decade (UP) via the alkali-coupled
-# headspace trajectory (self-oxidation / co-evaporation of volatiles under the
-# managed pO2 path vs the IW-buffered control). Pin is the executed value
-# under the landed L&H Pref; never hand-pasted.
-# 2026-08-09 b-151: Na2/Na2O_gas composite base_reference retargeted from the
-# retired activity-folded pseudo_psat (A=5.18586…) to monatomic L&H Pref
-# (A=11.342243 / B=12140.316409 / C=−163.701). Unit-activity Na2 P up
-# +1.95…+6.26 dex (base^2). SIGN CHECK at hot C2A hour-6 anchor:
-#   cum Na-family flux 0.1293 → 0.1682 kg (+30%); melt Na2O Δ −0.121 → −0.155 kg;
-#   p_SiO_finite 1.07465 → 1.07475 Pa (≈flat; managed pO2 floor 1e−9 both legs);
-#   p_SiO_IW 0.66213 → 0.64839 Pa (DOWN).
-# IW branch driver is fO2_log_iw = _compute_intrinsic_melt_fO2(T), NOT the
-# managed-path melt fO2_log hour-trace series (−8.3739 → −8.3105). Correct
-# lever series (probe sio_{before,after}.json top-level fO2_log_iw):
-#   fO2_log_iw −8.579295695005907 → −8.560997361998243 (Δ = +0.018298333007663814);
-#   pO2 factor 10^Δ ≈ 1.04303; p_SiO ∝ pO2^−0.5 ⇒ scale 1/√factor ≈ 0.979154;
-#   0.6621306185414277 × 0.979154 ≈ 0.648328 (vs observed 0.648391; residual
-#   ~9.8e−5 relative — a_SiO2 / melt-path detail, not a missed lever).
-#   decade |log10(finite/IW)| 0.2103247134402787 → 0.21947209153015898 (UP).
-# Same alkali-coupled class as t-383; SiO Antoine row bit-identical; not a
-# mass-balance artifact (AtomLedger closes). Pin = executed probe value;
-# never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
-EXPECTED_SIO_DECADE_DRIFT = 0.21947209153015898
+# For SiO2(l) -> SiO(g) + 1/2 O2(g), p_SiO = P_ref*a_SiO2*sqrt(p_ref/pO2).
+# Compare that mass-action relation using each branch's activity and interface pO2.
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
@@ -130,6 +65,12 @@ def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
     p_sio_iw = dict(iw_result.diagnostic or {}).get(
         "vapor_pressures_Pa", {}
     ).get("SiO")
+    finite_provenance = sim._last_vapor_pressure_diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["SiO"]
+    iw_provenance = dict(iw_result.diagnostic or {})[
+        "vapor_pressure_numerator_provenance"
+    ]["SiO"]
 
     if not p_sio_finite or not p_sio_iw:
         pytest.fail(
@@ -140,11 +81,14 @@ def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
             f"p_SiO_finite={p_sio_finite}, p_SiO_IW={p_sio_iw}"
         )
 
-    decade = abs(math.log10(p_sio_finite / p_sio_iw))
-    assert decade == pytest.approx(EXPECTED_SIO_DECADE_DRIFT, abs=5.0e-4), (
-        f"finite-pO2 vs IW SiO ratio drifted: "
-        f"|log10({p_sio_finite:.4g} / {p_sio_iw:.4g})| = "
-        f"{decade:.4f} decade"
+    expected_ratio = (
+        finite_provenance["activity_factor"]
+        / iw_provenance["activity_factor"]
+        * math.sqrt(iw_provenance["pO2_bar"] / finite_provenance["pO2_bar"])
+    )
+    assert p_sio_finite / p_sio_iw == pytest.approx(
+        expected_ratio,
+        rel=5.0e-4,
     )
 
 

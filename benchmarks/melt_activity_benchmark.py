@@ -570,7 +570,20 @@ class InternalAnalyticalEngine:
         backend.initialize({})
         sim = PyrolysisSimulator(
             backend,
-            {"campaigns": {}},
+            {
+                "campaigns": {},
+                "sso_r": {
+                    "oxygen_exchange": {
+                        "melt_oxygen_diffusivity_m2_s": {
+                            "value": 1.0e-9,
+                            "units": "m2/s",
+                            "source": "assumption: basaltic-melt redox diffusivity pending measurement",
+                            "range": [1.0e-10, 1.0e-8],
+                        },
+                        "effective_melt_depth_m": 0.2,
+                    }
+                },
+            },
             {
                 "benchmark": {
                     "label": "Melt-activity benchmark composition",

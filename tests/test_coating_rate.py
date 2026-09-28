@@ -609,7 +609,9 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     pareto = payload["run_metadata"]["pressure_coating_pareto_diagnostic"]
     magnesium = pareto["by_species"]["Mg"]
     assert magnesium["status"] == "unavailable"
-    assert magnesium["reason"] == "species_absent_from_latest_evaporation_series_diagnostic"
+    # Extrapolated Mg saturation pressure is known, but current wall mass is
+    # unavailable without authoritative melt-transfer inputs.
+    assert magnesium["reason"] == "current_wall_deposition_quantity_unavailable"
     assert magnesium["authority_level"] == "extrapolated"
     records = magnesium["wall_saturation_pressure_extrapolations"]
     assert records

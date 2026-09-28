@@ -1860,8 +1860,10 @@ def test_binding_cold_train_does_not_turn_redox_no_capacity_into_fo2_move(
     )
 
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0)
-    assert reservoir.redox_source_terms_applied is False
-    assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
+    # With C_m=0, a source amount has no finite d(ln fO2)=dn_O2/C_m;
+    # preserve its accounting diagnostic while keeping fO2 and the ledger fixed.
+    assert reservoir.redox_source_net_mol_o2_equiv == pytest.approx(1.0)
+    assert reservoir.redox_source_delta_log10_fO2 == pytest.approx(0.0)
     assert len(sim.atom_ledger.transitions) == before_transitions
 
 
