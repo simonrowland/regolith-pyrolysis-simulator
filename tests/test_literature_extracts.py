@@ -1118,6 +1118,16 @@ def test_stolyarova_printed_binary_compositions_survive_migration(tmp_path: Path
     from tests.battery.test_migrate import _migrate_real_extract
 
     rows = _repo_point_rows("kems-053-stolyarova-1991.yaml")
+    activity_source = {
+        observation["observation_id"]: observation["standard_state"]
+        for observation, _row in rows
+        if observation.get("values", {}).get("quantity") == "activity"
+    }
+    assert len(activity_source) == 6
+    assert all(
+        "p. 3711" in standard_state and "not stated" in standard_state
+        for standard_state in activity_source.values()
+    )
     typed_source = [
         (observation, row)
         for observation, row in rows
@@ -1160,12 +1170,39 @@ def test_stolyarova_printed_binary_compositions_survive_migration(tmp_path: Path
         == "mole_fraction"
         for observation in typed_migrated
     )
+    from simulator.battery.identity import quantity_token
+
+    activity_migrated = []
+    for observation in result.observations.values():
+        token = quantity_token(observation.identity)
+        if (
+            observation.source_id == "kems-053-stolyarova-1991"
+            and token is not None
+            and token.value == "activity"
+        ):
+            activity_migrated.append(observation)
+    assert len(activity_migrated) == 54
+    assert all(
+        observation.identity.reference_state is not None
+        and observation.identity.reference_state.is_unknown
+        for observation in activity_migrated
+    )
 
 
 def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
     from tests.battery.test_migrate import _migrate_real_extract
 
     rows = _repo_point_rows("kems-051-allibert-1981.yaml")
+    activity_source = {
+        observation["observation_id"]: observation["standard_state"]
+        for observation, _row in rows
+        if observation.get("values", {}).get("quantity") == "activity"
+    }
+    assert len(activity_source) == 5
+    assert all(
+        "p. 309" in standard_state and "solid " in standard_state
+        for standard_state in activity_source.values()
+    )
     typed_source = [
         (observation, row)
         for observation, row in rows
@@ -1215,6 +1252,28 @@ def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
         observation.point_conditions["composition"].state.value.amount_basis.value
         == "mole_fraction"
         for observation in typed_migrated
+    )
+    from simulator.battery.enums import Phase
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.records import phase_token
+
+    activity_migrated = []
+    for observation in result.observations.values():
+        token = quantity_token(observation.identity)
+        if (
+            observation.source_id == "kems-051-allibert-1981"
+            and token is not None
+            and token.value == "activity"
+        ):
+            activity_migrated.append(observation)
+    assert activity_migrated
+    assert all(
+            observation.identity.reference_state is not None
+            and observation.identity.reference_state.is_value
+            and phase_token(
+                observation.identity.reference_state.value.endmember
+            ) is Phase.CR
+        for observation in activity_migrated
     )
 
 
