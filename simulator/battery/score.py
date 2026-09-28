@@ -73,6 +73,7 @@ from simulator.battery.records import (
     Evidence,
     Execution,
     Experiment,
+    Located,
     Notice,
     Observation,
     Residual,
@@ -347,6 +348,7 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
+FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 _FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
     {
         NoticeKind.UNVERIFIED_APPARATUS,
@@ -854,7 +856,136 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
+    if any(_is_fusion_conversion_notice(notice) for notice in notices):
+        strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     return tuple(strata)
+
+
+def _is_fusion_conversion_notice(notice: Notice) -> bool:
+    return notice.reason.startswith(
+        f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION};"
+    )
+
+
+def _is_flagged_stratum_notice(notice: Notice) -> bool:
+    return notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS or _is_fusion_conversion_notice(
+        notice
+    )
+
+
+def _allibert_fusion_comparison_reference(reference: Observation) -> Observation:
+    """Return an in-memory liquid-reference view of admitted solid Allibert activities."""
+
+    identity = reference.identity
+    if (
+        reference.source_id != "kems-051-allibert-1981"
+        or reference.admission.status is not AdmissionStatus.ADMITTED
+        or not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.ACTIVITY
+        or identity.reference_state is None
+        or not identity.reference_state.is_value
+        or not isinstance(identity.reference_state.value, StandardState)
+    ):
+        return reference
+    standard_state = identity.reference_state.value
+    formula = identity.species.formula
+    if (
+        formula not in {"CaO", "Al2O3"}
+        or phase_token(identity.species) not in {None, Phase.L}
+        or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        or standard_state.component_basis != formula
+        or standard_state.endmember.formula != formula
+        or phase_token(standard_state.endmember) is not Phase.CR
+        or reference.value.kind is not ValueKind.POINT
+        or reference.value.point is None
+        or reference.value.point <= 0
+    ):
+        return reference
+    temperature_K = temperature_of(identity)
+    if temperature_K is None:
+        return reference
+
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        janaf_fusion_energy,
+    )
+
+    fusion = janaf_fusion_energy(formula, temperature_K)
+    delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
+
+    # Premise: at a common T and pressure, μ=G°+RT ln(a) is unchanged when
+    # the pure-oxide reference moves from solid to liquid. Thus
+    # G_s+RT ln(a_s)=G_l+RT ln(a_l), so ln(a_l)=ln(a_s)−ΔG_fus/(RT),
+    # where ΔG_fus=G_l−G_s. JANAF G values are kJ/mol and its R is J/mol/K,
+    # so multiply ΔG by 1000 before division. At the JANAF cr/l crossing,
+    # G_l=G_s, ΔG_fus=0, and the conversion leaves activity unchanged.
+    converted_activity = reference.value.point * (
+        -delta_g_fus_J_per_mol / (JANAF_R_J_PER_MOL_K * temperature_K)
+    ).exp()
+    liquid_endmember = replace(
+        standard_state.endmember,
+        phase=Phase.L,
+        polymorph=None,
+    )
+    # The extract records the oxide formula as its basis token. Melt engines
+    # identify the equivalent parent-oxide basis with the canonical "oxide"
+    # token; normalize only this in-memory comparison view.
+    liquid_state = replace(
+        standard_state,
+        endmember=liquid_endmember,
+        component_basis="oxide",
+    )
+    comparison_species = identity.species
+    if phase_token(comparison_species) is None:
+        # The source describes these admitted Table II points as melt
+        # activities, but the prose phase string is not in the closed parser
+        # map. Type that printed liquid phase on this comparison view only.
+        # At the final CaO-saturation point, this names the activity-bearing
+        # melt component, not the full CaO(s)+melt assemblage.
+        comparison_species = replace(comparison_species, phase=State.of(Phase.L))
+    comparison_identity = replace(identity, species=comparison_species)
+    point_composition = (reference.point_conditions or {}).get("composition")
+    if (
+        (identity.composition is None or not identity.composition.is_value)
+        and isinstance(point_composition, Located)
+        and point_composition.state.is_value
+    ):
+        comparison_identity = replace(
+            comparison_identity, composition=point_composition.state
+        )
+    mismatch_K = fusion.melting_temperature_K - fusion.accepted_melting_temperature_K
+    extrapolation_K = fusion.melting_temperature_K - temperature_K
+    notice = Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason=(
+            f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
+            f"oxide={formula}; source_activity_solid={reference.value.point}; "
+            f"converted_activity_liquid={converted_activity}; "
+            f"DeltaG_fus={fusion.delta_g_fus_kJ_per_mol} kJ/mol; T={temperature_K} K; "
+            f"JANAF_Tm={fusion.melting_temperature_K} K; "
+            f"distance_below_JANAF_Tm={extrapolation_K} K; "
+            f"accepted_Tm~{fusion.accepted_melting_temperature_K} K; "
+            f"JANAF_minus_accepted_Tm={mismatch_K} K; "
+            "table/accepted melting-point mismatch adds uncertainty to the "
+            f"metastable-liquid reference; tables={fusion.crystal_table}/"
+            f"{fusion.liquid_table}; source_sha256={fusion.source_sha256[0]}/"
+            f"{fusion.source_sha256[1]}"
+        ),
+        origin=reference.observation_id,
+    )
+    return replace(
+        reference,
+        identity=replace(comparison_identity, reference_state=State.of(liquid_state)),
+        value=replace(reference.value, point=converted_activity),
+        evidence=replace(
+            reference.evidence,
+            class_=State.unknown(
+                "activity converted from a solid to liquid reference with JANAF fusion Gibbs energy"
+            ),
+        ),
+        notices=union_notices(reference.notices, (notice,)),
+    )
 
 
 def temperature_of(identity: Identity) -> Decimal | None:
@@ -898,9 +1029,7 @@ def blocking_qualifications(
     quantity: Quantity | None,
     notices: Sequence[Notice],
 ) -> tuple[Notice, ...]:
-    flagged = tuple(
-        notice for notice in notices if notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS
-    )
+    flagged = tuple(notice for notice in notices if _is_flagged_stratum_notice(notice))
     if flagged:
         return flagged
     if quantity in _VAPOUR_EQUILIBRIUM:
@@ -1054,9 +1183,7 @@ def build_conjuncts(
         source_relation_independent_complete_ancestry=independent,
         candidate_engine_prediction_authority_allowed=cand_ok,
         no_blocking_qualification=not blocking_qualifications(quantity, notices),
-        not_flagged_stratum=not any(
-            notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS for notice in notices
-        ),
+        not_flagged_stratum=not any(_is_flagged_stratum_notice(n) for n in notices),
         selected_independent_lineage_level=selected_lineage_level(
             reference, comparison_ids
         ),
@@ -2734,6 +2861,7 @@ def compile_residual(
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
     derived_band: DecisionBand | None = None,
 ) -> tuple[Residual, Observation | None]:
+    reference = _allibert_fusion_comparison_reference(reference)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     formula = identity.species.formula if isinstance(identity, Identity) else ""
@@ -3062,7 +3190,10 @@ def compile_residual(
             source_relation=source_relation,
             exclusions=("valid_metric_domain",),
         )
-    if flagged_notices:
+    has_no_band_flag = bool(flagged_notices) or any(
+        _is_fusion_conversion_notice(notice) for notice in notices
+    )
+    if has_no_band_flag:
         numeric = replace(numeric, decision_band=None)
     if implied_alpha:
         status = {
@@ -3072,7 +3203,7 @@ def compile_residual(
         }[numeric.verdict or "consistent"]
     else:
         status = match_status(numeric)
-    if flagged_notices:
+    if has_no_band_flag:
         status = ResidualStatus.NO_BAND
     conjuncts = build_conjuncts(
         status=status,
@@ -3208,12 +3339,20 @@ def score_store(
 ) -> tuple[tuple[Residual, ...], dict[str, Observation]]:
     engine_set = tuple(engines) if engines is not None else SCORE_ENGINE_SET
     refs = list(comparison_candidates(context))
+    fusion_diagnostic_ids: set[str] = set()
     if include_diagnostics:
         seen = {o.observation_id for o in refs}
         for obs in diagnostic_references(context):
             if obs.observation_id not in seen:
                 refs.append(obs)
                 seen.add(obs.observation_id)
+        for obs in context.observations.values():
+            converted = _allibert_fusion_comparison_reference(obs)
+            if converted is not obs:
+                fusion_diagnostic_ids.add(obs.observation_id)
+                if obs.observation_id not in seen:
+                    refs.append(converted)
+                    seen.add(obs.observation_id)
     if work_id:
         filtered: list[Observation] = []
         for obs in refs:
@@ -3291,7 +3430,12 @@ def score_store(
                 )
                 for engine in engine_set:
                     prediction = None
-                    if diagnostic and predict is None and not compilation_thermo:
+                    if (
+                        diagnostic
+                        and point.observation_id not in fusion_diagnostic_ids
+                        and predict is None
+                        and not compilation_thermo
+                    ):
                         prediction = EnginePrediction(
                             engine=engine,
                             channel=ENGINE_CHANNELS[engine],
