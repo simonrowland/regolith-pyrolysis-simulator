@@ -39,6 +39,7 @@ from simulator.battery.score import (
 )
 from simulator.battery.migrate import bench_from_plain, load_migrated_store, load_yaml
 from simulator.battery.records import Composition, Species, State, Value
+from simulator.battery.validate import validate_corpus
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     BinaryPot,
@@ -1037,7 +1038,7 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     _require_simulator_janaf_gas()
     _require_oxygen_balance()
     context = _plante_score_context()
-    engines = (Engine.IMCC_SF04, Engine.OPENIMCC)
+    engines = (Engine.IMCC_SF04, Engine.IMCC_SF04_EXT, Engine.OPENIMCC)
     residuals, candidates = score_store(
         context,
         engines=engines,
@@ -1045,6 +1046,7 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     )
     expected = {
         Engine.IMCC_SF04: (True, "independent"),
+        Engine.IMCC_SF04_EXT: (True, "independent"),
         # Measured on green 6925ccacd, which adds the t-1020 lineage mapping.
         Engine.OPENIMCC: (True, "independent"),
     }
@@ -1066,6 +1068,22 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
             if candidate.engine is not None
         } == {lineage}
 
+    validation = validate_corpus(
+        context.works,
+        context.experiments,
+        {**context.observations, **candidates},
+        residuals,
+        benches=context.benches,
+    )
+    # Existing notice-shape issues are outside this score-eligibility regression.
+    eligibility_issues = tuple(
+        issue
+        for issue in validation.issues
+        if issue.path.startswith("residual[")
+        and issue.path.endswith(".score_eligible")
+    )
+    assert eligibility_issues == ()
+
     summary = {
         row["engine"]: row
         for row in headline_rows(residuals, context=context, engines=engines)
@@ -1073,7 +1091,10 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     }
     sf04 = summary[Engine.IMCC_SF04.value]
     assert sf04["n_score_eligible"] == 162
+    assert sf04["n_inside_band"] == 115
     assert float(sf04["band_width_dex"]) == pytest.approx(0.1461, abs=0.00005)
+    assert float(sf04["median_dex"]) == pytest.approx(0.0637, abs=0.00005)
+    assert float(sf04["rms_dex"]) == pytest.approx(0.1556, abs=0.00005)
     openimcc = summary[Engine.OPENIMCC.value]
     assert openimcc["n_score_eligible"] == 162
     assert openimcc["n_inside_band"] == 112

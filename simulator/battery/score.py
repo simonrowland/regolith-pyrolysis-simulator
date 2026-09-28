@@ -93,6 +93,11 @@ from simulator.battery.records import (
     StandardState,
     union_notices,
 )
+from simulator.battery.oxygen_balance import (
+    IMCC_ENGINES,
+    OXYGEN_BALANCE_NOTICE_PREFIX,
+    has_own_engine_solved_oxygen_balance,
+)
 from simulator.battery.source_lineage import coefficient_lineage_sources
 from simulator.battery.validate import (
     _observation_lineage,
@@ -122,9 +127,6 @@ SCORE_ENGINE_SET: tuple[Engine, ...] = (
 )
 MELTS_ENGINES: frozenset[Engine] = frozenset(
     {Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN}
-)
-IMCC_ENGINES: frozenset[Engine] = frozenset(
-    {Engine.IMCC_SF04, Engine.IMCC_SF04_EXT, Engine.OPENIMCC}
 )
 # These adapters consume the supplied composition as one homogeneous liquid.
 # AlphaMELTS, ThermoEngine, and MAGEMin can resolve a liquid from a bulk input.
@@ -1719,7 +1721,7 @@ def cell_notices(
                     kind=NoticeKind.SOURCE_DISAGREEMENT,
                     affected_quantities=(quantity,),
                     reason=(
-                        _OXYGEN_BALANCE_NOTICE_PREFIX
+                        OXYGEN_BALANCE_NOTICE_PREFIX
                         + " "
                         + json.dumps(dict(row), sort_keys=True, separators=(",", ":"))
                     ),
@@ -2021,21 +2023,6 @@ def _omission_notice(quantity: Quantity, reason: str) -> Notice:
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
-    )
-
-
-_OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
-
-
-def _has_solved_oxygen_balance_notice(
-    engine: Engine,
-    notices: Sequence[Notice],
-) -> bool:
-    return engine in IMCC_ENGINES and any(
-        notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-        and notice.origin == f"engine:{engine.value}"
-        and notice.reason.startswith(_OXYGEN_BALANCE_NOTICE_PREFIX)
-        for notice in notices
     )
 
 
@@ -3435,7 +3422,7 @@ def compile_residual(
         extract_review_status=review_status,
         comparison_ids=comparison_ids,
         notices=notices,
-        oxygen_balance_effusion_solved=_has_solved_oxygen_balance_notice(
+        oxygen_balance_effusion_solved=has_own_engine_solved_oxygen_balance(
             prediction.engine, prediction.notices
         ),
     )
