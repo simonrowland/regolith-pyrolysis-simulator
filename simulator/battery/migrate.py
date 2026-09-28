@@ -8079,7 +8079,13 @@ def _unique_located(
             )
             if low is None or high is None:
                 continue
-            value = Value(ValueKind.INTERVAL, interval_low=low, interval_high=high)
+            value = _value_from_plain(
+                {
+                    "kind": ValueKind.INTERVAL.value,
+                    "interval_low": low,
+                    "interval_high": high,
+                }
+            )
             converted.append((value, hit, low_trail or high_trail))
         else:
             si, trail = _convert_lab_value(hit.entry.field, hit.amount, hit.units)
