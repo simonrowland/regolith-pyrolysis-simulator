@@ -1895,14 +1895,41 @@ def _cell_material_values(
 def _cell_material_class(materials: Sequence[str]) -> str:
     if not materials:
         return "unknown"
-    inert_re = re.compile(r"\b(?:pt|platinum|ir|iridium)\b", re.IGNORECASE)
+    platinum_re = re.compile(r"(?<![a-z])(?:pt|platinum)(?![a-z])", re.IGNORECASE)
+    iridium_re = re.compile(r"(?<![a-z])(?:ir|iridium)(?![a-z])", re.IGNORECASE)
+    pt_ir_composition = (
+        r"(?:(?:pt|platinum)[\s/-]*(?:ir|iridium)|"
+        r"(?:ir|iridium)[\s/-]*(?:pt|platinum)|ptir|irpt)"
+    )
+    pt_ir_pair_re = re.compile(
+        rf"(?<![a-z]){pt_ir_composition}(?![a-z])",
+        re.IGNORECASE,
+    )
+    pt_ir_alloy_re = re.compile(
+        rf"(?<![a-z]){pt_ir_composition}[\s/-]+alloys?\b",
+        re.IGNORECASE,
+    )
+    inert_re = re.compile(
+        rf"{pt_ir_pair_re.pattern}|{platinum_re.pattern}|{iridium_re.pattern}",
+        re.IGNORECASE,
+    )
+    alloy_re = re.compile(r"\balloys?\b", re.IGNORECASE)
     reactive_re = re.compile(
-        r"\b(?:w|tungsten|mo|molybdenum|ta|tantalum)\b", re.IGNORECASE
+        r"\b(?:w|tungsten|mo|molybdenum|ta|tantalum|graphite|carbon)\b",
+        re.IGNORECASE,
     )
     rhenium_re = re.compile(r"\b(?:re|rhenium)\b", re.IGNORECASE)
     oxidation_re = re.compile(r"\b(?:oxide|oxidized|oxidised|passivation|passivated)\b", re.IGNORECASE)
     unknown_re = re.compile(
         r"\b(?:unknown|unspecified|unreported|not reported|not specified)\b",
+        re.IGNORECASE,
+    )
+    description_re = re.compile(
+        r"\b(?:cell|cells|liner|liners|crucible|crucibles|effusion|knudsen|"
+        r"cup|cups|vessel|vessels|container|containers|tube|tubes|apparatus|"
+        r"alloy|alloys|metal|material|materials|pure|foil|wire|powder|pellet|"
+        r"sheet|strip|rod|ring|with|the|a|an|of|and|or|in|made|from|coated|"
+        r"coat|lid|disc|later|using|used|was|were|is|are|as|for|to|by)\b",
         re.IGNORECASE,
     )
     classes: list[str] = []
@@ -1918,18 +1945,34 @@ def _cell_material_class(materials: Sequence[str]) -> str:
         reactive = bool(reactive_re.search(text)) or bool(
             rhenium_re.search(text) and oxidation_re.search(text)
         )
-        if inert and reactive:
+        other_text = inert_re.sub(" ", text)
+        other_material = re.sub(
+            r"\b\d+(?:\.\d+)?\b|[\W_]+",
+            "",
+            description_re.sub(" ", other_text),
+        )
+        if len(alloy_re.findall(text)) > len(pt_ir_alloy_re.findall(text)):
+            other_material += "alloy"
+        if inert and (reactive or other_material):
             classes.append("mixed")
         elif reactive:
             classes.append("reactive")
         elif inert:
             classes.append("inert")
+        elif other_material:
+            classes.append("not_inert")
         else:
             classes.append("unknown")
-    if "mixed" in classes or ("inert" in classes and "reactive" in classes):
+    if "mixed" in classes or (
+        "inert" in classes and ("reactive" in classes or "not_inert" in classes)
+    ):
         return "mixed"
     if "unknown" in classes:
         return "unknown"
+    if "reactive" in classes:
+        return "reactive"
+    if "not_inert" in classes:
+        return "not_inert"
     return classes[0]
 
 
@@ -2417,6 +2460,7 @@ def predict_with_engine(
             refusal_token = {
                 "reactive": "reactive_cell_oxygen_reservoir",
                 "mixed": "cell_material_not_inert",
+                "not_inert": "cell_material_not_inert",
                 "unknown": "cell_material_unknown",
             }[material_class]
             return _input_refusal(

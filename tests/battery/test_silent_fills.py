@@ -269,9 +269,21 @@ def test_printed_oxygen_is_commanded(monkeypatch) -> None:
     assert seen["mode"] != PO2_ENGINE_DEFAULT
 
 
-def test_inert_knudsen_cell_requests_oxygen_balance_effusion(monkeypatch) -> None:
+@pytest.mark.parametrize(
+    "cell_material",
+    (
+        "platinum Knudsen cell",
+        "Pt-Ir alloy Knudsen cell",
+        "PtIr alloy Knudsen cell",
+    ),
+    ids=("platinum", "platinum-iridium-alloy", "compact-platinum-iridium-alloy"),
+)
+def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
+    cell_material: str,
+    monkeypatch,
+) -> None:
     seen = _capture_cell(monkeypatch)
-    observation, experiment = _kems_partial(cell_material="platinum Knudsen cell")
+    observation, experiment = _kems_partial(cell_material=cell_material)
 
     predict_with_engine(
         Engine.OPENIMCC, observation, experiment=experiment, isolated=False
@@ -281,9 +293,21 @@ def test_inert_knudsen_cell_requests_oxygen_balance_effusion(monkeypatch) -> Non
     assert seen["po2_bar"] is None
 
 
-def test_bench_cell_material_is_used_when_experiment_does_not_repeat_it(monkeypatch) -> None:
+@pytest.mark.parametrize(
+    ("experiment_material", "bench_material"),
+    [
+        (None, "iridium effusion cell"),
+        ("platinum Knudsen cell", "iridium effusion cell"),
+    ],
+    ids=("bench-only-iridium", "platinum-iridium"),
+)
+def test_bench_cell_material_is_combined_with_experiment_material(
+    experiment_material: str | None,
+    bench_material: str,
+    monkeypatch,
+) -> None:
     seen = _capture_cell(monkeypatch)
-    observation, experiment = _kems_partial(cell_material=None)
+    observation, experiment = _kems_partial(cell_material=experiment_material)
     bench = Bench(
         id="bench-pt",
         work_id="work-1",
@@ -291,7 +315,7 @@ def test_bench_cell_material_is_used_when_experiment_does_not_repeat_it(monkeypa
             BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
             reason="test fixture",
         ),
-        cell_material_and_liner=F.located("iridium effusion cell"),
+        cell_material_and_liner=F.located(bench_material),
     )
 
     predict_with_engine(
@@ -312,6 +336,18 @@ def test_bench_cell_material_is_used_when_experiment_does_not_repeat_it(monkeypa
         ("molybdenum cell", "reactive_cell_oxygen_reservoir"),
         ("tantalum crucible", "reactive_cell_oxygen_reservoir"),
         ("rhenium oxide passivated cell", "reactive_cell_oxygen_reservoir"),
+        pytest.param(
+            "iridium cell, graphite-coated lid, and later graphite disc",
+            "cell_material_not_inert",
+            id="bencze-iridium-graphite",
+        ),
+        ("Ir liners in graphite cell", "cell_material_not_inert"),
+        ("pure graphite Knudsen cell", "reactive_cell_oxygen_reservoir"),
+        ("alumina-only Knudsen cell", "cell_material_not_inert"),
+        ("platinum cell with alumina liner", "cell_material_not_inert"),
+        ("platinum alloy Knudsen cell", "cell_material_not_inert"),
+        ("iridium alloy Knudsen cell", "cell_material_not_inert"),
+        ("Pt-Ir alloy cell with an alloy liner", "cell_material_not_inert"),
         ("platinum cell with tungsten liner", "cell_material_not_inert"),
         ("platinum cell with unknown liner", "cell_material_unknown"),
     ],
