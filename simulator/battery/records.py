@@ -349,6 +349,9 @@ class Composition:
     basis: str
     components: tuple[tuple[str, Decimal], ...]
     amount_basis: AmountBasis
+    proxy_flag: str | None = None
+    proxy_source: str | None = None
+    analysis_selection_rule: str | None = None
 
     def __post_init__(self) -> None:
         if not self.basis:
@@ -365,6 +368,13 @@ class Composition:
                     f"Composition component {key!r} must be a nonnegative finite amount"
                 )
         object.__setattr__(self, "components", canonical)
+        for name in ("proxy_flag", "proxy_source", "analysis_selection_rule"):
+            value = getattr(self, name)
+            if value is not None:
+                value = str(value).strip()
+                if not value:
+                    raise ValueError(f"Composition.{name} cannot be blank")
+                object.__setattr__(self, name, value)
 
     def as_map(self) -> dict[str, Decimal]:
         return dict(self.components)

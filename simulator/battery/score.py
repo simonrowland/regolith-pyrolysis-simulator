@@ -96,7 +96,11 @@ from simulator.battery.validate import (
     _table_ids,
     _VAPOUR_EQUILIBRIUM,
 )
-from simulator.battery.validity import GateOutcome, run_validity_gates
+from simulator.battery.validity import (
+    GateOutcome,
+    comparison_method_cell_constant_cancels,
+    run_validity_gates,
+)
 from simulator.reference_data.janaf import formula_composition
 
 # Explicit closed set. IMCC is first-class. Do not build this from
@@ -338,6 +342,16 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
     "candidate_engine_prediction_authority_allowed",
     "no_blocking_qualification",
     "selected_independent_lineage_level",
+    "not_flagged_stratum",
+)
+
+FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
+_FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
+    {
+        NoticeKind.UNVERIFIED_APPARATUS,
+        NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+    }
 )
 
 
@@ -387,6 +401,7 @@ class EligibleConjuncts:
     candidate_engine_prediction_authority_allowed: bool
     no_blocking_qualification: bool
     selected_independent_lineage_level: bool
+    not_flagged_stratum: bool = True
 
     def as_mapping(self) -> dict[str, bool]:
         return {
@@ -410,6 +425,7 @@ class EligibleConjuncts:
             ),
             "no_blocking_qualification": self.no_blocking_qualification,
             "selected_independent_lineage_level": self.selected_independent_lineage_level,
+            "not_flagged_stratum": self.not_flagged_stratum,
         }
 
     def eligible(self) -> bool:
@@ -696,6 +712,151 @@ def point_magnitude(value: Value) -> Decimal | None:
     return None
 
 
+def _catalogue_composition_notice(reference: Observation) -> Notice | None:
+    identity = reference.identity
+    if not isinstance(identity, Identity) or identity.composition is None:
+        return None
+    if not identity.composition.is_value or identity.composition.value is None:
+        return None
+    composition = identity.composition.value
+    if composition.proxy_flag != "composition_from_sample_catalog":
+        return None
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return None
+    return Notice(
+        kind=NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+        affected_quantities=(quantity,),
+        reason=(
+            "composition_from_sample_catalog: "
+            f"source={composition.proxy_source}; "
+            f"analysis_selection_rule={composition.analysis_selection_rule}"
+        ),
+        origin=reference.observation_id,
+        source=composition.proxy_source,
+    )
+
+
+def _missing_apparatus_fact(
+    check: object,
+    *,
+    allow_calibration: bool,
+) -> str | None:
+    name = str(getattr(check, "name", ""))
+    detail = getattr(check, "detail", {})
+    if not isinstance(detail, Mapping):
+        detail = {}
+    if name == "kems_calibration" and allow_calibration:
+        return "calibration"
+    if name == "background_pressure_stated" and not getattr(check, "passed", True):
+        return "background_pressure"
+    if name == "orifice_knudsen" and not getattr(check, "passed", True):
+        reason = str(detail.get("reason") or "").casefold()
+        if "unknown" in reason or "not published" in reason or "missing" in reason:
+            return "orifice_knudsen"
+        return None
+    if name == "background_pressure" and not getattr(check, "passed", True):
+        # A stated high or straddling background is an explicit invalid input,
+        # not an unverified apparatus fact.
+        return None
+    if name == "geometry_determinants" and allow_calibration:
+        missing = detail.get("missing")
+        if isinstance(missing, (list, tuple, set)) and set(missing) == {"calibration"}:
+            return "calibration"
+    return None
+
+
+def _unverified_apparatus_notices(
+    reference: Observation,
+    experiment: Experiment | None,
+    gates: GateOutcome,
+) -> tuple[Notice, ...]:
+    """Return the narrow predict-and-flag admission for printed KEMS rows."""
+
+    if experiment is None or gates.passed:
+        return ()
+    identity = reference.identity
+    if not isinstance(identity, Identity):
+        return ()
+    quantity = quantity_token(identity)
+    if quantity is None or point_magnitude(reference.value) is None:
+        return ()
+    if (
+        not experiment.method.is_value
+        or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+    ):
+        return ()
+    if reference.admission.status is not AdmissionStatus.ADMITTED:
+        return ()
+    source_is_kems = bool(reference.source_id and reference.source_id.startswith("kems-"))
+    author_reported_pressure = (
+        source_is_kems
+        and reference.evidence.original_method_class
+        in {"measured", "measured_direct", "measured_tabulated"}
+    )
+    author_reported_activity = (
+        source_is_kems
+        and reference.evidence.original_method_class
+        in {"measured", "measured_direct", "measured_tabulated", "derived"}
+    )
+    comparison_activity = (
+        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and author_reported_activity
+        and comparison_method_cell_constant_cancels(reference.provenance)
+    )
+    measured_pressure = (
+        quantity in {Quantity.P_SAT, Quantity.P_PARTIAL}
+        and author_reported_pressure
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value in MEASURED_EVIDENCE
+    )
+    if not (measured_pressure or comparison_activity):
+        return ()
+    missing: set[str] = set()
+    for check in gates.checks:
+        if getattr(check, "passed", True):
+            continue
+        fact = _missing_apparatus_fact(
+            check,
+            allow_calibration=author_reported_pressure or comparison_activity,
+        )
+        if fact is None:
+            return ()
+        missing.add(fact)
+    if not missing:
+        return ()
+    return tuple(
+        Notice(
+            kind=NoticeKind.UNVERIFIED_APPARATUS,
+            affected_quantities=(quantity,),
+            reason=f"apparatus_unverified:{fact}",
+            origin=reference.observation_id,
+        )
+        for fact in sorted(missing)
+    )
+
+
+def _flagged_stratum_notices(
+    reference: Observation,
+    experiment: Experiment | None,
+    gates: GateOutcome,
+) -> tuple[Notice, ...]:
+    return union_notices(
+        _unverified_apparatus_notices(reference, experiment, gates),
+        (() if (notice := _catalogue_composition_notice(reference)) is None else (notice,)),
+    )
+
+
+def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
+    strata: list[str] = []
+    kinds = {notice.kind for notice in notices}
+    if NoticeKind.UNVERIFIED_APPARATUS in kinds:
+        strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
+    if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG in kinds:
+        strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
+    return tuple(strata)
+
+
 def temperature_of(identity: Identity) -> Decimal | None:
     state = identity.temperature_K
     if state is not None and state.is_value and state.value is not None:
@@ -737,6 +898,11 @@ def blocking_qualifications(
     quantity: Quantity | None,
     notices: Sequence[Notice],
 ) -> tuple[Notice, ...]:
+    flagged = tuple(
+        notice for notice in notices if notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS
+    )
+    if flagged:
+        return flagged
     if quantity in _VAPOUR_EQUILIBRIUM:
         return _pressure_blocking_notices(tuple(notices))
     if quantity in MELT_ACTIVITY_QUANTITIES:
@@ -888,6 +1054,9 @@ def build_conjuncts(
         source_relation_independent_complete_ancestry=independent,
         candidate_engine_prediction_authority_allowed=cand_ok,
         no_blocking_qualification=not blocking_qualifications(quantity, notices),
+        not_flagged_stratum=not any(
+            notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS for notice in notices
+        ),
         selected_independent_lineage_level=selected_lineage_level(
             reference, comparison_ids
         ),
@@ -984,6 +1153,22 @@ def _printed_pressure_uncertainty_dex(observation: Observation) -> Decimal | Non
     return None
 
 
+def _observation_flagged_strata(
+    observation: Observation,
+    experiments: Mapping[str, Experiment],
+) -> tuple[str, ...]:
+    existing = flagged_strata(observation.notices)
+    experiment = experiments.get(observation.experiment_id)
+    if experiment is None:
+        return existing
+    gates = run_validity_gates(experiment, observation)
+    return tuple(
+        dict.fromkeys(
+            (*existing, *flagged_strata(_flagged_stratum_notices(observation, experiment, gates)))
+        )
+    )
+
+
 def _kems_replicate_groups(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
@@ -993,6 +1178,8 @@ def _kems_replicate_groups(
         identity = observation.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
+            continue
+        if _observation_flagged_strata(observation, experiments):
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
@@ -1045,6 +1232,8 @@ def derive_kems_partial_pressure_band(
         identity = observation.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
+            continue
+        if _observation_flagged_strata(observation, experiments):
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
@@ -2511,7 +2700,8 @@ def compile_residual(
             primary_check="experiment",
         )
 
-    notices = union_notices(reference.notices)
+    flagged_notices = _flagged_stratum_notices(reference, experiment, gates)
+    notices = union_notices(reference.notices, flagged_notices)
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -2597,7 +2787,15 @@ def compile_residual(
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("identity_equal",),
         )
-    if not gates.passed:
+    apparatus_flagged = any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in flagged_notices
+    )
+    scoring_gates = (
+        replace(gates, passed=True, reason=None, primary_check=None)
+        if apparatus_flagged
+        else gates
+    )
+    if not gates.passed and not apparatus_flagged:
         return _refused(
             gates.reason or RefusalReason.INVALID_SOURCE,
             {"primary_check": gates.primary_check, "checks": [c.name for c in gates.checks]},
@@ -2797,6 +2995,8 @@ def compile_residual(
             source_relation=source_relation,
             exclusions=("valid_metric_domain",),
         )
+    if flagged_notices:
+        numeric = replace(numeric, decision_band=None)
     if implied_alpha:
         status = {
             "physically_impossible": ResidualStatus.MISMATCH,
@@ -2805,6 +3005,8 @@ def compile_residual(
         }[numeric.verdict or "consistent"]
     else:
         status = match_status(numeric)
+    if flagged_notices:
+        status = ResidualStatus.NO_BAND
     conjuncts = build_conjuncts(
         status=status,
         reference=reference,
@@ -2812,7 +3014,7 @@ def compile_residual(
         numeric=numeric,
         source_relation=source_relation,
         lineage_complete=prediction.lineage_complete,
-        gates=gates,
+        gates=scoring_gates,
         extract_review_status=review_status,
         comparison_ids=comparison_ids,
         notices=notices,
@@ -3303,12 +3505,13 @@ def _measured_residuals(
     """Drop compilation rows. They have their own table."""
 
     if context is None:
-        return list(residuals)
+        return [residual for residual in residuals if not flagged_strata(residual.notices)]
     from simulator.battery.compilation_tier import compilation_row_observation
 
     return [
         residual
         for residual in residuals
+        if not flagged_strata(residual.notices)
         if compilation_row_observation(
             residual.reference, context.observations, context.origins
         )
@@ -3327,6 +3530,7 @@ def _compilation_residuals(
     return [
         residual
         for residual in residuals
+        if not flagged_strata(residual.notices)
         if compilation_row_observation(
             residual.reference, context.observations, context.origins
         )
@@ -3458,6 +3662,43 @@ def headline_rows(
             if r.score_eligible or "reference_measured_evidence" not in r.exclusions
         )
         rows.append(row)
+    return rows
+
+
+def flagged_stratum_rows(
+    residuals: Sequence[Residual],
+    *,
+    engines: Sequence[Engine] | None = None,
+) -> list[dict[str, object]]:
+    """Summarize numeric flagged diagnostics without a decision band."""
+
+    groups: dict[tuple[str, str, str], list[Residual]] = {}
+    for residual in residuals:
+        if residual.rail is None or residual.numeric is None:
+            continue
+        engine = _engine_of(residual)
+        for stratum in flagged_strata(residual.notices):
+            groups.setdefault((stratum, residual.rail.value, engine), []).append(residual)
+    rows: list[dict[str, object]] = []
+    for (stratum, rail, engine), bucket in sorted(groups.items()):
+        dex_values = [
+            residual.numeric.value
+            for residual in bucket
+            if residual.numeric is not None
+            and residual.numeric.operation is MetricOperation.DEX
+        ]
+        rows.append(
+            {
+                "stratum": stratum,
+                "rail": rail,
+                "engine": engine,
+                "n": len(bucket),
+                "median_dex": (
+                    None if not dex_values else str(_median(dex_values))
+                ),
+                "rms_dex": None if not dex_values else str(_rms(dex_values)),
+            }
+        )
     return rows
 
 
@@ -3782,6 +4023,29 @@ def render_score_report(
                 f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
                 f"{row['n_no_band']} | {rate_s} |"
             )
+    lines.extend(
+        [
+            "",
+            "## Flagged strata",
+            "",
+            "These numeric diagnostics carry an explicit source or apparatus flag. "
+            "They are excluded from measured headlines, bands, and band statistics; "
+            "a row carrying both flags appears in both strata.",
+            "",
+            "| stratum | rail | engine | n | median dex | RMS dex |",
+            "|---|---|---|---:|---:|---:|",
+        ]
+    )
+    flagged_rows = flagged_stratum_rows(residuals, engines=engines)
+    if not flagged_rows:
+        lines.append("| (none) | — | — | 0 | — | — |")
+    else:
+        for row in flagged_rows:
+            lines.append(
+                f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
+                f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
+            )
+
     from simulator.battery.compilation_tier import compilation_tier_lines
 
     lines.extend(
@@ -3953,6 +4217,8 @@ def headline_payloads(
         for engine in engine_names:
             groups[(rail.value, engine)] = []
     for row in rows:
+        if _flagged_payload_strata(row):
+            continue
         raw_rail = row.get("rail")
         if not raw_rail:
             continue
@@ -4036,6 +4302,72 @@ def headline_payloads(
     return out
 
 
+def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
+    kinds = {
+        str(notice.get("kind"))
+        for notice in row.get("notices") or ()
+        if isinstance(notice, Mapping) and notice.get("kind")
+    }
+    out: list[str] = []
+    if NoticeKind.UNVERIFIED_APPARATUS.value in kinds:
+        out.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
+    if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
+        out.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
+    return tuple(out)
+
+
+def flagged_stratum_payloads(
+    rows: Sequence[Mapping[str, object]],
+    engines: Sequence[Engine],
+) -> list[dict[str, object]]:
+    groups: dict[tuple[str, str, str], list[Decimal]] = {}
+    counts: dict[tuple[str, str, str], int] = {}
+    engine_names = {engine.value for engine in engines}
+    for row in rows:
+        numeric = row.get("numeric")
+        if not isinstance(numeric, Mapping):
+            continue
+        rail = str(row.get("rail") or "")
+        if not rail:
+            continue
+        engine = str(
+            ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
+            or str(row.get("key") or "").rsplit("::", 1)[-1]
+        )
+        if engine_names and engine not in engine_names:
+            continue
+        for stratum in _flagged_payload_strata(row):
+            key = (stratum, rail, engine)
+            counts[key] = counts.get(key, 0) + 1
+            dex = numeric.get("value") if numeric.get("operation") == MetricOperation.DEX.value else None
+            if dex is None:
+                continue
+            try:
+                value = as_decimal(dex)
+            except (TypeError, ValueError, ArithmeticError):
+                continue
+            groups.setdefault(key, []).append(value)
+    return [
+        {
+            "stratum": stratum,
+            "rail": rail,
+            "engine": engine,
+            "n": counts[(stratum, rail, engine)],
+            "median_dex": (
+                None
+                if not groups.get((stratum, rail, engine))
+                else str(_median(groups[(stratum, rail, engine)]))
+            ),
+            "rms_dex": (
+                None
+                if not groups.get((stratum, rail, engine))
+                else str(_rms(groups[(stratum, rail, engine)]))
+            ),
+        }
+        for stratum, rail, engine in sorted(counts)
+    ]
+
+
 def headline_payload_records(
     rows: Sequence[Mapping[str, object]],
     *,
@@ -4115,7 +4447,8 @@ def render_score_report_from_payloads(
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
 ) -> str:
-    measured_rows: Sequence[Mapping[str, object]] = rows
+    unflagged_rows = tuple(row for row in rows if not _flagged_payload_strata(row))
+    measured_rows: Sequence[Mapping[str, object]] = unflagged_rows
     compilation_lines: list[str] = []
     if observations is not None:
         from simulator.battery.compilation_tier import (
@@ -4125,14 +4458,14 @@ def render_score_report_from_payloads(
 
         measured_rows = [
             row
-            for row in rows
+            for row in unflagged_rows
             if compilation_row_observation(
                 str(row.get("reference") or ""), observations, origins
             )
             is None
         ]
         compilation_lines = compilation_tier_lines_from_payloads(
-            rows, observations, origins
+            unflagged_rows, observations, origins
         )
     lines: list[str] = [
         "# Battery score report (schema v2.1)",
@@ -4186,6 +4519,27 @@ def render_score_report_from_payloads(
             f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
             f"{row['n_no_band']} | {rate_s} |"
         )
+    lines.extend(
+        [
+            "",
+            "## Flagged strata",
+            "",
+            "Flagged numeric diagnostics are excluded from the measured headline, "
+            "bands, and band statistics.",
+            "",
+            "| stratum | rail | engine | n | median dex | RMS dex |",
+            "|---|---|---|---:|---:|---:|",
+        ]
+    )
+    flagged_rows = flagged_stratum_payloads(rows, engines)
+    if not flagged_rows:
+        lines.append("| (none) | — | — | 0 | — | — |")
+    else:
+        for row in flagged_rows:
+            lines.append(
+                f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
+                f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
+            )
     if compilation_lines:
         lines.extend(["", *compilation_lines])
     lines.extend(
