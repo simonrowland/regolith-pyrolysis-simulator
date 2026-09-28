@@ -165,15 +165,19 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
 @pytest.mark.parametrize(
     ("extract", "bench_id", "expected_material"),
     (
-        ("kems-020-hastie-1981-nbsir.yaml", "hastie-1981-kms", None),
+        ("kems-020-hastie-1981-nbsir.yaml", "hastie-1981-kms", "platinum KMS cell"),
         ("kems-023-demaria-1973.yaml", "demaria-1973-kems", None),
         ("kems-025-markova-1983.yaml", "markova-1983-kems", None),
         ("kems-026-markova-1984.yaml", "markova-1984-kems", None),
         ("kems-028-yakovlev-1984.yaml", "yakovlev-1984-kems", None),
-        ("kems-051-allibert-1981.yaml", "allibert-1981-kems", None),
+        ("kems-051-allibert-1981.yaml", "allibert-1981-kems", "molybdenum"),
         ("kems-114-nichols-1995.yaml", "nichols-1995-kems", None),
         ("kems-201-ichise-1986.yaml", "ichise-1986-kems", None),
-        ("bencze-yazhenskikh-2016.yaml", "bencze-2016-supplement-kems", None),
+        (
+            "bencze-yazhenskikh-2016.yaml",
+            "bencze-2016-supplement-kems",
+            "iridium cell with graphite-coated lid; later graphite disc",
+        ),
         (
             "metsoc-2019-6005.yaml",
             "shornikov-yakovlev-2019-kems",
