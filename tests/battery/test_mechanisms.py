@@ -2803,10 +2803,21 @@ def test_pi_p1_3_p2o5_vs_p4o10_component_basis() -> None:
 
 
 def test_pi_p1_5_fo2_channel_is_not_identity() -> None:
-    a = F.activity_identity(fO2_Pa=Decimal("1e-8"))
-    b = F.activity_identity(fO2_Pa=Decimal("1e-8"))
+    redox_composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("FeO", Decimal("0.5")), ("SiO2", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    a = F.activity_identity(
+        fO2_Pa=Decimal("1e-8"), composition=redox_composition
+    )
+    b = F.activity_identity(
+        fO2_Pa=Decimal("1e-8"), composition=redox_composition
+    )
     assert identity_equal(a, b).kind is IdentityEqualKind.EQUAL
-    shifted = F.activity_identity(fO2_Pa=Decimal("1e-9"))
+    shifted = F.activity_identity(
+        fO2_Pa=Decimal("1e-9"), composition=redox_composition
+    )
     fo2_only = identity_equal(a, shifted)
     assert fo2_only.kind is IdentityEqualKind.IDENTITY_MISMATCH
     from simulator.battery.records import FO2Control

@@ -29,6 +29,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    IdentityEqualKind,
     MethodToken,
     MetricOperation,
     NoticeKind,
@@ -49,7 +50,7 @@ from simulator.battery.pins import (
     pin_failures,
     tombstone_for_changed_identity,
 )
-from simulator.battery.identity import Exposure, SweepIdentity
+from simulator.battery.identity import Exposure, SweepIdentity, identity_equal
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -226,6 +227,103 @@ def _partial_prediction(engine, observation, **_kwargs):
         lineage_complete=True,
         identity=observation.identity,
     )
+
+
+def test_condensed_activity_axes_follow_composition_and_pressure() -> None:
+    experiment = F.tabulation_experiment()
+    ca_alumina = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("CaO", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+    def ca_al_identity(oxygen: State, pressure: State):
+        identity = F.activity_identity(
+            formula="Al2O3",
+            component_basis="Al2O3",
+            composition=ca_alumina,
+        )
+        return replace(identity, fO2_Pa=oxygen, total_pressure_Pa=pressure)
+
+    unknown_axes = ca_al_identity(
+        State.unknown("not printed"), State.unknown("not printed")
+    )
+    reference = F.observation(
+        "ca-al-activity-unknown-axes",
+        experiment.experiment_id,
+        unknown_axes,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    prediction = replace(
+        _predict(Decimal("0.4"), unknown_axes), unit="dimensionless"
+    )
+    residual, _ = _compile(reference, experiment, prediction)
+    assert residual.numeric is not None
+
+    low_left = ca_al_identity(State.of(Decimal("1e-8")), State.of(Decimal("100000")))
+    low_right = ca_al_identity(State.of(Decimal("1e-9")), State.of(Decimal("101325")))
+    assert identity_equal(low_left, low_right).kind is IdentityEqualKind.EQUAL
+
+    high_pressure = ca_al_identity(
+        State.of(Decimal("1e-8")), State.of(Decimal("2000000"))
+    )
+    high_vs_unknown = identity_equal(
+        high_pressure,
+        ca_al_identity(State.of(Decimal("1e-8")), State.unknown("not printed")),
+    )
+    assert high_vs_unknown.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "total_pressure_Pa" in high_vs_unknown.fields
+
+    feo_bearing = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("CaO", Decimal("0.4")),
+            ("Al2O3", Decimal("0.5")),
+            ("FeO", Decimal("0.1")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    feo_unknown_oxygen = replace(
+        unknown_axes,
+        composition=State.of(feo_bearing),
+    )
+    feo_outcome = identity_equal(feo_unknown_oxygen, feo_unknown_oxygen)
+    assert feo_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "fO2_Pa" in feo_outcome.fields
+
+    unknown_composition = replace(
+        unknown_axes,
+        composition=State.unknown("no complete composition"),
+    )
+    unknown_composition_outcome = identity_equal(
+        unknown_composition, unknown_composition
+    )
+    assert unknown_composition_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "fO2_Pa" in unknown_composition_outcome.fields
+
+    partial_composition = Composition(
+        basis="sample_catalog_proxy",
+        components=(("CaO", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag="composition_from_sample_catalog",
+    )
+    partial_identity = replace(
+        unknown_axes, composition=State.of(partial_composition)
+    )
+    partial_outcome = identity_equal(partial_identity, partial_identity)
+    assert partial_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "fO2_Pa" in partial_outcome.fields
+
+    vapour = replace(
+        _partial_identity(),
+        fO2_Pa=State.unknown("not printed"),
+        total_pressure_Pa=State.unknown("not printed"),
+    )
+    vapour_outcome = identity_equal(vapour, vapour)
+    assert vapour_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert {"fO2_Pa", "total_pressure_Pa"}.issubset(vapour_outcome.fields)
 
 
 def test_pooled_log_pressure_sd_known_replicates() -> None:
