@@ -1,16 +1,22 @@
 {
   "dose_reduction_slice": [
     {
+      "dose_consumed_kg": 0.0,
+      "dose_feo_reduced_mol": 0.0,
       "dose_fraction": 0.0,
       "native_fe_pool_mol": 0.0
     },
     {
+      "dose_consumed_kg": 18.077776206030467,
+      "dose_feo_reduced_mol": 393.1700224098653,
       "dose_fraction": 0.5,
-      "native_fe_pool_mol": 0.0
+      "native_fe_pool_mol": 393.1700224098653
     },
     {
+      "dose_consumed_kg": 36.155552412060935,
+      "dose_feo_reduced_mol": 786.3400448197306,
       "dose_fraction": 1.0,
-      "native_fe_pool_mol": 0.0
+      "native_fe_pool_mol": 786.3400448197306
     }
   ],
   "grid_expected_row_count": 36,
@@ -43,12 +49,13 @@
     }
   ],
   "owner_pn2_row": {
+    "SiO_flux_kg_hr": 0.025288535541661047,
     "classification": "current_physics_blocker",
     "dose_fraction": 1.0,
-    "native_fe_pool_mol": 0.0,
-    "native_fe_tap_mol": 0.0,
-    "native_fe_vapor_escape_fraction_of_pool": 0.0,
-    "native_fe_vapor_mol": 0.0,
+    "native_fe_pool_mol": 786.3400448197306,
+    "native_fe_tap_mol": 784.2446537413111,
+    "native_fe_vapor_escape_fraction_of_pool": 0.00266473911919343,
+    "native_fe_vapor_mol": 2.095391078419451,
     "owner_recipe_pass": false,
     "pN2_mbar": 10.0,
     "pO2_mbar": 1e-06,
@@ -57,22 +64,24 @@
   },
   "pN2_monotonic_slice": [
     {
-      "native_fe_vapor_escape_fraction_of_pool": 0.0,
+      "native_fe_vapor_escape_fraction_of_pool": 0.00266473911919343,
       "pN2_mbar": 10.0
     }
   ],
   "pO2_sio_suppression_slice": [
     {
-      "native_fe_pool_mol": 0.0,
-      "native_fe_tap_mol": 0.0,
+      "SiO_flux_kg_hr": 0.025288535541661047,
+      "native_fe_pool_mol": 786.3400448197306,
+      "native_fe_tap_mol": 784.2446537413111,
       "pO2_mbar": 1e-06
     },
     {
-      "native_fe_pool_mol": 0.0,
-      "native_fe_tap_mol": 0.0,
+      "SiO_flux_kg_hr": 0.0007426596060526363,
+      "native_fe_pool_mol": 786.3400448197306,
+      "native_fe_tap_mol": 784.4007838053413,
       "pO2_mbar": 1.0
     }
   ],
   "schema_version": "sso-r-validation-map-golden-v2",
-  "source_commit": "da0d1e32fdfe"
+  "source_commit": "unknown"
 }

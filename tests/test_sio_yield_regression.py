@@ -302,9 +302,12 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # 2026-09-28 Studio regeneration after the redox-authority rounds: lunar
 # 1.80287974292e-05 -> 1.80288028419e-05 kg; Mars
 # 2.09022690930e-05 -> 1.81679634319e-05 kg.
+# 2026-09-28 Studio regeneration at f85608e9b: the interface cap on
+# evaporative oxygen. Lunar 1.80288028419e-05 -> 1.70245533997e-05 kg;
+# Mars 1.81679634319e-05 -> 7.29868139175e-06 kg.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.80288028419e-05,
-    "mars_basalt": 1.81679634319e-05,
+    "lunar_mare_low_ti": 1.70245533997e-05,
+    "mars_basalt": 7.29868139175e-06,
 }
 
 
@@ -423,9 +426,12 @@ BASELINE_STAGE4_SIO2_KG = {
 # 1.32908673827e-05 kg.
 # 2026-09-28 Studio regeneration after the redox-authority rounds moves them
 # to lunar 1.14607317140e-05 kg and Mars 1.15492043547e-05 kg.
+# 2026-09-28 Studio regeneration at f85608e9b: lunar
+# 1.14607317140e-05 -> 1.07590551308e-05 kg; Mars
+# 1.15492043547e-05 -> 4.40787643883e-06 kg.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 1.14607317140e-05,
-    "mars_basalt": 1.15492043547e-05,
+    "lunar_mare_low_ti": 1.07590551308e-05,
+    "mars_basalt": 4.40787643883e-06,
 }
 
 

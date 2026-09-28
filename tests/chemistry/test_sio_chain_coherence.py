@@ -116,7 +116,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # lunar C2A fixture and its matching invariant pin to 1.80287974292e-05 kg.
 # 2026-09-28 Studio regeneration after the redox-authority rounds moves it to
 # 1.80288028419e-05 kg.
-PHASE3BIS_SIO_EVOLVED_KG = 1.80288028419e-05
+# 2026-09-28 Studio regeneration at f85608e9b: interface cap on evaporative
+# oxygen moves the lunar C2A pin to 1.70245533997e-05 kg.
+PHASE3BIS_SIO_EVOLVED_KG = 1.70245533997e-05
 
 
 @lru_cache(maxsize=None)

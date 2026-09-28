@@ -1200,7 +1200,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             1550.0,
             0.08130922438507092,
             33408.04523813668,
-            998.6622167630442,
+            998.6887761538698,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1267,7 +1267,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "evaporate_P2",
         "evaporate_PO",
         "evaporate_PO2",
-        "oxygen_reservoir_exchange",
+        "fe_redox_respeciation",
         "overhead_bleed",
     )
     # Admitted P source evidence authorizes cleanup offgas, not condensation.
