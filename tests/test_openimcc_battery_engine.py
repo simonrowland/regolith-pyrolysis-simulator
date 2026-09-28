@@ -91,12 +91,12 @@ def _require_oxygen_balance() -> None:
     # The oxygen-balance effusion solve landed in openimcc 23d7842; older installs
     # (e.g. 627bbc5) lack it and must SKIP these solve assertions. The typed
     # unavailable path is covered separately by
-    # test_openimcc_missing_balance_solver_is_typed.
+    # test_imcc_missing_generic_balance_solver_is_typed.
     _require_openimcc()
     import openimcc
 
-    if not hasattr(openimcc, "evaluate_gas_oxygen_balance"):
-        pytest.skip("installed openimcc lacks evaluate_gas_oxygen_balance")
+    if not hasattr(openimcc, "oxygen_balance_from_pressure_model"):
+        pytest.skip("installed openimcc lacks oxygen_balance_from_pressure_model")
 
 
 def test_imcc_battery_emits_notice_for_strict_envelope_edge() -> None:
@@ -545,7 +545,9 @@ def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
     assert notice["dominant_metal_carriers"]
 
 
-def test_janaf_imcc_refuses_package_gas_balance_without_mixing_tables() -> None:
+@pytest.mark.parametrize("engine_name", ("imcc_sf04", "imcc_sf04_ext"))
+def test_janaf_imcc_solves_plante_oxygen_balance_anchor(engine_name: str) -> None:
+    _require_oxygen_balance()
     plante_melt = BinaryPot(
         pot_id="openimcc-plante-o2-balance",
         kato_1993_table4_system=None,
@@ -553,15 +555,25 @@ def test_janaf_imcc_refuses_package_gas_balance_without_mixing_tables() -> None:
         composition_wt_pct={"K2O": 7.60, "SiO2": 92.40},
     )
     cell = equilibrate_cell(
-        open_battery_engine("imcc_sf04"),
+        open_battery_engine(engine_name),
         plante_melt,
         temperature_K=1500.0,
         po2=Po2Request(mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None),
         isolated=False,
     )
-    assert cell.status == "refusal"
-    assert cell.refusal_reason == "oxygen_balance_effusion_unsupported_gas_table"
-    assert "VapoRock-JANAF" in str(cell.engine_reason)
+    assert cell.status == "ok", cell.engine_reason
+    notice = next(
+        row for row in cell.notices
+        if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
+    )
+    ratio = notice["pO2_bar"] * 1.0e5 / cell.gas_partial_pressures_Pa["K"]
+    fork_dex = math.log10(ratio / 0.221)
+    assert ratio == pytest.approx(0.225, abs=0.002)
+    assert fork_dex == pytest.approx(0.01, abs=0.003)
+    assert notice["relative_residual"] < 1.0e-8
+    assert notice["bracket_log10_bar"] == [-30.0, 0.0]
+    assert notice["dominant_O_carriers"]
+    assert notice["dominant_metal_carriers"]
 
 
 def test_openimcc_hot_k_rich_melt_returns_molecular_flow_refusal() -> None:
@@ -584,22 +596,30 @@ def test_openimcc_hot_k_rich_melt_returns_molecular_flow_refusal() -> None:
     assert "above pO2 = 1 bar" in str(cell.engine_reason)
 
 
-def test_openimcc_missing_balance_solver_is_typed(monkeypatch) -> None:
+def test_imcc_missing_generic_balance_solver_is_typed(monkeypatch) -> None:
     import openimcc
 
-    handle = open_battery_engine("openimcc")
+    handle = open_battery_engine("imcc_sf04")
     assert handle.available
     original_getattr = openimcc.__getattr__
 
     def without_balance_solver(name: str):
-        if name == "evaluate_gas_oxygen_balance":
+        if name in {
+            "oxygen_balance_from_pressure_model",
+            "oxygen_balance_species_metadata",
+        }:
             raise AttributeError(name)
         return original_getattr(name)
 
     monkeypatch.setattr(openimcc, "__getattr__", without_balance_solver)
     cell = equilibrate_cell(
         handle,
-        _binary_probe(),
+        BinaryPot(
+            pot_id="imcc-missing-generic-o2-balance",
+            kato_1993_table4_system=None,
+            why="missing generic oxygen-balance core",
+            composition_wt_pct={"K2O": 7.60, "SiO2": 92.40},
+        ),
         temperature_K=1500.0,
         po2=Po2Request(mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None),
         isolated=False,
@@ -609,19 +629,39 @@ def test_openimcc_missing_balance_solver_is_typed(monkeypatch) -> None:
     assert "23d7842cf5525e058c66e8d68f6bb03ace04c256" in str(cell.engine_reason)
 
 
+@pytest.mark.parametrize("engine_name", ("imcc_sf04", "imcc_sf04_ext", "openimcc"))
 @pytest.mark.parametrize("temperature_K", (1500.0, 1800.0, 2200.0))
 @pytest.mark.parametrize("po2_bar", (1.0e-9, 1.0e-6, 1.0e-3))
-def test_openimcc_commanded_po2_grid_remains_direct_gas_evaluation(
+def test_commanded_po2_grid_remains_direct_gas_evaluation(
+    engine_name: str,
     temperature_K: float,
     po2_bar: float,
 ) -> None:
     _require_openimcc()
-    from openimcc import evaluate_gas, load_gas_datapack
+    if engine_name == "openimcc":
+        from openimcc import evaluate_gas, load_gas_datapack
+
+        gas_pack = load_gas_datapack()
+        parent_oxides = None
+    else:
+        from simulator.melt_backend.imcc_sf04.gas import (
+            IMCC_PARENT_OXIDES,
+            evaluate_gas,
+            load_gas_datapack,
+        )
+
+        gas_pack = load_gas_datapack()
+        parent_oxides = IMCC_PARENT_OXIDES
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        _ImccBatteryBackend,
         _OpenImccBatteryBackend,
     )
 
-    backend = _OpenImccBatteryBackend("openimcc")
+    backend = (
+        _OpenImccBatteryBackend("openimcc")
+        if engine_name == "openimcc"
+        else _ImccBatteryBackend(engine_name)
+    )
     result = backend.equilibrate(
         temperature_C=temperature_K - 273.15,
         composition_kg={"K2O": 43.94, "SiO2": 56.06},
@@ -629,12 +669,14 @@ def test_openimcc_commanded_po2_grid_remains_direct_gas_evaluation(
         fO2_log=math.log10(po2_bar),
         po2_request=Po2Request(mode="commanded", po2_bar=po2_bar),
     )
+    if parent_oxides is None:
+        parent_oxides = tuple(result.activity_coefficients)
     expected_bar = evaluate_gas(
         result.activity_coefficients,
         temperature_K,
         po2_bar,
-        load_gas_datapack(),
-        parent_oxides=tuple(result.activity_coefficients),
+        gas_pack,
+        parent_oxides=parent_oxides,
         allow_extrapolation=True,
     )
     assert result.vapor_pressures_Pa == {

@@ -1285,7 +1285,6 @@ def classify_equilibrate_outcome(
         if reason_code in _IMCC_OUT_OF_BASIS_CODES:
             return "refusal", REFUSAL_OUT_OF_BASIS, engine_reason
         if reason_code in {
-            "oxygen_balance_effusion_unsupported_gas_table",
             "openimcc_oxygen_balance_unavailable",
         } or reason_code.startswith("imcc_gas_"):
             return "refusal", reason_code, engine_reason
@@ -1578,38 +1577,135 @@ class _ImccBatteryBackend:
         )
         if saturation_notice is not None:
             notices.append(saturation_notice)
-        if po2_request is not None and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION:
-            raise _OxygenBalanceRefusal(
-                "oxygen_balance_effusion_unsupported_gas_table",
-                "openimcc's solver requires its package gas datapack; imcc_sf04 "
-                "engines use simulator VapoRock-JANAF, so the request is refused "
-                "rather than mixing gas tables",
-            )
         pressures: dict[str, float] = {}
         gas_error: str | None = None
         if self._gas is None:
             gas_error = self._gas_error or "imcc_gas_datapack_unavailable"
+            if (
+                po2_request is not None
+                and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
+            ):
+                raise _OxygenBalanceRefusal(
+                    "imcc_gas_datapack_unavailable",
+                    gas_error,
+                )
         else:
             try:
                 from simulator.melt_backend.imcc_sf04.gas import evaluate_gas
 
-                fo2_bar = (
-                    10.0 ** float(fO2_log)
-                    if fO2_log is not None and math.isfinite(float(fO2_log))
-                    else 10.0 ** _DEFAULT_FO2_LOG
-                )
-                gas_bar = evaluate_gas(
-                    activities,
-                    temperature_K,
-                    fo2_bar,
-                    self._gas,
-                    parent_oxides=result.parent_oxides,
-                    allow_extrapolation=True,
-                )
+                if (
+                    po2_request is not None
+                    and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
+                ):
+                    try:
+                        from openimcc import (
+                            oxygen_balance_from_pressure_model,
+                            oxygen_balance_species_metadata,
+                        )
+                    except (ImportError, AttributeError) as exc:
+                        from simulator.melt_backend.openimcc_bridge import (
+                            OPENIMCC_RECORDED_PIN,
+                        )
+
+                        raise _OxygenBalanceRefusal(
+                            "openimcc_oxygen_balance_unavailable",
+                            "installed openimcc does not expose the generic "
+                            "oxygen-balance core; remedy: install the recorded pin "
+                            f"{OPENIMCC_RECORDED_PIN}",
+                        ) from exc
+
+                    from simulator.melt_backend.imcc_sf04.gas import _SF04_REACTIONS
+
+                    try:
+                        species = oxygen_balance_species_metadata(
+                            {
+                                name: parent or None
+                                for name, (parent, _n_gas, _n_o2)
+                                in _SF04_REACTIONS.items()
+                            }
+                        )
+                    except Exception as exc:  # noqa: BLE001 - typed gas refusal
+                        raise _OxygenBalanceRefusal(
+                            "imcc_gas_oxygen_balance_failed",
+                            "cannot derive oxygen-balance metadata for VapoRock "
+                            f"species: {exc}",
+                        ) from exc
+                    missing_species = set(_SF04_REACTIONS) - set(species)
+                    if missing_species:
+                        missing = sorted(missing_species)[0]
+                        raise _OxygenBalanceRefusal(
+                            "imcc_gas_oxygen_balance_failed",
+                            f"VapoRock species {missing!r} has no oxygen-balance metadata",
+                        )
+
+                    for name, (_parent, n_gas, n_o2) in _SF04_REACTIONS.items():
+                        expected = (
+                            -n_o2 / n_gas
+                            if _parent
+                            else (1.0 if name == "O2" else 0.5)
+                        )
+                        if not math.isclose(
+                            species[name].pO2_exponent, expected, abs_tol=1e-12
+                        ):
+                            raise _OxygenBalanceRefusal(
+                                "imcc_gas_oxygen_balance_failed",
+                                f"VapoRock reaction exponent for species {name!r} "
+                                "does not match formula metadata",
+                            )
+
+                    def pressure_model(logp: float) -> Mapping[str, float]:
+                        return evaluate_gas(
+                            activities,
+                            temperature_K,
+                            10.0**logp,
+                            self._gas,
+                            parent_oxides=result.parent_oxides,
+                            allow_extrapolation=True,
+                        )
+
+                    try:
+                        po2_bar, gas_bar, balance = oxygen_balance_from_pressure_model(
+                            pressure_model, species, bracket=(-30.0, 0.0)
+                        )
+                    except Exception as exc:  # noqa: BLE001 - preserve typed solver refusal
+                        raise _OxygenBalanceRefusal(
+                            str(getattr(exc, "code", "") or "imcc_gas_oxygen_balance_failed"),
+                            str(exc),
+                        ) from exc
+                    notices.append(
+                        {
+                            "kind": "fo2_oxygen_balance_effusion_solved",
+                            "pO2_bar": float(po2_bar),
+                            "relative_residual": float(balance["residual"]),
+                            "bracket_log10_bar": list(balance["bracket"]),
+                            "dominant_O_carriers": list(
+                                balance["dominant_O_carriers"]
+                            ),
+                            "dominant_metal_carriers": list(
+                                balance["dominant_metal_carriers"]
+                            ),
+                        }
+                    )
+                else:
+                    fo2_bar = (
+                        10.0 ** float(fO2_log)
+                        if fO2_log is not None and math.isfinite(float(fO2_log))
+                        else 10.0 ** _DEFAULT_FO2_LOG
+                    )
+                    gas_bar = evaluate_gas(
+                        activities,
+                        temperature_K,
+                        fo2_bar,
+                        self._gas,
+                        parent_oxides=result.parent_oxides,
+                        allow_extrapolation=True,
+                    )
                 for name, value in dict(gas_bar).items():
                     number = _finite_float(value)
                     if number is not None and number > 0.0:
                         pressures[str(name)] = number * PA_PER_BAR
+            except _OxygenBalanceRefusal:
+                raise
             except ImccRefusal as exc:
                 gas_error = f"{getattr(exc, 'code', type(exc).__name__)}: {exc}"
             except Exception as exc:  # noqa: BLE001 - gas is optional
