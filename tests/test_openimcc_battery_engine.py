@@ -1429,6 +1429,97 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
     ) > 1.0e-9
 
 
+
+def test_allibert_single_phase_table_ii_residuals_are_unchanged() -> None:
+    """The 14 printed-melt rows keep the pre-typing residuals on both IMCC engines."""
+
+    import math
+    import tempfile
+    from pathlib import Path
+
+    from simulator.battery.enums import ExecutionState
+    from simulator.battery.identity import quantity_token
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    expected = {
+        ("Al2O3", Decimal("0.352")): Decimal("-0.4352878073629644"),
+        ("Al2O3", Decimal("0.414")): Decimal("-0.4368858361185386"),
+        ("Al2O3", Decimal("0.438")): Decimal("-0.7676943822462646"),
+        ("Al2O3", Decimal("0.495")): Decimal("-0.5785927361457213"),
+        ("Al2O3", Decimal("0.548")): Decimal("-0.16244321866738143"),
+        ("Al2O3", Decimal("0.578")): Decimal("-0.18296065968799388"),
+        ("Al2O3", Decimal("0.645")): Decimal("-1.5247529304755827"),
+        ("CaO", Decimal("0.352")): Decimal("-0.05660903970583223"),
+        ("CaO", Decimal("0.414")): Decimal("0.2193957906740513"),
+        ("CaO", Decimal("0.438")): Decimal("0.2974060565321931"),
+        ("CaO", Decimal("0.495")): Decimal("0.20712743938341197"),
+        ("CaO", Decimal("0.548")): Decimal("0.07227258108505644"),
+        ("CaO", Decimal("0.578")): Decimal("-0.005642551875408192"),
+        ("CaO", Decimal("0.645")): Decimal("0.7184208476485777"),
+    }
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _migrate_real_extract(Path(tmp), "kems-051-allibert-1981.yaml")
+    rows = []
+    for observation in result.observations.values():
+        if observation.source_id != "kems-051-allibert-1981":
+            continue
+        if quantity_token(observation.identity) is not Quantity.ACTIVITY:
+            continue
+        if str(getattr(observation.locator, "table", None)) != "II":
+            continue
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value
+        cao = next(
+            amount
+            for name, amount in composition.value.components
+            if name == "CaO"
+        )
+        if cao == Decimal("0.8"):
+            continue
+        assert observation.identity.species.phase.value is Phase.L
+        rows.append(observation)
+    assert len(rows) == 14
+    context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations={observation.observation_id: observation for observation in rows},
+        extract_review={"kems-051-allibert-1981": "reviewed"},
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.IMCC_SF04, Engine.OPENIMCC),
+        include_diagnostics=True,
+    )
+    by_id = {observation.observation_id: observation for observation in rows}
+    seen: dict[tuple[str, Decimal, str], Decimal] = {}
+    for residual in residuals:
+        observation = by_id[residual.reference]
+        composition = observation.identity.composition
+        assert composition is not None and composition.value is not None
+        cao = next(
+            amount
+            for name, amount in composition.value.components
+            if name == "CaO"
+        )
+        engine = residual.key.rsplit("::", 1)[-1]
+        assert residual.numeric is not None
+        assert residual.execution.state is ExecutionState.PRODUCED
+        seen[(observation.identity.species.formula, cao, engine)] = residual.numeric.value
+        assert residual.status is ResidualStatus.NO_BAND
+        assert abs(
+            residual.numeric.value - expected[(observation.identity.species.formula, cao)]
+        ) <= Decimal("1e-12")
+    assert len(seen) == 28
+    one_engine = [
+        value
+        for (formula, cao, engine), value in seen.items()
+        if engine == Engine.IMCC_SF04.value
+    ]
+    assert len(one_engine) == 14
+    rms = math.sqrt(sum(float(value) ** 2 for value in one_engine) / len(one_engine))
+    assert rms == pytest.approx(0.560, abs=0.001)
+
+
 def statistics_median(values: list[float]) -> float:
     ordered = sorted(values)
     middle = len(ordered) // 2
