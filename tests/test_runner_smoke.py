@@ -2313,22 +2313,21 @@ def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
     assert len(observed_errors) == 1
     assert type(observed_errors[0]) is RuntimeError
     assert payload["status"] == "failed"
-    assert payload["reason"] == "poisoned_hour"
+    # Poison is the append-only ledger rule: an abort poisons the hour only
+    # after that hour has committed a transition. Unconstrained respeciation
+    # does not mint a ferric floor, exchange is patched out, and the Fe-FeO
+    # extent at the saturation bound is zero, so this abort commits nothing.
+    assert payload["reason"] == ""
     assert "RuntimeError: post-MRE runner abort" in payload["error_message"]
-    assert "simulator hour 0 is poisoned" in payload["error_message"]
-    assert sim._poisoned_hour is not None
-    assert (
-        f"{sim._poisoned_hour.committed_transition_count} ledger transition(s) committed"
-        in payload["error_message"]
-    )
-    assert "fresh simulator or reload the batch" in payload["error_message"]
+    assert sim._poisoned_hour is None
     assert payload["run_metadata"]["hours_completed"] == 0
     assert payload["per_hour_summary"] == []
 
-    with pytest.raises(PoisonedHourError) as replay_error:
+    with pytest.raises(RuntimeError) as replay_error:
         session.advance()
 
-    assert type(replay_error.value) is PoisonedHourError
+    assert type(replay_error.value) is RuntimeError
+    assert "post-MRE runner abort" in str(replay_error.value)
     assert len(observed_errors) == 2
     assert observed_errors[-1] is replay_error.value
 

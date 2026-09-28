@@ -2400,13 +2400,17 @@ def test_freeze_gate_pre_curve_tick_builds_curve_before_native_split(
         result.get('respeciation_status') != 'skipped_solid'
         for result in respeciation_results
     )
-    assert native_results[0]['native_fe_event'] == 'native_fe_partitioned_saturation'
-    assert native_results[0]['native_fe_partition']['native_fe_pool_mol'] > 0.0
-    event = snapshot.fe_redox_split['native_fe_saturation_event']
-    assert event['native_fe_event'] == 'native_fe_partitioned_saturation'
-    assert snapshot.fe_redox_split['native_fe_partition'][
-        'native_fe_pool_mol'
-    ] > 0.0
+    # FeO(l) = Fe + 1/2 O2, so a_FeO,sat = 10^((log fO2 - IW)/2).
+    # The reported fO2 is the saturation bound, where that activity is at
+    # least a_FeO and the native-Fe extent is zero.
+    assert native_results[0]['native_fe_event'] == 'no_native_fe_below_threshold'
+    split = snapshot.fe_redox_split
+    assert float(split['native_fe_saturation_activity']) >= float(
+        split['native_fe_activity']
+    )
+    assert float(split['native_fe_frac']) == 0.0
+    event = split['native_fe_saturation_event']
+    assert event['native_fe_event'] == 'no_native_fe_below_threshold'
 
 
 def test_temperature_rereference_noop_skips_liquid_guard(

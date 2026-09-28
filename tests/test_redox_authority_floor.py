@@ -325,6 +325,124 @@ def test_zero_transfer_on_trace_feo_never_follows_the_gas() -> None:
     assert fO2_log != pytest.approx(math.log10(1.0))
 
 
+def test_iron_free_melt_zero_transfer_is_flagged_not_aborted() -> None:
+    """No FeO and no Fe2O3: directional capacity is 0, and a zero transfer
+    predicts the interface pressure instead of aborting.
+    """
+
+    sim = _sim_with_oxides(feo_wt=0.0, fe2o3_wt=0.0, temperature_C=1600.0)
+    assert _oxide_mol(sim, "FeO") == 0.0
+    assert _oxide_mol(sim, "Fe2O3") == 0.0
+
+    fO2_log = sim._melt_fO2_from_ledger()
+    domain = sim._last_redox_domain
+
+    assert domain["basis"] == "no_modelled_redox_couple"
+    assert domain["status"] == "out_of_domain"
+    assert domain["authority"] == "extrapolated"
+    assert "both_iron_oxides_absent" in domain["reason"]
+    assert fO2_log == pytest.approx(math.log10(TRANSPORT_PO2_BAR))
+
+
+def test_iron_free_melt_nonzero_transfer_follows_the_gas() -> None:
+    """Capacity is 0 in both directions, so a non-zero transfer hands the
+    melt to the gas. Uptake is n_FeO/4 and release is n_Fe2O3/2.
+    """
+
+    sim = _sim_with_oxides(feo_wt=0.0, fe2o3_wt=0.0, temperature_C=1600.0)
+    sim._redox_handover_transfer_override = 1.0e-6
+
+    fO2_log = sim._melt_fO2_from_ledger()
+    domain = sim._last_redox_domain
+
+    assert domain["basis"] == "no_melt_redox_buffer"
+    assert domain["status"] == "out_of_domain"
+    assert "both_iron_oxides_absent" in domain["reason"]
+    assert fO2_log == pytest.approx(math.log10(TRANSPORT_PO2_BAR))
+
+
+def test_ledger_feo_bounds_when_the_inventory_projection_is_empty() -> None:
+    """The Fe authority is the ledger. An empty inventory wt% projection
+    must not abort the saturation bound.
+    """
+
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1600.0)
+    sim.inventory.melt_oxide_kg.clear()
+    assert sim._melt_oxide_wt_pct() == {}
+    assert _oxide_mol(sim, "FeO") > 0.0
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
+    ledger_wt = sim._cleaned_melt_ledger_wt_pct()
+    temperature_K = 1600.0 + 273.15
+    activity = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=ledger_wt,
+        fO2_log=fO2_log,
+        T_K=temperature_K,
+        pressure_bar=_pressure_bar(sim),
+    )
+    a_feo = float(activity["a_FeO_authoritative"])
+    expected = feo_iw_log10_fO2_bar(temperature_K, a_feo=1.0) + 2.0 * math.log10(a_feo)
+    assert a_feo > 0.0
+    assert fO2_log == pytest.approx(expected, abs=1.0e-6)
+
+
+def test_evaporative_coproduct_oxygen_oxidises_remaining_feo(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """FeO -> Fe(g) + 1/2 O2 leaves real O2. At the saturation bound the
+    unclamped Kress fraction is interior, so that O2 oxidises Fe2+.
+    """
+
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1600.0)
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_exchange_is_liquid",
+        lambda *_args, **_kwargs: True,
+    )
+    fO2_log = sim._melt_fO2_from_ledger()
+    assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
+    composition = melt_mol_fractions_for_kress91(sim._cleaned_melt_ledger_wt_pct())
+    target_q = kress91_fe3_over_sigma_fe(
+        fO2_log=fO2_log,
+        mol_fractions=composition,
+        T_K=1600.0 + 273.15,
+        pressure_bar=_pressure_bar(sim),
+    )
+    assert KRESS91_FERRIC_FRACTION_EPSILON < target_q < (
+        1.0 - KRESS91_FERRIC_FRACTION_EPSILON
+    )
+    feo_before = _oxide_mol(sim, "FeO")
+    oxygen_mol = 5.0
+    sim.atom_ledger.load_external_mol(
+        "reservoir.fo2_buffer",
+        {"O2": oxygen_mol},
+        source="test evaporative oxygen coproduct",
+        material_origin="feedstock",
+    )
+    monkeypatch.setattr(
+        sim,
+        "_headspace_evaporative_o2_source_mol",
+        lambda _index: (oxygen_mol, 0.0),
+    )
+
+    diagnostic = sim._apply_post_evaporation_fe_respeciation(
+        transition_start_index=0,
+    )
+
+    fe2o3 = _oxide_mol(sim, "Fe2O3")
+    expected_fe2o3 = min(0.5 * target_q * feo_before, 2.0 * oxygen_mol)
+    assert diagnostic["oxygen_source"] == "evaporative_metal_loss_internal"
+    assert fe2o3 == pytest.approx(expected_fe2o3, rel=1.0e-6)
+    assert fe2o3 > 0.0
+    buffer_o2 = float(
+        sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0)
+        or 0.0
+    )
+    assert buffer_o2 == pytest.approx(oxygen_mol - 0.5 * fe2o3, rel=1.0e-6)
+
+
 def test_unconstrained_respeciation_does_not_mint_from_the_bound(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

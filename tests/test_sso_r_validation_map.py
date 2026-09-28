@@ -502,16 +502,28 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
     ][0]
     assertions = {a["name"]: a for a in smoke_payload["assertions"]}
 
-    # b-598/t-992 stages native-Fe partition through the Na shuttle; parity stays separately gated.
-    assert owner["native_fe_pool_mol"] == pytest.approx(0.0, rel=0.0, abs=1.0e-9)
-    assert owner["native_fe_tap_mol"] == pytest.approx(0.0, rel=0.0, abs=1.0e-9)
-    assert owner["native_fe_vapor_mol"] == pytest.approx(0.0, rel=0.0, abs=1.0e-12)
+    # 2 Na + FeO -> Na2O + Fe. The staged path still defers the FeO-derived
+    # saturation split; it taps the Fe metal that dose already credited.
+    # Pool mol equals that FeO debit. Tap plus vapor closes the pool.
+    # Escape exceeds the owner cap, so the certification predicate stays false.
+    assert owner["native_fe_pool_mol"] == pytest.approx(
+        owner["dose_feo_reduced_mol"]
+    )
+    assert (
+        owner["native_fe_tap_mol"] + owner["native_fe_vapor_mol"]
+    ) == pytest.approx(owner["native_fe_pool_mol"])
+    assert owner["native_fe_tap_mol"] > owner["native_fe_vapor_mol"]
     assert owner["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0, rel=0.0, abs=1.0e-15
+        owner["native_fe_vapor_mol"] / owner["native_fe_pool_mol"]
+    )
+    assert owner["native_fe_vapor_escape_fraction_of_pool"] > (
+        validation_map.OWNER_RECIPE_MAX_ESCAPE_FRACTION
     )
     assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
         0.0, rel=0.0, abs=1.0e-15
     )
+    assert owner["stage_3_total_kg"] > 0.0
+    assert owner["row_passes_base_integrity"] is True
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
     assert owner["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
@@ -530,9 +542,13 @@ def test_map_live_semantics_parity_is_computed_from_live_owner_tick(smoke_payloa
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
     probe = smoke_payload["live_owner_probe"]
 
-    # b-598/t-992 staged Na-shuttle authority defers native-Fe partition, so parity remains a blocker; see integrate-report.md.
-    assert probe["native_split_observed"] is False
-    assert probe["native_fe_pool_mol"] == pytest.approx(0.0, abs=1.0e-12)
+    # The observed split is the metallic tap of dose Fe. It credits no O2,
+    # so it is not the deferred FeO -> Fe + 1/2 O2 saturation split.
+    # Map and live native mols agree. Parity still fails on the SiO flux.
+    owner = _owner_recipe_row(smoke_payload)
+    assert probe["native_split_observed"] is True
+    assert probe["native_split_o2_mol"] == pytest.approx(0.0, abs=1.0e-12)
+    assert probe["native_fe_pool_mol"] == pytest.approx(owner["dose_feo_reduced_mol"])
     assert probe["native_fe_tap_mol"] + probe["native_fe_vapor_mol"] == pytest.approx(
         probe["native_fe_pool_mol"]
     )
@@ -541,7 +557,7 @@ def test_map_live_semantics_parity_is_computed_from_live_owner_tick(smoke_payloa
     assert "live_pO2_bar=" in parity["detail"]
     assert "map_SiO_kg_hr=" in parity["detail"]
     assert "live_SiO_kg_hr=" in parity["detail"]
-    assert "native_split_observed=False" in parity["detail"]
+    assert "native_split_observed=True" in parity["detail"]
 
 
 def test_map_live_semantics_parity_refuses_genuinely_absent_native_split(
@@ -618,11 +634,11 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     window = _assertion(smoke_payload, "grind_ready_target_window")
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
 
-    # b-598/t-992 staged Na-shuttle authority leaves native split and live parity unconfirmed; see integrate-report.md.
-    assert smoke_payload["live_owner_probe"]["native_split_observed"] is False
+    # The metallic tap is observed. Certification still requires live parity,
+    # and the SiO map/live residual leaves that parity missing.
+    assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
     assert parity["passed"] is False
     assert window["passed"] is False
-    assert "first_passing_T_C=None" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
     assert "live parity=missing" in window["detail"]
 

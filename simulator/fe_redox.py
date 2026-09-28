@@ -64,6 +64,7 @@ class RedoxDomainRecord(TypedDict):
         'fe_saturation_bound',
         'kress91_inverse',
         'no_melt_redox_buffer',
+        'no_modelled_redox_couple',
     ]
     certified_band: dict[str, tuple[float, float]]
     endpoint_clamped: bool

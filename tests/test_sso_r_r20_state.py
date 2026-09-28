@@ -184,13 +184,19 @@ def test_finite_transfer_commits_once_from_integrated_plan(monkeypatch) -> None:
     reservoir = sim._apply_oxygen_reservoir_exchange()
     payload = dict(reservoir.shadow_oxygen_transfer)
 
-    assert payload["authority"] == "finite_interface_flux"
-    assert payload["committed_o2_mol"] == pytest.approx(
-        reservoir.exchange_o2_mol
-    )
-    assert payload["transfer_o2_mol"] == pytest.approx(
-        reservoir.exchange_o2_mol
-    )
+    # Release capacity is n_Fe2O3/2. The sweep transport pressure sits below
+    # the Fe-FeO saturation bound and the ferric inventory is empty, so that
+    # capacity is at or below the 1e-15 mol noop and the exchange gate does
+    # not integrate a flux. Uptake into FeO is a different direction.
+    melt_mol = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    fe2o3_mol = max(0.0, float(melt_mol.get("Fe2O3", 0.0) or 0.0))
+    release_capacity_mol = fe2o3_mol / 2.0
+    melt_pO2_bar = 10.0 ** float(reservoir.melt_intrinsic_fO2_log)
+    assert float(reservoir.headspace_transport_pO2_bar) < melt_pO2_bar
+    assert release_capacity_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+    assert payload["authority"] == "diagnostic_only"
+    assert payload["status"] == "no_melt_redox_buffer"
+    assert payload["transfer_o2_mol"] == 0.0
     assert payload["bounded"] is True
     assert len(sim.atom_ledger.transitions) >= transition_count_before
     passive_transitions = [
@@ -198,11 +204,7 @@ def test_finite_transfer_commits_once_from_integrated_plan(monkeypatch) -> None:
         for transition in sim.atom_ledger.transitions[transition_count_before:]
         if transition.name == "oxygen_reservoir_exchange"
     ]
-    assert len(passive_transitions) == (
-        1
-        if abs(reservoir.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
-        else 0
-    )
+    assert passive_transitions == []
 
     sim._refresh_oxygen_reservoir_without_exchange(
         exchange_direction="test_refresh_preserves_finite_plan"
@@ -2603,8 +2605,13 @@ def test_fe_redox_respeciation_refuses_managed_floor_without_phantom_o2() -> Non
     sim._apply_oxygen_reservoir_exchange()
     diagnostic = sim._apply_fe_redox_respeciation()
 
-    assert diagnostic["status"] == "refused"
-    assert diagnostic["reason"] == "fe_redox_respeciation_o2_unavailable"
+    # The saturation bound is not a ferric measurement. Unconstrained
+    # respeciation is skipped, so it neither writes Fe2O3 nor invents O2.
+    assert diagnostic["status"] == "ok"
+    assert diagnostic["respeciation_status"] == "skipped_fe_saturation_bound"
+    assert diagnostic["reason"] == (
+        "interface_controls_fO2_floor_is_not_a_measurement"
+    )
     assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
         "Fe2O3",
         0.0,
@@ -2614,9 +2621,6 @@ def test_fe_redox_respeciation_refuses_managed_floor_without_phantom_o2() -> Non
         0.0,
     ) == pytest.approx(0.0)
     assert diagnostic["ferric_divergence_after"]["delta_abs"] >= 0.0
-    assert diagnostic["ferric_divergence_after"]["attribution"] == (
-        "managed_floor_unbacked"
-    )
 
 
 def test_fe_redox_respeciation_uses_committed_overhead_o2_without_scalar_source() -> None:
