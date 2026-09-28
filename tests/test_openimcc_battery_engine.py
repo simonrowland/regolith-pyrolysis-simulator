@@ -862,6 +862,23 @@ def test_stolyarova_1991_w_cell_pressure_and_residual_report() -> None:
             )
     print("STOLYAROVA_W_CELL_REPORT=" + json.dumps(rows, sort_keys=True))
     assert len(rows) == 2 * len(ca_atm.keys() & sio_atm.keys())
+    # Physics invariants only. The residuals against Stolyarova are REPORTED,
+    # not asserted: the remaining +2.4–3.4 dex pO2 gap is a model/target
+    # finding, and pinning it here would be test-forcing.
+    by_point: dict[float, list[dict]] = {}
+    for row in rows:
+        # Cell oxides are oxygen SINKS (parentless carriers, w*k >= 0), so a
+        # W cell can only lower the solved pO2 relative to an inert cell.
+        assert row["inert_to_W_pull_down_dex"] >= 0.0, row
+        # These roots sit below the W/WO2(cr) coexistence pO2.
+        assert row["buffer_pinned"] is False, row
+        by_point.setdefault(row["X_SiO2"], []).append(row)
+    for x_sio2, pair in by_point.items():
+        # Both engines share the same melt kernel lineage; they must agree.
+        assert len(pair) == 2, x_sio2
+        assert abs(
+            math.log10(pair[0]["W_pO2_atm_1933K"] / pair[1]["W_pO2_atm_1933K"])
+        ) < 0.01, x_sio2
 
 
 def test_imcc_missing_generic_balance_solver_is_typed(monkeypatch) -> None:

@@ -1652,6 +1652,16 @@ def _solve_cell_oxygen_balance(
             row.parent_oxygen_demand * pressures[name] / math.sqrt(row.molar_mass)
             for name, row in all_metadata.items()
         )
+        # Pinned-branch residual = oxygen retained as condensed wall oxide.
+        # f(pO2) = oxygen_flux - parent_flux rises monotonically with pO2
+        # (sign rule, w*k >= 0) and vanishes at the free root. The buffer
+        # pins only when that root lies ABOVE the buffer, so at the buffer
+        # f < 0: the melt liberates more O than the effusing gas carries,
+        # and the deficit condenses as the buffer oxide (e.g. WO2(cr)) on
+        # the cell wall. The residual (parent - oxygen) / parent is therefore
+        # the fraction of liberated O the wall retains. It lies in [0, 1)
+        # and is 0 only at the free root. Sanity: a Mo cell with 0.5/0.5
+        # K2O/SiO2 at 1933 K gives ~0.9996, i.e. almost all O goes to MoO2.
         residual = abs(oxygen_flux - parent_flux) / max(
             oxygen_flux, parent_flux, 1e-300
         )
