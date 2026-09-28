@@ -49,7 +49,7 @@ from simulator.battery.pins import (
     pin_failures,
     tombstone_for_changed_identity,
 )
-from simulator.battery.identity import Exposure, SweepIdentity
+from simulator.battery.identity import Exposure, Identity, SweepIdentity, quantity_token
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -3262,3 +3262,167 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
             diagnostic_residuals, engines=(Engine.INTERNAL_ANALYTICAL,)
         )
     ] == [(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION, 1)]
+
+
+def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
+    import simulator.battery.score as score_module
+
+    context = load_score_context()
+    observations = {
+        key: obs
+        for key, obs in context.observations.items()
+        if "allibert" in key.casefold() or "stolyarova" in key.casefold()
+    }
+    filtered = replace(
+        context,
+        observations=observations,
+        origins={
+            key: value
+            for key, value in context.origins.items()
+            if key in observations
+        },
+    )
+    admitted_model_derived = {
+        key
+        for key, obs in observations.items()
+        if obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
+    allibert_activities = {
+        key
+        for key, obs in observations.items()
+        if "allibert" in key.casefold()
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.ACTIVITY
+    }
+    allibert_admitted = {
+        key
+        for key in allibert_activities
+        if observations[key].admission.status is AdmissionStatus.ADMITTED
+    }
+    allibert_rejected = allibert_activities - allibert_admitted
+    stolyarova_activities = {
+        key
+        for key, obs in observations.items()
+        if "stolyarova" in key.casefold()
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.ACTIVITY
+    }
+    stolyarova_derived_pressures = {
+        key
+        for key, obs in observations.items()
+        if "stolyarova" in key.casefold()
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
+    assert len(allibert_admitted) == 16
+    assert len(allibert_rejected) == 55
+    assert len(stolyarova_activities) == 54
+    assert len(stolyarova_derived_pressures) == 9
+    assert admitted_model_derived == (
+        allibert_admitted | stolyarova_activities | stolyarova_derived_pressures
+    )
+    assert not admitted_model_derived & {
+        obs.observation_id for obs in score_module.comparison_candidates(filtered)
+    }
+
+    def typed_test_refusal(engine, point, *, handles, experiment):
+        if (
+            point.source_id == "kems-053-stolyarova-1991"
+            and isinstance(point.identity, Identity)
+            and quantity_token(point.identity) is Quantity.ACTIVITY
+        ):
+            return score_module.predict_with_engine(
+                engine,
+                point,
+                handles=handles,
+                experiment=experiment,
+            )
+        reason = (
+            RefusalReason.IDENTITY_UNKNOWN
+            if point.source_id == "kems-051-allibert-1981"
+            else RefusalReason.IDENTITY_INCOMPLETE
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=score_module.ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=(),
+            lineage_complete=False,
+            refusal_reason=reason,
+            refusal_detail={"reason": "test_engine_identity_unavailable"},
+            identity=point.identity if isinstance(point.identity, Identity) else None,
+        )
+
+    engines = (Engine.IMCC_SF04, Engine.OPENIMCC)
+    residuals, _ = score_store(
+        filtered,
+        engines=engines,
+        predict=typed_test_refusal,
+    )
+
+    def engine_rows(token: str, engine: Engine):
+        return [
+            residual
+            for residual in residuals
+            if token in residual.reference.casefold()
+            and residual.key.rsplit("::", 1)[-1] == engine.value
+        ]
+
+    for engine in engines:
+        allibert_rows = engine_rows("allibert", engine)
+        assert len(allibert_rows) == 16
+        assert {row.reference for row in allibert_rows} == allibert_admitted
+        assert all(row.status is ResidualStatus.REFUSED for row in allibert_rows)
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+            for row in allibert_rows
+        )
+        assert all(not row.score_eligible for row in allibert_rows)
+        assert all(
+            any(
+                "reference_converted_via_fusion" in notice.reason
+                for notice in row.notices
+            )
+            for row in allibert_rows
+        )
+        assert not any(row.reference in allibert_rejected for row in residuals)
+
+        stolyarova_rows = engine_rows("stolyarova", engine)
+        assert len(stolyarova_rows) == 130
+        activity_rows = [
+            row for row in stolyarova_rows if row.reference in stolyarova_activities
+        ]
+        derived_pressure_rows = [
+            row
+            for row in stolyarova_rows
+            if row.reference in stolyarova_derived_pressures
+        ]
+        assert len(activity_rows) == 54
+        assert len(derived_pressure_rows) == 9
+        assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
+        assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason
+            in {
+                RefusalReason.IDENTITY_INCOMPLETE,
+                RefusalReason.UNDERDETERMINED_APPARATUS,
+            }
+            for row in activity_rows
+        )
+        assert any(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+            and any(
+                gap.get("waypoint") == "reference_state"
+                for gap in row.refusal.detail.get("gaps", ())
+            )
+            for row in activity_rows
+        )
+        assert all(not row.score_eligible for row in stolyarova_rows)

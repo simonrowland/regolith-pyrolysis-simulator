@@ -2248,8 +2248,10 @@ def predict_with_engine(
             identity=identity,
         )
 
-    if quantity in MELT_ACTIVITY_QUANTITIES and (
-        identity.composition is None or not identity.composition.is_value
+    if (
+        quantity in MELT_ACTIVITY_QUANTITIES
+        and experiment is None
+        and (identity.composition is None or not identity.composition.is_value)
     ):
         composition_reason = (
             "composition is missing"
@@ -3397,6 +3399,7 @@ def score_store(
     engine_set = tuple(engines) if engines is not None else SCORE_ENGINE_SET
     refs = list(comparison_candidates(context))
     fusion_diagnostic_ids: set[str] = set()
+    admitted_model_derived_ids: set[str] = set()
     if include_diagnostics:
         seen = {o.observation_id for o in refs}
         for obs in diagnostic_references(context):
@@ -3413,6 +3416,18 @@ def score_store(
                 if obs.observation_id not in seen:
                     refs.append(converted)
                     seen.add(obs.observation_id)
+        for obs in context.observations.values():
+            evidence_class = obs.evidence.class_
+            if (
+                obs.admission.status is not AdmissionStatus.ADMITTED
+                or not evidence_class.is_value
+                or evidence_class.value is not EvidenceClass.MODEL_DERIVED
+                or obs.observation_id in seen
+            ):
+                continue
+            refs.append(obs)
+            seen.add(obs.observation_id)
+            admitted_model_derived_ids.add(obs.observation_id)
     if work_id:
         filtered: list[Observation] = []
         for obs in refs:
@@ -3492,6 +3507,7 @@ def score_store(
                     prediction = None
                     if (
                         diagnostic
+                        and obs.observation_id not in admitted_model_derived_ids
                         and point.observation_id not in fusion_diagnostic_ids
                         and predict is None
                         and not compilation_thermo
