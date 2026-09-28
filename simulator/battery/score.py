@@ -82,6 +82,7 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
     Work,
+    _is_source_internally_inconsistent,
     as_decimal,
     phase_token,
     Species,
@@ -347,6 +348,7 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
+FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 _FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
     {
         NoticeKind.UNVERIFIED_APPARATUS,
@@ -854,7 +856,18 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
+    if any(
+        _is_source_internally_inconsistent(notice.kind, notice.reason)
+        for notice in notices
+    ):
+        strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
     return tuple(strata)
+
+
+def _is_flagged_stratum_notice(notice: Notice) -> bool:
+    return notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS or (
+        _is_source_internally_inconsistent(notice.kind, notice.reason)
+    )
 
 
 def temperature_of(identity: Identity) -> Decimal | None:
@@ -899,7 +912,7 @@ def blocking_qualifications(
     notices: Sequence[Notice],
 ) -> tuple[Notice, ...]:
     flagged = tuple(
-        notice for notice in notices if notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS
+        notice for notice in notices if _is_flagged_stratum_notice(notice)
     )
     if flagged:
         return flagged
@@ -1055,7 +1068,7 @@ def build_conjuncts(
         candidate_engine_prediction_authority_allowed=cand_ok,
         no_blocking_qualification=not blocking_qualifications(quantity, notices),
         not_flagged_stratum=not any(
-            notice.kind in _FLAGGED_STRATUM_NOTICE_KINDS for notice in notices
+            _is_flagged_stratum_notice(notice) for notice in notices
         ),
         selected_independent_lineage_level=selected_lineage_level(
             reference, comparison_ids
@@ -4370,16 +4383,24 @@ def headline_payloads(
 
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
-    kinds = {
-        str(notice.get("kind"))
+    notices = tuple(
+        notice
         for notice in row.get("notices") or ()
-        if isinstance(notice, Mapping) and notice.get("kind")
-    }
+        if isinstance(notice, Mapping)
+    )
+    kinds = {str(notice.get("kind")) for notice in notices if notice.get("kind")}
     out: list[str] = []
     if NoticeKind.UNVERIFIED_APPARATUS.value in kinds:
         out.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
         out.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
+    if any(
+        _is_source_internally_inconsistent(
+            str(notice.get("kind") or ""), notice.get("reason")
+        )
+        for notice in notices
+    ):
+        out.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
     return tuple(out)
 
 

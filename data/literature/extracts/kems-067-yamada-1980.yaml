@@ -34,6 +34,13 @@ benches:
   apparatus_family:
     state: {tag: value, value: Modified Hitachi RM-6K Knudsen-cell mass spectrometer}
     locator: *yamada_apparatus
+  cell_material_and_liner:
+    state: {tag: value, value: homemade thoria (ThO2) Knudsen cell}
+    locator:
+      published_page: 489
+      pdf_page_index: 2
+      section: '2.3-2.4'
+      note: ThO2 cell material; alumina and beryllia cells were tried and abandoned.
   temperature_measurement:
     sensor:
       state: {tag: value, value: W-26%Re/W-5%Re thermocouples at Knudsen-cell top and bottom}

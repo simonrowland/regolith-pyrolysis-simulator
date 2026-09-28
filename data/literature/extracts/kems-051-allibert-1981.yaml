@@ -72,6 +72,19 @@ fidelity_samples:
     pdf_page_index: 5
     figure: '6'
     note: X_Al2O3=.29 at 2060 K
+benches:
+- id: allibert-1981-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: differential Knudsen-effusion mass spectrometry}
+    locator: {published_page: 308, pdf_page_index: 2, section: II Mass-Spectrometric Measurements}
+  cell_material_and_liner:
+    state: {tag: value, value: molybdenum}
+    locator:
+      published_page: 308
+      pdf_page_index: 2
+      section: II Mass-Spectrometric Measurements
+      note: 'Section II: “Six effusion cells were drilled in a molybdenum block.”'
 species:
   CaO:
     context:
