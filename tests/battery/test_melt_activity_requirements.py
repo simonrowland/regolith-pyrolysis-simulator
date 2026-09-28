@@ -70,6 +70,17 @@ def test_fill_identity_retains_known_uncompared_activity_axes() -> None:
     assert identity.total_pressure_Pa == pressure
 
 
+def test_nonfinite_activity_pressure_stays_required() -> None:
+    identity = fill_identity(
+        Quantity.ACTIVITY,
+        Species("Al2O3", Phase.L),
+        composition=State.of(_composition(("CaO", "0.5"), ("Al2O3", "0.5"))),
+        total_pressure_Pa=State.of(Decimal("NaN")),
+    )
+
+    assert "total_pressure_Pa" in profile_for(identity).required
+
+
 def _reference_state(
     formula: str = "Na2O",
     basis: str = "oxide",

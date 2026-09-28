@@ -751,6 +751,7 @@ def _activity_pressure_above_limit(identity: Identity) -> bool:
         pressure is not None
         and pressure.is_value
         and pressure.value is not None
+        and pressure.value.is_finite()
         and pressure.value > _MELT_ACTIVITY_PRESSURE_LIMIT_PA
     )
 
@@ -767,7 +768,16 @@ def _melt_activity_uncompared_axes(
     omitted: set[str] = set()
     if all(_composition_is_fixed_valence(identity) for identity in identities):
         omitted.add("fO2_Pa")
-    if not any(_activity_pressure_above_limit(identity) for identity in identities):
+    pressure_is_nonfinite = any(
+        pressure is not None
+        and pressure.is_value
+        and pressure.value is not None
+        and not pressure.value.is_finite()
+        for pressure in (identity.total_pressure_Pa for identity in identities)
+    )
+    if not pressure_is_nonfinite and not any(
+        _activity_pressure_above_limit(identity) for identity in identities
+    ):
         omitted.add("total_pressure_Pa")
     return frozenset(omitted)
 

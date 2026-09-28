@@ -6357,7 +6357,7 @@ def fill_identity(
     species: Species,
     **known: Any,
 ) -> Identity:
-    """Fill required axes as unknown and permitted-N/A as not_applicable.
+    """Fill required/uncompared axes as unknown, permitted-not-applicable axes as N/A.
 
     A VALUE on an axis the profile does not require is invalid (v2.1), except
     for physically omitted melt-activity axes, whose known values are retained.
@@ -6398,6 +6398,10 @@ def fill_identity(
                 payload[name] = State.not_applicable(
                     f"profile {token.value} does not use {name}"
                 )
+                changed = True
+        for name in uncompared_axes:
+            if payload.get(name) is None:
+                payload[name] = State.unknown(f"no {name} mapped from source")
                 changed = True
         for name in _AXIS_NAMES:
             if (
