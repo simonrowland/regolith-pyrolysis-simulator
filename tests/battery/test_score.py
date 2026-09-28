@@ -3518,7 +3518,6 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             row["n"] == 0
             and row["n_refused"] == 0
             and row["n_candidates"] == 0
-            and row.get("n_eligible_references", 0) == 0
             and row["n_score_eligible"] == 0
             and row["rms_dex"] is None
             and row["band_width_dex"] is None
@@ -3526,13 +3525,13 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             for row in rows
         )
 
-    assert_empty_measured_headlines(
-        headline_rows(
-            headline_diagnostic_residuals,
-            context=diagnostic_context,
-            engines=engines,
-        )
+    object_headlines = headline_rows(
+        headline_diagnostic_residuals,
+        context=diagnostic_context,
+        engines=engines,
     )
+    assert_empty_measured_headlines(object_headlines)
+    assert all(row["n_eligible_references"] == 0 for row in object_headlines)
     payload_rows = [
         residual_to_plain(residual) for residual in headline_diagnostic_residuals
     ]
@@ -3542,14 +3541,13 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         or row.get("refusal")
         for row in payload_rows
     )
-    assert_empty_measured_headlines(
-        headline_payload_records(
-            payload_rows,
-            engines=engines,
-            observations=diagnostic_context.observations,
-            origins=diagnostic_context.origins,
-        )
+    payload_record_headlines = headline_payload_records(
+        payload_rows,
+        engines=engines,
+        observations=diagnostic_context.observations,
+        origins=diagnostic_context.origins,
     )
+    assert_empty_measured_headlines(payload_record_headlines)
     for engine in engines:
         assert_empty_measured_headlines(
             headline_payloads(payload_rows, (engine,), tier="measured")
