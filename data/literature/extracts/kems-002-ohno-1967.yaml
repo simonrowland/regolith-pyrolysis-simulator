@@ -60,10 +60,11 @@ species:
             paragraph: るつぼ (CP-2) の寸法は内径 38 mm
             line_range: experimental method
         chamber_pressure:
-          value: 0.01
+          value: {kind: interval, interval_low: '0.001', interval_high: '0.01'}
           units: mmHg
-          note: 10^{-2}–10^{-3} mmHg during vacuum hold
+          as_printed: '$10^{-2} \sim 10^{-3}$ mmHg'
           locator:
+            page: 1164
             source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
             paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
     - observation_id: ohno_1967_mn_olette_alpha_table3

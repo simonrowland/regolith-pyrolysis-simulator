@@ -5444,11 +5444,6 @@ _PRESSURE_BOUND_OPERATOR_RE = re.compile(
     r"(?:^|\s)(?:pressure|vacuum)?\s*[<>≤≥]\s*(?:\d|$)",
     re.IGNORECASE,
 )
-_PRESSURE_EXACT_ASSIGNMENT_RE = re.compile(
-    r"(?:\bP[_ ]?[A-Za-z0-9]+|\b(?:pressure|vacuum))\s*(?:is|=|:|of)\s*"
-    r"(?:about\s+|approximately\s+|~\s*)?(?:\d|[.]\d)",
-    re.IGNORECASE,
-)
 _PRESSURE_CHAMBER_RE = re.compile(
     r"(?:chamber|background|vacuum|ultimate\s*[_ ]?vacuum|residual\s*[_ ]?pressure|"
     r"到達真空度|到达真空度)",
@@ -7517,6 +7512,7 @@ class LabHit:
     path: str
     mapping: Mapping[str, Any] | None = None
     text: str | None = None
+    interval: tuple[Decimal, Decimal] | None = None
 
 
 def load_lab_parameter_vocabulary(path: Path | None = None) -> tuple[VocabEntry, ...]:
@@ -7763,10 +7759,55 @@ def _hit_from_value(
         loc = locator_from_mapping(value.get("locator")) or loc
     if loc is None:
         return None
+    nested_value = raw if isinstance(raw, Mapping) else None
+    nested_as_printed = (
+        nested_value.get("as_printed") if nested_value is not None else None
+    )
+    if (
+        _lab_kind(entry.field) == "pressure"
+        and nested_value is not None
+        and str(nested_value.get("kind") or "").casefold() == "interval"
+    ):
+        low = _as_dec_or_none(nested_value.get("interval_low"))
+        high = _as_dec_or_none(nested_value.get("interval_high"))
+        if low is not None and high is not None:
+            unit_text = str(units) if units else ""
+            printed = (
+                mapping.get("as_printed")
+                or nested_as_printed
+                or mapping.get("as_published")
+                or f"{low} to {high}"
+            )
+            published = str(printed).strip()
+            if unit_text and unit_text.casefold() not in published.casefold():
+                published = f"{published} {unit_text}".strip()
+            return LabHit(
+                entry=entry,
+                amount=None,
+                units=unit_text,
+                locator=loc,
+                as_published=published,
+                path=path,
+                mapping=mapping,
+                interval=(low, high),
+            )
+    unit_text = str(units) if units else ""
+    if _lab_kind(entry.field) == "pressure" and nested_value is not None:
+        nested_amounts = [
+            (str(key), amount)
+            for key, raw_amount in nested_value.items()
+            if str(key).endswith("_as_printed")
+            and (amount := _as_dec_or_none(raw_amount)) is not None
+        ]
+        if len(nested_amounts) == 1:
+            printed_key, raw = nested_amounts[0]
+            unit_match = re.search(r"_([A-Za-z][A-Za-z0-9]*)_as_printed$", printed_key)
+            if not unit_text and unit_match is not None:
+                units = unit_match.group(1)
+                unit_text = units
     wants_string = kind in {"string", "mapping_string_leaf"}
     if kind == "mapping_any_leaf" and _as_dec_or_none(raw) is None:
         wants_string = True
-    unit_text = str(units) if units else ""
     if wants_string:
         if raw is None or isinstance(raw, (bool, Mapping)):
             return None
@@ -7790,7 +7831,14 @@ def _hit_from_value(
     amount = _as_dec_or_none(raw)
     if amount is None:
         return None
-    published = f"{raw} {unit_text}".strip()
+    printed = (
+        (mapping.get("as_printed") or mapping.get("as_published"))
+        if mapping is not None
+        else None
+    ) or nested_as_printed
+    published = str(printed).strip() if printed not in (None, "") else f"{raw} {unit_text}".strip()
+    if printed not in (None, "") and unit_text and unit_text.casefold() not in published.casefold():
+        published = f"{published} {unit_text}".strip()
     return LabHit(
         entry=entry,
         amount=amount,
@@ -7825,6 +7873,13 @@ def _walk_lab_hits(
                 hit = _hit_from_value(entry, value, loc, child)
                 if hit is not None:
                     hits.append(hit)
+                    if (
+                        _lab_kind(entry.field) == "pressure"
+                        and isinstance(value, Mapping)
+                        and isinstance(value.get("value"), Mapping)
+                        and (hit.amount is not None or hit.interval is not None)
+                    ):
+                        continue
             if name == "locator":
                 continue
             hits.extend(
@@ -7871,7 +7926,9 @@ def collect_lab_hits(
     return hits
 
 
-def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[Decimal]:
+def _located_from_hit(
+    hit: LabHit, si: Decimal | Value, trail: str | None
+) -> Located[Decimal | Value]:
     converted = conversion_derivation(trail, hit.amount, hit.locator)
     mapping = hit.mapping or {}
     is_pressure = _lab_kind(hit.entry.field) == "pressure"
@@ -7887,41 +7944,68 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
         extra = (f"as_published={hit.as_published}", f"printed={hit.entry.printed}")
     if mapping.get("as_printed") is not None:
         extra += (f"as_printed={mapping['as_printed']}",)
+    if hit.interval is not None:
+        extra += (f"original_interval={hit.interval[0]}..{hit.interval[1]} {hit.units}",)
     qualification = " ".join(
         [f"{key}=true" for key in ("upper_bound", "lower_bound") if mapping.get(key) is True]
         + [str(mapping.get(key) or "") for key in ("inference", "qualifier", "note", "quote")]
     )
     if is_pressure:
+        value_mapping = mapping.get("value")
+        value_kind = (
+            value_mapping.get("kind")
+            if isinstance(value_mapping, Mapping)
+            else mapping.get("kind")
+        )
+        own_qualifier = " ".join(
+            str(value)
+            for value in (
+                mapping.get("qualifier"),
+                value_mapping.get("qualifier") if isinstance(value_mapping, Mapping) else None,
+            )
+            if value not in (None, "")
+        )
+        raw_value = mapping.get("value")
+        value_channels: list[object] = []
+        if isinstance(raw_value, Mapping):
+            for key in (
+                "value",
+                "interval_low",
+                "interval_high",
+                "as_printed",
+                "as_published",
+            ):
+                channel = raw_value.get(key)
+                if channel not in (None, "") and not isinstance(channel, Mapping):
+                    value_channels.append(channel)
+            value_channels.extend(
+                channel
+                for key, channel in raw_value.items()
+                if str(key).endswith("_as_printed")
+                and channel not in (None, "")
+                and not isinstance(channel, Mapping)
+            )
+        elif raw_value not in (None, ""):
+            value_channels.append(raw_value)
         own_printed = " ".join(
             _extract_text(value)
             for value in (
-                mapping.get("value"),
+                *value_channels,
                 mapping.get("as_printed"),
                 mapping.get("as_published"),
                 hit.as_published,
             )
             if value not in (None, "")
+            and not isinstance(value, Mapping)
         )
-        non_point = (
+        non_point = hit.interval is None and (
             any(mapping.get(key) is True for key in ("upper_bound", "lower_bound"))
             or bool(_PRESSURE_NON_POINT_RE.search(own_printed))
             or bool(_PRESSURE_BOUND_OPERATOR_RE.search(own_printed))
-            or str(mapping.get("kind") or "").casefold()
+            or str(value_kind or "").casefold()
             in {"pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"}
-            or bool(
-                re.search(
-                    r"(?:about|approx|ultimate|range|upper[_ ]?end)",
-                    hit.entry.printed,
-                    re.I,
-                )
-            )
-            or (
-                (
-                    bool(_PRESSURE_NON_POINT_RE.search(qualification))
-                    or bool(_PRESSURE_BOUND_OPERATOR_RE.search(qualification))
-                )
-                and not bool(_PRESSURE_EXACT_ASSIGNMENT_RE.search(qualification))
-            )
+            or bool(_PRESSURE_NON_POINT_RE.search(own_qualifier))
+            or bool(_PRESSURE_BOUND_OPERATOR_RE.search(own_qualifier))
         )
     else:
         non_point = any(mapping.get(key) is True for key in ("upper_bound", "lower_bound")) or any(
@@ -7942,7 +8026,9 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
         )
     )
     state = (
-        State.of(
+        State.of(si)
+        if isinstance(si, Value)
+        else State.of(
             _value_from_plain(
                 {"kind": ValueKind.POINT.value, "point": si, "approximate": True}
             )
@@ -7967,7 +8053,9 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
                 (f"unit_conversion={trail}",) if inferred else ()
             ),
             parameters=converted.parameters if converted else (
-                ("original", Located(State.of(hit.amount), locator=hit.locator)),
+                (("original", Located(State.of(hit.amount), locator=hit.locator)),)
+                if hit.amount is not None
+                else ()
             ),
             output_unit=_output_unit_for(hit.entry.field),
         ),
@@ -7976,19 +8064,35 @@ def _located_from_hit(hit: LabHit, si: Decimal, trail: str | None) -> Located[De
 
 def _unique_located(
     hits: list[LabHit],
-) -> Located[Decimal] | None:
-    converted: list[tuple[Decimal, LabHit, str | None]] = []
-    numeric_hits = [hit for hit in hits if hit.amount is not None]
+) -> Located[Decimal | Value] | None:
+    converted: list[tuple[Decimal | Value, LabHit, str | None]] = []
+    numeric_hits = [
+        hit for hit in hits if hit.amount is not None or hit.interval is not None
+    ]
     for hit in numeric_hits:
-        si, trail = _convert_lab_value(hit.entry.field, hit.amount, hit.units)
-        if si is None:
-            continue
-        converted.append((si, hit, trail))
+        if hit.interval is not None:
+            low, low_trail = _convert_lab_value(
+                hit.entry.field, hit.interval[0], hit.units
+            )
+            high, high_trail = _convert_lab_value(
+                hit.entry.field, hit.interval[1], hit.units
+            )
+            if low is None or high is None:
+                continue
+            value = Value(ValueKind.INTERVAL, interval_low=low, interval_high=high)
+            converted.append((value, hit, low_trail or high_trail))
+        else:
+            si, trail = _convert_lab_value(hit.entry.field, hit.amount, hit.units)
+            if si is None:
+                continue
+            converted.append((si, hit, trail))
     if not converted:
         if not numeric_hits:
             return None
+        first = numeric_hits[0]
+        amount = first.amount if first.amount is not None else first.interval[0]
         _, why = _convert_lab_value(
-            numeric_hits[0].entry.field, numeric_hits[0].amount, numeric_hits[0].units
+            first.entry.field, amount, first.units
         )
         return located_unknown(why or "missing unit")
     values = {item[0] for item in converted}

@@ -19,7 +19,7 @@ from simulator.battery.migrate import (
     experiment_from_plain,
     to_plain,
 )
-from simulator.battery.records import State, SweepGas, SweepGasComponent
+from simulator.battery.records import State, SweepGas, SweepGasComponent, ValueKind
 from simulator.battery.validate import validate_experiment, validate_sweep_gas
 from tests.battery import factories
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
@@ -268,6 +268,17 @@ def test_model_row_total_pressure_is_not_a_partial_pressure_identity() -> None:
 
 def test_ueda_about_chamber_pressure_does_not_inherit_to_knudsen_points(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-095-ueda-1986.yaml")
+    pressures = [
+        experiment.pressure_environment.total_pressure_Pa
+        for key, experiment in result.experiments.items()
+        if "::experiment::ti-co-nco-" in key
+    ]
+    assert len(pressures) == 11
+    assert all(pressure.state.is_unknown for pressure in pressures)
+    assert all(
+        "extract_value=about 3 x 10^-5 Pa" in (pressure.state.reason or "")
+        for pressure in pressures
+    )
     points = [
         observation
         for observation in result.observations.values()
@@ -281,22 +292,68 @@ def test_ueda_about_chamber_pressure_does_not_inherit_to_knudsen_points(tmp_path
     )
 
 
-def test_homma_range_upper_end_does_not_inherit_as_a_point(tmp_path) -> None:
+def test_homma_printed_chamber_pressure_is_an_interval(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-001-homma-1966.yaml")
-    assert not any(
-        observation.identity.total_pressure_Pa is not None
-        and observation.identity.total_pressure_Pa.is_value
-        for observation in result.observations.values()
-    )
+    experiments = [
+        experiment
+        for key, experiment in result.experiments.items()
+        if "::experiment::" in key
+    ]
+    assert len(experiments) == 12
+    for experiment in experiments:
+        pressure = experiment.pressure_environment.total_pressure_Pa
+        assert pressure.state.is_value
+        assert pressure.state.value.kind is ValueKind.INTERVAL
+        assert pressure.state.value.interval_low == Decimal(
+            "0.1333223684210526315789473684"
+        )
+        assert pressure.state.value.interval_high == Decimal(
+            "1.333223684210526315789473684"
+        )
+        assert pressure.locator.page == 516
 
 
-def test_ohno_range_upper_end_does_not_inherit_as_a_point(tmp_path) -> None:
+def test_ohno_printed_chamber_pressure_is_an_interval(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-002-ohno-1967.yaml")
-    assert not any(
-        observation.identity.total_pressure_Pa is not None
-        and observation.identity.total_pressure_Pa.is_value
-        for observation in result.observations.values()
+    pressure = next(
+        experiment.pressure_environment.total_pressure_Pa
+        for key, experiment in result.experiments.items()
+        if key.endswith("::kems-002-ohno-1967")
     )
+    assert pressure.state.is_value
+    assert pressure.state.value.kind is ValueKind.INTERVAL
+    assert pressure.state.value.interval_low == Decimal(
+        "0.1333223684210526315789473684"
+    )
+    assert pressure.state.value.interval_high == Decimal(
+        "1.333223684210526315789473684"
+    )
+    assert pressure.locator.page == 1164
+
+
+def test_richter_h2_pressure_note_does_not_demote_its_point(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-037-richter-2002.yaml")
+    pressures = [
+        experiment.pressure_environment.total_pressure_Pa
+        for experiment in result.experiments.values()
+        if experiment.pressure_environment.total_pressure_Pa.inference is not None
+        and "as_published=0.000187 bar"
+        in experiment.pressure_environment.total_pressure_Pa.inference.inputs
+    ]
+    assert len(pressures) == 1
+    assert pressures[0].state.is_value
+    assert pressures[0].state.value.kind is ValueKind.POINT
+    assert pressures[0].state.value.point == Decimal("18.7")
+
+
+def test_heck_inferred_one_atmosphere_remains_a_point(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-140-heck-2025.yaml")
+    pressure = result.experiments[
+        "10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series"
+    ].pressure_environment.total_pressure_Pa
+    assert pressure.state.is_value
+    assert pressure.state.value.kind is ValueKind.POINT
+    assert pressure.state.value.point == Decimal("101325")
 
 
 def test_sossi_printed_one_atmosphere_still_inherits(tmp_path) -> None:
