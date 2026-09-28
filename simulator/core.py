@@ -6533,6 +6533,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
         )
 
+    def _melt_redox_transport_pO2_bar(self, reservoir: object) -> float:
+        """Return the headspace oxygen pressure that sets an unbuffered melt."""
+
+        transport_pO2_raw = getattr(
+            reservoir,
+            'headspace_transport_pO2_bar',
+            None,
+        )
+        try:
+            transport_pO2_bar = float(transport_pO2_raw)
+        except (TypeError, ValueError):
+            transport_pO2_bar = 0.0
+        if math.isfinite(transport_pO2_bar) and transport_pO2_bar > 0.0:
+            return transport_pO2_bar
+        head_o2_mol = max(0.0, float(
+            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+        ))
+        ledger_pO2_bar = self._headspace_ledger_pO2_bar_from_o2_mol(
+            head_o2_mol
+        )
+        return self._headspace_transport_pO2_bar_from_ledger(
+            ledger_pO2_bar,
+            head_o2_mol=head_o2_mol,
+        )
+
     def _melt_fO2_from_ledger(
         self,
         *,
@@ -6542,8 +6570,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         The ledger remains authoritative for Fe inventory.  When native Fe
         metal coexists with FeO in that melt, the Fe--FeO buffer supplies the
-        redox state; a depleted Fe inventory follows the gas/interface limit;
-        Kress91 inversion is retained only for a finite non-buffered case.
+        redox state.  After that metal has left, Kress91 inversion is
+        authoritative only for a measured interior Fe3+/Fe2+ ratio.  A ratio
+        on the open-interval floor is not a measurement: the interface oxygen
+        exchange is the passive thermostat and reported fO2 follows the gas.
         Every path preserves endpoint provenance in the typed domain record,
         and none mutates the ledger or creates O2.
         """
@@ -6675,6 +6705,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
 
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        # Premise: Kress91 maps the open interval (epsilon, 1-epsilon) of
+        # Fe3+/sumFe onto finite fO2.  Clamping a ledger endpoint to epsilon
+        # and inverting it treats a floor as a measured ratio.
+        # Algebra: do not evaluate
+        #   log10(fO2/bar) = [ln(q / (2(1-q))) - b(T,P,X)] / (0.196 ln 10)
+        # at q = epsilon.  Units: q is dimensionless; fO2 is bar.
+        # Limiting case: Fe2O3 = 0, FeO > 0, no metal-phase Fe.  Reported
+        # fO2 is log10(P_transport), not the ~20 dex sub-IW floor inverse.
+        if endpoint_clamped:
+            transport_pO2_bar = self._melt_redox_transport_pO2_bar(reservoir)
+            fO2_log = math.log10(transport_pO2_bar)
+            self._last_redox_domain = self._redox_domain_record(
+                fO2_log=fO2_log,
+                basis='no_melt_redox_buffer',
+                endpoint_clamped=True,
+                endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
+                endpoint_provenance=endpoint_provenance,
+                authority_level='gas_interface_controlled',
+                reason=(
+                    'out_of_domain:no_melt_redox_buffer; '
+                    'ledger ferric fraction is the Kress open-interval '
+                    'floor, not a measured Fe3+/Fe2+; '
+                    'absence is not a measured zero; '
+                    'kress91_inverse_not_evaluated; '
+                    'interface O2 exchange is the passive thermostat; '
+                    'P_i=P_g; '
+                    f'{endpoint_provenance}'
+                ),
+                status_override='out_of_domain',
+            )
+            return fO2_log
+
         capacity_reference_raw = getattr(
             reservoir,
             'melt_intrinsic_fO2_log',
@@ -6702,29 +6764,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'got {capacity!r}'
             )
         capacity = max(0.0, capacity)
-        transport_pO2_raw = getattr(
-            reservoir,
-            'headspace_transport_pO2_bar',
-            None,
-        )
-        try:
-            transport_pO2_bar = float(transport_pO2_raw)
-        except (TypeError, ValueError):
-            transport_pO2_bar = 0.0
-        if not math.isfinite(transport_pO2_bar) or transport_pO2_bar <= 0.0:
-            head_o2_mol = max(0.0, float(
-                self.atom_ledger.mol_by_account('process.overhead_gas').get(
-                    OXYGEN_SPECIES,
-                    0.0,
-                )
-            ))
-            ledger_pO2_bar = self._headspace_ledger_pO2_bar_from_o2_mol(
-                head_o2_mol
-            )
-            transport_pO2_bar = self._headspace_transport_pO2_bar_from_ledger(
-                ledger_pO2_bar,
-                head_o2_mol=head_o2_mol,
-            )
+        transport_pO2_bar = self._melt_redox_transport_pO2_bar(reservoir)
         per_tick_transfer = self._per_tick_o2_transfer_mol()
         directional_capacity = self._melt_redox_directional_inventory_capacity_mol(
             fO2_log=capacity_reference_fO2_log,
@@ -8850,6 +8890,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 context='fe_redox_respeciation_override',
                 candidate_fO2_log=float(fO2_log_override),
             )
+        # Premise: once the ledger ratio is only the Kress floor, fO2 is the
+        # gas pressure.  Rewriting FeO/Fe2O3 to Kress(P_g) would mint a ferric
+        # inventory the melt does not hold and would skip the finite exchange.
+        # Algebra: unconstrained respeciation delta is zero while the domain
+        # basis is no_melt_redox_buffer.  Units: mol.  Limiting case: Fe2O3 = 0
+        # stays Fe2O3 = 0; an explicit post-exchange target still commits.
+        interface_controlled = (
+            target_ferric_fraction is None
+            and fO2_log_override is None
+            and bool(getattr(self, '_melt_redox_ledger_initialized', False))
+            and str(
+                (getattr(self, '_last_redox_domain', {}) or {}).get('basis')
+                or ''
+            ) == 'no_melt_redox_buffer'
+        )
         control_inputs = {
             'source': 'scalar Kress91 fO2 ledger re-speciation',
             'o2_account': (
@@ -8864,17 +8919,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             control_inputs['target_ferric_fraction'] = float(
                 target_ferric_fraction
             )
-        result = self._dispatch_only(
-            ChemistryIntent.FE_REDOX_RESPECIATION,
-            control_inputs=control_inputs,
-            fO2_log=fO2_log,
-        )
-        diagnostic = dict(result.diagnostic or {})
-        diagnostic['status'] = str(result.status)
+        if interface_controlled:
+            diagnostic = {
+                'respeciation_status': 'skipped_no_melt_redox_buffer',
+                'status': 'ok',
+                'direction': 'none',
+                'reason': (
+                    'interface_controls_fO2_floor_is_not_a_measurement'
+                ),
+                'oxygen_source': oxygen_source,
+                'internal_o2_capacity_mol': buffer_capacity_mol,
+            }
+            proposal = None
+        else:
+            result = self._dispatch_only(
+                ChemistryIntent.FE_REDOX_RESPECIATION,
+                control_inputs=control_inputs,
+                fO2_log=fO2_log,
+            )
+            diagnostic = dict(result.diagnostic or {})
+            diagnostic['status'] = str(result.status)
+            proposal = result.transition
         diagnostic['gate_authority'] = (
             self._melt_redox_gate_authority_provenance(gate_authority)
         )
-        proposal = result.transition
+        if not interface_controlled:
+            proposal = result.transition
         if proposal is None:
             self._chem_no_op_dispatch_count += 1
         else:

@@ -519,10 +519,13 @@ def test_interface_po2_uses_finite_two_film_force_and_publishes_regime():
         diagnostic['melt_oxygen_equilibrium_mol']
         - diagnostic['melt_oxygen_ledger_mol']
     )
-    assert min(transport_pO2_bar, melt_pO2_bar) <= interface_pO2_bar <= max(
-        transport_pO2_bar,
-        melt_pO2_bar,
-    )
+    # A floor ledger reports melt fO2 = P_transport, so the two boundary
+    # pressures are the same number.  The root then matches that pressure
+    # to a few ulps; an exact closed bracket rejects the rounding.
+    low_pO2_bar = min(transport_pO2_bar, melt_pO2_bar)
+    high_pO2_bar = max(transport_pO2_bar, melt_pO2_bar)
+    bracket_ulp = 8.0 * max(low_pO2_bar, high_pO2_bar, 1.0e-30) * 2.220446049250313e-16
+    assert low_pO2_bar - bracket_ulp <= interface_pO2_bar <= high_pO2_bar + bracket_ulp
     if diagnostic['interface_root_clamped']:
         # The fixture is at a native-Fe/FeO ledger endpoint, so its formal
         # Kress91 equilibrium can sit outside the gas/melt pressure bracket.

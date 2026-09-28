@@ -193,18 +193,43 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                     "target_ferric_fraction must be finite in [0, 1]"
                 )
         else:
-            target_ferric = max(
-                KRESS91_FERRIC_FRACTION_EPSILON,
-                min(
-                    1.0 - KRESS91_FERRIC_FRACTION_EPSILON,
-                    kress91_fe3_over_sigma_fe(
-                        fO2_log=fO2_log,
-                        mol_fractions=mol_fractions,
-                        T_K=T_K,
-                        pressure_bar=pressure_bar,
-                    ),
-                ),
+            # Premise: Kress91's forward map is open at q = 0 and q = 1.
+            # Clamping that endpoint up to epsilon and writing
+            # n_Fe2O3 = epsilon * n_Fe / 2 mints a floor into the ledger.
+            # Algebra: if the unclamped target is outside (epsilon, 1-epsilon),
+            # delta_n_Fe2O3 = 0.  Units: mol.  Limiting case: Fe2O3 = 0 and
+            # Kress(fO2) < epsilon leaves Fe2O3 = 0.
+            unclamped_target = kress91_fe3_over_sigma_fe(
+                fO2_log=fO2_log,
+                mol_fractions=mol_fractions,
+                T_K=T_K,
+                pressure_bar=pressure_bar,
             )
+            if (
+                unclamped_target <= KRESS91_FERRIC_FRACTION_EPSILON
+                or unclamped_target >= 1.0 - KRESS91_FERRIC_FRACTION_EPSILON
+            ):
+                current_ferric = 2.0 * fe2o3_mol / total_fe_mol
+                return IntentResult(
+                    intent=ChemistryIntent.FE_REDOX_RESPECIATION,
+                    status="ok",
+                    transition=None,
+                    control_audit=control_audit,
+                    diagnostic={
+                        "respeciation_status": "endpoint_not_a_measurement",
+                        "direction": "none",
+                        "reason": "kress_endpoint_floor_not_a_measurement",
+                        "current_ferric_fraction": current_ferric,
+                        "target_ferric_fraction": current_ferric,
+                        "unclamped_target_ferric_fraction": unclamped_target,
+                        "current_feo_mol": feo_mol,
+                        "current_fe2o3_mol": fe2o3_mol,
+                        "o2_account": o2_account,
+                        "oxygen_source": oxygen_source,
+                        "internal_o2_capacity_mol": internal_o2_capacity_mol,
+                    },
+                )
+            target_ferric = unclamped_target
         current_ferric = 2.0 * fe2o3_mol / total_fe_mol
         target_fe2o3_mol = 0.5 * target_ferric * total_fe_mol
         delta_fe2o3_mol = target_fe2o3_mol - fe2o3_mol
