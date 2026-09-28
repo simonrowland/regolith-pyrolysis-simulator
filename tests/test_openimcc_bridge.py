@@ -625,3 +625,19 @@ def test_cleaned_melt_fe_fold_is_order_independent(composition) -> None:
     _wt, moles = _cleaned_melt_projection(composition)
     assert moles["FeO"] == pytest.approx(3.0, rel=0, abs=1e-12)
     assert moles["SiO2"] == pytest.approx(2.0, rel=0, abs=1e-12)
+
+
+def test_recorded_openimcc_pin_matches_pyproject_extra() -> None:
+    # The refusal remedies cite OPENIMCC_RECORDED_PIN; it must name the same openimcc
+    # commit as the pyproject `imcc` optional extra, so a remedy can never point at a
+    # revision that lacks the features the code requires.
+    import tomllib
+    from pathlib import Path
+
+    from simulator.melt_backend.openimcc_bridge import OPENIMCC_RECORDED_PIN
+
+    pyproject = tomllib.loads(
+        (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text()
+    )
+    extra = pyproject["project"]["optional-dependencies"]["imcc"]
+    assert extra == [OPENIMCC_RECORDED_PIN]

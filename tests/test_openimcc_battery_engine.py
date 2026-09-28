@@ -626,7 +626,12 @@ def test_imcc_missing_generic_balance_solver_is_typed(monkeypatch) -> None:
     )
     assert cell.status == "refusal"
     assert cell.refusal_reason == "openimcc_oxygen_balance_unavailable", cell.engine_reason
-    assert "23d7842cf5525e058c66e8d68f6bb03ace04c256" in str(cell.engine_reason)
+    from simulator.melt_backend.openimcc_bridge import OPENIMCC_RECORDED_PIN
+
+    # Assert against the recorded pin constant, not a literal sha, so the remedy
+    # check tracks pin bumps (test_recorded_openimcc_pin_matches_pyproject_extra
+    # keeps the constant equal to the pyproject extra).
+    assert OPENIMCC_RECORDED_PIN in str(cell.engine_reason)
 
 
 @pytest.mark.parametrize("engine_name", ("imcc_sf04", "imcc_sf04_ext", "openimcc"))
