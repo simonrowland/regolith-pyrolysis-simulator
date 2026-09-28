@@ -21,6 +21,7 @@ from simulator.battery.enums import (
     NoticeKind,
     Phase,
     PerBasis,
+    MetricOperation,
     Quantity,
     RefusalReason,
     ResidualStatus,
@@ -37,6 +38,7 @@ from simulator.battery.score import (
     ScoreContext,
     predict_with_engine,
     score_store,
+    flagged_stratum_rows,
     headline_rows,
 )
 from simulator.battery.records import Composition, Species, State, Value
@@ -861,6 +863,117 @@ def test_stolyarova_1991_w_cell_pressure_and_residual_report() -> None:
         assert abs(
             math.log10(pair[0]["W_pO2_atm_1933K"] / pair[1]["W_pO2_atm_1933K"])
         ) < 0.01, x_sio2
+
+
+def test_stolyarova_typed_w_cell_scores_through_cell_oxide_reservoir(tmp_path: Path) -> None:
+    # Suppose my change is wrong in the way that matters most: restoring the
+    # old reactive_cell_oxygen_reservoir refusal makes this red, because typed
+    # [W] rows never request oxygen_balance_effusion with cell_material W.
+
+    _require_simulator_janaf_gas()
+    _require_oxygen_balance()
+    _require_openimcc()
+    from simulator.battery.oxygen_balance import IMCC_ENGINES
+    from simulator.battery.score import quantity_token
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(tmp_path, "kems-053-stolyarova-1991.yaml")
+    context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+        benches=result.benches,
+        extract_review={"kems-053-stolyarova-1991": "draft"},
+    )
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-053-stolyarova-1991"
+        and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        and (observation.point_conditions or {}).get("composition") is not None
+        and observation.point_conditions["composition"].state.is_value
+    ]
+    assert rows
+    engines = (
+        Engine.IMCC_SF04,
+        Engine.IMCC_SF04_EXT,
+        Engine.OPENIMCC,
+    )
+    assert set(engines) <= set(IMCC_ENGINES)
+    blocked = {
+        "missing_fO2",
+        "reactive_cell_oxygen_reservoir",
+        "cell_material_unknown",
+    }
+    residuals = []
+    tagged = []
+    handles = {engine.value: open_battery_engine(engine.value) for engine in engines}
+    for observation in rows:
+        for engine in engines:
+            residual, _candidate = compile_residual(
+                observation, engine, context=context, handles=handles
+            )
+            residuals.append(residual)
+            tagged.append((engine.value, residual))
+            detail = {} if residual.refusal is None else residual.refusal.detail
+            reason = detail.get("reason")
+            assert residual.refusal is None or (
+                residual.refusal.reason is not RefusalReason.IDENTITY_INCOMPLETE
+                and reason not in blocked
+            ), (
+                observation.observation_id,
+                engine.value,
+                None if residual.refusal is None else residual.refusal.reason.value,
+                reason,
+            )
+            if residual.numeric is None:
+                continue
+            solved = [
+                notice
+                for notice in residual.notices
+                if notice.origin == "engine:%s" % engine.value
+                and notice.reason.startswith("fo2_oxygen_balance_effusion_solved:")
+            ]
+            assert len(solved) == 1, (observation.observation_id, engine.value)
+            payload = json.loads(solved[0].reason.split(" ", 1)[1])
+            assert payload.get("cell_material") == "W"
+    report = []
+    for engine in engines:
+        bucket = [
+            residual
+            for name, residual in tagged
+            if name == engine.value
+            and residual.rail is not None
+            and residual.rail.value == "vapour"
+        ]
+        scored = [residual for residual in bucket if residual.numeric is not None]
+        dex = sorted(
+            float(residual.numeric.value)
+            for residual in scored
+            if residual.numeric.operation is MetricOperation.DEX
+        )
+        mid = None if not dex else dex[len(dex) // 2]
+        rms = None if not dex else (sum(value * value for value in dex) / len(dex)) ** 0.5
+        report.append(
+            {
+                "engine": engine.value,
+                "n": len(scored),
+                "n_score_eligible": sum(1 for residual in scored if residual.score_eligible),
+                "n_inside_band": sum(
+                    1 for residual in scored if residual.status is ResidualStatus.MATCH
+                ),
+                "median_dex": mid,
+                "rms_dex": rms,
+            }
+        )
+    print("STOLYAROVA_SCORER_REPORT=" + json.dumps(report))
+    print(
+        "STOLYAROVA_FLAGGED="
+        + json.dumps(flagged_stratum_rows(tuple(residuals), engines=engines), sort_keys=True)
+    )
+    assert all(row["n"] > 0 for row in report)
+
+
 
 
 def test_imcc_missing_generic_balance_solver_is_typed(monkeypatch) -> None:

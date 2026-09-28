@@ -79,6 +79,7 @@ def _capture_cell(monkeypatch) -> dict[str, object]:
         seen["wt"] = dict(pot.composition_wt_pct)
         seen["mode"] = po2.mode
         seen["po2_bar"] = po2.po2_bar
+        seen["cell_material"] = po2.cell_material
         seen["pressure_bar"] = physical_pressure_bar
         return types.SimpleNamespace(
             status="refusal",
@@ -365,19 +366,59 @@ def test_inert_knudsen_cell_requests_oxygen_balance_effusion(
 
     assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
     assert seen["po2_bar"] is None
+    assert seen["cell_material"] is None
+
+
+@pytest.mark.parametrize(
+    ("materials", "cell_material"),
+    (
+        ((CellMaterial.W,), "W"),
+        ((CellMaterial.MO,), "Mo"),
+        ((CellMaterial.W, CellMaterial.W), "W"),
+    ),
+)
+def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
+    materials: tuple[CellMaterial, ...],
+    cell_material: str,
+    monkeypatch,
+) -> None:
+    seen = _capture_cell(monkeypatch)
+    observation, experiment = _kems_partial(cell_material=None)
+
+    predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=_cell_material_bench(materials),
+        isolated=False,
+    )
+
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["po2_bar"] is None
+    assert seen["cell_material"] == cell_material
 
 
 @pytest.mark.parametrize(
     ("materials", "reason"),
     (
-        ((CellMaterial.W,), "reactive_cell_oxygen_reservoir"),
-        ((CellMaterial.MO,), "reactive_cell_oxygen_reservoir"),
         ((CellMaterial.TA,), "reactive_cell_oxygen_reservoir"),
         ((CellMaterial.NB,), "reactive_cell_oxygen_reservoir"),
         ((CellMaterial.C_GRAPHITE,), "reactive_cell_oxygen_reservoir"),
         ((CellMaterial.RE,), "reactive_cell_oxygen_reservoir"),
         (
             (CellMaterial.IR, CellMaterial.C_GRAPHITE),
+            "reactive_cell_oxygen_reservoir",
+        ),
+        (
+            (CellMaterial.IR, CellMaterial.W),
+            "reactive_cell_oxygen_reservoir",
+        ),
+        (
+            (CellMaterial.W, CellMaterial.RE),
+            "reactive_cell_oxygen_reservoir",
+        ),
+        (
+            (CellMaterial.MO, CellMaterial.AL2O3),
             "reactive_cell_oxygen_reservoir",
         ),
         ((CellMaterial.AL2O3,), "cell_material_not_inert"),
