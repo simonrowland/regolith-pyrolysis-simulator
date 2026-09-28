@@ -61,11 +61,13 @@ from simulator.battery.migrate import (
     REPO_ROOT,
     canonicalize_rail,
     iter_observation_store_paths,
+    load_migrated_benches,
     load_migrated_store,
     load_yaml,
     to_plain,
 )
 from simulator.battery.records import (
+    Bench,
     CandidateRequest,
     Composition,
     DecisionBand,
@@ -385,6 +387,7 @@ class ScoreContext:
     origins: Mapping[str, str] = field(default_factory=dict)
     extract_review: Mapping[str, str | None] = field(default_factory=dict)
     hostname: str = ""
+    benches: Mapping[str, Bench] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -910,6 +913,8 @@ def composition_wt_pct(composition: Composition) -> dict[str, float] | None:
 def blocking_qualifications(
     quantity: Quantity | None,
     notices: Sequence[Notice],
+    *,
+    oxygen_balance_effusion_solved: bool = False,
 ) -> tuple[Notice, ...]:
     flagged = tuple(
         notice for notice in notices if _is_flagged_stratum_notice(notice)
@@ -917,7 +922,10 @@ def blocking_qualifications(
     if flagged:
         return flagged
     if quantity in _VAPOUR_EQUILIBRIUM:
-        return _pressure_blocking_notices(tuple(notices))
+        return _pressure_blocking_notices(
+            tuple(notices),
+            oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
+        )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         found: list[Notice] = []
         for notice in notices:
@@ -1027,6 +1035,7 @@ def build_conjuncts(
     extract_review_status: str | None,
     comparison_ids: set[str],
     notices: Sequence[Notice],
+    oxygen_balance_effusion_solved: bool = False,
 ) -> EligibleConjuncts:
     quantity = quantity_token(reference.identity) if isinstance(reference.identity, Identity) else None
     ref_point = point_magnitude(reference.value)
@@ -1066,7 +1075,11 @@ def build_conjuncts(
         identity_equal=identity_ok,
         source_relation_independent_complete_ancestry=independent,
         candidate_engine_prediction_authority_allowed=cand_ok,
-        no_blocking_qualification=not blocking_qualifications(quantity, notices),
+        no_blocking_qualification=not blocking_qualifications(
+            quantity,
+            notices,
+            oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
+        ),
         not_flagged_stratum=not any(
             _is_flagged_stratum_notice(notice) for notice in notices
         ),
@@ -1537,6 +1550,19 @@ def cell_notices(
                     destination=row.get("to"),
                 )
             )
+        elif kind == "fo2_oxygen_balance_effusion_solved":
+            notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        _OXYGEN_BALANCE_NOTICE_PREFIX
+                        + " "
+                        + json.dumps(dict(row), sort_keys=True, separators=(",", ":"))
+                    ),
+                    origin=f"engine:{engine.value}",
+                )
+            )
         elif kind == "composition_projected":
             notices.append(
                 Notice(
@@ -1826,6 +1852,210 @@ def _omission_notice(quantity: Quantity, reason: str) -> Notice:
     )
 
 
+_OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
+
+
+def _has_solved_oxygen_balance_notice(
+    engine: Engine,
+    notices: Sequence[Notice],
+) -> bool:
+    return engine is Engine.OPENIMCC and any(
+        notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+        and notice.origin == "engine:openimcc"
+        and notice.reason.startswith(_OXYGEN_BALANCE_NOTICE_PREFIX)
+        for notice in notices
+    )
+
+
+def _cell_material_values(
+    experiment: Experiment | None,
+    bench: Bench | None,
+) -> tuple[tuple[str, str], ...]:
+    values: list[tuple[str, str]] = []
+    for path, located in (
+        (
+            "experiment.apparatus.cell_material_and_liner",
+            experiment.apparatus.cell_material_and_liner
+            if experiment is not None and experiment.apparatus is not None
+            else None,
+        ),
+        (
+            "bench.cell_material_and_liner",
+            bench.cell_material_and_liner if bench is not None else None,
+        ),
+    ):
+        if located is None or not located.state.is_value:
+            continue
+        value = located.state.value
+        if isinstance(value, str) and value.strip():
+            values.append((path, value.strip()))
+    return tuple(values)
+
+
+_CELL_ELEMENT_SYMBOLS = frozenset(
+    "H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co "
+    "Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb "
+    "Te I Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re "
+    "Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es "
+    "Fm Md No Lr Rf Db Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv Ts Og".split()
+)
+_CELL_INERT_SYMBOLS = frozenset({"Pt", "Ir"})
+_CELL_REACTIVE_SYMBOLS = frozenset({"W", "Mo", "Ta", "Nb", "Ni", "Fe", "C"})
+_CELL_INERT_NAME_RE = re.compile(r"\b(?:platinum|iridium)\b", re.IGNORECASE)
+_CELL_REACTIVE_NAME_RE = re.compile(
+    r"\b(?:tungsten|molybdenum|tantalum|niobium|nickel|iron|steel|graphite|carbon|c)\b",
+    re.IGNORECASE,
+)
+_CELL_RHENIUM_NAME_RE = re.compile(r"\brhenium\b", re.IGNORECASE)
+_CELL_NOT_INERT_NAME_RE = re.compile(
+    r"\b(?:alumina|al2o3|sapphire|quartz|silica|sio2|y2o3|yttria|thoria|tho2|"
+    r"beo|beryllia|mgo|magnesia|zro2|zirconia|bn|boron\s+nitride|sic|"
+    r"aluminium|aluminum|rhodium)\b",
+    re.IGNORECASE,
+)
+_CELL_UNKNOWN_RE = re.compile(
+    r"\b(?:unknown|unspecified|unreported|not reported|not specified)\b",
+    re.IGNORECASE,
+)
+_CELL_OXIDATION_RE = re.compile(
+    r"\b(?:oxide|oxidized|oxidised|passivation|passivated)\b", re.IGNORECASE
+)
+_CELL_CHEMICAL_TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
+_CELL_HYPHENATED_FORMULA_RE = re.compile(
+    r"(?<![A-Za-z0-9])(?:[A-Z][a-z]?\d*)(?:[-/](?:[A-Z][a-z]?\d*))+"
+    r"(?![A-Za-z0-9])"
+)
+_CELL_ELEMENT_PART_RE = re.compile(r"([A-Z][a-z]?)(\d*)")
+
+
+def _cell_material_class(materials: Sequence[str]) -> str:
+    if not materials:
+        return "unknown"
+    classes: list[str] = []
+    for material in materials:
+        if _CELL_UNKNOWN_RE.search(material):
+            classes.append("unknown")
+            continue
+
+        oxidation = bool(_CELL_OXIDATION_RE.search(material))
+        material_classes: set[str] = set()
+        if _CELL_INERT_NAME_RE.search(material):
+            material_classes.add("inert")
+        if _CELL_REACTIVE_NAME_RE.search(material):
+            material_classes.add("reactive")
+        if _CELL_RHENIUM_NAME_RE.search(material):
+            material_classes.add("reactive" if oxidation else "not_inert")
+        if _CELL_NOT_INERT_NAME_RE.search(material):
+            material_classes.add("not_inert")
+
+        # Symbols use canonical case and whole tokens, so words like "in", "as",
+        # "no", and "at" do not become elements; the c in "0.025 cm" is not C.
+        # Element names above remain case-insensitive.
+        def symbol_class(symbol: str) -> str:
+            if symbol in _CELL_INERT_SYMBOLS:
+                return "inert"
+            if symbol == "Re":
+                return "reactive" if oxidation else "not_inert"
+            if symbol in _CELL_REACTIVE_SYMBOLS:
+                return "reactive"
+            return "not_inert"
+
+        def formula_classes(symbols: Sequence[str]) -> set[str]:
+            if len(symbols) == 1:
+                return {symbol_class(symbols[0])}
+            symbol_classes = {symbol_class(symbol) for symbol in symbols}
+            if symbol_classes == {"inert"}:
+                return {"inert"}
+            formula_class = {"not_inert"}
+            if "inert" in symbol_classes:
+                formula_class.add("inert")
+            return formula_class
+
+        formula_spans: list[tuple[int, int]] = []
+        for match in _CELL_HYPHENATED_FORMULA_RE.finditer(material):
+            symbols = [
+                part.group(1)
+                for token in re.split(r"[-/]", match.group())
+                if (part := _CELL_ELEMENT_PART_RE.fullmatch(token))
+                and part.group(1) in _CELL_ELEMENT_SYMBOLS
+            ]
+            if len(symbols) == len(re.split(r"[-/]", match.group())):
+                material_classes.update(formula_classes(symbols))
+                formula_spans.append(match.span())
+
+        for match in _CELL_CHEMICAL_TOKEN_RE.finditer(material):
+            if any(start <= match.start() < end for start, end in formula_spans):
+                continue
+            token = match.group()
+            symbols: list[str] = []
+            position = 0
+            while position < len(token):
+                part = _CELL_ELEMENT_PART_RE.match(token, position)
+                if part is None or part.group(1) not in _CELL_ELEMENT_SYMBOLS:
+                    symbols = []
+                    break
+                symbols.append(part.group(1))
+                position = part.end()
+            if not symbols or position != len(token):
+                continue
+            if len(symbols) > 2 and not any(char.islower() or char.isdigit() for char in token):
+                continue
+            material_classes.update(formula_classes(symbols))
+
+        if "inert" in material_classes and material_classes & {"reactive", "not_inert"}:
+            classes.append("mixed")
+        # Without an inert component, a reactive token sets the refusal class;
+        # other detected chemistry alone fails closed as not_inert.
+        elif "reactive" in material_classes:
+            classes.append("reactive")
+        elif "not_inert" in material_classes:
+            classes.append("not_inert")
+        elif "inert" in material_classes:
+            classes.append("inert")
+        else:
+            classes.append("unknown")
+    if "mixed" in classes or (
+        "inert" in classes and ("reactive" in classes or "not_inert" in classes)
+    ):
+        return "mixed"
+    if "unknown" in classes:
+        return "unknown"
+    if "reactive" in classes:
+        return "reactive"
+    if "not_inert" in classes:
+        return "not_inert"
+    return classes[0]
+
+
+def _derived_fo2_condition(observation: Observation) -> bool:
+    point = (observation.point_conditions or {}).get("fO2_Pa")
+    if point is not None:
+        if point.inference is not None:
+            return True
+        note = point.locator.note if point.locator is not None else None
+        if note is not None and "derived condition" in note.casefold():
+            return True
+    return any(
+        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.reason.startswith("fO2_Pa is a DERIVED condition")
+        for notice in observation.notices
+    )
+
+
+def _has_printed_fo2(observation: Observation, identity: Identity) -> bool:
+    if _derived_fo2_condition(observation):
+        return False
+    fo2 = identity.fO2_Pa
+    if fo2 is not None and fo2.is_value and fo2.value is not None:
+        return True
+    point = (observation.point_conditions or {}).get("fO2_Pa")
+    return bool(
+        point is not None
+        and point.inference is None
+        and point.state.is_value
+    )
+
+
 def total_pressure_bar_for_score(
     identity: Identity,
     quantity: Quantity,
@@ -1989,6 +2219,7 @@ def predict_with_engine(
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
     experiment: Experiment | None = None,
+    bench: Bench | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -1998,6 +2229,7 @@ def predict_with_engine(
         MELTS_FAMILY_ENGINES,
         PO2_COMMANDED,
         PO2_NOT_AN_INPUT,
+        PO2_OXYGEN_BALANCE_EFFUSION,
         REFUSAL_ENGINE_CRASH,
         REFUSAL_TIMEOUT,
         REFUSAL_UNAVAILABLE,
@@ -2254,6 +2486,13 @@ def predict_with_engine(
             input_notices.append(pressure_notice)
 
     fo2_state = identity.fO2_Pa
+    oxygen_balance_effusion = (
+        quantity in _VAPOUR_EQUILIBRIUM
+        and experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        and not _has_printed_fo2(observation, identity)
+    )
     if activity_payload is not None:
         # The contract's oxygen point, or none. Never an engine default.
         if "fO2_log" in activity_payload:
@@ -2263,6 +2502,55 @@ def predict_with_engine(
             )
         else:
             po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+    elif oxygen_balance_effusion:
+        material_values = _cell_material_values(experiment, bench)
+        material_class = _cell_material_class(
+            tuple(value for _path, value in material_values)
+        )
+        if material_class != "inert":
+            refusal_token = {
+                "reactive": "reactive_cell_oxygen_reservoir",
+                "mixed": "cell_material_not_inert",
+                "not_inert": "cell_material_not_inert",
+                "unknown": "cell_material_unknown",
+            }[material_class]
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=(
+                    RefusalReason.IDENTITY_INCOMPLETE
+                    if material_class == "unknown"
+                    else RefusalReason.UNSUPPORTED
+                ),
+                detail={
+                    "reason": refusal_token,
+                    "cell_material": [
+                        {"field": path, "value": value}
+                        for path, value in material_values
+                    ],
+                },
+                notices=tuple(input_notices),
+            )
+        if engine not in IMCC_ENGINES:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.UNSUPPORTED,
+                detail={
+                    "reason": "oxygen_balance_effusion_unsupported_engine",
+                    "engine": engine.value,
+                },
+                notices=tuple(input_notices),
+            )
+        # The openimcc bridge discards pressure_bar; its balance solve uses
+        # printed composition-derived activities and T, never measured p_K.
+        po2 = Po2Request(mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None)
     else:
         oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(identity, composition_value)
         if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
@@ -2885,11 +3173,16 @@ def compile_residual(
 
     if prediction is None:
         predictor = predict or predict_with_engine
+        predictor_kwargs: dict[str, object] = {
+            "handles": handles,
+            "experiment": experiment,
+        }
+        if predict is None and experiment is not None and experiment.bench_id is not None:
+            predictor_kwargs["bench"] = context.benches.get(experiment.bench_id)
         prediction = predictor(
             engine,
             implied_alpha_reference or reference,
-            handles=handles,
-            experiment=experiment,
+            **predictor_kwargs,
         )
 
     notices = union_notices(notices, prediction.notices)
@@ -3098,6 +3391,9 @@ def compile_residual(
         extract_review_status=review_status,
         comparison_ids=comparison_ids,
         notices=notices,
+        oxygen_balance_effusion_solved=_has_solved_oxygen_balance_notice(
+            prediction.engine, prediction.notices
+        ),
     )
     if is_internal_consistency(origin) or compilation:
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
@@ -3143,6 +3439,7 @@ def _gate_tables(
 def load_score_context(root: Path | None = None) -> ScoreContext:
     root = root or REPO_ROOT
     works, experiments, observations = load_migrated_store(root)
+    benches = load_migrated_benches(root)
     origins: dict[str, str] = {}
     extract_review: dict[str, str | None] = {}
     literature = root / "data" / "literature"
@@ -3177,6 +3474,7 @@ def load_score_context(root: Path | None = None) -> ScoreContext:
         origins=origins,
         extract_review=extract_review,
         hostname=socket.gethostname(),
+        benches=benches,
     )
 
 
