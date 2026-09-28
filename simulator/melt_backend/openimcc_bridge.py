@@ -26,6 +26,7 @@ from simulator.composition_projection import (
     classify_projected_bulk,
     projected_component_moles_per_kg,
 )
+from simulator.state import MOLAR_MASS
 
 try:  # Optional dependency: C1 must remain importable without openimcc.
     import openimcc as _openimcc
@@ -59,12 +60,11 @@ OPENIMCC_PARENT_OXIDES = (
 _OPENIMCC_CRMN_RELAXED_OXIDES = ("Cr2O3", "MnO")
 _OPENIMCC_CRMN_RELAXED_RULING = "owner 2026-09-27"
 
-# DERIVATION: FeO_total is the FeO-equivalent mass handed to the FeO-only
-# SF04 convention.  wt%(FeO_total) = wt%(FeO) + wt%(Fe2O3) *
-# 2*M(FeO)/M(Fe2O3), and 2 * 71.844 / 159.688 = 0.89982.  Unit check:
-# (mass FeO / mass Fe2O3) is kg/kg, so the factor is dimensionless.  Sanity:
-# 1 wt% Fe2O3 contributes 0.89982 wt% FeO at equal Fe atoms.
-FE2O3_TO_FEO_TOTAL_WT_FACTOR = 2.0 * 71.844 / 159.688
+# Fe2O3 contributes two FeO-equivalent moles. Keep this mass ratio for the
+# policy diagnostic only; the actual projection folds moles directly.
+FE2O3_TO_FEO_TOTAL_WT_FACTOR = (
+    2.0 * MOLAR_MASS["FeO"] / MOLAR_MASS["Fe2O3"]
+)
 
 
 class OpenImccUnavailableError(RuntimeError):
@@ -210,10 +210,10 @@ def _canonical_composition(composition: Mapping[str, float]) -> dict[str, float]
     return normalized
 
 
-def _cleaned_melt_wt_pct(
+def _cleaned_melt_projection(
     composition_mol: Mapping[str, float],
-) -> tuple[dict[str, float], dict[str, float], float]:
-    """Return source wt%, FeO-folded IMCC wt%, and source mass in kg."""
+) -> tuple[dict[str, float], dict[str, float]]:
+    """Return source wt% and the cleaned IMCC mole projection."""
 
     try:
         canonical = _canonical_composition(composition_mol)
@@ -224,6 +224,7 @@ def _cleaned_melt_wt_pct(
         ) from exc
 
     source_mass_kg: dict[str, float] = {}
+    cleaned_composition_mol: dict[str, float] = {}
     for raw_name, raw_mol in canonical.items():
         name = str(raw_name)
         if not isinstance(raw_mol, numbers.Real) or isinstance(raw_mol, bool):
@@ -262,6 +263,14 @@ def _cleaned_melt_wt_pct(
             )
         if mol == 0.0:
             continue
+        if name in OPENIMCC_PARENT_OXIDES and name != "FeO":
+            cleaned_composition_mol[name] = mol
+        elif name == "FeO":
+            cleaned_composition_mol["FeO"] = mol
+        elif name == "Fe2O3":
+            cleaned_composition_mol["FeO"] = (
+                cleaned_composition_mol.get("FeO", 0.0) + 2.0 * mol
+            )
         try:
             mass_kg = mol * resolve_species_formula(name).molar_mass_kg_per_mol()
         except Exception as exc:  # noqa: BLE001 - policy turns this into a typed refusal
@@ -281,23 +290,30 @@ def _cleaned_melt_wt_pct(
         name: mass_kg / total_mass_kg * 100.0
         for name, mass_kg in source_mass_kg.items()
     }
-    folded = {
-        name: wt_pct
-        for name, wt_pct in source_wt_pct.items()
-        if name in OPENIMCC_PARENT_OXIDES and name != "FeO"
+    return source_wt_pct, cleaned_composition_mol
+
+
+def _composition_wt_pct_from_moles(
+    composition_mol: Mapping[str, float],
+) -> dict[str, float]:
+    masses = {
+        name: float(amount) * float(MOLAR_MASS[name])
+        for name, amount in composition_mol.items()
+        if amount > 0.0
     }
-    feo_total_wt_pct = source_wt_pct.get("FeO", 0.0) + (
-        source_wt_pct.get("Fe2O3", 0.0) * FE2O3_TO_FEO_TOTAL_WT_FACTOR
-    )
-    if feo_total_wt_pct > 0.0:
-        folded["FeO"] = feo_total_wt_pct
-    return source_wt_pct, folded, total_mass_kg
+    total_mass = sum(masses.values())
+    return {
+        name: mass / total_mass * 100.0
+        for name, mass in masses.items()
+    }
 
 
 def _cleaned_melt_policy(
     composition_mol: Mapping[str, float],
 ) -> tuple[dict[str, float], dict[str, Any]]:
-    source_wt_pct, folded_wt_pct, _ = _cleaned_melt_wt_pct(composition_mol)
+    source_wt_pct, cleaned_composition_mol = _cleaned_melt_projection(
+        composition_mol
+    )
     dropped = {
         name: value
         for name, value in source_wt_pct.items()
@@ -414,11 +430,13 @@ def _cleaned_melt_policy(
         policy["fe2o3_fold"] = {
             "code": "openimcc_fe2o3_fold",
             "fe2o3_wt_pct": fe2o3_wt_pct,
-            "feo_total_wt_pct": folded_wt_pct.get("FeO", 0.0),
+            "feo_total_wt_pct": _composition_wt_pct_from_moles(
+                cleaned_composition_mol
+            ).get("FeO", 0.0),
             "factor": FE2O3_TO_FEO_TOTAL_WT_FACTOR,
             "basis": "Fe_atoms",
         }
-    return folded_wt_pct, policy
+    return cleaned_composition_mol, policy
 
 
 def evaluate_cleaned_melt(
@@ -430,17 +448,10 @@ def evaluate_cleaned_melt(
     """Apply C3's cleaned-melt policy, then call the C1 bridge."""
 
     _require_openimcc()
-    composition_wt_pct, policy = _cleaned_melt_policy(composition_mol)
-    canonical_composition_mol = _canonical_composition(composition_mol)
-    cleaned_composition_mol = {
-        str(name): float(amount)
-        for name, amount in canonical_composition_mol.items()
-        if name in OPENIMCC_PARENT_OXIDES and name != "FeO" and float(amount) > 0.0
-    }
-    feo_mol = float(canonical_composition_mol.get("FeO", 0.0))
-    fe2o3_mol = float(canonical_composition_mol.get("Fe2O3", 0.0))
-    if feo_mol + fe2o3_mol > 0.0:
-        cleaned_composition_mol["FeO"] = feo_mol + 2.0 * fe2o3_mol
+    cleaned_composition_mol, policy = _cleaned_melt_policy(composition_mol)
+    composition_wt_pct = _composition_wt_pct_from_moles(
+        cleaned_composition_mol
+    )
     bridge = evaluate(
         composition_mol=cleaned_composition_mol,
         temperature_K=temperature_K,

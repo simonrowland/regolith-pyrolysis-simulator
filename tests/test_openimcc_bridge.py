@@ -16,10 +16,11 @@ from simulator.melt_backend.openimcc_bridge import (
     OpenImccBridgeResult,
     OpenImccUnavailableError,
     OPENIMCC_PARENT_OXIDES,
-    _cleaned_melt_wt_pct,
+    _cleaned_melt_projection,
     evaluate as bridge_evaluate,
     evaluate_cleaned_melt,
 )
+from simulator.state import MOLAR_MASS
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -104,7 +105,7 @@ def _openimcc_or_skip():
 )
 def test_cleaned_melt_rejects_invalid_inventory(invalid_inventory) -> None:
     with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
-        _cleaned_melt_wt_pct({"SiO2": 1.0, "MgO": invalid_inventory})
+        _cleaned_melt_projection({"SiO2": 1.0, "MgO": invalid_inventory})
 
     refusal = exc_info.value
     assert refusal.code == "openimcc_composition_invalid_input"
@@ -113,12 +114,12 @@ def test_cleaned_melt_rejects_invalid_inventory(invalid_inventory) -> None:
 
 
 def test_cleaned_melt_treats_zero_inventory_as_absent() -> None:
-    source_wt_pct, folded_wt_pct, _ = _cleaned_melt_wt_pct(
+    source_wt_pct, cleaned_mol = _cleaned_melt_projection(
         {"SiO2": 1.0, "MgO": 0.0}
     )
 
     assert "MgO" not in source_wt_pct
-    assert "MgO" not in folded_wt_pct
+    assert "MgO" not in cleaned_mol
 
 
 def test_cleaned_melt_passes_exact_parent_moles_to_openimcc(
@@ -139,6 +140,56 @@ def test_cleaned_melt_passes_exact_parent_moles_to_openimcc(
     assert observed[-1]["composition_mol"] == {"Na2O": 0.5, "SiO2": 0.5}
     assert "composition_kg" not in observed[-1]
     assert result.bridge.envelope_status == "inside"
+
+
+@pytest.mark.parametrize(
+    "composition_mol",
+    (
+        {"SiO2": 1.0},
+        {"SiO2": 0.8, "FeO": 0.1, "Fe2O3": 0.05},
+        {
+            "SiO2": 0.78,
+            "Na2O": 0.1,
+            "K2O": 0.1,
+            "Fe2O3": 0.019,
+            "Cr2O3": 0.0005,
+            "MnO": 0.0005,
+        },
+    ),
+)
+def test_cleaned_melt_wt_pct_describes_the_openimcc_mole_input(
+    monkeypatch: pytest.MonkeyPatch,
+    composition_mol: dict[str, float],
+) -> None:
+    import simulator.melt_backend.openimcc_bridge as bridge
+
+    original_evaluate = bridge.evaluate
+    observed = []
+
+    def capture(**kwargs):
+        observed.append(kwargs["composition_mol"])
+        return original_evaluate(**kwargs)
+
+    monkeypatch.setattr(bridge, "evaluate", capture)
+    result = evaluate_cleaned_melt(composition_mol, 2200.0)
+
+    package_moles = observed[-1]
+    masses = {
+        oxide: amount * float(MOLAR_MASS[oxide])
+        for oxide, amount in package_moles.items()
+    }
+    total_mass = sum(masses.values())
+    recovered_wt_pct = {
+        oxide: mass / total_mass * 100.0
+        for oxide, mass in masses.items()
+    }
+    assert result.composition_wt_pct == pytest.approx(
+        recovered_wt_pct, rel=0.0, abs=1e-14
+    )
+    if "Fe2O3" in composition_mol:
+        assert package_moles["FeO"] == pytest.approx(
+            composition_mol.get("FeO", 0.0) + 2.0 * composition_mol["Fe2O3"]
+        )
 
 
 def test_cleaned_melt_omits_absent_parent_activity() -> None:
