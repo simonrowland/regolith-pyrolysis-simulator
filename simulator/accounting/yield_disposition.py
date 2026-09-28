@@ -1808,17 +1808,31 @@ def _build_ideal_train_melt_boundary(
                     )
 
     for element in sorted(
-        set(oxygen_exchange_outward) | set(oxygen_exchange_returned)
+        set(oxygen_exchange_outward)
+        | set(oxygen_exchange_returned)
+        | set(redox_boundary_adjustment)
     ):
         exchange_net = float(
             oxygen_exchange_outward.get(element, 0.0)
         ) - float(oxygen_exchange_returned.get(element, 0.0))
+        redox_adjustment = float(
+            redox_boundary_adjustment.get(element, 0.0)
+        )
         surface_value = float(surface_crossed.get(element, 0.0))
-        net_surface_value = surface_value + exchange_net
+        # Combine signed melt-boundary terms before validating the nonnegative
+        # surface crossing.  A redox respeciation can emit O2 to overhead and
+        # a later exchange can return that same O2 to the buffer; validating
+        # the return first falsely rejects this conserved round trip.
+        net_surface_value = surface_value + exchange_net + redox_adjustment
         if net_surface_value < -_atom_tolerance(max(abs(net_surface_value), 1.0)):
+            refusal_code = (
+                "oxygen_exchange_return_exceeds_surface_evidence"
+                if exchange_net < 0.0
+                else "fe_redox_respeciation_return_exceeds_surface_evidence"
+            )
             surface_refusals[element].append(
                 {
-                    "code": "oxygen_exchange_return_exceeds_surface_evidence",
+                    "code": refusal_code,
                     "surface_mol_atoms": surface_value,
                     "outward_mol_atoms": float(
                         oxygen_exchange_outward.get(element, 0.0)
@@ -1826,6 +1840,7 @@ def _build_ideal_train_melt_boundary(
                     "returned_mol_atoms": float(
                         oxygen_exchange_returned.get(element, 0.0)
                     ),
+                    "net_redox_adjustment_mol_atoms": redox_adjustment,
                 }
             )
             continue
@@ -1834,23 +1849,9 @@ def _build_ideal_train_melt_boundary(
             surface_transition_flags[element].add(
                 "oxygen_reservoir_exchange_authoritative"
             )
-        if surface_crossed[element] > 0.0:
-            surface_species_by_element[element].add("O2")
-
-    for element, adjustment in sorted(redox_boundary_adjustment.items()):
-        surface_value = float(surface_crossed.get(element, 0.0))
-        net_surface_value = surface_value + float(adjustment)
-        if net_surface_value < -_atom_tolerance(max(abs(net_surface_value), 1.0)):
-            surface_refusals[element].append(
-                {
-                    "code": "fe_redox_respeciation_return_exceeds_surface_evidence",
-                    "surface_mol_atoms": surface_value,
-                    "net_adjustment_mol_atoms": float(adjustment),
-                }
-            )
-            continue
-        surface_crossed[element] = max(0.0, net_surface_value)
-        if abs(adjustment) > _atom_tolerance(max(abs(adjustment), 1.0)):
+        if abs(redox_adjustment) > _atom_tolerance(
+            max(abs(redox_adjustment), 1.0)
+        ):
             surface_transition_flags[element].add(
                 "fe_redox_respeciation_boundary_authoritative"
             )

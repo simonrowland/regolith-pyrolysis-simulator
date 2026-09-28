@@ -2045,6 +2045,53 @@ def test_ideal_train_exchange_return_cancels_surface_oxygen() -> None:
     assert rows["O"]["partition_residual_fraction"] <= 5.0e-12
 
 
+def test_ideal_train_redox_oxygen_return_is_netted_before_validation() -> None:
+    fe2o3_kg = resolve_species_formula("Fe2O3", {}).molar_mass_kg_per_mol()
+    feo_kg = resolve_species_formula("FeO", {}).molar_mass_kg_per_mol()
+    o2_kg = resolve_species_formula("O2", {}).molar_mass_kg_per_mol()
+    ledger = AtomLedger()
+    ledger.load_external(
+        "process.cleaned_melt",
+        {"Fe2O3": fe2o3_kg},
+        source="synthetic ferric feedstock",
+        material_origin="feedstock",
+    )
+    ledger.apply(
+        LedgerTransition(
+            name="fe_redox_respeciation",
+            debits=(MaterialLot("process.cleaned_melt", {"Fe2O3": fe2o3_kg}),),
+            credits=(
+                MaterialLot("process.cleaned_melt", {"FeO": 2.0 * feo_kg}),
+                MaterialLot("process.overhead_gas", {"O2": 0.5 * o2_kg}),
+            ),
+        )
+    )
+    ledger.apply(
+        LedgerTransition(
+            name="oxygen_reservoir_exchange",
+            debits=(
+                MaterialLot("process.overhead_gas", {"O2": 0.5 * o2_kg}),
+            ),
+            credits=(
+                MaterialLot("reservoir.fo2_buffer", {"O2": 0.5 * o2_kg}),
+            ),
+        )
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+    oxygen = next(
+        row
+        for row in payload["ideal_train_melt_boundary"]["rows"]
+        if row["element"] == "O"
+    )
+
+    assert oxygen["status"] == "ok"
+    assert oxygen["surface_crossed_mol_atoms"] == pytest.approx(0.0)
+    assert oxygen["retained_redox_buffer"] == pytest.approx(1.0)
+    assert oxygen["ideal_train_fraction"] == pytest.approx(0.0)
+    assert oxygen["partition_residual_fraction"] <= 5.0e-12
+
+
 def test_ideal_train_evaporation_buffer_oxygen_then_exchange_counts_once() -> None:
     feo_kg = resolve_species_formula("FeO", {}).molar_mass_kg_per_mol()
     fe_kg = resolve_species_formula("Fe", {}).molar_mass_kg_per_mol()

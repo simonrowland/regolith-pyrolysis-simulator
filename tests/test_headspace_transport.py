@@ -601,7 +601,7 @@ def test_finite_interface_root_conserves_flux_for_interior_inventory():
 def test_interface_po2_holds_headspace_at_kress91_ratio_limits(
     target_fe3_fraction: float,
 ):
-    """Ratio-limit bulk redox cannot become a nonphysical surface source."""
+    """Only inventory available in the current ratio-limit direction buffers."""
 
     sim = _transport_sim()
     sim.melt.temperature_C = 1500.0 - 273.15
@@ -648,24 +648,20 @@ def test_interface_po2_holds_headspace_at_kress91_ratio_limits(
     assert sim._vacuum_floor_bar() <= interface_pO2_bar
     diagnostic = sim._last_oxygen_interface_diagnostic
     if target_fe3_fraction < 0.5:
-        assert interface_pO2_bar <= hold_pO2_bar
+        # Ferrous inventory can absorb O2 at the low-ferric endpoint even
+        # when the local differential Kress capacity is small.
+        assert interface_pO2_bar == pytest.approx(hold_pO2_bar)
+        assert diagnostic['redox_buffer_status'] == 'available'
+        assert diagnostic['redox_buffer_exhausted'] is False
+    else:
+        # The fixture's ledger is ferrous; a cached ferric endpoint cannot
+        # invent Fe2O3 inventory for release in the opposite direction.
         assert interface_pO2_bar == pytest.approx(transport_pO2_bar)
         assert diagnostic['redox_buffer_status'] == 'exhausted'
         assert diagnostic['redox_buffer_exhausted'] is True
         assert diagnostic['limiting_regime'] == (
             'gas_side_redox_buffer_exhausted'
         )
-    else:
-        # A high-Fe melt near the former ratio threshold still has finite
-        # differential capacity.  Exhaustion is inventory/capacity based, not
-        # a ferric-fraction clamp.
-        assert diagnostic['redox_buffer_status'] == 'available'
-        assert diagnostic['redox_buffer_exhausted'] is False
-        assert interface_pO2_bar > transport_pO2_bar
-        assert diagnostic['limiting_regime'] in {
-            'gas_side_limited',
-            'melt_side_limited',
-        }
 
     equilibrium = sim._internal_analytical_equilibrium()
     release_pressures = [
@@ -693,7 +689,9 @@ def test_interface_distinguishes_fe_free_from_capacity_exhaustion(monkeypatch):
     assert diagnostic['limiting_regime'] == 'gas_side_no_fe_redox_buffer'
 
 
-def test_interface_marks_positive_fe_with_zero_capacity_exhausted(monkeypatch):
+def test_interface_keeps_directional_inventory_when_differential_capacity_is_zero(
+    monkeypatch,
+):
     sim = _transport_sim()
     sim.melt.temperature_C = 1500.0 - 273.15
     sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0e-9
@@ -706,13 +704,13 @@ def test_interface_marks_positive_fe_with_zero_capacity_exhausted(monkeypatch):
     interface_pO2_bar = sim._interface_pO2_bar()
     diagnostic = sim._last_oxygen_interface_diagnostic
 
-    assert interface_pO2_bar == pytest.approx(1.0e-9)
-    assert diagnostic['redox_buffer_status'] == 'exhausted'
+    assert interface_pO2_bar >= sim._vacuum_floor_bar()
+    assert diagnostic['redox_buffer_status'] == 'available'
     assert diagnostic['redox_buffer_inventory_mol'] > 0.0
-    assert diagnostic['redox_buffer_exhausted'] is True
+    assert diagnostic['redox_buffer_exhausted'] is False
 
 
-def test_trace_fe_follows_interface_without_kress_inversion_or_sio_swing(
+def test_trace_fe_directional_inventory_uses_kress_inverse(
     monkeypatch,
 ):
     sim = _trace_fe_transport_sim()
@@ -723,41 +721,59 @@ def test_trace_fe_follows_interface_without_kress_inversion_or_sio_swing(
 
     monkeypatch.setattr(sim, '_ledger_fe3_over_sigma_fe', changing_ledger_ratio)
 
-    def inverse_must_not_run(**_kwargs):
-        pytest.fail('trace Fe redox state must not call Kress91 inverse')
+    inverse_evaluations = []
+    inverse = core_module.kress91_log_fO2_from_fe3_over_sigma_fe
+
+    def record_inverse(**kwargs):
+        result = inverse(**kwargs)
+        inverse_evaluations.append((
+            float(kwargs['fe3_over_sigma_fe']),
+            result,
+        ))
+        return result
 
     monkeypatch.setattr(
         core_module,
         'kress91_log_fO2_from_fe3_over_sigma_fe',
-        inverse_must_not_run,
+        record_inverse,
     )
 
     samples = []
     for _ in range(2):
+        evaluation_start = len(inverse_evaluations)
         fO2_log = sim._current_melt_redox_fO2_log()
+        ferric_input, inverse_result = inverse_evaluations[evaluation_start]
         domain = dict(sim._last_redox_domain)
         interface_pO2_bar = sim._interface_pO2_bar()
         equilibrium = sim._internal_analytical_equilibrium()
-        samples.append((fO2_log, domain, interface_pO2_bar, float(
-            equilibrium.vapor_pressures_Pa['SiO']
-        )))
+        samples.append((
+            fO2_log,
+            domain,
+            interface_pO2_bar,
+            float(equilibrium.vapor_pressures_Pa['SiO']),
+            ferric_input,
+            inverse_result,
+        ))
 
     transport_pO2_bar = sim.melt.oxygen_reservoir.headspace_transport_pO2_bar
     assert transport_pO2_bar == pytest.approx(1.0e-6)
-    assert [sample[0] for sample in samples] == pytest.approx([-6.0, -6.0])
-    assert [sample[2] for sample in samples] == pytest.approx(
-        [transport_pO2_bar, transport_pO2_bar]
+    expected_ferric_inputs = (0.03, 0.9999)
+    assert [sample[4] for sample in samples] == pytest.approx(
+        expected_ferric_inputs
     )
-    assert samples[0][3] == pytest.approx(samples[1][3])
-    for _, domain, _, _ in samples:
-        assert domain['basis'] == 'no_melt_redox_buffer'
-        assert domain['status'] == 'out_of_domain'
-        assert domain['authority'] == 'gas_interface_controlled'
-        assert domain['certified_band']['pO2_bar'] == (1.0e-12, 100.0)
-        assert 'kress91_inverse_not_evaluated' in domain['reason']
-    assert sim._last_oxygen_interface_diagnostic['limiting_regime'] == (
-        'gas_side_redox_buffer_exhausted'
+    assert [sample[0] for sample in samples] == pytest.approx(
+        [sample[5] for sample in samples]
     )
+    for fO2_log, domain, interface_pO2_bar, sio_p, _, _ in samples:
+        assert domain['basis'] == 'kress91_inverse'
+        melt_pO2_bar = 10.0 ** fO2_log
+        assert min(melt_pO2_bar, transport_pO2_bar) * (1.0 - 1.0e-6) <= (
+            interface_pO2_bar
+        )
+        assert interface_pO2_bar <= max(melt_pO2_bar, transport_pO2_bar) * (
+            1.0 + 1.0e-6
+        )
+        assert math.isfinite(sio_p) and sio_p > 0.0
 
 
 def test_na2o_evaporation_from_fe_free_melt_has_no_direct_redox_source(

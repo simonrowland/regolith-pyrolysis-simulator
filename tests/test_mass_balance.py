@@ -260,7 +260,157 @@ def test_finite_backpressure_o2_uptake_closes_atoms_and_fe_ledger():
     )
 
 
-def test_trace_fe_interface_limit_preserves_atom_closure():
+def test_directionally_available_feo_absorbs_o2_after_larger_prior_tick(
+    monkeypatch,
+):
+    sim = _oxygen_exchange_sim("FeO")
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.05},
+        source="test directional oxygen uptake",
+        material_origin="feedstock",
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.exchange_o2_mol = -0.2
+    sim.melt.oxygen_reservoir.shadow_oxygen_transfer = {
+        "status": "ok",
+        "transfer_o2_mol": -0.2,
+        "committed_o2_mol": -0.2,
+    }
+    # Reproduce the reviewed scale separation: differential C_m is smaller
+    # than the prior 0.2 mol transfer, while FeO can still accept far more.
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_capacity_mol_per_ln_fO2",
+        lambda **_: 0.0392,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_source_capacity_mol_per_ln_fO2",
+        lambda **_: 0.0392,
+    )
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+    melt_before = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.redox_buffer_status == "available"
+    assert reservoir.exchange_o2_mol < -OXYGEN_RESERVOIR_NOOP_MOL
+    assert abs(reservoir.exchange_o2_mol) <= 0.05
+    melt_after = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    assert melt_after["FeO"] == pytest.approx(
+        melt_before["FeO"] + 4.0 * reservoir.exchange_o2_mol
+    )
+    assert melt_after.get("Fe2O3", 0.0) == pytest.approx(
+        melt_before.get("Fe2O3", 0.0) - 2.0 * reservoir.exchange_o2_mol
+    )
+    drift_after = sim.atom_ledger.element_atom_drift_report()
+    assert drift_after["accepted_transition_residual_mol_atoms"] == pytest.approx(
+        drift_before["accepted_transition_residual_mol_atoms"]
+    )
+    assert drift_after["whole_run_boundary_residual_mol_atoms"] == pytest.approx(
+        drift_before["whole_run_boundary_residual_mol_atoms"]
+    )
+
+
+def test_partial_directional_feo_inventory_still_absorbs_o2(
+    monkeypatch,
+):
+    sim = _oxygen_exchange_sim("FeO", mass_kg=0.01)
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.05},
+        source="test partial directional oxygen uptake",
+        material_origin="feedstock",
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.exchange_o2_mol = -0.2
+    sim.melt.oxygen_reservoir.shadow_oxygen_transfer = {
+        "status": "ok",
+        "transfer_o2_mol": -0.2,
+        "committed_o2_mol": -0.2,
+    }
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_capacity_mol_per_ln_fO2",
+        lambda **_: 0.0392,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_source_capacity_mol_per_ln_fO2",
+        lambda **_: 0.0392,
+    )
+    melt_before = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    directional_capacity = melt_before["FeO"] / 4.0
+    assert 0.0 < directional_capacity < 0.2
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.redox_buffer_status == "available"
+    assert reservoir.exchange_o2_mol < -OXYGEN_RESERVOIR_NOOP_MOL
+    assert abs(reservoir.exchange_o2_mol) <= directional_capacity
+    melt_after = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    assert melt_after["FeO"] == pytest.approx(
+        melt_before["FeO"] + 4.0 * reservoir.exchange_o2_mol
+    )
+
+
+def test_directionally_available_fe2o3_releases_o2_after_larger_prior_tick(
+    monkeypatch,
+):
+    sim = _oxygen_exchange_sim("Fe2O3")
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.pO2_mbar = 0.001
+    sim.melt.p_total_mbar = 100.0
+    sim._melt_headspace_composition_mbar = {"N2": 1.0}
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = 0.0
+    sim.melt.oxygen_reservoir.exchange_o2_mol = 0.2
+    sim.melt.oxygen_reservoir.shadow_oxygen_transfer = {
+        "status": "ok",
+        "transfer_o2_mol": 0.2,
+        "committed_o2_mol": 0.2,
+    }
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_capacity_mol_per_ln_fO2",
+        lambda **_: 0.0392,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_source_capacity_mol_per_ln_fO2",
+        lambda **_: 0.0392,
+    )
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+    melt_before = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.redox_buffer_status == "available"
+    assert reservoir.exchange_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL
+    assert reservoir.exchange_o2_mol <= melt_before["Fe2O3"] / 2.0
+    melt_after = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    assert melt_after["FeO"] == pytest.approx(
+        melt_before.get("FeO", 0.0) + 4.0 * reservoir.exchange_o2_mol
+    )
+    assert melt_after["Fe2O3"] == pytest.approx(
+        melt_before["Fe2O3"] - 2.0 * reservoir.exchange_o2_mol
+    )
+    drift_after = sim.atom_ledger.element_atom_drift_report()
+    assert drift_after["accepted_transition_residual_mol_atoms"] == pytest.approx(
+        drift_before["accepted_transition_residual_mol_atoms"]
+    )
+    assert drift_after["whole_run_boundary_residual_mol_atoms"] == pytest.approx(
+        drift_before["whole_run_boundary_residual_mol_atoms"]
+    )
+
+
+def test_trace_fe_directional_release_preserves_atom_closure():
     sim = _oxygen_exchange_sim("Fe2O3", mass_kg=1.0e-11)
     sim.melt.atmosphere = Atmosphere.PN2_SWEEP
     sim.melt.p_total_mbar = 100.0
@@ -280,16 +430,29 @@ def test_trace_fe_interface_limit_preserves_atom_closure():
         "committed_o2_mol": 1.0e-7,
     }
     drift_before = sim.atom_ledger.element_atom_drift_report()
+    melt_before = sim.atom_ledger.project_account_mol("process.cleaned_melt")
     transitions_before = len(sim.atom_ledger.transitions)
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
-    assert sim._last_redox_domain["basis"] == "no_melt_redox_buffer"
-    assert reservoir.shadow_oxygen_transfer["status"] == (
-        "no_melt_redox_buffer"
+    assert reservoir.redox_buffer_status == "available"
+    assert reservoir.shadow_oxygen_transfer["status"] == "ok"
+    assert "reference_o2_transfer_mol" not in reservoir.shadow_oxygen_transfer
+    assert reservoir.exchange_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL
+    assert reservoir.exchange_o2_mol <= melt_before["Fe2O3"] / 2.0
+    melt_after = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    assert melt_after["FeO"] == pytest.approx(
+        melt_before.get("FeO", 0.0) + 4.0 * reservoir.exchange_o2_mol
     )
-    assert reservoir.exchange_o2_mol == pytest.approx(0.0)
-    assert len(sim.atom_ledger.transitions) == transitions_before
+    assert melt_after["Fe2O3"] == pytest.approx(
+        melt_before["Fe2O3"] - 2.0 * reservoir.exchange_o2_mol
+    )
+    exchange_transitions = [
+        transition
+        for transition in sim.atom_ledger.transitions[transitions_before:]
+        if transition.name == "oxygen_reservoir_exchange"
+    ]
+    assert len(exchange_transitions) == 1
     drift_after = sim.atom_ledger.element_atom_drift_report()
     assert drift_after["accepted_transition_residual_mol_atoms"] == pytest.approx(
         drift_before["accepted_transition_residual_mol_atoms"]

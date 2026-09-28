@@ -4554,6 +4554,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         redox_buffer_state = self._melt_redox_buffer_capacity_state(
             fO2_log=intrinsic_fO2_log,
             T_K=T_K,
+            transport_pO2_bar=transport_pO2_bar,
         )
         redox_buffer_inventory_mol = float(
             redox_buffer_state['inventory_mol']
@@ -4598,6 +4599,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if redox_buffer_status == 'no_fe_redox_buffer':
             interface_pO2_bar = transport_pO2_bar
             limiting_regime = 'gas_side_no_fe_redox_buffer'
+        elif redox_buffer_status == 'not_liquid':
+            interface_pO2_bar = transport_pO2_bar
+            limiting_regime = 'gas_side_not_liquid'
         elif redox_buffer_exhausted:
             interface_pO2_bar = transport_pO2_bar
             limiting_regime = 'gas_side_redox_buffer_exhausted'
@@ -4962,6 +4966,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'invalid_oxygen_interface_pressure',
                 f'transport_pO2_bar={transport_pO2_bar!r}',
             )
+        # The initial transport pressure can include current ledger O2.
+        # Recompute only independent control/source terms at zero O2 inventory
+        # so provisional uptake can lower its own pressure.
+        transport_pO2_floor_bar = max(
+            self._vacuum_floor_bar(),
+            float(self._headspace_transport_pO2_bar_from_ledger(
+                0.0,
+                head_o2_mol=0.0,
+            )),
+        )
+        if not math.isfinite(transport_pO2_floor_bar):
+            raise OxygenInterfaceConfigurationError(
+                'invalid_oxygen_interface_pressure',
+                f'transport_pO2_floor_bar={transport_pO2_floor_bar!r}',
+            )
 
         melt_mol = self.atom_ledger.project_account_mol(
             'process.cleaned_melt'
@@ -5049,6 +5068,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             capacity_state = self._melt_redox_buffer_capacity_state(
                 fO2_log=intrinsic_fO2_log,
                 T_K=T_K,
+                transport_pO2_bar=transport_pO2_bar,
             )
             capacity_mol_per_ln_fO2 = float(
                 capacity_state['capacity_mol_per_ln_fO2']
@@ -5062,9 +5082,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ledger_pressure = self._headspace_ledger_pO2_bar_from_o2_mol(
                 max(0.0, n_head_mol)
             )
+            # At fixed headspace volume and temperature, inventory pressure
+            # follows n_O2.  Each implicit trial therefore uses the trial
+            # inventory plus only independent floors; the initial aggregate
+            # transport pressure is not a fixed boundary condition.
             return max(
                 self._vacuum_floor_bar(),
-                transport_pO2_bar,
+                transport_pO2_floor_bar,
                 ledger_pressure,
             )
 
@@ -6678,33 +6702,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'got {capacity!r}'
             )
         capacity = max(0.0, capacity)
+        transport_pO2_raw = getattr(
+            reservoir,
+            'headspace_transport_pO2_bar',
+            None,
+        )
+        try:
+            transport_pO2_bar = float(transport_pO2_raw)
+        except (TypeError, ValueError):
+            transport_pO2_bar = 0.0
+        if not math.isfinite(transport_pO2_bar) or transport_pO2_bar <= 0.0:
+            head_o2_mol = max(0.0, float(
+                self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                    OXYGEN_SPECIES,
+                    0.0,
+                )
+            ))
+            ledger_pO2_bar = self._headspace_ledger_pO2_bar_from_o2_mol(
+                head_o2_mol
+            )
+            transport_pO2_bar = self._headspace_transport_pO2_bar_from_ledger(
+                ledger_pO2_bar,
+                head_o2_mol=head_o2_mol,
+            )
         per_tick_transfer = self._per_tick_o2_transfer_mol()
-        if self._melt_redox_capacity_is_negligible(
-            capacity=capacity,
+        directional_capacity = self._melt_redox_directional_inventory_capacity_mol(
+            fO2_log=capacity_reference_fO2_log,
+            transport_pO2_bar=transport_pO2_bar,
             per_tick_o2_transfer_mol=per_tick_transfer,
+        )
+        if self._melt_redox_capacity_is_negligible(
+            directional_capacity_mol=directional_capacity,
             native_buffer_active=self._native_fe_feo_buffer_is_active(),
         ):
-            transport_pO2_raw = getattr(
-                reservoir,
-                'headspace_transport_pO2_bar',
-                None,
-            )
-            if transport_pO2_raw is None:
-                transport_pO2_raw = self._vapor_pressure_transport_pO2_bar()
-            try:
-                transport_pO2_bar = float(transport_pO2_raw)
-            except (TypeError, ValueError):
-                transport_pO2_bar = self._vapor_pressure_transport_pO2_bar()
-            if not math.isfinite(transport_pO2_bar):
-                transport_pO2_bar = self._vapor_pressure_transport_pO2_bar()
-            transport_pO2_bar = max(
-                self._vacuum_floor_bar(),
-                transport_pO2_bar,
-            )
             fO2_log = math.log10(transport_pO2_bar)
             no_buffer_provenance = (
                 'not_applicable:no_melt_redox_buffer; '
                 f'C_m={capacity:.17g}; '
+                f'directional_capacity_mol={directional_capacity:.17g}; '
                 f'per_tick_o2_transfer_mol={per_tick_transfer:.17g}'
             )
             self._last_redox_domain = self._redox_domain_record(
@@ -6716,8 +6751,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 authority_level='gas_interface_controlled',
                 reason=(
                     'out_of_domain:no_melt_redox_buffer; '
-                    'C_m is no larger than the prior committed one-tick O2 '
-                    'transfer, so the trace Fe couple cannot control melt fO2; '
+                    'the current gas-driven FeO/Fe2O3 inventory cannot '
+                    'support the prior signed O2 transfer (or numerical '
+                    'no-op when none exists); '
                     'melt follows the gas/interface limit P_i=P_g; '
                     'kress91_inverse_not_evaluated'
                 ),
@@ -7563,6 +7599,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_melt_redox_liquid_fraction_diagnostic = fraction_diagnostic
         return liquid_fraction
 
+    def _melt_redox_exchange_is_liquid(
+        self,
+        T_K: float,
+        *,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
+    ) -> bool:
+        temperature_C = float(T_K) - 273.15
+        liquid_fraction = self._melt_redox_liquid_fraction_factor(
+            T_K,
+            gate_authority=gate_authority,
+        )
+        # Exchange conductance is C_m_full times the residual liquid fraction.
+        # Keep partial melt active above Kress91's calibration floor; the
+        # stricter liquidus predicate is only for temperature re-referencing.
+        return (
+            temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
+            and liquid_fraction > 0.0
+        )
+
     def _melt_redox_source_capacity_mol_per_ln_fO2(
         self,
         *,
@@ -7586,7 +7643,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return C_m_full * liquid_fraction
 
     def _per_tick_o2_transfer_mol(self) -> float:
-        """Return the last physical O2 transfer available to the capacity gate."""
+        """Return the last committed signed O2 transfer for redox direction."""
 
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         candidates: list[float] = []
@@ -7599,11 +7656,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             math.isfinite(exchange)
             and abs(exchange) > OXYGEN_RESERVOIR_NOOP_MOL
         ):
-            return abs(exchange)
+            return exchange
         shadow = getattr(reservoir, 'shadow_oxygen_transfer', {}) or {}
         if isinstance(shadow, Mapping):
             for key in (
-                'reference_o2_transfer_mol',
                 'committed_o2_mol',
                 'transfer_o2_mol',
             ):
@@ -7613,24 +7669,82 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 except (TypeError, ValueError):
                     continue
                 if math.isfinite(value):
-                    magnitude = abs(value)
-                    candidates.append(magnitude)
-                    if magnitude > OXYGEN_RESERVOIR_NOOP_MOL:
-                        return magnitude
-        return max(candidates, default=0.0)
+                    candidates.append(value)
+                    if abs(value) > OXYGEN_RESERVOIR_NOOP_MOL:
+                        return value
+        return max(candidates, key=abs, default=0.0)
+
+    def _melt_redox_directional_inventory_capacity_mol(
+        self,
+        *,
+        fO2_log: float,
+        transport_pO2_bar: Optional[float] = None,
+        per_tick_o2_transfer_mol: float = 0.0,
+    ) -> Optional[float]:
+        """Return Fe inventory capacity in the current pressure-driven direction."""
+
+        if transport_pO2_bar is None:
+            head_o2_mol = max(0.0, float(
+                self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                    OXYGEN_SPECIES,
+                    0.0,
+                )
+            ))
+            ledger_pO2_bar = self._headspace_ledger_pO2_bar_from_o2_mol(
+                head_o2_mol
+            )
+            transport_pO2_bar = self._headspace_transport_pO2_bar_from_ledger(
+                ledger_pO2_bar,
+                head_o2_mol=head_o2_mol,
+            )
+        transport_pO2_bar = float(transport_pO2_bar)
+        if not math.isfinite(transport_pO2_bar) or transport_pO2_bar <= 0.0:
+            raise AccountingError(
+                'directional melt redox capacity requires finite positive '
+                f'headspace pO2; got {transport_pO2_bar!r}'
+            )
+        try:
+            melt_pO2_bar = 10.0 ** float(fO2_log)
+        except (OverflowError, TypeError, ValueError) as exc:
+            raise AccountingError(
+                'directional melt redox capacity requires finite fO2; '
+                f'got {fO2_log!r}'
+            ) from exc
+        if not math.isfinite(melt_pO2_bar) or melt_pO2_bar < 0.0:
+            raise AccountingError(
+                'directional melt redox capacity requires finite fO2; '
+                f'got {fO2_log!r}'
+            )
+        if transport_pO2_bar == melt_pO2_bar:
+            if per_tick_o2_transfer_mol < -OXYGEN_RESERVOIR_NOOP_MOL:
+                uptake = True
+            elif per_tick_o2_transfer_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+                uptake = False
+            else:
+                return None
+        else:
+            uptake = transport_pO2_bar > melt_pO2_bar
+
+        melt_mol = self.atom_ledger.project_account_mol(
+            'process.cleaned_melt'
+        )
+        feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
+        fe2o3_mol = max(0.0, float(melt_mol.get('Fe2O3', 0.0) or 0.0))
+        # 4FeO + O2 <-> 2Fe2O3 gives n_FeO/4 mol O2 for uptake and
+        # n_Fe2O3/2 mol O2 for release.  Compare this finite inventory in the
+        # current transfer direction; C_m is only d(n_O2)/d(ln fO2), not
+        # directional exhaustion capacity.
+        return feo_mol / 4.0 if uptake else fe2o3_mol / 2.0
 
     @staticmethod
     def _melt_redox_capacity_is_negligible(
         *,
-        capacity: float,
-        per_tick_o2_transfer_mol: float,
+        directional_capacity_mol: Optional[float],
         native_buffer_active: bool,
     ) -> bool:
-        if native_buffer_active:
+        if native_buffer_active or directional_capacity_mol is None:
             return False
-        if per_tick_o2_transfer_mol > OXYGEN_RESERVOIR_NOOP_MOL:
-            return capacity <= per_tick_o2_transfer_mol
-        return capacity <= OXYGEN_RESERVOIR_NOOP_MOL
+        return directional_capacity_mol <= OXYGEN_RESERVOIR_NOOP_MOL
 
     def _melt_redox_buffer_capacity_state(
         self,
@@ -7641,6 +7755,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ),
         per_tick_o2_transfer_mol: Optional[float] = None,
+        transport_pO2_bar: Optional[float] = None,
     ) -> Dict[str, Any]:
         """Classify Fe redox capacity from inventory and Kress conductance.
 
@@ -7648,30 +7763,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         capacity.  A high-Fe melt can sit near a Kress ratio endpoint and still
         carry a resolvable amount of redox oxygen; conversely, an Fe-free melt
         has no Fe redox buffer regardless of whatever bootstrap fO2 it reports.
-        The finite-difference Kress conductance is therefore the capacity
-        measure after the absolute Fe inventory test.  Units are mol O2 per
-        unit natural-log fO2.  The physical exhaustion test is
-        ``C_m <= abs(delta_n_O2_tick)``: one tick's actual O2 transfer can
-        traverse at least one natural-log unit of this residual Fe buffer, so
-        the ratio cannot authoritatively set the melt oxygen potential.  The
-        transfer is read from the last committed tick because this classifier
-        runs before the current tick's interface solve.  ``NOOP_MOL`` remains
-        only the numerical no-op fallback when no physical transfer exists.
+        The finite-difference Kress conductance describes local response per
+        natural-log fO2, not finite inventory.  Any resolvable FeO or Fe2O3
+        inventory in the current pressure-driven direction remains available;
+        the previous signed transfer selects a direction only when gas and
+        melt pressures are equal.  The transfer solve clamps each accepted
+        amount to stoichiometric and headspace bounds.
         """
 
+        liquid_active = self._melt_redox_exchange_is_liquid(
+            T_K,
+            gate_authority=gate_authority,
+        )
         inventory_mol = self._cleaned_melt_fe_atom_mol()
         if inventory_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
             return {
                 'status': 'no_fe_redox_buffer',
+                'liquid_active': liquid_active,
                 'inventory_mol': inventory_mol,
                 'capacity_mol_per_ln_fO2': 0.0,
                 'per_tick_o2_transfer_mol': self._per_tick_o2_transfer_mol(),
+                'directional_capacity_mol': None,
                 'capacity_negligible': False,
             }
         if per_tick_o2_transfer_mol is None:
             per_tick_o2_transfer_mol = self._per_tick_o2_transfer_mol()
         try:
-            per_tick_o2_transfer_mol = abs(float(per_tick_o2_transfer_mol))
+            per_tick_o2_transfer_mol = float(per_tick_o2_transfer_mol)
         except (TypeError, ValueError) as exc:
             raise AccountingError(
                 'per-tick O2 transfer must be finite; '
@@ -7693,20 +7811,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'got {capacity!r}'
             )
         capacity = max(0.0, capacity)
-        capacity_negligible = self._melt_redox_capacity_is_negligible(
-            capacity=capacity,
+        directional_capacity = self._melt_redox_directional_inventory_capacity_mol(
+            fO2_log=fO2_log,
+            transport_pO2_bar=transport_pO2_bar,
             per_tick_o2_transfer_mol=per_tick_o2_transfer_mol,
+        )
+        capacity_negligible = self._melt_redox_capacity_is_negligible(
+            directional_capacity_mol=directional_capacity,
             native_buffer_active=self._native_fe_feo_buffer_is_active(),
         )
         return {
             'status': (
-                'exhausted'
+                'not_liquid'
+                if not liquid_active
+                else 'exhausted'
                 if capacity_negligible
                 else 'available'
             ),
+            'liquid_active': liquid_active,
             'inventory_mol': inventory_mol,
             'capacity_mol_per_ln_fO2': capacity,
             'per_tick_o2_transfer_mol': per_tick_o2_transfer_mol,
+            'directional_capacity_mol': directional_capacity,
             'capacity_negligible': capacity_negligible,
         }
 
@@ -8683,7 +8809,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'Fe redox respeciation buffer oxygen capacity must be finite; '
                 f'got {internal_o2_capacity_mol!r}'
             )
-        if not self._melt_redox_temperature_shift_is_liquid(
+        if not self._melt_redox_exchange_is_liquid(
             T_K,
             gate_authority=gate_authority,
         ):
@@ -8765,7 +8891,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             diagnostic['transition_name'] = transition.name
             self._project_cleaned_melt_from_atom_ledger()
-        if self._melt_redox_temperature_shift_is_liquid(
+        if self._melt_redox_exchange_is_liquid(
             T_K,
             gate_authority=gate_authority,
         ):
@@ -8912,7 +9038,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         if (
             not bool(getattr(self, '_melt_redox_ledger_initialized', True))
-            and self._melt_redox_temperature_shift_is_liquid(
+            and self._melt_redox_exchange_is_liquid(
                 T_K,
                 gate_authority=gate_authority,
             )
@@ -8922,12 +9048,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # different target; otherwise an FeO-only ledger would be clamped
             # to the reducing endpoint before its first Kress respeciation.
             self._apply_fe_redox_respeciation(gate_authority=gate_authority)
-        self._re_reference_melt_fO2_to_temperature(
-            T_K,
-            gate_authority=gate_authority,
-        )
-        base_fO2_log = self._current_melt_redox_fO2_log()
-        reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
             self.atom_ledger.mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
@@ -8939,11 +9059,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ledger_pO2,
             head_o2_mol=head_o2_mol,
         )
+        # Make the current ledger-derived gas pressure authoritative before
+        # classifying the pre-solve redox direction.
+        self.melt.oxygen_reservoir.headspace_ledger_pO2_bar = ledger_pO2
+        self.melt.oxygen_reservoir.headspace_transport_pO2_bar = transport_pO2
+        self._re_reference_melt_fO2_to_temperature(
+            T_K,
+            gate_authority=gate_authority,
+        )
+        base_fO2_log = self._current_melt_redox_fO2_log()
+        reference_T_K = self._current_melt_redox_reference_T_K()
         control_floor = self._headspace_control_floor_pO2_bar()
         redox_buffer_state = self._melt_redox_buffer_capacity_state(
             fO2_log=base_fO2_log,
             T_K=T_K,
             gate_authority=gate_authority,
+            transport_pO2_bar=transport_pO2,
         )
         redox_buffer_status = str(redox_buffer_state['status'])
         C_m = float(redox_buffer_state['capacity_mol_per_ln_fO2'])
@@ -8953,6 +9084,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         capacity_floor_engaged = bool(
             redox_buffer_state.get('capacity_negligible', False)
         )
+        liquid_active = bool(redox_buffer_state.get('liquid_active', True))
         effective_floor_mol = self._effective_headspace_floor_o2_mol()
         C_h = max(head_o2_mol, effective_floor_mol)
 
@@ -8996,16 +9128,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             headspace_capacity_mol_per_ln_pO2=C_h,
         )
         self._apply_headspace_transport_diagnostic(reservoir)
-        if capacity_floor_engaged:
-            # With C_m <= |delta_n_O2_tick|, a one-tick transfer would span at
-            # least one natural-log fO2 unit.  Do not run the finite Fe
-            # respeciation solve: it would re-infer fO2 from a ratio that no
-            # longer has authority.  Carry the previous physical transfer as
-            # a reference so the next pre-solve classifier remains in this
-            # interface-controlled branch after this tick commits zero O2.
-            reference_transfer_mol = float(
-                redox_buffer_state['per_tick_o2_transfer_mol']
-            )
+        if not liquid_active:
+            finite_transfer = {
+                'authority': 'diagnostic_only',
+                'status': 'not_liquid',
+                'transfer_o2_mol': 0.0,
+                'transfer_o2_kg': 0.0,
+                'requested_transfer_o2_mol': 0.0,
+                'unbacked_transfer_o2_mol': 0.0,
+                'availability_clamped': False,
+                'direction': 'none:not_liquid',
+                'substeps': 0,
+                'bounded': True,
+                'finite': True,
+                'capacity_mol_per_ln_fO2': C_m,
+                'per_tick_o2_transfer_mol': float(
+                    redox_buffer_state['per_tick_o2_transfer_mol']
+                ),
+            }
+        elif capacity_floor_engaged:
+            # The current pressure drive points into a direction with no
+            # resolvable FeO/Fe2O3 inventory.  Refuse this transfer, but do not
+            # carry a historical amount forward: a later pressure reversal
+            # must be classified from its own directional inventory.
             finite_transfer = {
                 'authority': 'diagnostic_only',
                 'status': 'no_melt_redox_buffer',
@@ -9019,8 +9164,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'bounded': True,
                 'finite': True,
                 'capacity_mol_per_ln_fO2': C_m,
-                'per_tick_o2_transfer_mol': reference_transfer_mol,
-                'reference_o2_transfer_mol': reference_transfer_mol,
+                'per_tick_o2_transfer_mol': float(
+                    redox_buffer_state['per_tick_o2_transfer_mol']
+                ),
             }
         else:
             finite_transfer = self._oxygen_shadow_transfer(
@@ -9030,7 +9176,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 capacity_mol_per_ln_fO2=C_m,
             )
         finite_transfer = dict(finite_transfer)
-        if not capacity_floor_engaged:
+        if liquid_active and not capacity_floor_engaged:
             finite_transfer['authority'] = 'finite_interface_flux'
         finite_transfer.setdefault(
             'per_tick_o2_transfer_mol',
@@ -9069,10 +9215,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 finite_transfer.get('direction')
                 or f'none:{transfer_status or "unavailable"}'
             )
-        elif not self._melt_redox_temperature_shift_is_liquid(
-            T_K,
-            gate_authority=gate_authority,
-        ):
+        elif not liquid_active:
             transfer_mol = 0.0
             reservoir.exchange_direction = 'none:not_liquid'
         elif abs(transfer_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:

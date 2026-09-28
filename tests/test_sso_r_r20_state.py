@@ -165,9 +165,20 @@ def test_shadow_transfer_is_finite_bounded_and_monotonic_at_tiny_capacity() -> N
     assert _ledger_signature(sim) == before
 
 
-def test_finite_transfer_commits_once_from_integrated_plan() -> None:
+def test_finite_transfer_commits_once_from_integrated_plan(monkeypatch) -> None:
     sim = _make_sim()
     _configure_shadow_transport(sim)
+    liquid_curve = {
+        "source": "test_liquid_melt",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1300.0,
+        "path": ((1000.0, 0.0), (1300.0, 1.0)),
+    }
+    monkeypatch.setattr(
+        sim,
+        "_resolved_melt_redox_gate_authority",
+        lambda *_args, **_kwargs: liquid_curve,
+    )
     transition_count_before = len(sim.atom_ledger.transitions)
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
@@ -197,6 +208,58 @@ def test_finite_transfer_commits_once_from_integrated_plan() -> None:
         exchange_direction="test_refresh_preserves_finite_plan"
     )
     assert sim.melt.oxygen_reservoir.shadow_oxygen_transfer == payload
+
+
+def test_implicit_uptake_recomputes_headspace_pressure_from_trial_inventory(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    _configure_shadow_transport(sim)
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 100.0
+    head_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+    initial_pressure = sim._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
+    independent_floor = max(
+        sim._vacuum_floor_bar(),
+        sim._headspace_transport_pO2_bar_from_ledger(
+            0.0,
+            head_o2_mol=0.0,
+        ),
+    )
+    assert initial_pressure > independent_floor
+
+    initial_exchange_count = sum(
+        transition.name == "oxygen_reservoir_exchange"
+        for transition in sim.atom_ledger.transitions
+    )
+    probed_pressures: list[float] = []
+    solve_root = getattr(sim, "_oxygen_finite_interface_root", None)
+    if callable(solve_root):
+        def record_trial_pressure(**kwargs):
+            exchange_count = sum(
+                transition.name == "oxygen_reservoir_exchange"
+                for transition in sim.atom_ledger.transitions
+            )
+            if exchange_count == initial_exchange_count:
+                probed_pressures.append(float(kwargs["gas_pO2_bar"]))
+            return solve_root(**kwargs)
+
+        monkeypatch.setattr(
+            sim,
+            "_oxygen_finite_interface_root",
+            record_trial_pressure,
+        )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -40.0
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.exchange_o2_mol < -OXYGEN_RESERVOIR_NOOP_MOL
+    assert probed_pressures, "exchange did not evaluate provisional pressure"
+    assert probed_pressures[0] > independent_floor
+    assert len(probed_pressures) > 1
+    assert min(probed_pressures[1:]) < probed_pressures[0]
+    assert all(pressure >= independent_floor for pressure in probed_pressures)
+    assert reservoir.headspace_transport_pO2_bar >= independent_floor
 
 
 def test_step_orders_passive_exchange_sources_native_split_and_evaporation(

@@ -2134,6 +2134,7 @@ def test_redox_source_capacity_scales_with_continuous_liquid_fraction(
 
 
 def test_passive_exchange_refuses_zero_liquid_capacity(
+    monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -2159,6 +2160,21 @@ def test_passive_exchange_refuses_zero_liquid_capacity(
         source='test frozen passive exchange oxygen',
         material_origin="feedstock",
     )
+
+    def finite_root_must_not_run(**_kwargs):
+        pytest.fail('frozen interface must bypass the finite melt-flux root')
+
+    monkeypatch.setattr(
+        sim,
+        '_oxygen_finite_interface_root',
+        finite_root_must_not_run,
+    )
+    transport_pO2_bar = sim._vapor_pressure_transport_pO2_bar()
+    interface_pO2_bar = sim._interface_pO2_bar()
+    assert interface_pO2_bar == pytest.approx(transport_pO2_bar)
+    assert sim._last_oxygen_interface_diagnostic['limiting_regime'] == (
+        'gas_side_not_liquid'
+    )
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_reference_T_K = sim.melt.oxygen_reservoir.reference_T_K
     before_overhead_o2 = sim.atom_ledger.mol_by_account('process.overhead_gas')[
@@ -2168,16 +2184,61 @@ def test_passive_exchange_refuses_zero_liquid_capacity(
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
-    # 7f0a7fbd5's depleted-Fe trace uses the interface-controlled fO2; the
-    # frozen case therefore reaches the no-buffer refusal on this fixture.
-    assert reservoir.exchange_direction == 'none:no_melt_redox_buffer'
+    # A frozen melt has no redox transfer capacity, even when Fe inventory is
+    # directionally available after melting.
+    assert reservoir.exchange_direction == 'none:not_liquid'
     assert reservoir.melt_redox_capacity_mol_per_ln_fO2 == pytest.approx(0.0)
+    assert reservoir.shadow_oxygen_transfer['transfer_o2_mol'] == pytest.approx(0.0)
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
     assert reservoir.reference_T_K == pytest.approx(before_reference_T_K)
     assert sim.atom_ledger.mol_by_account('process.overhead_gas')['O2'] == (
         pytest.approx(before_overhead_o2)
     )
     assert len(sim.atom_ledger.transitions) == before_transition_count
+
+
+def test_partial_liquid_exchange_uses_residual_redox_capacity(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1250.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1500.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    _install_freeze_gate_curve(
+        sim,
+        path=((1100.0, 0.0), (1300.0, 1.0)),
+    )
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas',
+        {'O2': 10_000.0},
+        source='test partially molten passive exchange oxygen',
+        material_origin="feedstock",
+    )
+    capacity_state = sim._melt_redox_buffer_capacity_state(
+        fO2_log=sim._current_melt_redox_fO2_log(),
+        T_K=1250.0 + 273.15,
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert capacity_state.get('liquid_active') is True
+    assert capacity_state.get('capacity_mol_per_ln_fO2', 0.0) > 0.0
+    assert reservoir.redox_buffer_status == 'available'
+    assert reservoir.shadow_oxygen_transfer['status'] == 'ok'
+    assert reservoir.exchange_direction != 'none:not_liquid'
+    assert abs(reservoir.exchange_o2_mol) > 1.0e-10
+    assert sim._last_oxygen_interface_diagnostic['limiting_regime'] != (
+        'gas_side_not_liquid'
+    )
 
 
 def test_redox_reference_seed_builds_liquidus_curve_before_first_seed(
@@ -2791,6 +2852,7 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
             'source': 'test_recovered_real_curve',
             'solidus_T_C': 1000.0,
             'liquidus_T_C': 1700.0,
+            'path': ((1000.0, 0.0), (1700.0, 1.0)),
         }
 
     monkeypatch.setattr(sim, '_freeze_gate_curve', fail_then_recover_curve)
@@ -2813,7 +2875,7 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
     recovered_operation = sim._apply_fe_redox_respeciation()
 
     assert curve_calls == 2
-    assert recovered_operation['respeciation_status'] == 'skipped_solid'
+    assert recovered_operation['respeciation_status'] == 'ok'
     assert sim._last_melt_redox_liquidus_gate_diagnostic == {
         'status': 'ok',
         'source': 'test_recovered_real_curve',
