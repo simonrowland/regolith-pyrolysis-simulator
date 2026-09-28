@@ -24,6 +24,7 @@ import yaml
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    AmountBasis,
     Authority,
     Engine,
     EvidenceClass,
@@ -39,6 +40,7 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
     UncertaintyKind,
+    ValueKind,
 )
 from simulator.battery.pins import (
     PinBandRecord,
@@ -51,6 +53,7 @@ from simulator.battery.identity import Exposure, SweepIdentity
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
+    Composition,
     Derivation,
     EngineTrace,
     Execution,
@@ -61,6 +64,7 @@ from simulator.battery.records import (
     Species,
     State,
     Uncertainty,
+    Value,
 )
 from simulator.battery.validity import run_validity_gates, underdetermined_apparatus
 from simulator.battery.score import (
@@ -76,10 +80,13 @@ from simulator.battery.score import (
     derive_kems_partial_pressure_band,
     dumps_residual_line,
     engines_from_names,
+    flagged_stratum_payloads,
+    headline_payloads,
     load_score_context,
     parse_species_formula,
     pooled_log_pressure_sd,
     resolve_source_relation,
+    residual_to_plain,
     score_eligible_from_conjuncts,
     score_store,
 )
@@ -227,7 +234,10 @@ def test_pooled_log_pressure_sd_known_replicates() -> None:
 
 def test_kems_band_derives_known_replicate_scatter() -> None:
     experiment = F.kems_experiment()
-    identity = _partial_identity()
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
     first = F.observation(
         "kems-replicate-1",
         experiment.experiment_id,
@@ -1191,6 +1201,122 @@ def test_comparison_activity_cancels_cell_geometry_only_for_activity() -> None:
     )
     assert partial_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
     assert partial_gate.primary_check == "kems_calibration"
+
+
+def test_unverified_kems_value_is_numeric_flagged_but_missing_value_refuses() -> None:
+    experiment = F.kems_experiment(calibrated=True, kn=None)
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=Located(State.unknown("not printed")),
+        ),
+    )
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    reference = F.observation(
+        "unverified-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-053-stolyarova-1991",
+    )
+    reference = replace(
+        reference,
+        evidence=replace(
+            reference.evidence,
+            original_method_class="measured_direct",
+        ),
+    )
+    prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and notice.reason == "apparatus_unverified:background_pressure"
+        for notice in residual.notices
+    )
+
+    missing = replace(
+        reference,
+        value=Value(kind=ValueKind.UNAVAILABLE, unavailable_reason="printed dash"),
+    )
+    refused, _ = compile_residual(
+        missing,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, missing, review="reviewed"),
+        prediction=prediction,
+    )
+    assert refused.status is ResidualStatus.REFUSED
+    assert refused.numeric is None
+
+
+def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
+    experiment = F.kems_experiment()
+    composition = Composition(
+        basis="sample_catalog_proxy",
+        components=(("SiO2", Decimal("0.5")), ("Na2O", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag="composition_from_sample_catalog",
+        proxy_source="catalogue-10017",
+        analysis_selection_rule="first complete whole-sample analysis",
+    )
+    identity = F.activity_identity(composition=composition)
+    reference = F.observation(
+        "catalogue-composition",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    prediction = _predict(Decimal("0.3"), identity)
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert any(
+        notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
+        for notice in residual.notices
+    )
+
+    from simulator.battery.score import flagged_stratum_rows, headline_rows
+
+    assert headline_rows((residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,))[0][
+        "n"
+    ] == 0
+    rows = flagged_stratum_rows((residual,), engines=(Engine.INTERNAL_ANALYTICAL,))
+    assert [(row["stratum"], row["n"]) for row in rows] == [
+        ("catalogue-composition", 1)
+    ]
+    payload = residual_to_plain(residual)
+    for tier in ("measured", "compilation"):
+        assert headline_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+        )[0]["n"] == 0
+    assert [(row["stratum"], row["n"]) for row in flagged_stratum_payloads(
+        (payload,), (Engine.INTERNAL_ANALYTICAL,)
+    )] == [("catalogue-composition", 1)]
 
 
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:

@@ -473,6 +473,7 @@ REGIME_TO_METHOD = {
     "kems_effusion_compiled_experiment": MethodToken.KNUDSEN_EFFUSION,
     "kems_effusion_method_context": MethodToken.KNUDSEN_EFFUSION,
     "kems_effusion_review_compilation": MethodToken.KNUDSEN_EFFUSION,
+    "kems_effusion_ion_comparison": MethodToken.KNUDSEN_EFFUSION,
     "knudsen_effusion": MethodToken.KNUDSEN_EFFUSION,
     "knudsen_effusion_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
     "langmuir_free_evaporation": MethodToken.LANGMUIR_FREE_EVAPORATION,
@@ -626,10 +627,34 @@ def _provenance_from_extract(
     values: Mapping[str, Any],
     inherited: Mapping[str, Any] | None,
 ) -> Mapping[str, Any] | None:
+    selected: dict[str, Any] | None = None
     for candidate in (obs.get("provenance"), values.get("provenance"), inherited):
         if isinstance(candidate, Mapping):
-            return dict(candidate)
-    return None
+            selected = dict(candidate)
+            break
+    method = values.get("method") or values.get("experimental_method")
+    method_token = str(method or "").strip().casefold().replace("_", "-")
+    if "ion-comparison" in method_token or "comparison-ratio" in method_token:
+        selected = dict(selected or {})
+        selected.setdefault(
+            "comparison_method",
+            {
+                "kind": "comparison_ratio",
+                "basis": "source-declared ion-comparison method",
+            },
+        )
+        selected.setdefault(
+            "common_knudsen_cell_constant",
+            {
+                "cancels": True,
+                "basis": "same-condition reference-cell ratio",
+            },
+        )
+        selected.setdefault(
+            "melt_reference_pairing",
+            {"kind": "same_effective_setup"},
+        )
+    return selected
 
 def _temperature_number(value: object) -> Decimal | None:
     if isinstance(value, Value) and value.kind is ValueKind.POINT:
@@ -827,6 +852,25 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
                 State.unknown(f"mass-percent composition is not usable: {exc}"),
                 locator=locator,
             )
+        if isinstance(payload, Mapping):
+            composition = replace(
+                composition,
+                proxy_flag=(
+                    None
+                    if payload.get("proxy_flag") in (None, "")
+                    else str(payload.get("proxy_flag"))
+                ),
+                proxy_source=(
+                    None
+                    if payload.get("proxy_source") in (None, "")
+                    else str(payload.get("proxy_source"))
+                ),
+                analysis_selection_rule=(
+                    None
+                    if payload.get("analysis_selection_rule") in (None, "")
+                    else str(payload.get("analysis_selection_rule"))
+                ),
+            )
         return Located(
             State.of(composition),
             locator=locator,
@@ -1000,10 +1044,27 @@ def _composition_from_plain(payload: object) -> Composition:
     components = payload.get("components") or ()
     pairs = tuple((str(k), as_decimal(v)) for k, v in components)
     amount_basis = _enum(AmountBasis, payload.get("amount_basis"))
+    metadata = {
+        "proxy_flag": (
+            None
+            if payload.get("proxy_flag") in (None, "")
+            else str(payload.get("proxy_flag"))
+        ),
+        "proxy_source": (
+            None
+            if payload.get("proxy_source") in (None, "")
+            else str(payload.get("proxy_source"))
+        ),
+        "analysis_selection_rule": (
+            None
+            if payload.get("analysis_selection_rule") in (None, "")
+            else str(payload.get("analysis_selection_rule"))
+        ),
+    }
     if amount_basis is AmountBasis.MASS_PERCENT:
         wt = _mass_percent_components(payload)
         if wt is not None:
-            return wt_pct_to_mole_fraction(wt)
+            return replace(wt_pct_to_mole_fraction(wt), **metadata)
         raise ValueError(
             "mass-percent composition contains unsupported or ambiguous components"
         )
@@ -1011,6 +1072,7 @@ def _composition_from_plain(payload: object) -> Composition:
         basis=str(payload.get("basis") or "unknown"),
         components=pairs,
         amount_basis=amount_basis or AmountBasis.MOLE_FRACTION,
+        **metadata,
     )
 
 
@@ -2545,6 +2607,57 @@ def _initial_oxide_map_from_values(
             if got:
                 return got
     return _oxide_map_from_mapping(values)
+
+
+def _catalogue_composition_located_from_values(
+    values: object,
+    locator: Locator | None,
+) -> Located[Composition] | None:
+    """Map an explicitly marked same-sample catalogue composition.
+
+    The catalogue map is an engine input proxy, never the paper's printed
+    composition. Keep its source and analysis rule on the typed value so the
+    scorer can carry the flag without creating a second provenance path.
+    """
+
+    if not isinstance(values, Mapping) or values.get("composition_from_sample_catalog") is not True:
+        return None
+    wt = _initial_oxide_map_from_values(values)
+    if not wt or len(wt) < 2:
+        return None
+    source_raw = values.get("composition_source") or values.get("composition_source_locator")
+    source = str(source_raw).strip() if source_raw not in (None, "") else None
+    rule_raw = values.get("analysis_selection_rule") or values.get(
+        "composition_analysis_selection_rule"
+    )
+    rule = str(rule_raw).strip() if rule_raw not in (None, "") else ""
+    selection_match = (
+        re.search(r"selection rule:\s*(.*)", source, re.IGNORECASE)
+        if source
+        else None
+    )
+    if not rule and selection_match is not None:
+        rule = selection_match.group(1)
+        rule = re.split(r"\s+(?:This composition|Sample \d+ is)\b", rule, maxsplit=1)[0]
+        rule = rule.strip(" .")
+    if not rule:
+        rule = "source-declared catalogue analysis; no separate selection rule stated"
+    try:
+        converted = wt_pct_to_mole_fraction(wt)
+    except (ArithmeticError, ValueError):
+        return None
+    composition = replace(
+        converted,
+        basis="sample_catalog_proxy",
+        proxy_flag="composition_from_sample_catalog",
+        proxy_source=source or "sample catalogue source not named",
+        analysis_selection_rule=rule,
+    )
+    return Located(
+        State.of(composition),
+        locator=locator,
+        inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+    )
 
 
 def _mole_fraction_composition_from_values(
@@ -8197,14 +8310,18 @@ def sample_from_equipment(
     hard_form, hard_container = _form_and_container(equipment)
     form_located = _prefer_located(form_located, hard_form)
     container_located = _prefer_located(container_located, hard_container)
-    printed = _printed_composition_from_roots(
+    catalogue = _catalogue_composition_located_from_values(values, locator)
+    catalogue_marked = isinstance(values, Mapping) and values.get(
+        "composition_from_sample_catalog"
+    ) is True
+    printed = None if catalogue_marked else _printed_composition_from_roots(
         roots, vocab, fallback_locator=locator
     )
-    if printed is None:
+    if printed is None and catalogue is None and not catalogue_marked:
         oxide_map = _initial_oxide_map_from_values(values)
         printed, _ = _located_printed_and_initial(oxide_map, locator)
-    initial = None
-    if printed is not None and printed.state.is_value:
+    initial = catalogue
+    if initial is None and printed is not None and printed.state.is_value:
         raw = printed.state.value
         if isinstance(raw, Mapping):
             wt = {
@@ -10200,6 +10317,7 @@ class Migrator:
         )
         initial_oxide_map = _initial_oxide_map_from_values(values)
         composition_located = _composition_located_from_values(values, locator)
+        catalogue_composition = _catalogue_composition_located_from_values(values, locator)
         initial_composition, omitted_components = _mole_fraction_composition_from_values(
             values
         )
@@ -10431,6 +10549,8 @@ class Migrator:
             )
         elif initial_composition is not None:
             ident_kwargs["composition"] = State.of(initial_composition)
+        elif catalogue_composition is not None:
+            ident_kwargs["composition"] = catalogue_composition.state
         elif composition_located is not None:
             ident_kwargs["composition"] = composition_located.state
         elif initial_oxide_map:
@@ -10626,6 +10746,11 @@ class Migrator:
             point_conditions = {
                 **(point_conditions or {}),
                 "composition": composition_located,
+            }
+        elif catalogue_composition is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": catalogue_composition,
             }
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
@@ -10885,6 +11010,7 @@ class Migrator:
                         source_derivation=source_derivation,
                         equipment=obs.get("equipment"),
                         parent_values=values,
+                        provenance=observation_provenance,
                         parent_point_conditions=point_conditions,
                         content_stable_id=True,
                     )
@@ -10926,6 +11052,29 @@ class Migrator:
                         "of the common Knudsen-cell constant"
                     ),
                     origin=obs_id,
+                )
+            )
+        if (
+            isinstance(q_token, Quantity)
+            and isinstance(identity, Identity)
+            and identity.composition is not None
+            and identity.composition.is_value
+            and identity.composition.value is not None
+            and identity.composition.value.proxy_flag
+            == "composition_from_sample_catalog"
+        ):
+            composition = identity.composition.value
+            observation_notices.append(
+                Notice(
+                    kind=NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+                    affected_quantities=(q_token,),
+                    reason=(
+                        "composition_from_sample_catalog: "
+                        f"source={composition.proxy_source}; "
+                        f"analysis_selection_rule={composition.analysis_selection_rule}"
+                    ),
+                    origin=obs_id,
+                    source=composition.proxy_source,
                 )
             )
         hold_reason = str(
@@ -11054,6 +11203,8 @@ class Migrator:
         t_original: object = None
         value_sel: SourceSelection | None = None
         point_oxide_map: dict[str, Decimal] | None = None
+        point_composition_located: Located[Composition] | None = None
+        point_catalogue: Located[Composition] | None = None
         if isinstance(raw_item, Mapping):
             q_for_species = (
                 quantity.value
@@ -11090,6 +11241,19 @@ class Migrator:
                     )
                     or locator
                 )
+            point_composition, _point_omitted = _mole_fraction_composition_from_values(
+                raw_item
+            )
+            point_composition_located = (
+                None
+                if point_composition is None
+                else Located(State.of(point_composition), locator=point_locator)
+            )
+            point_catalogue = _catalogue_composition_located_from_values(
+                raw_item, point_locator
+            )
+            if point_catalogue is not None:
+                point_oxide_map = None
             t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, raw_item)
             t_trail = t_sel.unit_trail
             t_original = _temperature_field_raw(raw_item, t_sel.field_name)
@@ -11161,6 +11325,11 @@ class Migrator:
                 point_id = f"{parent_id}::point:{index}"
 
         ident_kwargs = dict(ident_kwargs)
+        if point_catalogue is not None:
+            ident_kwargs["composition"] = point_catalogue.state
+            point_composition_located = point_catalogue
+        elif point_composition_located is not None:
+            ident_kwargs["composition"] = point_composition_located.state
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
         else:
@@ -11324,6 +11493,11 @@ class Migrator:
                 extra_pc["composition"] = residual
             if extra_pc:
                 point_conditions = {**(point_conditions or {}), **extra_pc}
+        if point_composition_located is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": point_composition_located,
+            }
         if isinstance(raw_item, Mapping):
             raw_point_conditions = raw_item.get("point_conditions")
             if isinstance(raw_point_conditions, Mapping):
@@ -11352,6 +11526,56 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
+        child_notices = list(notices)
+        from simulator.battery.validity import comparison_method_cell_constant_cancels
+
+        if (
+            isinstance(q_token_point, Quantity)
+            and q_token_point in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and comparison_method_cell_constant_cancels(provenance)
+            and not any(
+                notice.kind is NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS
+                for notice in child_notices
+            )
+        ):
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS,
+                    affected_quantities=(q_token_point,),
+                    reason=(
+                        "normalized melt/reference comparison records cancellation "
+                        "of the common Knudsen-cell constant"
+                    ),
+                    origin=point_id,
+                )
+            )
+        composition_state = identity.composition
+        if (
+            isinstance(q_token_point, Quantity)
+            and composition_state is not None
+            and composition_state.is_value
+            and composition_state.value is not None
+            and composition_state.value.proxy_flag
+            == "composition_from_sample_catalog"
+            and not any(
+                notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
+                for notice in child_notices
+            )
+        ):
+            composition = composition_state.value
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+                    affected_quantities=(q_token_point,),
+                    reason=(
+                        "composition_from_sample_catalog: "
+                        f"source={composition.proxy_source}; "
+                        f"analysis_selection_rule={composition.analysis_selection_rule}"
+                    ),
+                    origin=point_id,
+                    source=composition.proxy_source,
+                )
+            )
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,
@@ -11360,7 +11584,7 @@ class Migrator:
             uncertainty=unc,
             evidence=evidence,
             admission=admission,
-            notices=notices,
+            notices=tuple(child_notices),
             provenance=provenance,
             source_id=source_id,
             locator=point_locator,
