@@ -2031,9 +2031,9 @@ def _has_solved_oxygen_balance_notice(
     engine: Engine,
     notices: Sequence[Notice],
 ) -> bool:
-    return engine is Engine.OPENIMCC and any(
+    return engine in IMCC_ENGINES and any(
         notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-        and notice.origin == "engine:openimcc"
+        and notice.origin == f"engine:{engine.value}"
         and notice.reason.startswith(_OXYGEN_BALANCE_NOTICE_PREFIX)
         for notice in notices
     )
