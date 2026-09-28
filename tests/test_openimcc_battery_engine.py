@@ -41,6 +41,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     BinaryPot,
     Po2Request,
+    PO2_OXYGEN_BALANCE_EFFUSION,
     composition_kg_and_mol,
     equilibrate_cell,
     open_battery_engine,
@@ -501,6 +502,134 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert "openimcc" in cell.vapor_pressures_source["K"]
     assert "gas-shomate.csv" in cell.vapor_pressures_source["K"]
     assert cell.model_id == "IMCC-SF04"
+
+
+def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
+    _require_openimcc()
+    plante_melt = BinaryPot(
+        pot_id="openimcc-plante-o2-balance",
+        kato_1993_table4_system=None,
+        why="Plante oxygen-balance anchor",
+        composition_wt_pct={"K2O": 7.60, "SiO2": 92.40},
+    )
+    cell = equilibrate_cell(
+        open_battery_engine("openimcc"),
+        plante_melt,
+        temperature_K=1500.0,
+        po2=Po2Request(mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None),
+        isolated=False,
+    )
+    assert cell.status == "ok", cell.engine_reason
+    notice = next(
+        row for row in cell.notices
+        if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
+    )
+    ratio = notice["pO2_bar"] * 1.0e5 / cell.gas_partial_pressures_Pa["K"]
+    assert ratio == pytest.approx(0.221, rel=0.02)
+    assert notice["relative_residual"] < 1.0e-8
+    assert notice["bracket_log10_bar"] == [-30.0, 0.0]
+    assert notice["dominant_O_carriers"]
+    assert notice["dominant_metal_carriers"]
+
+
+def test_janaf_imcc_refuses_package_gas_balance_without_mixing_tables() -> None:
+    plante_melt = BinaryPot(
+        pot_id="openimcc-plante-o2-balance",
+        kato_1993_table4_system=None,
+        why="Plante oxygen-balance anchor",
+        composition_wt_pct={"K2O": 7.60, "SiO2": 92.40},
+    )
+    cell = equilibrate_cell(
+        open_battery_engine("imcc_sf04"),
+        plante_melt,
+        temperature_K=1500.0,
+        po2=Po2Request(mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None),
+        isolated=False,
+    )
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == "oxygen_balance_effusion_unsupported_gas_table"
+    assert "VapoRock-JANAF" in str(cell.engine_reason)
+
+
+def test_openimcc_hot_k_rich_melt_returns_molecular_flow_refusal() -> None:
+    hot_k_rich = BinaryPot(
+        pot_id="openimcc-hot-k-rich",
+        kato_1993_table4_system=None,
+        why="oxygen balance molecular-flow ceiling refusal",
+        composition_wt_pct={"K2O": 95.0, "SiO2": 5.0},
+    )
+    cell = equilibrate_cell(
+        open_battery_engine("openimcc"),
+        hot_k_rich,
+        temperature_K=2600.0,
+        po2=Po2Request(mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None),
+        isolated=False,
+    )
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == "imcc_gas_oxygen_balance_failed"
+    assert "above pO2 = 1 bar" in str(cell.engine_reason)
+
+
+def test_openimcc_missing_balance_solver_is_typed(monkeypatch) -> None:
+    import openimcc
+
+    handle = open_battery_engine("openimcc")
+    assert handle.available
+    original_getattr = openimcc.__getattr__
+
+    def without_balance_solver(name: str):
+        if name == "evaluate_gas_oxygen_balance":
+            raise AttributeError(name)
+        return original_getattr(name)
+
+    monkeypatch.setattr(openimcc, "__getattr__", without_balance_solver)
+    cell = equilibrate_cell(
+        handle,
+        _binary_probe(),
+        temperature_K=1500.0,
+        po2=Po2Request(mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None),
+        isolated=False,
+    )
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == "openimcc_oxygen_balance_unavailable", cell.engine_reason
+    assert "23d7842cf5525e058c66e8d68f6bb03ace04c256" in str(cell.engine_reason)
+
+
+@pytest.mark.parametrize("temperature_K", (1500.0, 1800.0, 2200.0))
+@pytest.mark.parametrize("po2_bar", (1.0e-9, 1.0e-6, 1.0e-3))
+def test_openimcc_commanded_po2_grid_remains_direct_gas_evaluation(
+    temperature_K: float,
+    po2_bar: float,
+) -> None:
+    _require_openimcc()
+    from openimcc import evaluate_gas, load_gas_datapack
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        temperature_C=temperature_K - 273.15,
+        composition_kg={"K2O": 43.94, "SiO2": 56.06},
+        composition_mol={"K2O": 0.5, "SiO2": 0.5},
+        fO2_log=math.log10(po2_bar),
+        po2_request=Po2Request(mode="commanded", po2_bar=po2_bar),
+    )
+    expected_bar = evaluate_gas(
+        result.activity_coefficients,
+        temperature_K,
+        po2_bar,
+        load_gas_datapack(),
+        parent_oxides=tuple(result.activity_coefficients),
+        allow_extrapolation=True,
+    )
+    assert result.vapor_pressures_Pa == {
+        name: value * 1.0e5 for name, value in expected_bar.items() if value > 0.0
+    }
+    assert not any(
+        row.get("kind") == "fo2_oxygen_balance_effusion_solved"
+        for row in result.imcc_notices
+    )
 
 
 def test_imcc_battery_reports_single_cation_gamma() -> None:

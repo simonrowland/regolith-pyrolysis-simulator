@@ -84,6 +84,7 @@ QUANTITY_PRESSURE = "gas_partial_pressure_Pa"
 
 PO2_ENGINE_DEFAULT = "engine_default"
 PO2_COMMANDED = "commanded"
+PO2_OXYGEN_BALANCE_EFFUSION = "oxygen_balance_effusion"
 # Caller-stated oxygen omission, including condensed activity without a
 # multivalent element, is never rewritten as engine fO2 = -9.
 PO2_NOT_AN_INPUT = "not_an_input"
@@ -1265,7 +1266,12 @@ def classify_equilibrate_outcome(
         status_reason = str(getattr(error, "backend_status_reason", "") or "")
         category = str(getattr(error, "backend_failure_category", "") or "")
         message = str(error)
-        engine_reason = status_reason or reason_code or message
+        if status_reason:
+            engine_reason = status_reason
+        elif reason_code.startswith("imcc_gas_"):
+            engine_reason = f"{reason_code}: {message}"
+        else:
+            engine_reason = reason_code or message
         haystack = _haystack(
             type(error).__name__, reason_code, status_reason, category, message
         )
@@ -1278,6 +1284,11 @@ def classify_equilibrate_outcome(
             return "refusal", REFUSAL_ENGINE_CRASH, engine_reason
         if reason_code in _IMCC_OUT_OF_BASIS_CODES:
             return "refusal", REFUSAL_OUT_OF_BASIS, engine_reason
+        if reason_code in {
+            "oxygen_balance_effusion_unsupported_gas_table",
+            "openimcc_oxygen_balance_unavailable",
+        } or reason_code.startswith("imcc_gas_"):
+            return "refusal", reason_code, engine_reason
         bucket = _bucket_from_text(haystack) or REFUSAL_UNAVAILABLE
         return "refusal", bucket, engine_reason
 
@@ -1407,6 +1418,13 @@ def reclassify_projected_composition_cells(
 # ---------------------------------------------------------------------------
 
 
+class _OxygenBalanceRefusal(RuntimeError):
+    def __init__(self, code: str, detail: str) -> None:
+        self.reason_code = code
+        self.backend_status_reason = f"{code}: {detail}"
+        super().__init__(self.backend_status_reason)
+
+
 class _ImccBatteryBackend:
     """Thin MeltBackend-shaped wrapper around ``openimcc.evaluate``.
 
@@ -1474,6 +1492,7 @@ class _ImccBatteryBackend:
         pressure_bar: float = 1.0e-6,
         *,
         composition_mol: Mapping[str, float] | None = None,
+        po2_request: Po2Request | None = None,
         **_unused: object,
     ) -> Any:
         from types import SimpleNamespace
@@ -1559,6 +1578,13 @@ class _ImccBatteryBackend:
         )
         if saturation_notice is not None:
             notices.append(saturation_notice)
+        if po2_request is not None and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_effusion_unsupported_gas_table",
+                "openimcc's solver requires its package gas datapack; imcc_sf04 "
+                "engines use simulator VapoRock-JANAF, so the request is refused "
+                "rather than mixing gas tables",
+            )
         pressures: dict[str, float] = {}
         gas_error: str | None = None
         if self._gas is None:
@@ -1682,6 +1708,7 @@ class _OpenImccBatteryBackend:
         pressure_bar: float = 1.0e-6,
         *,
         composition_mol: Mapping[str, float] | None = None,
+        po2_request: Po2Request | None = None,
         **_unused: object,
     ) -> Any:
         from types import SimpleNamespace
@@ -1758,7 +1785,64 @@ class _OpenImccBatteryBackend:
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
         gas_diagnostics: dict[str, Any] = {}
-        if fO2_log is not None:
+        if (
+            po2_request is not None
+            and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
+        ):
+            if self._gas is None:
+                raise _OxygenBalanceRefusal(
+                    "openimcc_oxygen_balance_unavailable",
+                    "openimcc gas datapack unavailable; remedy: install the "
+                    f"solver-enabled openimcc pin {self._bridge.OPENIMCC_RECORDED_PIN}",
+                )
+            from simulator.melt_backend.openimcc_bridge import (
+                evaluate_gas_oxygen_balance,
+            )
+
+            po2_bar, gas_result, balance = evaluate_gas_oxygen_balance(
+                result.parent_oxide_activities,
+                temperature_K,
+                self._gas,
+                parent_oxides=result.parent_oxides,
+            )
+            gas_diagnostics = {
+                "domain_flags": dict(gas_result.domain_flags),
+                "provenance_class": dict(gas_result.provenance_class),
+                "oxygen_balance": dict(balance),
+            }
+            notices.append(
+                {
+                    "kind": "fo2_oxygen_balance_effusion_solved",
+                    "pO2_bar": float(po2_bar),
+                    "relative_residual": float(balance["residual"]),
+                    "bracket_log10_bar": list(balance["bracket"]),
+                    "dominant_O_carriers": list(balance["dominant_O_carriers"]),
+                    "dominant_metal_carriers": list(
+                        balance["dominant_metal_carriers"]
+                    ),
+                }
+            )
+            for name, value in dict(gas_result).items():
+                number = _finite_float(value)
+                if number is None or number <= 0.0:
+                    continue
+                pressures[str(name)] = number * PA_PER_BAR
+                vapor_sources[str(name)] = (
+                    f"openimcc:{self._gas.gas_path}:"
+                    f"{gas_result.provenance_class.get(name, 'unknown')}"
+                )
+            for name, flag in gas_result.domain_flags.items():
+                if flag:
+                    notices.append(
+                        {
+                            "kind": "openimcc_gas_flag",
+                            "authority": AUTHORITY_EXTRAPOLATED,
+                            "species": str(name),
+                            "reason": str(flag),
+                        }
+                    )
+                    authority = AUTHORITY_EXTRAPOLATED
+        elif fO2_log is not None:
             if self._gas is None:
                 notices.append(
                     {
@@ -2483,6 +2567,8 @@ def _fo2_log_for_request(handle: EngineHandle, request: Po2Request) -> float | N
         return math.log10(float(request.po2_bar))
     if request.mode == PO2_NOT_AN_INPUT:
         return None
+    if request.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+        return None
     if handle.supports_intrinsic_fo2:
         return None
     return _DEFAULT_FO2_LOG
@@ -2620,6 +2706,8 @@ def equilibrate_cell(
         parameters = {}
     if "fO2_log" in parameters:
         kwargs["fO2_log"] = fo2_log
+    if "po2_request" in parameters:
+        kwargs["po2_request"] = po2
     if "call_timeout_s" in parameters:
         kwargs["call_timeout_s"] = timeout
     if handle.name == "alphamelts" or "subprocess_run_mode" in parameters:

@@ -41,6 +41,10 @@ OPENIMCC_INSTALL_HINT = (
     "python -m pip install --no-deps "
     "'openimcc @ git+https://github.com/simonrowland/openimcc'"
 )
+OPENIMCC_RECORDED_PIN = (
+    "openimcc @ git+https://github.com/simonrowland/openimcc"
+    "@23d7842cf5525e058c66e8d68f6bb03ace04c256"
+)
 
 _PACK_RESOURCE_NAMES = {
     "v1.0.2": None,
@@ -105,6 +109,21 @@ class OpenImccCompositionPolicyRefusal(RuntimeError):
         self.reason = self.code
         self.diagnostics = dict(diagnostics or {})
         super().__init__(f"reason={self.code}: {detail}")
+
+
+class OpenImccOxygenBalanceUnavailableError(RuntimeError):
+    """Typed refusal when the installed package lacks the balance solver."""
+
+    code = "openimcc_oxygen_balance_unavailable"
+    reason_code = code
+
+    def __init__(self) -> None:
+        self.backend_status_reason = (
+            f"{self.code}: installed openimcc does not expose "
+            "evaluate_gas_oxygen_balance; remedy: install the recorded pin "
+            f"{OPENIMCC_RECORDED_PIN}"
+        )
+        super().__init__(self.backend_status_reason)
 
 
 @dataclass(frozen=True)
@@ -195,6 +214,34 @@ def _require_openimcc() -> Any:
     if _openimcc is None:
         raise OpenImccUnavailableError(_OPENIMCC_IMPORT_ERROR)
     return _openimcc
+
+
+def evaluate_gas_oxygen_balance(
+    parent_activities: Mapping[str, float],
+    temperature_K: float,
+    datapack: Any,
+    *,
+    parent_oxides: tuple[str, ...] | None = None,
+) -> tuple[float, Any, Mapping[str, Any]]:
+    """Solve openimcc gas effusion balance using the supplied package table.
+
+    Scoring must restrict the physical interpretation to inert bench cells,
+    using ``cell_material``. This helper evaluates the requested balance and
+    never substitutes commanded pO2.
+    """
+
+    package = _require_openimcc()
+    try:
+        solver = getattr(package, "evaluate_gas_oxygen_balance")
+    except (AttributeError, ImportError) as exc:
+        raise OpenImccOxygenBalanceUnavailableError() from exc
+    return solver(
+        parent_activities,
+        float(temperature_K),
+        datapack,
+        parent_oxides=parent_oxides,
+        allow_extrapolation=True,
+    )
 
 
 def _canonical_composition(composition: Mapping[str, float]) -> dict[str, float]:
