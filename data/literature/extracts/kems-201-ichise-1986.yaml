@@ -43,6 +43,19 @@ fidelity_samples:
     published_page: 794
     pdf_page_index: 4
     note: Table 2 first data row Heat 201, 11.1 at% W, transform T 1821 K
+benches:
+- id: ichise-1986-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen-cell ion-intensity thermal analysis}
+    locator: {published_page: 792, pdf_page_index: 2, section: '2.1'}
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_published}
+    locator:
+      published_page: 792
+      pdf_page_index: 2
+      section: '2.1'
+      note: Apparatus details are omitted and referred to Ueshima et al. 1982; the 1982 alumina cell is not inferred for this study.
 species:
   W:
     observations:
@@ -101,12 +114,6 @@ species:
             published_page: 792
             pdf_page_index: 2
             paragraph: apparatus and experimental-method details already reported in ref 1, omitted here
-        cell_material:
-          value: unstated in this paper (referred to Ueshima et al. 1982)
-          locator:
-            published_page: 792
-            pdf_page_index: 2
-            paragraph: 装置および実験方法の詳細はすでに報告した1)ので省略する
     - observation_id: ichise_1986_few_table2_kems_thermal_analysis
       type: transition_point
       locator:

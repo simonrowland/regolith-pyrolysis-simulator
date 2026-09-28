@@ -119,8 +119,17 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
 
     doc = yaml.safe_load((EXTRACTS / "kems-042-plante-1979.yaml").read_text())
     bench_ids = {bench["id"] for bench in doc["benches"]}
+    kems_bench = next(bench for bench in doc["benches"] if bench["id"] == "kems-system")
     experiments = {item["experiment_id"]: item for item in doc["experiments"]}
 
+    assert kems_bench["cell_material_and_liner"]["state"] == {
+        "tag": "value",
+        "value": "Platinum effusion cell",
+    }
+    assert kems_bench["cell_material_and_liner"]["locator"] == {
+        "page": 268,
+        "section": "2. Description of Mass Spectrometric System",
+    }
     assert set(experiments) == {"k2o-sio2-effusion-series"}
     assert all(item["bench_id"] in bench_ids for item in experiments.values())
 
@@ -151,6 +160,52 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
             "k2o-sio2-s1214": 37,
         }
     )
+
+
+@pytest.mark.parametrize(
+    ("extract", "bench_id", "expected_material"),
+    (
+        ("kems-020-hastie-1981-nbsir.yaml", "hastie-1981-kms", "platinum KMS cell"),
+        ("kems-023-demaria-1973.yaml", "demaria-1973-kems", None),
+        ("kems-025-markova-1983.yaml", "markova-1983-kems", None),
+        ("kems-026-markova-1984.yaml", "markova-1984-kems", None),
+        ("kems-028-yakovlev-1984.yaml", "yakovlev-1984-kems", None),
+        ("kems-051-allibert-1981.yaml", "allibert-1981-kems", "molybdenum"),
+        ("kems-114-nichols-1995.yaml", "nichols-1995-kems", None),
+        ("kems-201-ichise-1986.yaml", "ichise-1986-kems", None),
+        (
+            "bencze-yazhenskikh-2016.yaml",
+            "bencze-2016-supplement-kems",
+            "iridium cell with graphite-coated lid; later graphite disc",
+        ),
+        (
+            "metsoc-2019-6005.yaml",
+            "shornikov-yakovlev-2019-kems",
+            "Knudsen molybdenum effusion cell",
+        ),
+    ),
+)
+def test_kems_cell_material_state_survives_migration(
+    tmp_path: Path,
+    extract: str,
+    bench_id: str,
+    expected_material: str | None,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(tmp_path, extract)
+    bench = next(
+        bench for bench in result.benches.values()
+        if bench.id.endswith(f"::bench::{bench_id}")
+    )
+    cell = bench.cell_material_and_liner
+    assert cell is not None and cell.locator is not None
+    if expected_material is None:
+        assert cell.state.is_unknown
+        assert cell.state.reason == "not_published"
+    else:
+        assert cell.state.is_value
+        assert cell.state.value == expected_material
 
 
 def test_tsukihashi_split_temperature_locators_use_figure7() -> None:
@@ -961,6 +1016,7 @@ def test_stolyarova_wilson_numbers_are_gibbs_model_parameters_only():
 
 def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
     from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.enums import NoticeKind
 
     atomic_source = _repo_observation(
         "kems-053-stolyarova-1991.yaml",
@@ -986,6 +1042,16 @@ def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
         tmp_path, "kems-053-stolyarova-1991.yaml"
     )
     source = "kems-053-stolyarova-1991"
+    stolyarova_benches = [
+        bench for bench in result.benches.values()
+        if bench.id.endswith("::bench::stolyarova-kems")
+    ]
+    assert len(stolyarova_benches) == 1
+    cell = stolyarova_benches[0].cell_material_and_liner
+    assert cell is not None and cell.state.is_value
+    assert cell.state.value == "tungsten"
+    assert cell.locator.published_page == 3710
+    assert cell.locator.section == "Experimental"
     atomic_rows = [
         observation
         for observation in result.observations.values()
@@ -1002,8 +1068,30 @@ def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
             f"{source}::stolyarova_1991_o2_pressure_fig4::"
         )
     ]
+    cao_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source
+        and observation.observation_id.startswith(
+            f"{source}::stolyarova_1991_cao_partial_pressure"
+        )
+    ]
     assert len(atomic_rows) == 9
     assert len(figure_rows) == 8
+    assert len(cao_rows) == 22
+    assert sum("complete_evaporation" in row.observation_id for row in cao_rows) == 11
+    assert sum("ion_comparison" in row.observation_id for row in cao_rows) == 11
+    for observation in cao_rows:
+        flags = [
+            notice for notice in observation.notices
+            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+        ]
+        assert len(flags) == 1
+        assert flags[0].reason.startswith("source_internally_inconsistent:")
+        assert "3.70 dex below the printed value" in flags[0].reason
+        assert "141 kJ/mol" in flags[0].reason
+        assert observation.value.point is not None
+        assert observation.admission.status.value == "admitted"
 
     for observation in atomic_rows:
         reaction = observation.identity.reaction

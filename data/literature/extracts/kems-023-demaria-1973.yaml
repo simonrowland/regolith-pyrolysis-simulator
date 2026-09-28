@@ -56,6 +56,19 @@ fidelity_samples:
     published_page: 176
     pdf_page_index: 2
     note: Table I Na 1300 K sample 12022 = 8.5 x 10^-9 atm (quoted comparison column)
+benches:
+- id: demaria-1973-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen-cell mass spectrometry}
+    locator: {published_page: 175, pdf_page_index: 1, section: body}
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_published}
+    locator:
+      published_page: 175
+      pdf_page_index: 1
+      section: body
+      note: Cell material is not stated; method is said to be similar to De Maria et al. 1971, whose Re cell is not inferred here.
 species:
   Na:
     observations:

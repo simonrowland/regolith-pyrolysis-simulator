@@ -129,6 +129,7 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
     Work,
+    _is_source_internally_inconsistent,
     as_decimal,
 )
 from simulator.battery.enums import BenchIdentityBasis
@@ -11018,6 +11019,7 @@ class Migrator:
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
         )
+        hold_reason = str(values.get("reason") or obs.get("reason") or "").strip()
         if isinstance(values.get("series"), list) and values.get("series"):
             measured.series += 1
         if isinstance(values.get("tabulated_delta_fG_kJ_mol"), list) and values.get(
@@ -11458,6 +11460,7 @@ class Migrator:
                     identity_provenance=identity_provenance,
                     notices=point_notices,
                     equipment=obs.get("equipment"),
+                    parent_reason=hold_reason,
                     parent_values=values,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
@@ -11499,6 +11502,7 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     equipment=obs.get("equipment"),
+                    parent_reason=hold_reason,
                     parent_values=values,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
@@ -11542,6 +11546,7 @@ class Migrator:
                         derived_from=derived_from,
                         source_derivation=source_derivation,
                         equipment=obs.get("equipment"),
+                        parent_reason=hold_reason,
                         parent_values=values,
                         provenance=observation_provenance,
                         parent_point_conditions=point_conditions,
@@ -11610,9 +11615,6 @@ class Migrator:
                     source=composition.proxy_source,
                 )
             )
-        hold_reason = str(
-            values.get("reason") or obs.get("reason") or ""
-        ).strip()
         if (
             isinstance(q_token, Quantity)
             and hold_reason.lower().startswith("probable source misprint")
@@ -11620,6 +11622,20 @@ class Migrator:
             observation_notices.append(
                 Notice(
                     kind=NoticeKind.PROBABLE_SOURCE_MISPRINT,
+                    affected_quantities=(q_token,),
+                    reason=hold_reason,
+                    origin=obs_id,
+                )
+            )
+        elif (
+            isinstance(q_token, Quantity)
+            and _is_source_internally_inconsistent(
+                NoticeKind.SOURCE_DISAGREEMENT, hold_reason
+            )
+        ):
+            observation_notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
                     affected_quantities=(q_token,),
                     reason=hold_reason,
                     origin=obs_id,
@@ -11721,6 +11737,7 @@ class Migrator:
         identity_provenance: tuple[str, ...] = (),
         notices: tuple[Notice, ...] = (),
         equipment: object = None,
+        parent_reason: str | None = None,
         parent_values: object = None,
         provenance: Mapping[str, Any] | None = None,
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
@@ -12066,6 +12083,17 @@ class Migrator:
                 **(point_conditions or {}),
             }
         child_notices = list(notices)
+        if _is_source_internally_inconsistent(
+            NoticeKind.SOURCE_DISAGREEMENT, parent_reason
+        ) and isinstance(q_token_point, Quantity):
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(q_token_point,),
+                    reason=parent_reason,
+                    origin=point_id,
+                )
+            )
         from simulator.battery.validity import comparison_method_cell_constant_cancels
 
         if (
