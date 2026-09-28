@@ -11,18 +11,29 @@ import pytest
 
 from simulator.battery.enums import (
     AmountBasis,
+    BenchIdentityBasis,
     Engine,
     NoticeKind,
     Phase,
     Quantity,
     RefusalReason,
 )
-from simulator.battery.records import Composition, Species, State
-from simulator.battery.score import predict_with_engine
+from simulator.battery.records import (
+    Bench,
+    BenchIdentity,
+    Composition,
+    Derivation,
+    Located,
+    Species,
+    State,
+    Value,
+)
+from simulator.battery.score import cell_notices, predict_with_engine
 from simulator.diagnostic_helpers.binary_pot_battery import (
     PO2_COMMANDED,
     PO2_ENGINE_DEFAULT,
     PO2_NOT_AN_INPUT,
+    PO2_OXYGEN_BALANCE_EFFUSION,
     BinaryPot,
     EngineHandle,
     Po2Request,
@@ -108,6 +119,41 @@ def _melt(components: tuple[tuple[str, str], ...], species: str, *, fO2_Pa, tota
     if updates:
         ident = replace(ident, **updates)
     return ident
+
+
+def _kems_partial(*, cell_material: str | None, fO2_Pa: Decimal | None = None):
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("K2O", Decimal("0.2")), ("SiO2", Decimal("0.8"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    ident = replace(
+        F.activity_identity(
+            formula="K",
+            composition=composition,
+            component_basis="K2O",
+            fO2_Pa=Decimal("1e-8") if fO2_Pa is None else fO2_Pa,
+        ),
+        quantity=State.of(Quantity.P_PARTIAL),
+        species=Species("K", Phase.G),
+        fO2_Pa=(
+            State.unknown("no fO2 printed")
+            if fO2_Pa is None
+            else State.of(fO2_Pa)
+        ),
+    )
+    experiment = F.kems_experiment()
+    if cell_material is not None:
+        assert experiment.apparatus is not None
+        experiment = replace(
+            experiment,
+            apparatus=replace(
+                experiment.apparatus,
+                cell_material_and_liner=F.located(cell_material),
+            ),
+        )
+    observation = F.observation("kems-potassium", experiment.experiment_id, ident, Decimal("1"))
+    return observation, experiment
 
 
 def test_predict_with_engine_does_not_select_the_engine_default() -> None:
@@ -221,6 +267,142 @@ def test_printed_oxygen_is_commanded(monkeypatch) -> None:
     assert seen["mode"] == PO2_COMMANDED
     assert seen["po2_bar"] == pytest.approx(1e-3 / 1.0e5)
     assert seen["mode"] != PO2_ENGINE_DEFAULT
+
+
+def test_inert_knudsen_cell_requests_oxygen_balance_effusion(monkeypatch) -> None:
+    seen = _capture_cell(monkeypatch)
+    observation, experiment = _kems_partial(cell_material="platinum Knudsen cell")
+
+    predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+    )
+
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["po2_bar"] is None
+
+
+def test_bench_cell_material_is_used_when_experiment_does_not_repeat_it(monkeypatch) -> None:
+    seen = _capture_cell(monkeypatch)
+    observation, experiment = _kems_partial(cell_material=None)
+    bench = Bench(
+        id="bench-pt",
+        work_id="work-1",
+        identity=BenchIdentity(
+            BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
+            reason="test fixture",
+        ),
+        cell_material_and_liner=F.located("iridium effusion cell"),
+    )
+
+    predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        isolated=False,
+    )
+
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+
+
+@pytest.mark.parametrize(
+    ("cell_material", "reason"),
+    [
+        ("tungsten Knudsen cell", "reactive_cell_oxygen_reservoir"),
+        ("molybdenum cell", "reactive_cell_oxygen_reservoir"),
+        ("tantalum crucible", "reactive_cell_oxygen_reservoir"),
+        ("rhenium oxide passivated cell", "reactive_cell_oxygen_reservoir"),
+        ("platinum cell with tungsten liner", "cell_material_not_inert"),
+        ("platinum cell with unknown liner", "cell_material_unknown"),
+    ],
+)
+def test_noninert_knudsen_cell_refuses_oxygen_balance(
+    cell_material: str,
+    reason: str,
+    monkeypatch,
+) -> None:
+    opened = _no_engine(monkeypatch)
+    observation, experiment = _kems_partial(cell_material=cell_material)
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+    )
+
+    assert opened == []
+    assert prediction.refusal_detail["reason"] == reason
+
+
+def test_unknown_knudsen_cell_refuses_with_typed_reason(monkeypatch) -> None:
+    opened = _no_engine(monkeypatch)
+    observation, experiment = _kems_partial(cell_material=None)
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+    )
+
+    assert opened == []
+    assert prediction.refusal_detail["reason"] == "cell_material_unknown"
+
+
+def test_printed_fo2_leaves_knudsen_request_unchanged_even_for_reactive_cell(monkeypatch) -> None:
+    seen = _capture_cell(monkeypatch)
+    observation, experiment = _kems_partial(
+        cell_material="tungsten cell", fO2_Pa=Decimal("1e-3")
+    )
+
+    predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+    )
+
+    assert seen["mode"] == PO2_COMMANDED
+    assert seen["po2_bar"] == pytest.approx(1e-3 / 1.0e5)
+
+
+def test_derived_point_condition_fo2_is_not_sent_as_a_command(monkeypatch) -> None:
+    seen = _capture_cell(monkeypatch)
+    observation, experiment = _kems_partial(
+        cell_material="platinum cell", fO2_Pa=Decimal("1e-3")
+    )
+    derived = Located(
+        State.of(Value.point_of(Decimal("1e-3"))),
+        inference=Derivation(
+            relation="derived from measured pK",
+            inputs=("measured-pK",),
+            parameters=(),
+            output_unit="Pa",
+        ),
+    )
+    observation = replace(observation, point_conditions={"fO2_Pa": derived})
+
+    predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment, isolated=False
+    )
+
+    assert seen["mode"] == PO2_OXYGEN_BALANCE_EFFUSION
+    assert seen["po2_bar"] is None
+
+
+def test_solved_effusion_notice_keeps_pO2_diagnostics() -> None:
+    notice = cell_notices(
+        Quantity.P_PARTIAL,
+        Engine.OPENIMCC,
+        types.SimpleNamespace(
+            notices=[
+                {
+                    "kind": "fo2_oxygen_balance_effusion_solved",
+                    "pO2_bar": 0.12,
+                    "relative_residual": 1e-8,
+                    "bracket_log10_bar": [-3.0, -1.0],
+                    "dominant_O_carriers": ["O2"],
+                }
+            ]
+        ),
+    )[0]
+
+    assert notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+    assert notice.reason.startswith("fo2_oxygen_balance_effusion_solved:")
+    assert '"pO2_bar":0.12' in notice.reason
+    assert '"dominant_O_carriers":["O2"]' in notice.reason
 
 
 def test_unknown_vapour_composition_is_not_a_pure_pot(monkeypatch) -> None:
