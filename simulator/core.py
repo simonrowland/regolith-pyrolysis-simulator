@@ -6519,16 +6519,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _native_fe_feo_buffer_is_active(self) -> bool:
         melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
         feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
-        native_partition = dict(
-            getattr(self, '_last_native_fe_partition_diagnostic', {}) or {}
-        )
         native_metal_account = self.atom_ledger.project_account_mol(
             'process.metal_phase'
         )
+        # Fe-FeO buffering requires retained metal in contact with the melt;
+        # the cached partition pool records Fe already sent to vapour or tap.
         native_fe_mol = max(
             0.0,
             float(native_metal_account.get('Fe', 0.0) or 0.0),
-            float(native_partition.get('native_fe_pool_mol', 0.0) or 0.0),
         )
         return (
             native_fe_mol > OXYGEN_RESERVOIR_NOOP_MOL
@@ -6600,10 +6598,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         native_metal_account = self.atom_ledger.project_account_mol(
             'process.metal_phase'
         )
+        # Fe-FeO equilibrium uses only metal still in process.metal_phase.
+        # The diagnostic pool below is committed vapour plus committed tap,
+        # so counting it here would leave a buffer after its metal has left.
         native_fe_mol = max(
             0.0,
             float(native_metal_account.get('Fe', 0.0) or 0.0),
-            float(native_partition.get('native_fe_pool_mol', 0.0) or 0.0),
         )
         native_fe_coexists = (
             native_fe_mol > OXYGEN_RESERVOIR_NOOP_MOL
@@ -10574,6 +10574,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         gate_authority = self._resolved_melt_redox_gate_authority(
             gate_authority
         )
+        staged_na_shuttle_event: Dict[str, str] | None = None
         if (
             self.melt.campaign == CampaignPhase.C2A_STAGED
         ):
@@ -10585,10 +10586,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # 2 Na + FeO -> Na2O + Fe.  Na's oxygen is captured by the committed
             # Na2O coproduct, so this branch must not ask the Fe redox-buffer
             # capacity gate to fund (or suppress) the metallothermic transfer.
-            # Defer only the native-Fe competitor; the C3 provider's liquid and
-            # Ellingham gates still refuse infeasible shuttle proposals.
+            # Defer only the FeO-derived split. Existing Fe metal still needs
+            # the metallic-tap path below, while the C3 provider's liquid and
+            # Ellingham gates refuse infeasible shuttle proposals.
             split = self._compute_fe_redox_split_diagnostic()
-            event = {
+            staged_na_shuttle_event = {
                 'native_fe_event': 'deferred_for_staged_na_shuttle',
                 'native_fe_event_reason': (
                     'staged_path_reserves_feo_for_na_shuttle'
@@ -10596,30 +10598,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'native_fe_event_status': 'deferred',
             }
             self._last_native_fe_partition_diagnostic = {}
-            self._last_native_fe_saturation_event = dict(event)
-            return {**split, **event}
-        T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
-        if not self._melt_redox_temperature_shift_is_liquid(
-            T_K,
-            gate_authority=gate_authority,
-        ):
-            split = self._compute_fe_redox_split_diagnostic()
-            event = {
-                'native_fe_event': 'deferred_not_liquid_for_redox',
-                'native_fe_event_reason': 'deferred_not_liquid_for_redox',
-                'native_fe_event_status': 'deferred',
-                'temperature_C': float(self.melt.temperature_C),
-            }
-            self._last_native_fe_partition_diagnostic = {}
-            self._last_native_fe_saturation_event = dict(event)
-            return {**split, **event}
+            self._last_native_fe_saturation_event = dict(
+                staged_na_shuttle_event
+            )
+            native_extent: Dict[str, Any] = {}
+        else:
+            T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
+            if not self._melt_redox_temperature_shift_is_liquid(
+                T_K,
+                gate_authority=gate_authority,
+            ):
+                split = self._compute_fe_redox_split_diagnostic()
+                event = {
+                    'native_fe_event': 'deferred_not_liquid_for_redox',
+                    'native_fe_event_reason': 'deferred_not_liquid_for_redox',
+                    'native_fe_event_status': 'deferred',
+                    'temperature_C': float(self.melt.temperature_C),
+                }
+                self._last_native_fe_partition_diagnostic = {}
+                self._last_native_fe_saturation_event = dict(event)
+                return {**split, **event}
 
-        self._re_reference_melt_fO2_to_temperature(
-            T_K,
-            gate_authority=gate_authority,
-        )
-        native_extent = self._compute_native_fe_saturation_extent()
-        split = self._compute_fe_redox_split_diagnostic()
+            self._re_reference_melt_fO2_to_temperature(
+                T_K,
+                gate_authority=gate_authority,
+            )
+            native_extent = self._compute_native_fe_saturation_extent()
+            split = self._compute_fe_redox_split_diagnostic()
         native_frac = max(
             0.0,
             float(native_extent.get('native_fe_frac', 0.0) or 0.0),
@@ -10644,7 +10649,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 native_fe_source_account = 'process.metal_phase'
                 native_fe_intent = ChemistryIntent.NATIVE_FE_METALLIC_TAP
         if native_fe_mol <= 1.0e-12:
-            event = {
+            event = staged_na_shuttle_event or {
                 'native_fe_event': 'no_native_fe_below_threshold',
                 'native_fe_event_reason': 'native_fe_inventory_below_threshold',
                 'native_fe_event_status': 'ok',
@@ -10842,7 +10847,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             exchange_direction='redox_source:native_fe_saturation_split',
             gate_authority=gate_authority,
         )
-        if transition is None and committed_vapor_mol > 1.0e-12:
+        if staged_na_shuttle_event is not None:
+            event = staged_na_shuttle_event
+        elif transition is None and committed_vapor_mol > 1.0e-12:
             event = {
                 'native_fe_event': 'native_fe_partitioned_saturation',
                 'native_fe_event_reason': (

@@ -201,14 +201,18 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
 def test_native_fe_coexistence_uses_fe_feo_buffer_domain_record() -> None:
     sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
     _seed_redox_liquidus_curve(sim)
+    sim.atom_ledger.load_external_mol(
+        "process.metal_phase",
+        {"Fe": 1.0},
+        source="test retained native Fe",
+        material_origin="feedstock",
+    )
     sim._melt_redox_ledger_initialized = True
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     sim.melt.fO2_log = -10.0
     sim.melt.melt_fO2_log = -10.0
 
-    assert sim._compute_fe_redox_split_diagnostic()["native_fe_saturation"] is True
-    sim._apply_native_fe_saturation_split()
-
+    assert sim._native_fe_feo_buffer_is_active() is True
     split = sim._compute_fe_redox_split_diagnostic()
     domain = split["redox_domain"]
     assert domain["basis"] == "fe_feo_buffer"
@@ -231,6 +235,24 @@ def test_native_fe_coexistence_uses_fe_feo_buffer_domain_record() -> None:
     assert report["redox_source_breakdown"]["redox_domain"]["basis"] == (
         "fe_feo_buffer"
     )
+
+
+def test_vapor_committed_native_fe_does_not_buffer_melt_redox() -> None:
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    _seed_redox_liquidus_curve(sim)
+    sim._last_native_fe_partition_diagnostic = {
+        "native_fe_pool_mol": 12.0,
+        "native_fe_vapor_mol": 12.0,
+        "native_fe_tap_mol": 0.0,
+        "native_fe_activity": 1.0,
+    }
+
+    assert sim.atom_ledger.project_account_mol("process.metal_phase").get(
+        "Fe", 0.0
+    ) == pytest.approx(0.0)
+    assert sim._native_fe_feo_buffer_is_active() is False
+    assert sim._melt_fO2_from_ledger() is not None
+    assert sim._last_redox_domain["basis"] != "fe_feo_buffer"
 
 
 def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
