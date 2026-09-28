@@ -309,10 +309,14 @@ def test_other_quantities_are_not_applicable_and_do_not_loosen_engine_point():
     assert engine_point[0].status is not ReadinessStatus.READY
 
 
-def test_unknown_reference_state_is_not_consumed():
+def test_stolyarova_untyped_reference_state_is_not_consumed():
     experiment, bench, observation = _case(
-        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        composition=_composition(("CaO", "0.6"), ("SiO2", "0.4")),
         known_reference=False,
+        formula="SiO2",
+    )
+    observation = replace(
+        observation, source_id="kems-053-stolyarova-1991"
     )
     results = _melt(experiment, bench, observation)
     assert all(item.payload is None for item in results)
