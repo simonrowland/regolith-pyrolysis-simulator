@@ -69,3 +69,26 @@ experiments:
     pdf_page_index: 1
     section: Technique
     note: Knudsen cell; MS-1301; heating 3-7 grad/min; technique in Yakovlev et al. 1983 LPSC XIV (ref 2)
+benches:
+- id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::bench::markova-1983-kems
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen mass spectrometry
+    locator:
+      published_page: 460
+      pdf_page_index: 1
+      section: Technique
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 460
+      pdf_page_index: 1
+      section: Technique
+      note: The two-page abstract does not print the cell material.
+  other_facts: []

@@ -74,11 +74,14 @@ experiments:
     cell_material_and_liner:
       state:
         tag: value
-        value: unstated in this paper (referred to Ueshima et al. 1982)
+        value: unstated in this paper; apparatus details omitted and referred to ref 1 (Ueshima, Ichise, Mori, Tetsu-to-Hagane
+          68 (1982) 2569)
       locator:
-        published_page: 792
-        pdf_page_index: 2
-        paragraph: 装置および実験方法の詳細はすでに報告した1)ので省略する
+        published_page: 791
+        pdf_page_index: 1
+        section: '2.1'
+        note: KEMS ion-intensity thermal analysis method; apparatus details omitted, referred to Ueshima et al. 1982 (ref
+          1)
     ionization:
       ionizing_energy:
         state:
@@ -90,3 +93,27 @@ experiments:
           section: '2.1'
           note: KEMS ion-intensity thermal analysis method; apparatus details omitted, referred to Ueshima et al. 1982 (ref
             1)
+benches:
+- id: 10.2355/tetsutohagane1955.72.7_791::bench::ichise-1986-kems
+  work_id: 10.2355/tetsutohagane1955.72.7_791
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen-cell ion-intensity thermal analysis
+    locator:
+      published_page: 792
+      pdf_page_index: 2
+      section: '2.1'
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 792
+      pdf_page_index: 2
+      section: '2.1'
+      note: Apparatus details are omitted and referred to Ueshima et al. 1982; the 1982 alumina cell is not inferred for this
+        study.
+  other_facts: []

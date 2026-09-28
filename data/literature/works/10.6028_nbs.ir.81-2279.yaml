@@ -175,10 +175,10 @@ experiments:
     cell_material_and_liner:
       state:
         tag: value
-        value: platinum TMS/KMS (Bonnell and Hastie 1979)
+        value: platinum TMS reactor (boat, carrier, probe)
       locator:
-        page: 12
-        paragraph: from our TMS and KMS second-law data (see Bonnell and Hastie, 1979)
+        page: 9
+        paragraph: all of these components were fabricated from platinum metal
     geometry:
       orifice_area_m2:
         state:
@@ -231,3 +231,25 @@ experiments:
                 page: 28
                 paragraph: relatively small effusion orifice (0.34 mm diameter)
           output_unit: m
+benches:
+- id: 10.6028/nbs.ir.81-2279::bench::hastie-1981-kms
+  work_id: 10.6028/nbs.ir.81-2279
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen mass spectrometry
+    locator:
+      page: 9
+      paragraph: primary experimental methods KMS and TMS
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: platinum KMS cell
+    locator:
+      page: 53
+      pdf_page_index: 59
+      figure: '20'
+      note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
+  other_facts: []

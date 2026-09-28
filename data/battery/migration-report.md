@@ -24,7 +24,7 @@ hard issues: 3180
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2030 (mismatch) |
-| equipment_payloads | 670 | 972 (mismatch) |
+| equipment_payloads | 670 | 971 (mismatch) |
 | absent_admissions | 3511 | 4767 (mismatch) |
 | absent_classes | 2174 | 2201 (mismatch) |
 | range_only_T | 3125 | 2743 (mismatch) |

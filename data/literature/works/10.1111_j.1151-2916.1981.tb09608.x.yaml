@@ -52,6 +52,29 @@ experiments:
     published_page: 309
     pdf_page_index: 3
     table: II
+benches:
+- id: 10.1111/j.1151-2916.1981.tb09608.x::bench::allibert-1981-kems
+  work_id: 10.1111/j.1151-2916.1981.tb09608.x
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: differential Knudsen-effusion mass spectrometry
+    locator:
+      published_page: 308
+      pdf_page_index: 2
+      section: II Mass-Spectrometric Measurements
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: molybdenum
+    locator:
+      published_page: 308
+      pdf_page_index: 2
+      section: II Mass-Spectrometric Measurements
+      note: 'Section II: “Six effusion cells were drilled in a molybdenum block.”'
+  other_facts: []
 context:
 - observation_id: allibert_1981_emf_method_context
   type: method
