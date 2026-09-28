@@ -18271,8 +18271,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 217130
+advisory issues: 216385
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 217130 |
+| `identity_incomplete` | 216385 |
