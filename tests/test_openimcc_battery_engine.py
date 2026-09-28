@@ -538,9 +538,13 @@ def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
         if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
     )
     ratio = notice["pO2_bar"] * 1.0e5 / cell.gas_partial_pressures_Pa["K"]
-    assert ratio == pytest.approx(0.221, rel=0.02)
+    assert ratio == pytest.approx(0.22489, abs=1e-5)
     assert notice["relative_residual"] < 1.0e-8
     assert notice["bracket_log10_bar"] == [-30.0, 0.0]
+    assert notice["cell_material"] is None
+    assert notice["cell_oxide_flux_fraction"] == 0.0
+    assert notice["buffer_pinned"] is False
+    assert notice["buffer_pO2_bar"] is None
     assert notice["dominant_O_carriers"]
     assert notice["dominant_metal_carriers"]
 
@@ -567,11 +571,13 @@ def test_janaf_imcc_solves_plante_oxygen_balance_anchor(engine_name: str) -> Non
         if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
     )
     ratio = notice["pO2_bar"] * 1.0e5 / cell.gas_partial_pressures_Pa["K"]
-    fork_dex = math.log10(ratio / 0.221)
-    assert ratio == pytest.approx(0.225, abs=0.002)
-    assert fork_dex == pytest.approx(0.01, abs=0.003)
+    assert ratio == pytest.approx(0.22487, abs=1e-5)
     assert notice["relative_residual"] < 1.0e-8
     assert notice["bracket_log10_bar"] == [-30.0, 0.0]
+    assert notice["cell_material"] is None
+    assert notice["cell_oxide_flux_fraction"] == 0.0
+    assert notice["buffer_pinned"] is False
+    assert notice["buffer_pO2_bar"] is None
     assert notice["dominant_O_carriers"]
     assert notice["dominant_metal_carriers"]
 
@@ -594,6 +600,268 @@ def test_openimcc_hot_k_rich_melt_returns_molecular_flow_refusal() -> None:
     assert cell.status == "refusal"
     assert cell.refusal_reason == "imcc_gas_oxygen_balance_failed"
     assert "above pO2 = 1 bar" in str(cell.engine_reason)
+
+
+def test_reactive_cell_wo3_dominated_balance_matches_analytic_root(monkeypatch) -> None:
+    import openimcc
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    T = 1933.0
+    delta_g_j_mol = -250_000.0
+    K = math.exp(-delta_g_j_mol / (8.31446261815324 * T))
+    target_po2_bar = 1e-8
+    si_mass = 28.085
+    wo3_mass = 183.84 + 3 * 15.999
+    si_o_pressure_scale = (
+        3.0
+        * K
+        * target_po2_bar**2.5
+        * math.sqrt(si_mass)
+        / (2.0 * math.sqrt(wo3_mass))
+    )
+    monkeypatch.setattr(
+        battery,
+        "_cell_oxide_thermodynamics",
+        lambda _material, _temperature: (
+            {"WO3": (delta_g_j_mol, 3.0)},
+            1.0,
+            {"WO3": {"table_id": "O-068", "source_sha256": "test"}},
+        ),
+    )
+    species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
+
+    def pressure_model(logp: float) -> dict[str, float]:
+        return {"Si": si_o_pressure_scale * 10.0 ** (-logp)}
+
+    solved, pressures, _balance, fraction, info = battery._solve_cell_oxygen_balance(
+        pressure_model,
+        species,
+        temperature_K=T,
+        cell_material="W",
+        oxygen_balance_from_pressure_model=openimcc.oxygen_balance_from_pressure_model,
+    )
+
+    assert solved == pytest.approx(target_po2_bar, rel=1e-8)
+    assert pressures["WO3"] > 0
+    assert fraction == pytest.approx(1.0, abs=1e-8)
+    assert info["buffer_pinned"] is False
+
+
+def test_reactive_cell_buffer_pins_at_selected_buffer(monkeypatch) -> None:
+    import openimcc
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "_cell_oxide_thermodynamics",
+        lambda _material, _temperature: (
+            {"WO3": (-250_000.0, 3.0)},
+            -15.0,
+            {"WO3": {"table_id": "O-068", "source_sha256": "test"}},
+        ),
+    )
+    species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
+
+    def pressure_model(logp: float) -> dict[str, float]:
+        return {"Si": 1e-12 * 10.0 ** (-logp)}
+
+    solved, _pressures, _balance, _fraction, info = battery._solve_cell_oxygen_balance(
+        pressure_model,
+        species,
+        temperature_K=1933.0,
+        cell_material="W",
+        oxygen_balance_from_pressure_model=openimcc.oxygen_balance_from_pressure_model,
+    )
+
+    assert info["buffer_pinned"] is True
+    assert solved == pytest.approx(10.0**-15.0)
+    assert info["buffer_pO2_bar"] == pytest.approx(solved)
+
+
+def test_unknown_cell_material_is_a_typed_refusal() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    cell = equilibrate_cell(
+        EngineHandle(
+            name="openimcc",
+            backend=None,
+            available=False,
+            unavailable_reason="engine is unavailable",
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        ),
+        BinaryPot(
+            pot_id="unknown-cell-material",
+            kato_1993_table4_system=None,
+            why="invalid reactive cell request",
+            composition_wt_pct={"K2O": 43.94, "SiO2": 56.06},
+        ),
+        temperature_K=1933.0,
+        po2=Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material="Pt",
+        ),
+        isolated=False,
+    )
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == "oxygen_balance_cell_material_invalid"
+
+
+def test_inert_po2_request_payload_keeps_legacy_shape() -> None:
+    assert Po2Request(mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None).as_payload() == {
+        "mode": PO2_OXYGEN_BALANCE_EFFUSION,
+        "po2_bar": None,
+    }
+
+
+def test_cell_material_distinguishes_reused_cell_identity() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import _cell_identity_key
+
+    base = {
+        "pot_id": "reuse-key",
+        "engine": "openimcc",
+        "temperature_K": 1933.0,
+        "po2": {"mode": PO2_OXYGEN_BALANCE_EFFUSION, "po2_bar": None},
+    }
+    assert _cell_identity_key(base) != _cell_identity_key(
+        {**base, "po2": {**base["po2"], "cell_material": "W"}}
+    )
+
+
+@pytest.mark.parametrize("engine_name", ("imcc_sf04", "openimcc"))
+@pytest.mark.parametrize(
+    ("cell_material", "oxide_gas", "table_id"),
+    (("W", "WO3", "O-068"), ("Mo", "MoO3", "Mo-017")),
+)
+def test_reactive_cell_adds_shared_janaf_oxides_to_engine_pressure_model(
+    engine_name: str, cell_material: str, oxide_gas: str, table_id: str
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _ImccBatteryBackend,
+        _OpenImccBatteryBackend,
+    )
+
+    backend = (
+        _OpenImccBatteryBackend("openimcc")
+        if engine_name == "openimcc"
+        else _ImccBatteryBackend("imcc_sf04")
+    )
+    result = backend.equilibrate(
+        temperature_C=1933.0 - 273.15,
+        composition_kg={"K2O": 43.94, "SiO2": 56.06},
+        composition_mol={"K2O": 0.5, "SiO2": 0.5},
+        po2_request=Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material=cell_material,
+        ),
+    )
+    if engine_name == "openimcc":
+        notices = result.diagnostics["imcc_notices"]
+        gas_pressures = result.vapor_pressures_Pa
+    else:
+        notices = result.imcc_notices
+        gas_pressures = result.vapor_pressures_Pa
+    solved = next(
+        row for row in notices
+        if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
+    )
+    assert solved["cell_material"] == cell_material
+    assert solved["cell_oxide_flux_fraction"] > 0.0
+    assert oxide_gas in gas_pressures
+    assert solved["cell_oxide_janaf_sources"][oxide_gas]["table_id"] == table_id
+
+
+def test_stolyarova_1991_w_cell_pressure_and_residual_report() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _ImccBatteryBackend,
+        _OpenImccBatteryBackend,
+    )
+
+    extract = load_yaml(REPO_ROOT / "data/literature/extracts/kems-053-stolyarova-1991.yaml")
+
+    def observation_points(species: str, observation_id: str) -> dict[float, float]:
+        observation = next(
+            row
+            for row in extract["species"][species]["observations"]
+            if row["observation_id"] == observation_id
+        )
+        return {
+            float(point["SiO2_mole_fraction_as_printed"]): float(point["pressure_atm"])
+            for point in observation["values"]["points"]
+        }
+
+    ca_atm = observation_points(
+        "Ca", "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation"
+    )
+    sio_atm = observation_points(
+        "SiO", "stolyarova_1991_sio_partial_pressure_1933k_ion_comparison"
+    )
+    engines = {
+        "imcc_sf04": _ImccBatteryBackend("imcc_sf04"),
+        "openimcc": _OpenImccBatteryBackend("openimcc"),
+    }
+    rows = []
+
+    def solve(engine: str, x_sio2: float, temperature_K: float, material: str | None):
+        result = engines[engine].equilibrate(
+            temperature_C=temperature_K - 273.15,
+            composition_mol={"CaO": 1.0 - x_sio2, "SiO2": x_sio2},
+            po2_request=Po2Request(
+                mode=PO2_OXYGEN_BALANCE_EFFUSION,
+                po2_bar=None,
+                cell_material=material,
+            ),
+        )
+        notices = (
+            result.diagnostics["imcc_notices"]
+            if engine == "openimcc"
+            else result.imcc_notices
+        )
+        solved = next(
+            row
+            for row in notices
+            if row.get("kind") == "fo2_oxygen_balance_effusion_solved"
+        )
+        return solved, result.vapor_pressures_Pa
+
+    for engine in engines:
+        for x_sio2 in sorted(ca_atm.keys() & sio_atm.keys(), reverse=True):
+            solved_W, gas_1933 = solve(engine, x_sio2, 1933.0, "W")
+            solved_inert, _ = solve(engine, x_sio2, 1933.0, None)
+            solved_Ca, gas_1993 = solve(engine, x_sio2, 1993.0, "W")
+            pO2_atm = solved_W["pO2_bar"] * 1.0e5 / 101325.0
+            rows.append(
+                {
+                    "engine": engine,
+                    "X_SiO2": x_sio2,
+                    "W_pO2_atm_1933K": pO2_atm,
+                    "dex_vs_inferred_range_2.9e-12_to_6.6e-12": [
+                        math.log10(pO2_atm / 6.6e-12),
+                        math.log10(pO2_atm / 2.9e-12),
+                    ],
+                    "inert_to_W_pull_down_dex": math.log10(
+                        solved_inert["pO2_bar"] / solved_W["pO2_bar"]
+                    ),
+                    "buffer_pinned": solved_W["buffer_pinned"],
+                    "buffer_phase": solved_W["cell_oxide_janaf_sources"][
+                        "buffer_phase"
+                    ]["formula"],
+                    "Ca_1993K_residual_dex": math.log10(
+                        (gas_1993["Ca"] / 101325.0) / ca_atm[x_sio2]
+                    ),
+                    "SiO_1933K_residual_dex": math.log10(
+                        (gas_1933["SiO"] / 101325.0) / sio_atm[x_sio2]
+                    ),
+                    "Ca_target_atm": ca_atm[x_sio2],
+                    "SiO_target_atm": sio_atm[x_sio2],
+                    "Ca_predicted_atm": gas_1993["Ca"] / 101325.0,
+                    "SiO_predicted_atm": gas_1933["SiO"] / 101325.0,
+                }
+            )
+    print("STOLYAROVA_W_CELL_REPORT=" + json.dumps(rows, sort_keys=True))
+    assert len(rows) == 2 * len(ca_atm.keys() & sio_atm.keys())
 
 
 def test_imcc_missing_generic_balance_solver_is_typed(monkeypatch) -> None:
