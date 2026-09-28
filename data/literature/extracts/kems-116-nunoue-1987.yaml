@@ -27,6 +27,13 @@ benches:
   apparatus_family:
     state: {tag: value, value: Hitachi RM-6E Knudsen-cell mass spectrometer}
     locator: &nunoue_apparatus {published_page: 869, section: '2.1 Apparatus'}
+  cell_materials:
+    - state:
+        tag: value
+        value: Al2O3
+      locator:
+        published_page: 869
+        section: 2.1 Apparatus
   cell_material_and_liner:
     state: {tag: value, value: High-purity alumina SSA-S Knudsen cell}
     locator: *nunoue_apparatus
