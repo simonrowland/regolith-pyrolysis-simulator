@@ -11,17 +11,18 @@ import pytest
 
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from simulator.battery.enums import RefusalReason
+from simulator.battery.enums import Quantity, RefusalReason
 from simulator.battery.migrate import (
     Migrator,
+    _pressure_total_from_extract,
     _sweep_gas_from_plain,
     experiment_from_plain,
     to_plain,
 )
-from simulator.battery.records import State, SweepGas, SweepGasComponent
+from simulator.battery.records import State, SweepGas, SweepGasComponent, ValueKind
 from simulator.battery.validate import validate_experiment, validate_sweep_gas
 from tests.battery import factories
-from tests.battery.test_migrate import _write_min_tree
+from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
 from tests.battery.test_migrate_benches import _registry_extract
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -148,6 +149,14 @@ def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
     assert located.locator.pdf_page_index == 2
     assert located.locator.section == "2. Experimental principle"
     assert "printed P_CO = 1 atm" in located.locator.note
+    activity = result.observations["ts1985::ts1985_na2o_table2_X0p40_T1100C"]
+    assert activity.identity.total_pressure_Pa.is_value
+    assert activity.identity.total_pressure_Pa.value == Decimal("101325")
+    assert activity.identity.fO2_Pa.is_value
+    assert activity.identity.fO2_Pa.value > 0
+    assert activity.derivation is not None
+    assert "experiment.pressure_environment.total_pressure_Pa" in activity.derivation.relation
+    assert "graphite_c_co_buffer" in activity.derivation.relation
 
     anchor_experiment = next(e for e in result.experiments.values()
                              if e.experiment_id.endswith("::na2o-sio2-table1-xna2o-0p50-t1200"))
@@ -174,6 +183,271 @@ def test_ts1985_keeps_printed_alternatives_and_absences(tmp_path) -> None:
     round_tripped = experiment_from_plain(to_plain(experiment))
     assert to_plain(round_tripped.pressure_environment.sweep_gas) == to_plain(located)
     assert not any("sweep_gas" in i.path for i in result.validation.hard_issues)
+
+
+def _ts1985_single_activity_doc() -> dict:
+    doc = load_cached_safe_yaml((EXTRACTS / "ts1985.yaml").read_text())
+    experiment_id = "na2o-sio2-xna2o-0p40-t1100"
+    experiment = next(
+        item for item in doc["experiments"] if item["experiment_id"] == experiment_id
+    )
+    observation = next(
+        item
+        for item in doc["species"]["Na2O"]["observations"]
+        if item["observation_id"] == "ts1985_na2o_table2_X0p40_T1100C"
+    )
+    doc["experiments"] = [copy.deepcopy(experiment)]
+    doc["species"]["Na2O"]["observations"] = [copy.deepcopy(observation)]
+    doc["species"]["Na2O"].pop("context", None)
+    return doc
+
+
+def test_experiment_unknown_pressure_is_not_inherited(tmp_path) -> None:
+    doc = _ts1985_single_activity_doc()
+    experiment = doc["experiments"][0]
+    experiment["pressure_environment"]["total_pressure_Pa"] = UNKNOWN.copy()
+    experiment["pressure_environment"]["sweep_gas"]["state"]["value"][
+        "partial_pressure_Pa"
+    ] = UNKNOWN.copy()
+    doc["species"]["Na2O"]["observations"][0].pop("equipment", None)
+    result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
+    observation = next(iter(result.observations.values()))
+    assert observation.identity.total_pressure_Pa.is_unknown
+    assert observation.identity.total_pressure_Pa.reason == (
+        "no total_pressure_Pa mapped from source"
+    )
+
+
+def test_missing_cco_waypoint_keeps_fo2_refused(tmp_path) -> None:
+    doc = _ts1985_single_activity_doc()
+    doc["experiments"][0].pop("fO2_control", None)
+    result = Migrator(root=_write_min_tree(tmp_path, doc)).run()
+    observation = next(iter(result.observations.values()))
+    assert observation.identity.total_pressure_Pa.is_value
+    assert observation.identity.fO2_Pa.is_unknown
+    assert observation.identity.fO2_Pa.reason == (
+        "no fO2_Pa mapped from source"
+    )
+
+
+def test_hastie_model_pressure_does_not_inherit_to_kems_points(tmp_path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kems-020-hastie-1981-nbsir.yaml"
+    )
+    points = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity == State.of(Quantity.P_PARTIAL)
+    ]
+    assert len(points) == 12
+    assert all(
+        observation.identity.total_pressure_Pa is not None
+        and observation.identity.total_pressure_Pa.is_unknown
+        for observation in points
+    )
+    experiment = next(iter(result.experiments.values()))
+    assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
+
+
+def test_model_row_total_pressure_is_not_a_partial_pressure_identity() -> None:
+    model = load_cached_safe_yaml(
+        (EXTRACTS / "kems-020-hastie-1981-nbsir.yaml").read_text()
+    )
+    row = next(
+        observation
+        for observation in model["species"]["Na"]["observations"]
+        if observation["observation_id"]
+        == "hastie_1981_table3_solgasmix_model_not_measurement"
+    )
+    total, provenance = _pressure_total_from_extract(
+        row, row["values"], gas_formula="Na", source_text=""
+    )
+    assert total is None
+    assert provenance is None
+
+
+def test_ueda_about_chamber_pressure_does_not_inherit_to_knudsen_points(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-095-ueda-1986.yaml")
+    pressures = [
+        experiment.pressure_environment.total_pressure_Pa
+        for key, experiment in result.experiments.items()
+        if "::experiment::ti-co-nco-" in key
+    ]
+    assert len(pressures) == 11
+    assert all(pressure.state.is_unknown for pressure in pressures)
+    assert all(
+        "extract_value=about 3 x 10^-5 Pa" in (pressure.state.reason or "")
+        for pressure in pressures
+    )
+    points = [
+        observation
+        for observation in result.observations.values()
+        if "ueda_1986_table1_xrd::" in observation.observation_id
+    ]
+    assert len(points) == 9
+    assert all(
+        observation.identity.total_pressure_Pa is None
+        or observation.identity.total_pressure_Pa.is_unknown
+        for observation in points
+    )
+
+
+def test_homma_printed_chamber_pressure_is_an_interval(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-001-homma-1966.yaml")
+    experiments = [
+        experiment
+        for key, experiment in result.experiments.items()
+        if "::experiment::" in key
+    ]
+    assert len(experiments) == 12
+    for experiment in experiments:
+        pressure = experiment.pressure_environment.total_pressure_Pa
+        assert pressure.state.is_value
+        assert pressure.state.value.kind is ValueKind.INTERVAL
+        assert pressure.state.value.interval_low == Decimal(
+            "0.1333223684210526315789473684"
+        )
+        assert pressure.state.value.interval_high == Decimal(
+            "1.333223684210526315789473684"
+        )
+        assert pressure.locator.page == 516
+
+
+def test_ohno_printed_chamber_pressure_is_an_interval(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-002-ohno-1967.yaml")
+    pressure = next(
+        experiment.pressure_environment.total_pressure_Pa
+        for key, experiment in result.experiments.items()
+        if key.endswith("::kems-002-ohno-1967")
+    )
+    assert pressure.state.is_value
+    assert pressure.state.value.kind is ValueKind.INTERVAL
+    assert pressure.state.value.interval_low == Decimal(
+        "0.1333223684210526315789473684"
+    )
+    assert pressure.state.value.interval_high == Decimal(
+        "1.333223684210526315789473684"
+    )
+    assert pressure.locator.page == 1164
+
+
+def test_richter_h2_pressure_note_does_not_demote_its_point(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-037-richter-2002.yaml")
+    pressures = [
+        experiment.pressure_environment.total_pressure_Pa
+        for experiment in result.experiments.values()
+        if experiment.pressure_environment.total_pressure_Pa.inference is not None
+        and "as_published=0.000187 bar"
+        in experiment.pressure_environment.total_pressure_Pa.inference.inputs
+    ]
+    assert len(pressures) == 1
+    assert pressures[0].state.is_value
+    assert pressures[0].state.value.kind is ValueKind.POINT
+    assert pressures[0].state.value.point == Decimal("18.7")
+
+
+def test_heck_inferred_one_atmosphere_remains_a_point(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-140-heck-2025.yaml")
+    pressure = result.experiments[
+        "10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series"
+    ].pressure_environment.total_pressure_Pa
+    assert pressure.state.is_value
+    assert pressure.state.value.kind is ValueKind.POINT
+    assert pressure.state.value.point == Decimal("101325")
+
+
+def test_sossi_printed_one_atmosphere_still_inherits(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
+    observation = result.observations[
+        "kems-012-sossi-2019::sossi_2019_k_class_b1"
+    ]
+    assert observation.identity.total_pressure_Pa == State.of(Decimal("100000"))
+
+
+@pytest.mark.parametrize(
+    "observation_id",
+    [
+        "sossi_2019_na_alpha_e_authors_adopted_unity",
+        "sossi_2019_na_alpha_e_authors_adopted_unity_quoted_20260906",
+        "sossi_2019_na_pure_system_LH_table5",
+        "sossi_2019_na_pure_system_LH_table5_quoted_20260906",
+        "sossi_2019_k_open_furnace_alpha_e_context",
+    ],
+)
+def test_model_carrier_keeps_printed_sossi_furnace_condition(
+    tmp_path, observation_id: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
+    observation = result.observations[
+        f"kems-012-sossi-2019::{observation_id}"
+    ]
+    assert observation.identity.total_pressure_Pa == State.of(Decimal("100000"))
+
+
+@pytest.mark.parametrize(
+    "observation_id",
+    [
+        "sossi_2019_na_logKstar_table3",
+        "sossi_2019_na_logKstar_table3_quoted_20260906",
+    ],
+)
+def test_sossi_log_k_star_does_not_use_furnace_pressure(
+    tmp_path, observation_id: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-012-sossi-2019.yaml")
+    observation = result.observations[
+        f"kems-012-sossi-2019::{observation_id}"
+    ]
+    assert observation.identity.total_pressure_Pa == State.not_applicable(
+        "profile log10_K_star does not use total_pressure_Pa"
+    )
+
+
+def test_model_carrier_keeps_printed_fedkin_chamber_condition(tmp_path) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-005-fedkin-2006.yaml")
+    points = [
+        observation
+        for observation in result.observations.values()
+        if "fedkin_2006_sio_hashimoto_table3_complete_b1::" in observation.observation_id
+    ]
+    assert len(points) == 4
+    assert all(
+        observation.identity.total_pressure_Pa == State.of(Decimal("0.0013"))
+        for observation in points
+    )
+
+
+def test_norris_printed_atmosphere_ignores_page_range_locator(tmp_path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "norris-2017-earth-volatiles-nature.yaml"
+    )
+    observation = result.observations[
+        "norris-2017-earth-volatiles-nature::norris_2017_volatile_loss_conditions"
+    ]
+    assert observation.identity.total_pressure_Pa == State.of(Decimal("101325"))
+
+
+@pytest.mark.parametrize(
+    "observation_id",
+    [
+        "ts1985_na2o_table2_log10_a_AT_B",
+        "ts1985_na2o_prose_1200C_range",
+    ],
+)
+def test_ts1985_printed_atmosphere_ignores_sibling_range_prose(
+    tmp_path, observation_id: str
+) -> None:
+    result = _migrate_real_extract(tmp_path, "ts1985.yaml")
+    matches = [
+        observation
+        for observation in result.observations.values()
+        if f"::{observation_id}" in observation.observation_id
+    ]
+    assert len(matches) == (4 if observation_id.endswith("log10_a_AT_B") else 1)
+    assert all(
+        observation.identity.total_pressure_Pa == State.of(Decimal("101325"))
+        for observation in matches
+    )
 
 
 @pytest.mark.parametrize("defect", [
