@@ -640,6 +640,92 @@ def test_derived_oxygen_condition_notice_reaches_residual() -> None:
     )
 
 
+def test_solved_effusion_lifts_only_derived_oxygen_provenance_blocker() -> None:
+    experiment = replace(
+        F.kems_experiment(),
+        conditions={"temperature_K": F.located(Decimal("1156"))},
+    )
+    ident = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("1e-6")),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    derived = Notice(
+        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=(
+            "fO2_Pa is a DERIVED condition, not a measurement: "
+            "P_O2 derived from measured pK"
+        ),
+        origin="plante-row",
+    )
+    reference = F.observation(
+        "plante-derived-pressure",
+        experiment.experiment_id,
+        ident,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+        notices=(derived,),
+    )
+    solved = Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason='fo2_oxygen_balance_effusion_solved: {"pO2_bar":0.12}',
+        origin="engine:openimcc",
+    )
+    unsolved_prediction = replace(
+        _partial_prediction(Engine.OPENIMCC, reference),
+        notices=(),
+    )
+    unsolved, unsolved_candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference),
+        prediction=unsolved_prediction,
+        comparison_ids={reference.observation_id},
+    )
+    assert unsolved_candidate is not None
+    assert unsolved.score_eligible is False
+    assert "no_blocking_qualification" in unsolved.exclusions
+
+    prediction = replace(
+        _partial_prediction(Engine.OPENIMCC, reference),
+        notices=(solved,),
+    )
+    residual, candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference),
+        prediction=prediction,
+        comparison_ids={reference.observation_id},
+    )
+
+    assert candidate is not None
+    assert residual.score_eligible is True
+    assert residual.exclusions == ()
+    assert derived in residual.notices
+    assert validate_corpus(
+        [F.work()], [experiment], [reference, candidate], [residual]
+    ).ok
+
+    unrelated = replace(derived, reason="total pressure provenance unknown")
+    reference_with_other_blocker = replace(
+        reference,
+        observation_id="plante-derived-pressure-with-other-blocker",
+        notices=(derived, unrelated),
+    )
+    blocked, _ = compile_residual(
+        reference_with_other_blocker,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference_with_other_blocker),
+        prediction=prediction,
+        comparison_ids={reference_with_other_blocker.observation_id},
+    )
+    assert blocked.score_eligible is False
+    assert "no_blocking_qualification" in blocked.exclusions
+
+
 def _two_phase_notice():
     return Notice(
         kind=NoticeKind.OUT_OF_CERTIFIED_BAND,

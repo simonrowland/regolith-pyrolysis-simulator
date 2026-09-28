@@ -163,25 +163,202 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
 
 
 @pytest.mark.parametrize(
-    ("extract", "bench_id", "expected_material"),
+    ("extract", "bench_id", "expected_material", "expected_codes", "expected_class"),
     (
-        ("kems-020-hastie-1981-nbsir.yaml", "hastie-1981-kms", "platinum KMS cell"),
-        ("kems-023-demaria-1973.yaml", "demaria-1973-kems", None),
-        ("kems-025-markova-1983.yaml", "markova-1983-kems", None),
-        ("kems-026-markova-1984.yaml", "markova-1984-kems", None),
-        ("kems-028-yakovlev-1984.yaml", "yakovlev-1984-kems", None),
-        ("kems-051-allibert-1981.yaml", "allibert-1981-kems", "molybdenum"),
-        ("kems-114-nichols-1995.yaml", "nichols-1995-kems", None),
-        ("kems-201-ichise-1986.yaml", "ichise-1986-kems", None),
+        (
+            "kems-020-hastie-1981-nbsir.yaml",
+            "hastie-1981-kms",
+            "platinum KMS cell",
+            ("Pt",),
+            "inert",
+        ),
+        ("kems-023-demaria-1973.yaml", "demaria-1973-kems", None, None, "unknown"),
+        ("kems-025-markova-1983.yaml", "markova-1983-kems", None, None, "unknown"),
+        ("kems-026-markova-1984.yaml", "markova-1984-kems", None, None, "unknown"),
+        ("kems-028-yakovlev-1984.yaml", "yakovlev-1984-kems", None, None, "unknown"),
+        ("kems-051-allibert-1981.yaml", "allibert-1981-kems", "molybdenum", ("Mo",), "reactive"),
+        ("kems-114-nichols-1995.yaml", "nichols-1995-kems", None, None, "unknown"),
+        ("kems-201-ichise-1986.yaml", "ichise-1986-kems", None, None, "unknown"),
         (
             "bencze-yazhenskikh-2016.yaml",
             "bencze-2016-supplement-kems",
             "iridium cell with graphite-coated lid; later graphite disc",
+            ("Ir", "C_graphite"),
+            "reactive",
         ),
         (
             "metsoc-2019-6005.yaml",
             "shornikov-yakovlev-2019-kems",
             "Knudsen molybdenum effusion cell",
+            ("Mo",),
+            "reactive",
+        ),
+        (
+            "kems-021-plante-1992-feo.yaml",
+            "tungsten-iridium-kems",
+            "tungsten cell with iridium inner cup",
+            ("W", "Ir"),
+            "reactive",
+        ),
+        (
+            "kems-027-plante-hastie-1983.yaml",
+            "kms",
+            "Welded platinum cell; 0.025 cm Pt sheet",
+            ("Pt",),
+            "inert",
+        ),
+        (
+            "kems-029-yakovlev-shornikov-2011.yaml",
+            "yakovlev-ms1301-kems",
+            "Tungsten effusion cell with rhenium boat",
+            ("W", "Re"),
+            "reactive",
+        ),
+        (
+            "kems-031-halwax-2024.yaml",
+            "julich-ir-kems",
+            "Iridium Knudsen cell in a molybdenum container with tantalum radiation shields",
+            ("Ir", "Mo", "Ta"),
+            "reactive",
+        ),
+        ("kems-042-plante-1979.yaml", "kems-system", "Platinum effusion cell", ("Pt",), "inert"),
+        ("kems-053-stolyarova-1991.yaml", "stolyarova-kems", "tungsten", ("W",), "reactive"),
+        (
+            "kems-057-kambayashi-1985.yaml",
+            "rm6e",
+            "High-purity alumina SSA-S cell; tantalum susceptor",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-058-ohara-1987.yaml",
+            "ohara-kems",
+            "Alumina Knudsen cell with electrolytic-iron inner crucible",
+            ("Al2O3", "Fe"),
+            "not_inert",
+        ),
+        (
+            "kems-066-ichise-1977.yaml",
+            "rm6k",
+            "Alumina Knudsen cell; tantalum cell holder",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-067-yamada-1980.yaml",
+            "rm6k",
+            "homemade thoria (ThO2) Knudsen cell",
+            ("ThO2",),
+            "not_inert",
+        ),
+        (
+            "kems-069-furukawa-1976.yaml",
+            "thoria-kems",
+            "Laboratory-made thoria Knudsen cell",
+            ("ThO2",),
+            "not_inert",
+        ),
+        (
+            "kems-087-yamada-kato-1980.yaml",
+            "yamada-kato-rm6k",
+            "High-purity alumina Knudsen cell with tantalum susceptor and radiation shields",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-088-ichise-1975.yaml",
+            "ichise-rm6k",
+            "Alumina Knudsen cell and tantalum cell holder",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        ("kems-095-ueda-1986.yaml", "ueda-kems", "Y2O3", ("Y2O3",), "not_inert"),
+        (
+            "kems-105-yamada-1983.yaml",
+            "yamada-kato-rm6k",
+            "Beryllia Knudsen cells for Fe-P-Al and Fe-P-Ti; alumina "
+            "Knudsen cells for other Fe-P-i systems",
+            ("BeO", "Al2O3"),
+            "not_inert",
+        ),
+        (
+            "kems-111-ichise-1982.yaml",
+            "rm6k",
+            "Sintered alumina crucible",
+            ("Al2O3",),
+            "not_inert",
+        ),
+        (
+            "kems-112-ichise-1989.yaml",
+            "ichise-kems",
+            "sintered alumina crucible and tantalum holder",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-116-nunoue-1987.yaml",
+            "rm6e",
+            "High-purity alumina SSA-S Knudsen cell",
+            ("Al2O3",),
+            "not_inert",
+        ),
+        (
+            "kems-118-yamamoto-1983.yaml",
+            "rm-6e",
+            "High-purity alumina SSA-S Knudsen-cell crucible",
+            ("Al2O3",),
+            "not_inert",
+        ),
+        (
+            "kems-119-furukawa-1975.yaml",
+            "rm6k",
+            "High-purity alumina SSA-S; tantalum susceptor",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        ("kems-120-ueshima-1984.yaml", "rm6k", "Alumina Knudsen cell", ("Al2O3",), "not_inert"),
+        (
+            "kems-137-bischof-2023.yaml",
+            "finnigan-mat-271-ir",
+            "Iridium Knudsen cell in tungsten housing with three nested tantalum heat shields",
+            ("Ir", "W", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-138-bischof-2023.yaml",
+            "finnigan-mat-271-ir",
+            "Iridium Knudsen cell in tungsten container with three tantalum heat shields",
+            ("Ir", "W", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-169-nakazawa-1976.yaml",
+            "nag-530",
+            "Molybdenum lid, container, and orifice plate; alumina inner crucible",
+            ("Mo", "Al2O3"),
+            "reactive",
+        ),
+        (
+            "kems-184-behrens-1979.yaml",
+            "elfs-quadrupole",
+            "graphite",
+            ("C_graphite",),
+            "reactive",
+        ),
+        ("kems-188-nanjo-1976.yaml", "nanjo-kems", "Quartz Knudsen cell", ("SiO2",), "not_inert"),
+        (
+            "kems-ms2000-044.yaml",
+            "alkali-silicate-kems",
+            "Nb, Ta, Mo, or Ni cell material; aluminium powder sometimes mixed with test substance",
+            ("Nb", "Ta", "Mo", "Ni"),
+            "reactive",
+        ),
+        (
+            "ueshima-1982-fe-mo-thermal.yaml",
+            "ueshima-rm6k",
+            "Gas-tight high-purity Al2O3 crucible (Nippon Kagaku Togyo SSA-S) in a Ta container",
+            ("Al2O3", "Ta"),
+            "reactive",
         ),
     ),
 )
@@ -190,8 +367,12 @@ def test_kems_cell_material_state_survives_migration(
     extract: str,
     bench_id: str,
     expected_material: str | None,
+    expected_codes: tuple[str, ...] | None,
+    expected_class: str,
 ) -> None:
     from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.migrate import bench_from_plain, to_plain
+    from simulator.battery.score import _cell_material_class
 
     result = _migrate_real_extract(tmp_path, extract)
     bench = next(
@@ -206,6 +387,39 @@ def test_kems_cell_material_state_survives_migration(
     else:
         assert cell.state.is_value
         assert cell.state.value == expected_material
+
+    if expected_codes is None:
+        assert bench.cell_materials is None
+    else:
+        assert bench.cell_materials is not None
+        assert tuple(item.state.value.value for item in bench.cell_materials) == expected_codes
+        assert all(item.locator == cell.locator for item in bench.cell_materials)
+    assert bench_from_plain(to_plain(bench)) == bench
+    assert _cell_material_class(bench.cell_materials) == expected_class
+
+
+def test_plante_cell_materials_round_trip_through_work_store(tmp_path: Path) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.migrate import load_migrated_benches, write_outputs
+
+    root = tmp_path / "tree"
+    result = _migrate_real_extract(tmp_path, "kems-042-plante-1979.yaml")
+    source_bench = next(
+        bench
+        for bench in result.benches.values()
+        if bench.id.endswith("::bench::kems-system")
+    )
+    assert source_bench.cell_materials is not None
+    assert [item.state.value.value for item in source_bench.cell_materials] == ["Pt"]
+    assert all(item.locator is not None for item in source_bench.cell_materials)
+
+    write_outputs(result, root)
+    stored_bench = load_migrated_benches(root)[source_bench.id]
+
+    assert stored_bench.cell_materials == source_bench.cell_materials
+    assert [item.locator for item in stored_bench.cell_materials or ()] == [
+        item.locator for item in source_bench.cell_materials
+    ]
 
 
 def test_tsukihashi_split_temperature_locators_use_figure7() -> None:

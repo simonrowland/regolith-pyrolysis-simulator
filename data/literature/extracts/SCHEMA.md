@@ -330,6 +330,13 @@ does not assert another physical charge or reassign mixed Table 2 observations.
 The instrument's temperature-stability magnitude is a bound of <=0.5 C.
 These real records exercise RANGE, NOMINAL and BOUND through migration.
 
+For scorer-facing Knudsen/KEMS benches, `cell_materials` records each
+material stated in `cell_material_and_liner` as a located enum. Use only these
+closed values: `Pt`, `Ir`, `Rh`, `W`, `Mo`, `Ta`, `Nb`, `Re`, `Ni`, `Fe`,
+`C_graphite`, `Al2O3`, `SiO2`, `MgO`, `ZrO2`, `Y2O3`, `ThO2`, `BeO`, `BN`,
+`SiC`, `other_alloy`, `other`. Type only the printed cell description; do not
+infer material from related publications or parse prose in the scorer.
+
 ```yaml
 benches:
 - id: rm6k
@@ -339,6 +346,9 @@ benches:
     locator: {page: 13, published_page: 3051, section: '3.1'}
   cell_material_and_liner:
     state: {tag: value, value: High-purity alumina SSA-S}
+    locator: {page: 13, published_page: 3051, section: '3.1'}
+  cell_materials:
+  - state: {tag: value, value: Al2O3}
     locator: {page: 13, published_page: 3051, section: '3.1'}
   geometry:
     cell_internal_dimensions:
