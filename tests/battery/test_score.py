@@ -2682,3 +2682,99 @@ def test_battery_score_script_does_not_take_a_hand_stamp() -> None:
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
     assert "derive_store_stamp" in called
+
+
+def test_imcc_complex_saturation_routes_only_own_prediction() -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.score import (
+        cell_notices,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity()
+    reference = F.observation(
+        "ts1985-complex-saturation",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    notice = cell_notices(
+        Quantity.ACTIVITY,
+        Engine.IMCC_SF04,
+        SimpleNamespace(
+            notices=(
+                {
+                    "kind": "imcc_complex_saturation",
+                    "flag": "species-coverage-edge:Na2O",
+                    "reason": "species-coverage-edge:Na2O",
+                    "acid_sink_ratio": 0.0,
+                },
+            )
+        ),
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    saturated_prediction = replace(
+        _predict(Decimal("0.3"), identity),
+        engine=Engine.IMCC_SF04,
+        channel=Engine.IMCC_SF04.value,
+        unit="dimensionless",
+        notices=notice,
+    )
+    unaffected_prediction = replace(
+        _predict(Decimal("0.3"), identity),
+        engine=Engine.OPENIMCC,
+        channel=Engine.OPENIMCC.value,
+        unit="dimensionless",
+    )
+    saturated, _ = compile_residual(
+        reference,
+        Engine.IMCC_SF04,
+        context=context,
+        prediction=saturated_prediction,
+    )
+    unaffected, _ = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=unaffected_prediction,
+    )
+
+    assert saturated.numeric is not None
+    assert saturated.score_eligible is False
+    assert "not_flagged_stratum" in saturated.exclusions
+    assert any(
+        item.kind is NoticeKind.IMCC_COMPLEX_SATURATION
+        and item.reason == "species-coverage-edge:Na2O"
+        for item in saturated.notices
+    )
+    assert unaffected.numeric is not None
+    assert unaffected.score_eligible is True
+
+    headline = headline_rows(
+        (saturated, unaffected),
+        context=context,
+        engines=(Engine.IMCC_SF04, Engine.OPENIMCC),
+    )
+    by_engine = {
+        row["engine"]: row for row in headline if row["rail"] == saturated.rail.value
+    }
+    assert by_engine[Engine.IMCC_SF04.value]["n"] == 0
+    assert by_engine[Engine.OPENIMCC.value]["n"] == 1
+    assert by_engine[Engine.OPENIMCC.value]["n_score_eligible"] == 1
+
+    flagged = flagged_stratum_rows((saturated,), engines=(Engine.IMCC_SF04,))
+    assert [(row["stratum"], row["n"]) for row in flagged] == [
+        ("imcc_complex_saturation", 1)
+    ]
+    payload = residual_to_plain(saturated)
+    assert any(
+        row["kind"] == "imcc_complex_saturation" for row in payload["notices"]
+    )
+    assert [(row["stratum"], row["n"]) for row in flagged_stratum_payloads(
+        (payload,), (Engine.IMCC_SF04,)
+    )] == [("imcc_complex_saturation", 1)]
