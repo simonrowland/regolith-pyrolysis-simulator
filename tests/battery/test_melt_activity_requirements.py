@@ -22,7 +22,8 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.generators import melt_activity_requests
-from simulator.battery.identity import Identity
+from simulator.battery.identity import Identity, profile_for
+from simulator.battery.migrate import fill_identity
 from simulator.battery.records import (
     Bench,
     BenchIdentity,
@@ -48,6 +49,25 @@ def _composition(*pairs: tuple[str, str]) -> Composition:
         tuple((name, Decimal(amount)) for name, amount in pairs),
         AmountBasis.MOLE_FRACTION,
     )
+
+
+def test_fill_identity_retains_known_uncompared_activity_axes() -> None:
+    composition = _composition(("CaO", "0.5"), ("Al2O3", "0.5"))
+    oxygen = State.of(Decimal("1e-8"))
+    pressure = State.of(Decimal("101325"))
+
+    identity = fill_identity(
+        Quantity.ACTIVITY,
+        Species("Al2O3", Phase.L),
+        composition=State.of(composition),
+        fO2_Pa=oxygen,
+        total_pressure_Pa=pressure,
+    )
+
+    assert "fO2_Pa" not in profile_for(identity).required
+    assert "total_pressure_Pa" not in profile_for(identity).required
+    assert identity.fO2_Pa == oxygen
+    assert identity.total_pressure_Pa == pressure
 
 
 def _reference_state(
