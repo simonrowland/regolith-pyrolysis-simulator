@@ -873,7 +873,11 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
 
 
 def _is_fusion_conversion_notice(notice: Notice) -> bool:
-    return notice.reason.startswith(
+    return _is_fusion_conversion_reason(notice.reason)
+
+
+def _is_fusion_conversion_reason(reason: object) -> bool:
+    return isinstance(reason, str) and reason.startswith(
         f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION};"
     )
 
@@ -4590,6 +4594,8 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         out.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         out.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
+    if any(_is_fusion_conversion_reason(notice.get("reason")) for notice in notices):
+        out.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     return tuple(out)
 
 

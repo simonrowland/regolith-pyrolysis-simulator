@@ -1422,6 +1422,59 @@ def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> Non
     assert flagged_strata((ordinary_disagreement,)) == ()
 
 
+def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
+        FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
+        FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        _flagged_payload_strata,
+        _is_flagged_stratum_notice,
+        flagged_strata,
+    )
+
+    cases = (
+        (
+            FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+            NoticeKind.UNVERIFIED_APPARATUS,
+            "apparatus_unverified:probe",
+        ),
+        (
+            FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
+            NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+            "catalogue_composition:probe",
+        ),
+        (
+            FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+            NoticeKind.SOURCE_DISAGREEMENT,
+            "source_internally_inconsistent: probe",
+        ),
+        (
+            FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
+            NoticeKind.IMCC_COMPLEX_SATURATION,
+            "imcc_complex_saturation:probe",
+        ),
+        (
+            FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            "reference_converted_via_fusion;probe",
+        ),
+    )
+    for stratum, kind, reason in cases:
+        notice = Notice(
+            kind=kind,
+            affected_quantities=(Quantity.P_PARTIAL,),
+            reason=reason,
+            origin=f"probe:{stratum}",
+        )
+        payload = {"notices": [{"kind": kind.value, "reason": reason}]}
+
+        assert flagged_strata((notice,)) == (stratum,)
+        assert _is_flagged_stratum_notice(notice) is True
+        assert _flagged_payload_strata(payload) == (stratum,)
+
+
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:
     exp = F.kems_experiment(orifice_area=None, clausing=None)
     assert exp.apparatus is not None
@@ -2937,6 +2990,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         _fusion_comparison_reference,
         flagged_stratum_rows,
         headline_rows,
+        render_score_report_from_payloads,
     )
 
     temperature = Decimal("2000")
@@ -3067,6 +3121,35 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
             (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
         )
     ] == [(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION, 1)]
+
+    payload = residual_to_plain(residual)
+    for tier in ("measured", "compilation"):
+        headline = next(
+            row
+            for row in headline_payloads(
+                (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+            )
+            if row["rail"] == residual.rail.value
+        )
+        assert headline["n"] == 0
+        assert headline["n_candidates"] == 0
+    assert [
+        (row["stratum"], row["n"])
+        for row in flagged_stratum_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == [(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION, 1)]
+    report = render_score_report_from_payloads(
+        (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
+    )
+    assert (
+        f"| {residual.rail.value} | {Engine.INTERNAL_ANALYTICAL.value} | "
+        "0 | 0 | 0 | 0 |"
+    ) in report
+    assert (
+        f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
+        f"{residual.rail.value} | {Engine.INTERNAL_ANALYTICAL.value} | 1 |"
+    ) in report
 
     source_point_reference = replace(
         reference,
