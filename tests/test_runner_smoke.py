@@ -261,7 +261,13 @@ def test_completed_run_preserves_success_when_yield_disposition_raises(
     payload = run._run_session(session)
 
     assert payload["status"] == "ok"
-    assert payload["yield_disposition"] is None
+    disposition = payload["yield_disposition"]
+    assert disposition["status"] == "refused"
+    assert "OriginUnresolvedError" in disposition["reason"]
+    boundary = disposition["ideal_train_melt_boundary"]
+    assert boundary["status"] == "unavailable"
+    assert "OriginUnresolvedError" in boundary["reason"]
+    assert boundary["rows"] == []
     assert payload["terminal_product_taxonomy"] is not None
 
 

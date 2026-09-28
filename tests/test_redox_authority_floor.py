@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 from simulator.core import PyrolysisSimulator
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.state import MOLAR_MASS
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
@@ -391,8 +392,8 @@ def test_ledger_feo_bounds_when_the_inventory_projection_is_empty() -> None:
 def test_evaporative_coproduct_oxygen_oxidises_remaining_feo(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """FeO -> Fe(g) + 1/2 O2 leaves real O2. At the saturation bound the
-    unclamped Kress fraction is interior, so that O2 oxidises Fe2+.
+    """Congruent FeO evaporation oxidises Fe2+ only up to Kress at the
+    interface fO2, not up to the saturation-bound ratio.
     """
 
     sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1600.0)
@@ -401,11 +402,12 @@ def test_evaporative_coproduct_oxygen_oxidises_remaining_feo(
         "_melt_redox_exchange_is_liquid",
         lambda *_args, **_kwargs: True,
     )
-    fO2_log = sim._melt_fO2_from_ledger()
+    sim.melt.oxygen_reservoir.interface_pO2_bar = TRANSPORT_PO2_BAR
+    assert sim._melt_fO2_from_ledger() < math.log10(TRANSPORT_PO2_BAR)
     assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
     composition = melt_mol_fractions_for_kress91(sim._cleaned_melt_ledger_wt_pct())
     target_q = kress91_fe3_over_sigma_fe(
-        fO2_log=fO2_log,
+        fO2_log=math.log10(TRANSPORT_PO2_BAR),
         mol_fractions=composition,
         T_K=1600.0 + 273.15,
         pressure_bar=_pressure_bar(sim),
@@ -459,3 +461,228 @@ def test_unconstrained_respeciation_does_not_mint_from_the_bound(
     assert diagnostic["respeciation_status"] == "skipped_fe_saturation_bound"
     assert _oxide_mol(sim, "Fe2O3") == 0.0
     assert sim.atom_ledger.mol_by_account() == before
+
+
+def _ferric_state(sim: PyrolysisSimulator) -> tuple[float, float, float, float]:
+    feo = _oxide_mol(sim, "FeO")
+    fe2o3 = _oxide_mol(sim, "Fe2O3")
+    total = feo + 2.0 * fe2o3
+    fraction = 0.0 if total <= 0.0 else (2.0 * fe2o3) / total
+    return fraction, feo, fe2o3, total
+
+
+def _oxygen_atom_mol(sim: PyrolysisSimulator) -> float:
+    total = 0.0
+    for account, species_mol in sim.atom_ledger.mol_by_account().items():
+        del account
+        for species, mol in species_mol.items():
+            formula = resolve_species_formula(species, sim.species_formula_registry)
+            total += float(mol) * float(formula.elements.get("O", 0.0))
+    return total
+
+
+def _flush_evaporative_credit(sim: PyrolysisSimulator, credit_mol: float) -> None:
+    from simulator.state import EvaporationFlux
+
+    sim._headspace_evaporative_o2_source_mol = lambda _index: (credit_mol, 0.0)
+    flux = EvaporationFlux(species_kg_hr={})
+    flux.update_totals()
+    sim._set_headspace_transport_source_rates(flux, transition_start_index=0)
+    sim._flush_evaporative_o2_buffer_to_headspace()
+
+
+def test_trace_feo_evaporative_oxygen_stops_at_interface_target(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """1e-13 mol FeO plus a large O2 credit ends at the interface target.
+
+    The starting ferric fraction is the Kress endpoint, the measured
+    trace-iron state. An uncapped path treats that endpoint as not a
+    measurement and leaves the fraction there. Congruent evaporation
+    must bring it back to the interface target.
+    """
+
+    from simulator.state import MOLAR_MASS
+
+    feo_mol = 1.0e-13
+    fe2o3_mol = 5.0e-8
+    feo_wt = feo_mol * float(MOLAR_MASS["FeO"]) / 10.0
+    fe2o3_wt = fe2o3_mol * float(MOLAR_MASS["Fe2O3"]) / 10.0
+    sim = _sim_with_oxides(
+        feo_wt=feo_wt,
+        fe2o3_wt=fe2o3_wt,
+        temperature_C=1600.0,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_exchange_is_liquid",
+        lambda *_args, **_kwargs: True,
+    )
+    sim.melt.oxygen_reservoir.interface_pO2_bar = TRANSPORT_PO2_BAR
+    fraction, feo, fe2o3_before, _total = _ferric_state(sim)
+    assert feo == pytest.approx(feo_mol, rel=1.0e-6)
+    assert fraction >= 1.0 - KRESS91_FERRIC_FRACTION_EPSILON
+    composition = melt_mol_fractions_for_kress91(sim._cleaned_melt_ledger_wt_pct())
+    target_q = kress91_fe3_over_sigma_fe(
+        fO2_log=math.log10(TRANSPORT_PO2_BAR),
+        mol_fractions=composition,
+        T_K=1600.0 + 273.15,
+        pressure_bar=_pressure_bar(sim),
+    )
+    assert KRESS91_FERRIC_FRACTION_EPSILON < target_q < 0.5
+    oxygen_mol = 2.0
+    sim.atom_ledger.load_external_mol(
+        "reservoir.fo2_buffer",
+        {"O2": oxygen_mol},
+        source="test evaporative oxygen coproduct",
+        material_origin="feedstock",
+    )
+    oxygen_before = _oxygen_atom_mol(sim)
+    monkeypatch.setattr(
+        sim,
+        "_headspace_evaporative_o2_source_mol",
+        lambda _index: (oxygen_mol, 0.0),
+    )
+
+    sim._apply_post_evaporation_fe_respeciation(transition_start_index=0)
+    _flush_evaporative_credit(sim, oxygen_mol)
+
+    fraction_after, _feo_after, fe2o3_after, total_after = _ferric_state(sim)
+    headspace_o2 = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0)
+        or 0.0
+    )
+    buffer_o2 = float(
+        sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0)
+        or 0.0
+    )
+    assert fraction_after == pytest.approx(target_q, rel=1.0e-6)
+    assert fraction_after < 0.5
+    assert fe2o3_after == pytest.approx(0.5 * target_q * total_after, rel=1.0e-6)
+    released_o2 = 0.5 * (fe2o3_before - fe2o3_after)
+    assert headspace_o2 == pytest.approx(oxygen_mol + released_o2, abs=1.0e-12)
+    assert buffer_o2 == pytest.approx(0.0, abs=1.0e-12)
+    assert _oxygen_atom_mol(sim) == pytest.approx(oxygen_before, abs=1.0e-12)
+
+
+def test_melt_already_at_interface_target_flushes_all_evaporative_o2(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A melt already at the interface target does not respeciate.
+
+    Coexisting native Fe would otherwise pull the ratio to the Fe-FeO
+    buffer. Evaporative oxygen does not apply that second mutation.
+    """
+
+    sim = _sim_with_oxides(feo_wt=8.0, fe2o3_wt=2.0, temperature_C=1600.0)
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_exchange_is_liquid",
+        lambda *_args, **_kwargs: True,
+    )
+    sim.melt.oxygen_reservoir.interface_pO2_bar = TRANSPORT_PO2_BAR
+    from simulator.accounting import LedgerTransition, MaterialLot
+    from simulator.accounting.formulas import resolve_species_formula
+
+    feo_kg = resolve_species_formula("FeO", {}).molar_mass_kg_per_mol()
+    fe2o3_kg = resolve_species_formula("Fe2O3", {}).molar_mass_kg_per_mol()
+    o2_kg = resolve_species_formula("O2", {}).molar_mass_kg_per_mol()
+    for _ in range(4):
+        composition = melt_mol_fractions_for_kress91(
+            sim._cleaned_melt_ledger_wt_pct()
+        )
+        target_q = kress91_fe3_over_sigma_fe(
+            fO2_log=math.log10(TRANSPORT_PO2_BAR),
+            mol_fractions=composition,
+            T_K=1600.0 + 273.15,
+            pressure_bar=_pressure_bar(sim),
+        )
+        _fraction, feo, fe2o3, total = _ferric_state(sim)
+        target_fe2o3 = 0.5 * target_q * total
+        delta = target_fe2o3 - fe2o3
+        if abs(delta) <= 1.0e-12:
+            break
+        if delta > 0.0:
+            sim.atom_ledger.apply(
+                LedgerTransition(
+                    name="test_set_interface_target",
+                    debits=(
+                        MaterialLot("process.cleaned_melt", {"FeO": 2.0 * delta * feo_kg}),
+                        MaterialLot("reservoir.fo2_buffer", {"O2": 0.5 * delta * o2_kg}),
+                    ),
+                    credits=(
+                        MaterialLot(
+                            "process.cleaned_melt",
+                            {"Fe2O3": delta * fe2o3_kg},
+                        ),
+                    ),
+                )
+            )
+        else:
+            released = -delta
+            sim.atom_ledger.apply(
+                LedgerTransition(
+                    name="test_set_interface_target",
+                    debits=(
+                        MaterialLot(
+                            "process.cleaned_melt",
+                            {"Fe2O3": released * fe2o3_kg},
+                        ),
+                    ),
+                    credits=(
+                        MaterialLot("process.cleaned_melt", {"FeO": 2.0 * released * feo_kg}),
+                        MaterialLot("reservoir.fo2_buffer", {"O2": 0.5 * released * o2_kg}),
+                    ),
+                )
+            )
+    else:
+        raise AssertionError("interface target did not converge")
+    composition = melt_mol_fractions_for_kress91(sim._cleaned_melt_ledger_wt_pct())
+    target_q = kress91_fe3_over_sigma_fe(
+        fO2_log=math.log10(TRANSPORT_PO2_BAR),
+        mol_fractions=composition,
+        T_K=1600.0 + 273.15,
+        pressure_bar=_pressure_bar(sim),
+    )
+    fraction, _feo, fe2o3_before, _total = _ferric_state(sim)
+    assert fraction == pytest.approx(target_q, abs=1.0e-8)
+    sim.atom_ledger.load_external_mol(
+        "process.metal_phase",
+        {"Fe": 0.05},
+        source="test native Fe coexisting with the melt",
+        material_origin="feedstock",
+    )
+    # The ratio adjustment can credit O2. That oxygen is not this tick's
+    # evaporative credit, so the flush must leave it in the buffer.
+    leftover = float(
+        sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0) or 0.0
+    )
+    oxygen_mol = 3.0
+    sim.atom_ledger.load_external_mol(
+        "reservoir.fo2_buffer",
+        {"O2": oxygen_mol},
+        source="test evaporative oxygen coproduct",
+        material_origin="feedstock",
+    )
+    oxygen_before = _oxygen_atom_mol(sim)
+    monkeypatch.setattr(
+        sim,
+        "_headspace_evaporative_o2_source_mol",
+        lambda _index: (oxygen_mol, 0.0),
+    )
+
+    diagnostic = sim._apply_post_evaporation_fe_respeciation(transition_start_index=0)
+    _flush_evaporative_credit(sim, oxygen_mol)
+
+    _fraction_after, _feo_after, fe2o3_after, _total_after = _ferric_state(sim)
+    headspace_o2 = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) or 0.0
+    )
+    buffer_o2 = float(
+        sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0) or 0.0
+    )
+    assert diagnostic.get("direction") in {None, "none"}
+    assert fe2o3_after == pytest.approx(fe2o3_before, abs=1.0e-12)
+    assert headspace_o2 == pytest.approx(oxygen_mol, rel=1.0e-12)
+    assert buffer_o2 == pytest.approx(leftover, abs=1.0e-12)
+    assert _oxygen_atom_mol(sim) == pytest.approx(oxygen_before, abs=1.0e-12)

@@ -5572,6 +5572,70 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _flush_evaporative_o2_buffer_to_headspace(self) -> float:
         """Move this tick's available evaporative O₂ into the gas ledger."""
 
+        # Ferric oxygen the interface target did not retain returns to the
+        # buffer. It joins this tick's evaporative credit and is flushed once.
+        release_mol = max(
+            0.0,
+            float(getattr(
+                self,
+                '_evaporative_respeciation_o2_release_mol',
+                0.0,
+            ) or 0.0),
+        )
+        self._evaporative_respeciation_o2_release_mol = 0.0
+        if release_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            self._headspace_transport_source_o2_buffer_mol_this_hr = (
+                max(
+                    0.0,
+                    float(getattr(
+                        self,
+                        '_headspace_transport_source_o2_buffer_mol_this_hr',
+                        0.0,
+                    ) or 0.0),
+                )
+                + release_mol
+            )
+            self._headspace_transport_source_mass_kg_s = (
+                max(
+                    0.0,
+                    float(getattr(
+                        self,
+                        '_headspace_transport_source_mass_kg_s',
+                        0.0,
+                    ) or 0.0),
+                )
+                + release_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL / 3600.0
+            )
+            self._headspace_transport_source_total_mol_s = (
+                max(
+                    0.0,
+                    float(getattr(
+                        self,
+                        '_headspace_transport_source_total_mol_s',
+                        0.0,
+                    ) or 0.0),
+                )
+                + release_mol / 3600.0
+            )
+            overhead_o2_mol = max(
+                0.0,
+                float(getattr(
+                    self,
+                    '_headspace_transport_source_o2_overhead_mol_this_hr',
+                    0.0,
+                ) or 0.0),
+            )
+            self._headspace_transport_source_o2_mol_s = (
+                float(self._headspace_transport_source_o2_buffer_mol_this_hr)
+                + overhead_o2_mol
+            ) / 3600.0
+            total_mol_s = float(self._headspace_transport_source_total_mol_s)
+            if total_mol_s > 0.0:
+                self._headspace_transport_source_molar_mass_kg_mol = (
+                    float(self._headspace_transport_source_mass_kg_s)
+                    / total_mol_s
+                )
+
         gross_buffer_o2_mol = max(
             0.0,
             float(getattr(
@@ -9168,21 +9232,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         transition_start_index: int,
     ) -> Dict[str, Any]:
-        """Respeciate the O2 coproduct of elemental Fe evaporation.
+        """Respeciate evaporative oxygen only up to the interface equilibrium.
 
-        Premise: FeO(l) -> Fe(g) + 1/2 O2 credits that oxygen to
-        reservoir.fo2_buffer. It is real inventory. At the Fe-FeO saturation
-        bound, Kress91's unclamped Fe3+/sumFe is interior (above epsilon),
-        so the oxygen oxidises remaining Fe2+ up to that target. Oxygen the
-        target does not take leaves later by the explicit buffer-to-headspace
-        exchange. The epsilon floor is still not minted: this call is skipped
-        when there is no evaporative credit, and the engine refuses an
-        endpoint target.
+        Premise: FeO(l) -> Fe(g) + 1/2 O2(g) is congruent. The oxygen leaves
+        with the vapour and is credited to reservoir.fo2_buffer. The melt
+        retains only the Kress-forward ferric fraction at the interface fO2
+        already solved by the passive exchange (reservoir.interface_pO2_bar).
+        That is one target for both paths. There is no second redox mutation.
 
-        Algebra: available = min(this tick's evaporate_* buffer credit,
-        buffer balance). Applied n_Fe2O3 = min(0.5 * q * n_Fe, 2 * available),
-        with 2 FeO + 1/2 O2 -> Fe2O3. Units: mol.
-        Limiting case: available = 0 leaves Fe2O3 unchanged.
+        Algebra: q* = Kress_forward(log10(P_interface)).
+        Available = min(this tick's evaporate_* buffer credit, buffer balance).
+        Oxidation applies min(q* * n_Fe / 2 - n_Fe2O3, n_FeO / 2, 2 * available)
+        when that difference is positive. A melt already at q* applies zero.
+        A melt above q* returns the excess ferric oxygen to the buffer.
+        Every mole beyond q* is flushed once by
+        _flush_evaporative_o2_buffer_to_headspace. Units: mol.
+        Limiting case: 1e-13 mol FeO plus a large O2 credit ends at q*, not 1.
+        Available = 0 leaves Fe2O3 unchanged.
         """
 
         buffer_credit_mol, _overhead_mol = self._headspace_evaporative_o2_source_mol(
@@ -9196,12 +9262,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or 0.0
         ))
         capacity_mol = min(max(0.0, buffer_credit_mol), available_mol)
-        if capacity_mol > OXYGEN_RESERVOIR_NOOP_MOL:
-            return self._apply_fe_redox_respeciation(
-                oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_INTERNAL,
-                internal_o2_capacity_mol=capacity_mol,
-            )
-        return self._apply_fe_redox_respeciation()
+        self._evaporative_respeciation_o2_release_mol = 0.0
+        if capacity_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+            return self._apply_fe_redox_respeciation()
+        interface_pO2_bar = max(
+            self._vacuum_floor_bar(),
+            float(getattr(
+                self.melt.oxygen_reservoir,
+                'interface_pO2_bar',
+                0.0,
+            ) or 0.0),
+        )
+        comp = self._cleaned_melt_ledger_wt_pct() or self._melt_oxide_wt_pct()
+        temperature_K = float(self.melt.temperature_C) + 273.15
+        pressure_bar = floor_vacuum_pressure_bar(
+            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) / 1000.0,
+            floor_bar=self._vacuum_floor_bar(),
+        )
+        q_star = float(self._fe3_over_sigma_fe_at_fO2(
+            comp,
+            fO2_log=math.log10(interface_pO2_bar),
+            T_K=temperature_K,
+            pressure_bar=pressure_bar,
+        ))
+        respeciation_kwargs: Dict[str, Any] = {
+            'oxygen_source': FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_INTERNAL,
+            'internal_o2_capacity_mol': capacity_mol,
+            'fO2_log_override': math.log10(interface_pO2_bar),
+        }
+        if (
+            KRESS91_FERRIC_FRACTION_EPSILON < q_star
+            < 1.0 - KRESS91_FERRIC_FRACTION_EPSILON
+        ):
+            respeciation_kwargs['target_ferric_fraction'] = q_star
+        diagnostic = self._apply_fe_redox_respeciation(**respeciation_kwargs)
+        self._evaporative_respeciation_o2_release_mol = max(
+            0.0,
+            float(diagnostic.get('o2_credit_mol', 0.0) or 0.0),
+        )
+        return diagnostic
 
     def _apply_fe_redox_respeciation(
         self,
@@ -17360,6 +17459,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._headspace_transport_source_o2_committed_mol_this_hr = 0.0
             self._headspace_transport_source_o2_overhead_mol_this_hr = 0.0
             self._headspace_transport_source_mass_kg_s = 0.0
+            self._evaporative_respeciation_o2_release_mol = 0.0
         # The AtomLedger is the canonical quantity authority (see AGENTS.md),
         # so the turbine/vent decision is fed strictly the actual finite O2
         # holdup in process.overhead_gas. This is NOT max()'d with a per-tick

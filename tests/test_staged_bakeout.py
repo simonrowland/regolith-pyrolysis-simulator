@@ -1,3 +1,4 @@
+import math
 import shlex
 from dataclasses import replace
 from unittest.mock import patch
@@ -335,12 +336,46 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():
+    """Fe2O3 appears only when the interface Kress target is above the floor.
+
+    Congruent FeO evaporation does not oxidise every remaining ferrous mole.
+    The retained ferric fraction is the same interface target the passive
+    exchange uses. A target on the open floor leaves Fe2O3 at zero.
+    """
+
+    from simulator.fe_redox import KRESS91_FERRIC_FRACTION_EPSILON
+
     sim = _run_staged()
 
-    melt_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    melt_mol = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    feo = max(0.0, float(melt_mol.get("FeO", 0.0) or 0.0))
+    fe2o3 = max(0.0, float(melt_mol.get("Fe2O3", 0.0) or 0.0))
+    total_fe = feo + 2.0 * fe2o3
+    ferric = 0.0 if total_fe <= 0.0 else (2.0 * fe2o3) / total_fe
+    interface_pO2_bar = max(
+        sim._vacuum_floor_bar(),
+        float(getattr(sim.melt.oxygen_reservoir, "interface_pO2_bar", 0.0) or 0.0),
+    )
+    composition = sim._cleaned_melt_ledger_wt_pct() or sim._melt_oxide_wt_pct()
+    target_q = float(sim._fe3_over_sigma_fe_at_fO2(
+        composition,
+        fO2_log=math.log10(interface_pO2_bar),
+        T_K=float(sim.melt.temperature_C) + 273.15,
+        pressure_bar=max(sim._vacuum_floor_bar(), float(sim.melt.p_total_mbar) / 1000.0),
+    ))
     divergence = sim.melt.oxygen_reservoir.ferric_divergence
-
-    assert melt_kg.get("Fe2O3", 0.0) > 0.0
+    # The staged melt starts ferrous. Fe2O3 is retained only while the
+    # interface equilibrium itself is above the open-interval floor.
+    # Finite credit need not close the whole gap before the melt freezes,
+    # and it must not pass the target. A result on the floor is the
+    # uncapped skip, not this equilibrium: the floor is 1e-6 and this
+    # campaign's end interface (about 1e-3 bar) has q* about 0.68.
+    if target_q > KRESS91_FERRIC_FRACTION_EPSILON and total_fe > 0.0:
+        assert fe2o3 > 0.0
+        assert ferric <= target_q
+        assert ferric > 1.0e-4
+    else:
+        assert fe2o3 == pytest.approx(0.0, abs=1.0e-12)
     assert (
         divergence["delta_abs"] <= FERRIC_DIVERGENCE_WARNING_THRESHOLD
         or divergence.get("attribution") in {

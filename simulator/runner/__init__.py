@@ -1660,15 +1660,7 @@ class PyrolysisRun:
             "run_metadata": run_metadata,
             "final_state": final_state,
             "final": final_summary,
-            "yield_disposition": _json_safe(
-                _safe_failure_value(
-                    lambda: build_yield_disposition(
-                        sim,
-                        ledger_snapshots_from_sim(sim),
-                    ),
-                    None,
-                ),
-            ),
+            "yield_disposition": _json_safe(_yield_disposition_payload(sim)),
             "product_classification": _json_safe(
                 _safe_failure_value(
                     lambda: _product_classification_report(
@@ -5085,6 +5077,31 @@ def _safe_failure_value(builder: Any, default: Any) -> Any:
         return builder()
     except Exception:  # noqa: BLE001 -- failure reporting must survive
         return default
+
+
+def _yield_disposition_payload(sim: Any) -> Any:
+    """Build the disposition, or a typed refusal that still carries the block.
+
+    A missing ideal_train_melt_boundary is not an acceptable silent output.
+    The run stays successful; the refusal names the exception.
+    """
+
+    try:
+        return build_yield_disposition(
+            sim,
+            ledger_snapshots_from_sim(sim),
+        )
+    except Exception as exc:  # noqa: BLE001 -- flag, do not drop the block
+        reason = f"{type(exc).__name__}: {_safe_exception_text(exc)}"
+        return {
+            "status": "refused",
+            "reason": reason,
+            "ideal_train_melt_boundary": {
+                "status": "unavailable",
+                "reason": reason,
+                "rows": [],
+            },
+        }
 
 
 def _execution_hours_completed(execution: RunExecution | None) -> int:
