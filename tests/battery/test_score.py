@@ -3663,10 +3663,23 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert len(allibert_rows) == 16
         assert {row.reference for row in allibert_rows} == allibert_admitted
         assert all(row.status is ResidualStatus.REFUSED for row in allibert_rows)
-        assert all(
-            row.refusal is not None
-            and row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
-            for row in allibert_rows
+        # b-617 types Allibert's printed per-point phases: the two xCaO = 0.80
+        # "CaO + melt" points refuse as two-phase bulk compositions; the 14
+        # single-phase points keep the identity refusal in this reduced context.
+        assert all(row.refusal is not None for row in allibert_rows)
+        assert (
+            sum(
+                row.refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+                for row in allibert_rows
+            )
+            == 2
+        )
+        assert (
+            sum(
+                row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+                for row in allibert_rows
+            )
+            == 14
         )
         assert all(not row.score_eligible for row in allibert_rows)
         assert all(
