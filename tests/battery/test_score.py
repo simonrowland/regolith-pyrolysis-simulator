@@ -3369,7 +3369,15 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     observations = {
         key: obs
         for key, obs in context.observations.items()
-        if "allibert" in key.casefold() or "stolyarova" in key.casefold()
+        if any(
+            source in key.casefold()
+            for source in (
+                "allibert",
+                "stolyarova",
+                "kems-ms2000-044",
+                "kems-012-sossi-2019",
+            )
+        )
     }
     filtered = replace(
         context,
@@ -3417,12 +3425,28 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         and obs.evidence.class_.is_value
         and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
+    kems_model_derived = {
+        key
+        for key, obs in observations.items()
+        if any(
+            source in key.casefold()
+            for source in ("kems-ms2000-044", "kems-012-sossi-2019")
+        )
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
+    headline_diagnostic_references = (
+        stolyarova_activities | stolyarova_derived_pressures | kems_model_derived
+    )
     assert len(allibert_admitted) == 16
     assert len(allibert_rejected) == 55
     assert len(stolyarova_activities) == 54
     assert len(stolyarova_derived_pressures) == 9
+    assert len(kems_model_derived) == 28
+    assert len(headline_diagnostic_references) == 91
     assert admitted_model_derived == (
-        allibert_admitted | stolyarova_activities | stolyarova_derived_pressures
+        allibert_admitted | headline_diagnostic_references
     )
     assert not admitted_model_derived & {
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
@@ -3462,6 +3486,74 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         engines=engines,
         predict=typed_test_refusal,
     )
+    headline_diagnostic_residuals = [
+        residual
+        for residual in residuals
+        if residual.reference in headline_diagnostic_references
+    ]
+    assert len(headline_diagnostic_residuals) == 2 * len(
+        headline_diagnostic_references
+    )
+    assert all(
+        "reference_measured_evidence" in residual.exclusions
+        for residual in headline_diagnostic_residuals
+    )
+    diagnostic_context = replace(
+        filtered,
+        observations={
+            key: observations[key] for key in headline_diagnostic_references
+        },
+        origins={
+            key: value
+            for key, value in filtered.origins.items()
+            if key in headline_diagnostic_references
+        },
+    )
+
+    from simulator.battery.score import headline_payload_records, headline_rows
+
+    def assert_empty_measured_headlines(rows):
+        assert rows
+        assert all(
+            row["n"] == 0
+            and row["n_refused"] == 0
+            and row["n_candidates"] == 0
+            and row.get("n_eligible_references", 0) == 0
+            and row["n_score_eligible"] == 0
+            and row["rms_dex"] is None
+            and row["band_width_dex"] is None
+            and row["n_inside_band"] == 0
+            for row in rows
+        )
+
+    assert_empty_measured_headlines(
+        headline_rows(
+            headline_diagnostic_residuals,
+            context=diagnostic_context,
+            engines=engines,
+        )
+    )
+    payload_rows = [
+        residual_to_plain(residual) for residual in headline_diagnostic_residuals
+    ]
+    assert all(
+        row.get("status") == ResidualStatus.REFUSED.value
+        or row.get("notices")
+        or row.get("refusal")
+        for row in payload_rows
+    )
+    assert_empty_measured_headlines(
+        headline_payload_records(
+            payload_rows,
+            engines=engines,
+            observations=diagnostic_context.observations,
+            origins=diagnostic_context.origins,
+        )
+    )
+    for engine in engines:
+        assert_empty_measured_headlines(
+            headline_payloads(payload_rows, (engine,), tier="measured")
+        )
 
     def engine_rows(token: str, engine: Engine):
         return [

@@ -1177,6 +1177,23 @@ def selected_lineage_level(
     return True
 
 
+def _reference_has_measured_evidence(
+    reference: Observation | None,
+    *,
+    exclusions: object = (),
+) -> bool:
+    if reference is not None:
+        evidence = reference.evidence.class_
+        return evidence.is_value and evidence.value in MEASURED_EVIDENCE
+    if isinstance(exclusions, str):
+        exclusion_tokens = {exclusions}
+    elif isinstance(exclusions, Sequence):
+        exclusion_tokens = set(exclusions)
+    else:
+        exclusion_tokens = set()
+    return "reference_measured_evidence" not in exclusion_tokens
+
+
 def build_conjuncts(
     *,
     status: ResidualStatus,
@@ -1195,10 +1212,7 @@ def build_conjuncts(
     cand_point = None if candidate is None else point_magnitude(candidate.value)
     finite_points = ref_point is not None and cand_point is not None
     valid_domain = numeric is not None and numeric.value.is_finite()
-    evidence_ok = (
-        reference.evidence.class_.is_value
-        and reference.evidence.class_.value in MEASURED_EVIDENCE
-    )
+    evidence_ok = _reference_has_measured_evidence(reference)
     identity_ok = False
     if (
         candidate is not None
@@ -2970,6 +2984,11 @@ def compile_residual(
     ) -> tuple[Residual, Observation | None]:
         all_notices = union_notices(notices, extra_notices)
         excl = exclusions or ("status_match_or_mismatch",)
+        if (
+            not _reference_has_measured_evidence(reference)
+            and "reference_measured_evidence" not in excl
+        ):
+            excl = (*excl, "reference_measured_evidence")
         return (
             Residual(
                 key=key,
@@ -3789,16 +3808,27 @@ def _measured_residuals(
     residuals: Sequence[Residual],
     context: ScoreContext | None,
 ) -> list[Residual]:
-    """Drop compilation rows. They have their own table."""
+    """Keep only measured-evidence rows outside flagged and compilation tiers."""
 
     if context is None:
-        return [residual for residual in residuals if not flagged_strata(residual.notices)]
+        return [
+            residual
+            for residual in residuals
+            if not flagged_strata(residual.notices)
+            and _reference_has_measured_evidence(
+                None, exclusions=residual.exclusions
+            )
+        ]
     from simulator.battery.compilation_tier import compilation_row_observation
 
     return [
         residual
         for residual in residuals
         if not flagged_strata(residual.notices)
+        if _reference_has_measured_evidence(
+            context.observations.get(residual.reference),
+            exclusions=residual.exclusions,
+        )
         if compilation_row_observation(
             residual.reference, context.observations, context.origins
         )
@@ -4506,6 +4536,10 @@ def headline_payloads(
     for row in rows:
         if _flagged_payload_strata(row):
             continue
+        if tier == "measured" and not _reference_has_measured_evidence(
+            None, exclusions=row.get("exclusions")
+        ):
+            continue
         raw_rail = row.get("rail")
         if not raw_rail:
             continue
@@ -4684,13 +4718,27 @@ def headline_payload_records(
         measured_rows = []
         compilation_rows = []
         for row in rows:
+            reference = observations.get(str(row.get("reference") or ""))
             is_compilation = (
                 compilation_row_observation(
                     str(row.get("reference") or ""), observations, origins
                 )
                 is not None
             )
-            (compilation_rows if is_compilation else measured_rows).append(row)
+            if is_compilation:
+                compilation_rows.append(row)
+            elif _reference_has_measured_evidence(
+                reference, exclusions=row.get("exclusions")
+            ):
+                measured_rows.append(row)
+    else:
+        measured_rows = [
+            row
+            for row in rows
+            if _reference_has_measured_evidence(
+                None, exclusions=row.get("exclusions")
+            )
+        ]
     return [
         *headline_payloads(measured_rows, engines, tier="measured"),
         *headline_payloads(compilation_rows, engines, tier="compilation"),
@@ -4758,7 +4806,11 @@ def render_score_report_from_payloads(
         measured_rows = [
             row
             for row in unflagged_rows
-            if compilation_row_observation(
+            if _reference_has_measured_evidence(
+                observations.get(str(row.get("reference") or "")),
+                exclusions=row.get("exclusions"),
+            )
+            and compilation_row_observation(
                 str(row.get("reference") or ""), observations, origins
             )
             is None
