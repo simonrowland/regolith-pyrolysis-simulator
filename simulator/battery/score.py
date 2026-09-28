@@ -347,10 +347,12 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
+FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 _FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
     {
         NoticeKind.UNVERIFIED_APPARATUS,
         NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+        NoticeKind.IMCC_COMPLEX_SATURATION,
     }
 )
 
@@ -854,6 +856,8 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
+    if NoticeKind.IMCC_COMPLEX_SATURATION in kinds:
+        strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     return tuple(strata)
 
 
@@ -1545,6 +1549,15 @@ def cell_notices(
                     kind=NoticeKind.SOURCE_DISAGREEMENT,
                     affected_quantities=(quantity,),
                     reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
+        elif kind == NoticeKind.IMCC_COMPLEX_SATURATION.value:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.IMCC_COMPLEX_SATURATION,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or row.get("flag") or kind),
                     origin=f"engine:{engine.value}",
                 )
             )
@@ -4380,6 +4393,8 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         out.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
         out.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
+    if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
+        out.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     return tuple(out)
 
 
