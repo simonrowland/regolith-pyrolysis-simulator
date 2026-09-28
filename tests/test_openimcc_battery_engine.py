@@ -87,6 +87,18 @@ def _require_ti_gas() -> None:
         pytest.skip("installed openimcc datapack does not contain the Ti gas channel")
 
 
+def _require_oxygen_balance() -> None:
+    # The oxygen-balance effusion solve landed in openimcc 23d7842; older installs
+    # (e.g. 627bbc5) lack it and must SKIP these solve assertions. The typed
+    # unavailable path is covered separately by
+    # test_openimcc_missing_balance_solver_is_typed.
+    _require_openimcc()
+    import openimcc
+
+    if not hasattr(openimcc, "evaluate_gas_oxygen_balance"):
+        pytest.skip("installed openimcc lacks evaluate_gas_oxygen_balance")
+
+
 def test_imcc_battery_emits_notice_for_strict_envelope_edge() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import _ImccBatteryBackend
 
@@ -505,6 +517,7 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
 
 
 def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
+    _require_oxygen_balance()
     _require_openimcc()
     plante_melt = BinaryPot(
         pot_id="openimcc-plante-o2-balance",
@@ -552,6 +565,7 @@ def test_janaf_imcc_refuses_package_gas_balance_without_mixing_tables() -> None:
 
 
 def test_openimcc_hot_k_rich_melt_returns_molecular_flow_refusal() -> None:
+    _require_oxygen_balance()
     hot_k_rich = BinaryPot(
         pot_id="openimcc-hot-k-rich",
         kato_1993_table4_system=None,
