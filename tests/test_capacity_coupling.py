@@ -1014,6 +1014,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         snapshot.overhead.transport_saturation_pct,
         snapshot.melt_mass_kg,
     ) == pytest.approx(
+        # 2026-09-28 Studio redox-authority regeneration. The melt potential
+        # now follows the authoritative interface/buffer state, changing Fe
+        # vapour flux; saturation remains a diagnostic with enforcement off.
         # 2026-07-21 B1 vapor-package regen: corrected (higher) P_sat raises
         # hour-1 total evaporation 1.422 -> 2.621 kg/hr; transport saturation
         # and evaporated melt mass follow the same shift. Head-result values
@@ -1193,9 +1196,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         (
             1,
             1550.0,
-            3.991224711311173,
-            420964.78778095124,
-            826.253807011766,
+            0.08130922438507092,
+            33408.04523813668,
+            998.6622167630442,
         ),
         rel=1.0e-12,
         abs=1.0e-12,

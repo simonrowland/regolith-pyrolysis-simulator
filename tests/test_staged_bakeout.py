@@ -304,7 +304,9 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # tree (0.10246923985526701). docs-private/research/2026-08-02-train13-adjudication.md
     # 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves
     # the executable Stage-3 silica value to 0.1771124430246842 kg.
-    assert staged_silica == pytest.approx(0.1771124430246842, rel=1e-9)
+    # 2026-09-28 Studio regeneration after the redox-authority rounds:
+    # 0.17711194838837352 kg.
+    assert staged_silica == pytest.approx(0.17711194838837352, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
     assert set(staged_sio_stage) == {
         "AlO",
@@ -327,7 +329,9 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # tree (0.01143878479198185). docs-private/research/2026-08-02-train13-adjudication.md
     # 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves
     # the executable staged SiO product to 0.007909738862156002 kg.
-    assert staged_products["SiO"] == pytest.approx(0.007909738862156002)
+    # 2026-09-28 Studio regeneration after the redox-authority rounds:
+    # 0.007909716772124237 kg.
+    assert staged_products["SiO"] == pytest.approx(0.007909716772124237)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():

@@ -299,9 +299,12 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves the
 # executable C2A yield fixtures. Lunar 1.04097913286e-05 -> 1.80287974292e-05
 # kg; Mars 1.04873763032e-05 -> 2.09022690930e-05 kg.
+# 2026-09-28 Studio regeneration after the redox-authority rounds: lunar
+# 1.80287974292e-05 -> 1.80288028419e-05 kg; Mars
+# 2.09022690930e-05 -> 1.81679634319e-05 kg.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.80287974292e-05,
-    "mars_basalt": 2.09022690930e-05,
+    "lunar_mare_low_ti": 1.80288028419e-05,
+    "mars_basalt": 1.81679634319e-05,
 }
 
 
@@ -418,9 +421,11 @@ BASELINE_STAGE4_SIO2_KG = {
 # 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves the
 # executable Stage-3 silica pins to lunar 1.14607282073e-05 kg and Mars
 # 1.32908673827e-05 kg.
+# 2026-09-28 Studio regeneration after the redox-authority rounds moves them
+# to lunar 1.14607317140e-05 kg and Mars 1.15492043547e-05 kg.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 1.14607282073e-05,
-    "mars_basalt": 1.32908673827e-05,
+    "lunar_mare_low_ti": 1.14607317140e-05,
+    "mars_basalt": 1.15492043547e-05,
 }
 
 

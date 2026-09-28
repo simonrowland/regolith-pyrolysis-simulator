@@ -114,7 +114,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # cluster rebooks stage destinations but does not change evolved SiO.
 # 2026-09-27 Studio regeneration: b-588 interface/headspace drift moves the
 # lunar C2A fixture and its matching invariant pin to 1.80287974292e-05 kg.
-PHASE3BIS_SIO_EVOLVED_KG = 1.80287974292e-05
+# 2026-09-28 Studio regeneration after the redox-authority rounds moves it to
+# 1.80288028419e-05 kg.
+PHASE3BIS_SIO_EVOLVED_KG = 1.80288028419e-05
 
 
 @lru_cache(maxsize=None)
@@ -183,7 +185,7 @@ def test_sio_evolved_is_invariant_to_wall_temperature_at_fixed_po2_mode():
     assert evolved[0] == pytest.approx(
         PHASE3BIS_SIO_EVOLVED_KG, rel=0.0, abs=5e-11
     ), (
-        f'SiO evolution magnitude has drifted from its 2026-08-01 snapshot '
+        f'SiO evolution magnitude has drifted from its 2026-09-28 snapshot '
         f'({PHASE3BIS_SIO_EVOLVED_KG:.11e} -> {evolved[0]:.11e}, '
         f'{(evolved[0] - PHASE3BIS_SIO_EVOLVED_KG) / PHASE3BIS_SIO_EVOLVED_KG * 100:+.4f}%). '
         f'The wall-temperature INVARIANT above still holds exactly, so this is '

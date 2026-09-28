@@ -707,7 +707,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # wall-deposit report semantics, not a replacement number copied from a
     # failing run. C2A/C4's load-bearing Knudsen refusal remains.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "733e466b474b44178b5346764f782e971da71d48b22084c73fdd9e2e5cf54a0d"
+        "b2329bc8de094935e83d637f20a2d0e57006d3d9860dc62f8704e668b0c6edc9"
     )
 
 
