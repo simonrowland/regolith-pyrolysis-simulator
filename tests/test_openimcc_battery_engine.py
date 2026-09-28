@@ -18,6 +18,7 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     Engine,
+    NoticeKind,
     Phase,
     PerBasis,
     Quantity,
@@ -35,8 +36,10 @@ from simulator.battery.score import (
     ScoreContext,
     predict_with_engine,
     score_store,
+    headline_rows,
 )
 from simulator.battery.records import Composition, Species, State, Value
+from simulator.battery.validate import validate_corpus
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     BinaryPot,
@@ -989,32 +992,116 @@ def test_openimcc_plante_candidates_match_mole_basis_package() -> None:
     assert statistics_median(measured_residuals) == pytest.approx(0.093, abs=0.01)
 
 
-def test_plante_candidate_lineage_unchanged_by_kernel_switch() -> None:
+def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
     _require_simulator_janaf_gas()
+    _require_oxygen_balance()
     context = _plante_score_context()
+    engines = (Engine.IMCC_SF04, Engine.IMCC_SF04_EXT, Engine.OPENIMCC)
+    residuals, candidates = score_store(
+        context,
+        engines=engines,
+        work_id="kems-042-plante-1979",
+    )
     expected = {
         Engine.IMCC_SF04: (True, "independent"),
+        Engine.IMCC_SF04_EXT: (True, "independent"),
         # Measured on green 6925ccacd, which adds the t-1020 lineage mapping.
         Engine.OPENIMCC: (True, "independent"),
     }
+    rows = [
+        (residual, candidates[residual.candidate])
+        for residual in residuals
+        if residual.candidate in candidates
+    ]
     for engine, lineage in expected.items():
-        residuals, candidates = score_store(
-            context,
-            engines=(engine,),
-            work_id="kems-042-plante-1979",
-        )
-        rows = [
-            (residual, candidates[residual.candidate])
-            for residual in residuals
-            if residual.candidate in candidates
+        engine_rows = [
+            (residual, candidate)
+            for residual, candidate in rows
+            if candidate.engine is not None and candidate.engine.name is engine
         ]
-        assert len(rows) == 162
-        assert all(candidate.engine is not None for _, candidate in rows)
+        assert len(engine_rows) == 162
         assert {
             (candidate.engine.lineage_complete, residual.source_relation.value)
-            for residual, candidate in rows
+            for residual, candidate in engine_rows
             if candidate.engine is not None
         } == {lineage}
+
+    validation = validate_corpus(
+        context.works,
+        context.experiments,
+        {**context.observations, **candidates},
+        residuals,
+        benches=context.benches,
+    )
+    # Existing notice-shape issues are outside this score-eligibility regression.
+    eligibility_issues = tuple(
+        issue
+        for issue in validation.issues
+        if issue.path.startswith("residual[")
+        and issue.path.endswith(".score_eligible")
+    )
+    assert eligibility_issues == ()
+
+    summary = {
+        row["engine"]: row
+        for row in headline_rows(residuals, context=context, engines=engines)
+        if row["rail"] == "vapour"
+    }
+    sf04 = summary[Engine.IMCC_SF04.value]
+    assert sf04["n_score_eligible"] == 162
+    assert sf04["n_inside_band"] == 115
+    assert float(sf04["band_width_dex"]) == pytest.approx(0.1461, abs=0.00005)
+    assert float(sf04["median_dex"]) == pytest.approx(0.0637, abs=0.00005)
+    assert float(sf04["rms_dex"]) == pytest.approx(0.1556, abs=0.00005)
+    openimcc = summary[Engine.OPENIMCC.value]
+    assert openimcc["n_score_eligible"] == 162
+    assert openimcc["n_inside_band"] == 112
+    assert float(openimcc["band_width_dex"]) == pytest.approx(0.1461, abs=0.00005)
+    assert float(openimcc["median_dex"]) == pytest.approx(0.0748, abs=0.00005)
+    assert float(openimcc["rms_dex"]) == pytest.approx(0.1617, abs=0.00005)
+
+    solved_openimcc_notice = next(
+        notice
+        for residual, candidate in rows
+        if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
+        for notice in residual.notices
+        if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+        and notice.origin == "engine:openimcc"
+        and notice.reason.startswith("fo2_oxygen_balance_effusion_solved:")
+    )
+
+    def predict_with_foreign_notice(engine, reference, **kwargs):
+        experiment = kwargs.get("experiment")
+        if experiment is not None and experiment.bench_id is not None:
+            kwargs["bench"] = context.benches.get(experiment.bench_id)
+        prediction = predict_with_engine(engine, reference, **kwargs)
+        if engine is Engine.IMCC_SF04:
+            notices = tuple(
+                notice
+                for notice in prediction.notices
+                if not notice.reason.startswith(
+                    "fo2_oxygen_balance_effusion_solved:"
+                )
+            )
+            return replace(
+                prediction,
+                notices=(*notices, solved_openimcc_notice),
+            )
+        return prediction
+
+    foreign_notice_residuals, _ = score_store(
+        context,
+        engines=(Engine.IMCC_SF04,),
+        work_id="kems-042-plante-1979",
+        limit=1,
+        include_diagnostics=False,
+        predict=predict_with_foreign_notice,
+    )
+    assert len(foreign_notice_residuals) == 1
+    foreign_notice_residual = foreign_notice_residuals[0]
+    assert solved_openimcc_notice in foreign_notice_residual.notices
+    assert foreign_notice_residual.score_eligible is False
+    assert "no_blocking_qualification" in foreign_notice_residual.exclusions
 
 
 def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch) -> None:

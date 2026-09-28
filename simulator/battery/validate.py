@@ -87,6 +87,9 @@ from simulator.battery.records import (
     phase_token,
     union_notices,
 )
+from simulator.battery.oxygen_balance import (
+    has_own_engine_solved_oxygen_balance,
+)
 from simulator.battery.source_lineage import coefficient_lineage_sources
 from simulator.accounting.formulas import parse_formula
 from simulator.battery.validity import run_validity_gates
@@ -1602,18 +1605,11 @@ def validate_residual(
             if isinstance(reference.identity, Identity):
                 quantity = quantity_token(reference.identity)
             if quantity in _VAPOUR_EQUILIBRIUM:
-                oxygen_balance_effusion_solved = bool(
-                    candidate is not None
-                    and candidate.engine is not None
-                    and candidate.engine.name.value == "openimcc"
-                    and any(
-                        notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-                        and notice.origin == "engine:openimcc"
-                        and notice.reason.startswith(
-                            "fo2_oxygen_balance_effusion_solved:"
-                        )
-                        for notice in candidate.notices
-                    )
+                oxygen_balance_effusion_solved = has_own_engine_solved_oxygen_balance(
+                    None
+                    if candidate is None or candidate.engine is None
+                    else candidate.engine.name,
+                    () if candidate is None else candidate.notices,
                 )
                 blocking = _pressure_blocking_notices(
                     residual.notices,
