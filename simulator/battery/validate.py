@@ -82,6 +82,7 @@ from simulator.battery.records import (
     SweepGasComponent,
     Value,
     Work,
+    _is_source_internally_inconsistent,
     as_decimal,
     phase_token,
     union_notices,
@@ -1615,6 +1616,7 @@ def validate_residual(
                     NoticeKind.UNVERIFIED_APPARATUS,
                     NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
                 }
+                or _is_source_internally_inconsistent(notice.kind, notice.reason)
                 for notice in residual.notices
             ):
                 issues.append(

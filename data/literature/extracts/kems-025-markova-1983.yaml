@@ -54,6 +54,19 @@ fidelity_samples:
     published_page: 460
     pdf_page_index: 1
     paragraph: the proportions of AlO and Al2O were not higher than 10%
+benches:
+- id: markova-1983-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen mass spectrometry}
+    locator: {published_page: 460, pdf_page_index: 1, section: Technique}
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_published}
+    locator:
+      published_page: 460
+      pdf_page_index: 1
+      section: Technique
+      note: The two-page abstract does not print the cell material.
 species:
   Al2O3:
     observations:

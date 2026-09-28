@@ -454,6 +454,20 @@ class Notice:
             )
 
 
+SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX = "source_internally_inconsistent:"
+
+
+def _is_source_internally_inconsistent(
+    kind: NoticeKind | str, reason: object
+) -> bool:
+    kind_value = kind.value if isinstance(kind, NoticeKind) else str(kind)
+    return (
+        kind_value == NoticeKind.SOURCE_DISAGREEMENT.value
+        and isinstance(reason, str)
+        and reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
+    )
+
+
 _VALUE_PAYLOAD = {
     ValueKind.POINT: ("point",),
     ValueKind.SERIES: ("series",),

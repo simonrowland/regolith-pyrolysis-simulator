@@ -1319,6 +1319,109 @@ def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
     )] == [("catalogue-composition", 1)]
 
 
+def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+        flagged_strata,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    notice = Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason=(
+            "source_internally_inconsistent: JANAF equilibrium check of "
+            "Ca(g) + 1/2 O2(g) = CaO(g) predicts P_CaO 3.70 dex below "
+            "printed; reconciling requires about 141 kJ/mol."
+        ),
+        origin="stolyarova-cao-row",
+    )
+    experiment = F.kems_experiment()
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    reference = F.observation(
+        "source-inconsistent-kems-row",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-053-stolyarova-1991",
+        notices=(notice,),
+    )
+    reference = replace(
+        reference,
+        evidence=replace(
+            reference.evidence,
+            original_method_class="measured_direct",
+        ),
+    )
+    prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+    )
+
+    banded = F.residual(
+        f"source-inconsistent-banded::{Engine.INTERNAL_ANALYTICAL.value}",
+        reference.observation_id,
+        candidate="engine-row",
+        status=ResidualStatus.MISMATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+        notices=(notice,),
+        numeric=ResidualNumeric(
+            operation=MetricOperation.DEX,
+            unit="dimensionless",
+            value=Decimal("3.70"),
+            decision_band=DecisionBand(Decimal("0.1461"), "dimensionless", "kems"),
+        ),
+        quantity=Quantity.P_PARTIAL,
+    )
+    work = F.work()
+    issues = validate_residual(
+        banded,
+        {reference.observation_id: reference},
+        {experiment.experiment_id: experiment},
+        {work.work_id: work},
+    )
+    assert any(
+        issue.path == "residual.score_eligible"
+        and "flagged stratum" in issue.detail
+        for issue in issues
+    )
+    vapour_headline = next(
+        row
+        for row in headline_rows((banded,), engines=(Engine.INTERNAL_ANALYTICAL,))
+        if row["rail"] == Rail.VAPOUR.value
+    )
+    assert vapour_headline["n"] == 0
+    assert [(row["stratum"], row["n"]) for row in flagged_stratum_rows(
+        (banded,), engines=(Engine.INTERNAL_ANALYTICAL,)
+    )] == [(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT, 1)]
+    payload = residual_to_plain(banded)
+    for tier in ("measured", "compilation"):
+        assert headline_payloads(
+            (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+        )[0]["n"] == 0
+    assert [(row["stratum"], row["n"]) for row in flagged_stratum_payloads(
+        (payload,), (Engine.INTERNAL_ANALYTICAL,)
+    )] == [(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT, 1)]
+
+    ordinary_disagreement = replace(notice, reason="independent source values differ")
+    assert flagged_strata((ordinary_disagreement,)) == ()
+
+
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:
     exp = F.kems_experiment(orifice_area=None, clausing=None)
     assert exp.apparatus is not None

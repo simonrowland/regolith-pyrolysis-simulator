@@ -281,6 +281,18 @@ source_metadata:
       quote: The indicated reference state partial pressures were obtained from JANAF (1971).
     note: Parent temperature range at the NaCl melting label must not be used as the exchange plateau
       temperature; reference-state pressure is not an instrument measurement.
+benches:
+- id: hastie-1981-kms
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen mass spectrometry}
+    locator: {page: 9, paragraph: primary experimental methods KMS and TMS}
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_published}
+    locator:
+      page: 9
+      paragraph: primary experimental methods KMS and TMS
+      note: The KMS row cites Plante 1979a; the platinum apparatus belongs to TMS and is not assigned to KMS.
 species:
   K:
     observations:
@@ -484,11 +496,6 @@ species:
           as printed. ZrO2 row may be low by a factor of two (footnote g).
           No per-coefficient sigma except those statements.
       equipment:
-        cell_material:
-          value: KMS (Plante 1979a); TMS apparatus is Pt (section 6.1) but Table 2 footnote d is KMS
-          locator:
-            page: 9
-            paragraph: primary experimental methods KMS and TMS
         chamber_pressure:
           value: KMS upper limit ~1e-4 atm as stated for the method (section 6); Table 2 rows are KMS
           units: atm
@@ -1813,11 +1820,6 @@ species:
       uncertainty:
         note: +- 3 as printed on both deltaH and deltaS
       equipment:
-        cell_material:
-          value: platinum TMS/KMS (Bonnell and Hastie 1979)
-          locator:
-            page: 12
-            paragraph: from our TMS and KMS second-law data (see Bonnell and Hastie, 1979)
     - observation_id: hastie_1981_kohl1975_na2so4g_foreign_second_law
       type: transition_point
       locator:
