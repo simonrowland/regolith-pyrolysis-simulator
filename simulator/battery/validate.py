@@ -389,16 +389,23 @@ def _table_payloads(
     return tuple(payloads)
 
 
-def _pressure_blocking_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
+def _pressure_blocking_notices(
+    *groups: tuple[Notice, ...] | None,
+    oxygen_balance_effusion_solved: bool = False,
+) -> tuple[Notice, ...]:
+    notices = tuple(notice for group in groups if group for notice in group)
     found: list[Notice] = []
-    for group in groups:
-        if not group:
+    for notice in notices:
+        if notice.kind not in _PRESSURE_BLOCKING_NOTICES:
             continue
-        for notice in group:
-            if notice.kind not in _PRESSURE_BLOCKING_NOTICES:
-                continue
-            if any(q in _VAPOUR_EQUILIBRIUM for q in notice.affected_quantities):
-                found.append(notice)
+        if (
+            oxygen_balance_effusion_solved
+            and notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            and notice.reason.startswith("fO2_Pa is a DERIVED condition")
+        ):
+            continue
+        if any(q in _VAPOUR_EQUILIBRIUM for q in notice.affected_quantities):
+            found.append(notice)
     return tuple(found)
 
 
@@ -1594,10 +1601,24 @@ def validate_residual(
             if isinstance(reference.identity, Identity):
                 quantity = quantity_token(reference.identity)
             if quantity in _VAPOUR_EQUILIBRIUM:
+                oxygen_balance_effusion_solved = bool(
+                    candidate is not None
+                    and candidate.engine is not None
+                    and candidate.engine.name.value == "openimcc"
+                    and any(
+                        notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+                        and notice.origin == "engine:openimcc"
+                        and notice.reason.startswith(
+                            "fo2_oxygen_balance_effusion_solved:"
+                        )
+                        for notice in candidate.notices
+                    )
+                )
                 blocking = _pressure_blocking_notices(
                     residual.notices,
                     reference.notices,
                     None if candidate is None else candidate.notices,
+                    oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
                 )
                 if blocking:
                     issues.append(
