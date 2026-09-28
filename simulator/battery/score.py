@@ -2053,6 +2053,129 @@ def _cell_material_class(
     return "not_inert"
 
 
+_MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
+
+
+def _uniform_modelled_reactive_cell(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> str | None:
+    """W or Mo when every typed entry is that same modelled reservoir metal."""
+
+    if not materials:
+        return None
+    values: list[CellMaterial] = []
+    for material in materials:
+        if not material.state.is_value or not isinstance(material.state.value, CellMaterial):
+            return None
+        values.append(material.state.value)
+    if not values:
+        return None
+    metal = values[0]
+    if metal not in _MODELLED_REACTIVE_CELL:
+        return None
+    if any(item is not metal for item in values):
+        return None
+    return metal.value
+
+
+def _bench_for_score(
+    experiment: Experiment,
+    benches: Mapping[str, Bench],
+) -> Bench | None:
+    """Bench the scorer may read for a Knudsen oxygen-balance decision.
+
+    An explicit experiment.bench_id wins. A synthesized experiment often
+    omits that id even when the work declares one bench (Stolyarova W).
+    Adopt that bench only when it is uniformly W or uniformly Mo, the
+    metals the engine models as a cell-oxide reservoir. Any other unlinked
+    bench stays unresolved.
+    """
+
+    if experiment.bench_id is not None:
+        return benches.get(experiment.bench_id)
+    matched = [
+        bench
+        for bench in benches.values()
+        if bench.work_id == experiment.work_id and bench.cell_materials
+    ]
+    if len(matched) != 1:
+        return None
+    bench = matched[0]
+    if _uniform_modelled_reactive_cell(bench.cell_materials) is None:
+        return None
+    return bench
+
+
+def _printed_point_composition(observation: Observation) -> State[Composition] | None:
+    """Printed point composition when the identity axis does not carry one.
+
+    Series migration stores the row composition on point_conditions and
+    leaves identity.composition unknown. That stated composition is the
+    melt. A derived point composition is not used.
+    """
+
+    point = (observation.point_conditions or {}).get("composition")
+    if not isinstance(point, Located) or point.inference is not None:
+        return None
+    if not point.state.is_value or point.state.value is None:
+        return None
+    if not isinstance(point.state.value, Composition):
+        return None
+    return point.state
+
+
+def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
+    engine = prediction.engine
+    if engine is None:
+        return None
+    prefix = OXYGEN_BALANCE_NOTICE_PREFIX
+    for notice in prediction.notices:
+        if notice.origin != f"engine:{engine.value}":
+            continue
+        if not notice.reason.startswith(prefix):
+            continue
+        payload = json.loads(notice.reason.split(" ", 1)[1])
+        value = payload.get("pO2_bar")
+        if isinstance(value, (int, float)) and math.isfinite(float(value)):
+            return float(value)
+    return None
+
+
+def _effusion_comparison_identity(
+    identity: Identity,
+    reference: Observation,
+    prediction: EnginePrediction,
+) -> Identity:
+    """Comparison view for a solved oxygen-balance row.
+
+    The source leaves composition on the point and leaves fO2 and in-cell
+    total pressure unknown. The solve used the printed point composition,
+    its own pO2, and the scorer pressure assumption. Both sides of the
+    equality check see those same inputs. The stored identity is unchanged.
+    """
+
+    if not has_own_engine_solved_oxygen_balance(prediction.engine, prediction.notices):
+        return identity
+    updates: dict[str, State] = {}
+    if identity.composition is None or not identity.composition.is_value:
+        point = _printed_point_composition(reference)
+        if point is not None:
+            updates["composition"] = point
+    if identity.fO2_Pa is None or not identity.fO2_Pa.is_value:
+        po2_bar = _solved_effusion_po2_bar(prediction)
+        if po2_bar is not None:
+            updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * Decimal("1e5"))
+    if identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value:
+        quantity = quantity_token(identity)
+        if quantity is not None:
+            bar, _notice, invalid = total_pressure_bar_for_score(identity, quantity)
+            if invalid is None:
+                updates["total_pressure_Pa"] = State.of(Decimal(str(bar)) * Decimal("1e5"))
+    if not updates:
+        return identity
+    return replace(identity, **updates)
+
+
 def _derived_fo2_condition(observation: Observation) -> bool:
     point = (observation.point_conditions or {}).get("fO2_Pa")
     if point is not None:
@@ -2449,6 +2572,12 @@ def predict_with_engine(
         requested = identity.composition
         assert identity.composition.value is not None
         composition_value = identity.composition.value
+    elif quantity in _VAPOUR_EQUILIBRIUM and (
+        point_composition := _printed_point_composition(observation)
+    ) is not None:
+        requested = point_composition
+        assert point_composition.value is not None
+        composition_value = point_composition.value
     elif quantity in _VAPOUR_EQUILIBRIUM:
         # 100 wt% of a species is the pure substance only when the row says so.
         stated = stated_pure_substance_reservoir(identity)
@@ -2531,7 +2660,12 @@ def predict_with_engine(
     elif oxygen_balance_effusion:
         cell_materials = bench.cell_materials if bench is not None else None
         material_class = _cell_material_class(cell_materials)
-        if material_class != "inert":
+        modelled = (
+            _uniform_modelled_reactive_cell(cell_materials)
+            if material_class == "reactive"
+            else None
+        )
+        if material_class != "inert" and modelled is None:
             refusal_token = {
                 "reactive": "reactive_cell_oxygen_reservoir",
                 "not_inert": "cell_material_not_inert",
@@ -2577,7 +2711,11 @@ def predict_with_engine(
             )
         # The openimcc bridge discards pressure_bar; its balance solve uses
         # printed composition-derived activities and T, never measured p_K.
-        po2 = Po2Request(mode=PO2_OXYGEN_BALANCE_EFFUSION, po2_bar=None)
+        po2 = Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material=modelled,
+        )
     else:
         oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(identity, composition_value)
         if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
@@ -3207,6 +3345,10 @@ def compile_residual(
         }
         if predict is None and experiment is not None and experiment.bench_id is not None:
             predictor_kwargs["bench"] = context.benches.get(experiment.bench_id)
+        elif predict is None and experiment is not None:
+            adopted = _bench_for_score(experiment, context.benches)
+            if adopted is not None:
+                predictor_kwargs["bench"] = adopted
         prediction = predictor(
             engine,
             implied_alpha_reference or reference,
@@ -3342,7 +3484,16 @@ def compile_residual(
         )
 
     candidate = candidate_observation(reference, prediction)
-    equal = identity_equal(reference.identity, candidate.identity)
+    compared_reference = reference.identity
+    compared_candidate = candidate.identity
+    if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
+        compared_reference = _effusion_comparison_identity(
+            compared_reference, reference, prediction
+        )
+        compared_candidate = _effusion_comparison_identity(
+            compared_candidate, reference, prediction
+        )
+    equal = identity_equal(compared_reference, compared_candidate)
     if equal.kind is not IdentityEqualKind.EQUAL:
         reason = (
             RefusalReason.IDENTITY_MISMATCH
@@ -3411,10 +3562,15 @@ def compile_residual(
         status = match_status(numeric)
     if has_no_band_flag:
         status = ResidualStatus.NO_BAND
+    eligibility_reference = reference
+    eligibility_candidate = candidate
+    if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
+        eligibility_reference = replace(reference, identity=compared_reference)
+        eligibility_candidate = replace(candidate, identity=compared_candidate)
     conjuncts = build_conjuncts(
         status=status,
-        reference=reference,
-        candidate=candidate,
+        reference=eligibility_reference,
+        candidate=eligibility_candidate,
         numeric=numeric,
         source_relation=source_relation,
         lineage_complete=prediction.lineage_complete,
