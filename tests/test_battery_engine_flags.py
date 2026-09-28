@@ -232,10 +232,11 @@ def test_imcc_temperature_notice_survives_cell_notices() -> None:
     assert handle.available is True
     hot = _imcc_cell(handle, 800.0)
     warm = _imcc_cell(handle, 1700.0)
-    kg, _mol = composition_kg_and_mol(_mgo_sio2_pot().composition_wt_pct)
+    kg, mol = composition_kg_and_mol(_mgo_sio2_pot().composition_wt_pct)
     direct = handle.backend.equilibrate(
         temperature_C=800.0 - 273.15,
         composition_kg=kg,
+        composition_mol=mol,
         fO2_log=-9.0,
         pressure_bar=1.0e-6,
     )

@@ -30,6 +30,7 @@ from simulator.melt_backend.openimcc_bridge import (
 import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.runner import PyrolysisRun
+from simulator.state import MOLAR_MASS
 
 
 pytest.importorskip("openimcc")
@@ -705,11 +706,10 @@ def test_invalid_projection_verdict_maps_to_typed_refusal(
 ) -> None:
     monkeypatch.setattr(
         openimcc_bridge_module,
-        "_cleaned_melt_wt_pct",
+        "_cleaned_melt_projection",
         lambda _composition: (
             {"SiO2": 99.0, "NaCl": invalid_value},
             {"SiO2": 99.0},
-            1.0,
         ),
     )
 
@@ -746,9 +746,13 @@ def test_fe2o3_fold_is_numeric_and_lookup_only() -> None:
     assert FE2O3_TO_FEO_TOTAL_WT_FACTOR == pytest.approx(0.89982, abs=2.0e-5)
     assert fold["basis"] == "Fe_atoms"
     assert fold["factor"] == pytest.approx(FE2O3_TO_FEO_TOTAL_WT_FACTOR)
+    assert fold["factor"] == pytest.approx(
+        2.0 * MOLAR_MASS["FeO"] / MOLAR_MASS["Fe2O3"],
+        rel=0.0,
+        abs=0.0,
+    )
     assert fold["feo_total_wt_pct"] == pytest.approx(
-        9.0 + fold["fe2o3_wt_pct"] * FE2O3_TO_FEO_TOTAL_WT_FACTOR,
-        rel=1.0e-9,
+        result.composition_wt_pct["FeO"], rel=0.0, abs=0.0
     )
 
     inventory_before = {
