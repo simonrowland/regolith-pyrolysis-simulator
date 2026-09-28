@@ -31,11 +31,11 @@ from simulator.battery.score import (
     candidate_observation,
     compile_residual,
     composition_wt_pct,
+    load_score_context,
     ScoreContext,
     predict_with_engine,
     score_store,
 )
-from simulator.battery.migrate import load_migrated_store, load_yaml
 from simulator.battery.records import Composition, Species, State, Value
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
@@ -278,41 +278,19 @@ def _plante_score_context() -> ScoreContext:
              REPO_ROOT / "data/literature/works" / work_file),
             (Path("data/literature/extracts-v2") / extract_file,
              REPO_ROOT / "data/literature/extracts-v2" / extract_file),
+            (Path("data/literature/extracts") / extract_file,
+             REPO_ROOT / "data/literature/extracts" / extract_file),
             (Path("data/literature/works") / coefficient_work_file,
              REPO_ROOT / "data/literature/works" / coefficient_work_file),
             (Path("data/literature/extracts-v2") / coefficient_extract_file,
              REPO_ROOT / "data/literature/extracts-v2" / coefficient_extract_file),
+            (Path("data/literature/extracts") / coefficient_extract_file,
+             REPO_ROOT / "data/literature/extracts" / coefficient_extract_file),
         ):
             target = root / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             target.symlink_to(source)
-        works, experiments, observations = load_migrated_store(root)
-    source_doc = load_yaml(REPO_ROOT / "data/literature/extracts" / extract_file)
-    coefficient_doc = load_yaml(
-        REPO_ROOT / "data/literature/extracts" / coefficient_extract_file
-    )
-    origins = {
-        observation_id: extract_file
-        for observation_id in observations
-        if observation_id.startswith(f"{source_id}::")
-    }
-    origins.update(
-        {
-            observation_id: coefficient_extract_file
-            for observation_id in observations
-            if observation_id.startswith(f"{coefficient_source_id}::")
-        }
-    )
-    return ScoreContext(
-        works=works,
-        experiments=experiments,
-        observations=observations,
-        origins=origins,
-        extract_review={
-            source_id: source_doc.get("review_status"),
-            coefficient_source_id: coefficient_doc.get("review_status"),
-        },
-    )
+        return load_score_context(root)
 
 
 def _require_simulator_janaf_gas() -> None:

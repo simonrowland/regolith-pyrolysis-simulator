@@ -397,6 +397,31 @@ def test_kems_cell_material_state_survives_migration(
     assert bench_from_plain(to_plain(bench)) == bench
     assert _cell_material_class(bench.cell_materials) == expected_class
 
+
+def test_plante_cell_materials_round_trip_through_work_store(tmp_path: Path) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.migrate import load_migrated_benches, write_outputs
+
+    root = tmp_path / "tree"
+    result = _migrate_real_extract(tmp_path, "kems-042-plante-1979.yaml")
+    source_bench = next(
+        bench
+        for bench in result.benches.values()
+        if bench.id.endswith("::bench::kems-system")
+    )
+    assert source_bench.cell_materials is not None
+    assert [item.state.value.value for item in source_bench.cell_materials] == ["Pt"]
+    assert all(item.locator is not None for item in source_bench.cell_materials)
+
+    write_outputs(result, root)
+    stored_bench = load_migrated_benches(root)[source_bench.id]
+
+    assert stored_bench.cell_materials == source_bench.cell_materials
+    assert [item.locator for item in stored_bench.cell_materials or ()] == [
+        item.locator for item in source_bench.cell_materials
+    ]
+
+
 def test_tsukihashi_split_temperature_locators_use_figure7() -> None:
     doc = yaml.safe_load((EXTRACTS / "ts1985.yaml").read_text())
     experiments = [
