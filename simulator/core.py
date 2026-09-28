@@ -6465,6 +6465,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         fO2_log: float,
         basis: Literal[
             'fe_feo_buffer',
+            'fe_saturation_bound',
             'kress91_inverse',
             'no_melt_redox_buffer',
         ],
@@ -6561,6 +6562,86 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             head_o2_mol=head_o2_mol,
         )
 
+
+    def _fe_saturation_bound_fO2_log(
+        self,
+        *,
+        T_K: float,
+        pressure_bar: float,
+        comp: Mapping[str, float],
+    ) -> tuple[float, float]:
+        """Fe--FeO saturation fO2 when the ferric inventory is absent.
+
+        FeO(l) = Fe(s,l) + 1/2 O2.
+        K = a_Fe * sqrt(fO2/bar) / a_FeO, with a_Fe = 1 for pure native iron,
+        so log10(fO2/bar) = IW(T) + 2*log10(a_FeO).
+        Units: activities dimensionless, fO2 in bar.
+        Limiting case: a_FeO = 1 returns IW.
+
+        a_FeO is the authoritative activity ``_native_fe_saturation_state``
+        already computes with ``calphad_ferrous_feo_activity_diagnostic`` at
+        the fO2 under test.  The returned log is the fixed point of that map
+        on the side where the saturation activity is at least a_FeO, so the
+        native-Fe extent at this fO2 is zero.  It is not a metal tap.
+        """
+
+        iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+
+        def activity_at(fO2_log: float) -> float:
+            activity = calphad_ferrous_feo_activity_diagnostic(
+                comp_wt=comp,
+                fO2_log=fO2_log,
+                T_K=T_K,
+                pressure_bar=pressure_bar,
+            )
+            a_feo = float(activity.get('a_FeO_authoritative', 0.0) or 0.0)
+            if not math.isfinite(a_feo) or a_feo <= 0.0:
+                raise AccountingError(
+                    'Fe-FeO saturation bound requires positive a_FeO; '
+                    f'got {a_feo!r}'
+                )
+            return a_feo
+
+        def saturation_activity_covers(fO2_log: float, a_feo: float) -> bool:
+            # Same comparison as _native_fe_saturation_state: extent is zero
+            # when a_FeO,sat >= a_FeO.
+            saturation_log10 = (float(fO2_log) - iw) / 2.0
+            if saturation_log10 > 300.0:
+                return True
+            if saturation_log10 < -300.0:
+                return False
+            return (10.0 ** saturation_log10) >= a_feo
+
+        lo = iw - 30.0
+        hi = iw
+        a_hi = activity_at(hi)
+        if not saturation_activity_covers(hi, a_hi):
+            raise AccountingError(
+                'Fe-FeO saturation bound is above IW; '
+                f'a_FeO(IW)={a_hi!r}'
+            )
+        a_lo = activity_at(lo)
+        while saturation_activity_covers(lo, a_lo) and lo > iw - 120.0:
+            lo -= 15.0
+            a_lo = activity_at(lo)
+        if saturation_activity_covers(lo, a_lo):
+            raise AccountingError(
+                'Fe-FeO saturation bound is below the searched window; '
+                f'a_FeO={a_lo!r} at log fO2={lo!r}'
+            )
+        a_at_hi = a_hi
+        for _ in range(28):
+            if hi - lo <= 1.0e-9:
+                break
+            mid = 0.5 * (lo + hi)
+            a_mid = activity_at(mid)
+            if saturation_activity_covers(mid, a_mid):
+                hi = mid
+                a_at_hi = a_mid
+            else:
+                lo = mid
+        return hi, a_at_hi
+
     def _melt_fO2_from_ledger(
         self,
         *,
@@ -6572,8 +6653,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         metal coexists with FeO in that melt, the Fe--FeO buffer supplies the
         redox state.  After that metal has left, Kress91 inversion is
         authoritative only for a measured interior Fe3+/Fe2+ ratio.  A ratio
-        on the open-interval floor is not a measurement: the interface oxygen
-        exchange is the passive thermostat and reported fO2 follows the gas.
+        on the open-interval floor is not a measurement.  With FeO present
+        and no metal phase, the ledger-consistent value is the Fe--FeO
+        saturation bound.  The gas owns the melt only when a non-zero
+        per-tick O2 transfer exhausts the directional inventory.
         Every path preserves endpoint provenance in the typed domain record,
         and none mutates the ledger or creates O2.
         """
@@ -6707,12 +6790,90 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         # Premise: Kress91 maps the open interval (epsilon, 1-epsilon) of
         # Fe3+/sumFe onto finite fO2.  Clamping a ledger endpoint to epsilon
-        # and inverting it treats a floor as a measured ratio.
-        # Algebra: do not evaluate
-        #   log10(fO2/bar) = [ln(q / (2(1-q))) - b(T,P,X)] / (0.196 ln 10)
-        # at q = epsilon.  Units: q is dimensionless; fO2 is bar.
-        # Limiting case: Fe2O3 = 0, FeO > 0, no metal-phase Fe.  Reported
-        # fO2 is log10(P_transport), not the ~20 dex sub-IW floor inverse.
+        # and inverting it treats a floor as a measured ratio.  Copying the
+        # headspace setpoint into the melt is not a ledger state either.
+        # Algebra: FeO(l) = Fe(s,l) + 1/2 O2,
+        #   K = a_Fe * sqrt(fO2/bar) / a_FeO,
+        #   log10(fO2/bar) = IW(T) + 2*log10(a_FeO / a_Fe).
+        # Units: activities dimensionless; fO2 in bar.
+        # Limiting case: a_FeO = 1 and a_Fe = 1 returns IW.  With Fe2O3 = 0,
+        # FeO > 0 and no metal-phase Fe, reported fO2 is that bound.  The
+        # bound is where native-Fe extent is zero, so it does not tap metal.
+        # The gas owns the melt only for a non-zero per-tick transfer that
+        # the directional inventory cannot support.
+        ferric_inventory_absent = (
+            raw_ferric <= KRESS91_FERRIC_FRACTION_EPSILON
+            and feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
+            and not native_fe_coexists
+        )
+        if ferric_inventory_absent:
+            transport_pO2_bar = self._melt_redox_transport_pO2_bar(reservoir)
+            per_tick_transfer = self._per_tick_o2_transfer_mol()
+            bound_fO2_log, bound_a_feo = self._fe_saturation_bound_fO2_log(
+                T_K=temperature_K,
+                pressure_bar=pressure_bar,
+                comp=comp,
+            )
+            gas_owns_melt = False
+            directional_capacity = None
+            if abs(per_tick_transfer) > OXYGEN_RESERVOIR_NOOP_MOL:
+                directional_capacity = (
+                    self._melt_redox_directional_inventory_capacity_mol(
+                        fO2_log=bound_fO2_log,
+                        transport_pO2_bar=transport_pO2_bar,
+                        per_tick_o2_transfer_mol=per_tick_transfer,
+                    )
+                )
+                gas_owns_melt = self._melt_redox_capacity_is_negligible(
+                    directional_capacity_mol=directional_capacity,
+                    native_buffer_active=False,
+                )
+            if gas_owns_melt:
+                fO2_log = math.log10(transport_pO2_bar)
+                self._last_redox_domain = self._redox_domain_record(
+                    fO2_log=fO2_log,
+                    basis='no_melt_redox_buffer',
+                    endpoint_clamped=True,
+                    endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
+                    endpoint_provenance=endpoint_provenance,
+                    authority_level='gas_interface_controlled',
+                    reason=(
+                        'out_of_domain:no_melt_redox_buffer; '
+                        'non-zero per-tick O2 transfer exhausts the '
+                        'directional Fe inventory; '
+                        'kress91_inverse_not_evaluated; '
+                        'ferric_inventory_absent; '
+                        f'per_tick_o2_transfer_mol={per_tick_transfer:.17g}; '
+                        f'directional_capacity_mol={directional_capacity:.17g}; '
+                        f'{endpoint_provenance}'
+                    ),
+                    status_override='out_of_domain',
+                )
+                return fO2_log
+            fO2_log = self._finite_oxygen_reservoir_fO2_log(
+                bound_fO2_log,
+                context='ledger_fe_saturation_bound',
+            )
+            self._last_redox_domain = self._redox_domain_record(
+                fO2_log=fO2_log,
+                basis='fe_saturation_bound',
+                endpoint_clamped=True,
+                endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
+                endpoint_provenance=endpoint_provenance,
+                authority_level='extrapolated',
+                reason=(
+                    'out_of_domain:fe_saturation_bound; '
+                    'kress91_inverse_not_evaluated; '
+                    'ferric_inventory_absent; '
+                    'FeO(l)=Fe(s,l)+1/2 O2; '
+                    'K=a_Fe*sqrt(fO2)/a_FeO; a_Fe=1; '
+                    f'a_FeO={bound_a_feo:.17g}; '
+                    f'{endpoint_provenance}'
+                ),
+                status_override='out_of_domain',
+            )
+            return fO2_log
+
         if endpoint_clamped:
             transport_pO2_bar = self._melt_redox_transport_pO2_bar(reservoir)
             fO2_log = math.log10(transport_pO2_bar)
@@ -6771,9 +6932,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             transport_pO2_bar=transport_pO2_bar,
             per_tick_o2_transfer_mol=per_tick_transfer,
         )
-        if self._melt_redox_capacity_is_negligible(
-            directional_capacity_mol=directional_capacity,
-            native_buffer_active=self._native_fe_feo_buffer_is_active(),
+        if (
+            abs(per_tick_transfer) > OXYGEN_RESERVOIR_NOOP_MOL
+            and self._melt_redox_capacity_is_negligible(
+                directional_capacity_mol=directional_capacity,
+                native_buffer_active=self._native_fe_feo_buffer_is_active(),
+            )
         ):
             fO2_log = math.log10(transport_pO2_bar)
             no_buffer_provenance = (
@@ -6792,8 +6956,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 reason=(
                     'out_of_domain:no_melt_redox_buffer; '
                     'the current gas-driven FeO/Fe2O3 inventory cannot '
-                    'support the prior signed O2 transfer (or numerical '
-                    'no-op when none exists); '
+                    'support this non-zero per-tick O2 transfer; '
                     'melt follows the gas/interface limit P_i=P_g; '
                     'kress91_inverse_not_evaluated'
                 ),
@@ -8890,20 +9053,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 context='fe_redox_respeciation_override',
                 candidate_fO2_log=float(fO2_log_override),
             )
-        # Premise: once the ledger ratio is only the Kress floor, fO2 is the
-        # gas pressure.  Rewriting FeO/Fe2O3 to Kress(P_g) would mint a ferric
-        # inventory the melt does not hold and would skip the finite exchange.
+        # Premise: neither the saturation bound nor a gas-owned floor is a
+        # ferric measurement.  Rewriting FeO/Fe2O3 to Kress(fO2) would mint
+        # an inventory the ledger does not hold.  Real transferred O2 still
+        # commits through an explicit target and becomes measurable Fe2O3.
         # Algebra: unconstrained respeciation delta is zero while the domain
-        # basis is no_melt_redox_buffer.  Units: mol.  Limiting case: Fe2O3 = 0
-        # stays Fe2O3 = 0; an explicit post-exchange target still commits.
+        # basis is fe_saturation_bound or no_melt_redox_buffer.
+        # Units: mol.  Limiting case: Fe2O3 = 0 stays Fe2O3 = 0.
+        reported_basis = str(
+            (getattr(self, '_last_redox_domain', {}) or {}).get('basis') or ''
+        )
         interface_controlled = (
             target_ferric_fraction is None
             and fO2_log_override is None
             and bool(getattr(self, '_melt_redox_ledger_initialized', False))
-            and str(
-                (getattr(self, '_last_redox_domain', {}) or {}).get('basis')
-                or ''
-            ) == 'no_melt_redox_buffer'
+            and reported_basis in (
+                'no_melt_redox_buffer',
+                'fe_saturation_bound',
+            )
         )
         control_inputs = {
             'source': 'scalar Kress91 fO2 ledger re-speciation',
@@ -8921,7 +9088,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         if interface_controlled:
             diagnostic = {
-                'respeciation_status': 'skipped_no_melt_redox_buffer',
+                'respeciation_status': (
+                    'skipped_fe_saturation_bound'
+                    if reported_basis == 'fe_saturation_bound'
+                    else 'skipped_no_melt_redox_buffer'
+                ),
                 'status': 'ok',
                 'direction': 'none',
                 'reason': (

@@ -9,6 +9,9 @@ import pytest
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
+    calphad_ferrous_feo_activity_diagnostic,
+    feo_iw_log10_fO2_bar,
+    floor_vacuum_pressure_bar,
     kress91_log_fO2_from_fe3_over_sigma_fe,
     melt_mol_fractions_for_kress91,
 )
@@ -72,7 +75,11 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
                 for candidate in redox_domains
                 if isinstance(candidate, dict)
                 and candidate.get("basis")
-                in {"no_melt_redox_buffer", "fe_feo_buffer"}
+                in {
+                    "no_melt_redox_buffer",
+                    "fe_feo_buffer",
+                    "fe_saturation_bound",
+                }
             ),
             {},
         )
@@ -87,6 +94,30 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
                 assert "kress91_inverse_not_evaluated" in redox_domain[
                     "reason"
                 ]
+            elif redox_domain["basis"] == "fe_saturation_bound":
+                assert redox_domain["status"] == "out_of_domain"
+                assert redox_domain["authority"] == "extrapolated"
+                assert "kress91_inverse_not_evaluated" in redox_domain[
+                    "reason"
+                ]
+                assert "ferric_inventory_absent" in redox_domain["reason"]
+                temperature_K = float(snapshot.temperature_C) + 273.15
+                pressure_bar = floor_vacuum_pressure_bar(
+                    float(row["P_total_bar"]),
+                    floor_bar=DEFAULT_VACUUM_FLOOR_BAR,
+                )
+                activity = calphad_ferrous_feo_activity_diagnostic(
+                    comp_wt=snapshot.composition_wt_pct,
+                    fO2_log=fO2_log,
+                    T_K=temperature_K,
+                    pressure_bar=pressure_bar,
+                )
+                a_feo = float(activity["a_FeO_authoritative"])
+                iw = feo_iw_log10_fO2_bar(temperature_K, a_feo=1.0)
+                assert fO2_log == pytest.approx(
+                    iw + 2.0 * math.log10(a_feo),
+                    abs=1.0e-6,
+                )
             else:
                 assert redox_domain["basis"] == "fe_feo_buffer"
                 assert "native_fe_metal_coexists_with_melt" in redox_domain[

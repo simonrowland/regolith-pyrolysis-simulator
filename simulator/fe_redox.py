@@ -61,6 +61,7 @@ class RedoxDomainRecord(TypedDict):
     equivalent_pO2_bar: float
     basis: Literal[
         'fe_feo_buffer',
+        'fe_saturation_bound',
         'kress91_inverse',
         'no_melt_redox_buffer',
     ]

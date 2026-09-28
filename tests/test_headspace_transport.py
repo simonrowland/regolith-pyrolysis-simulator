@@ -519,9 +519,8 @@ def test_interface_po2_uses_finite_two_film_force_and_publishes_regime():
         diagnostic['melt_oxygen_equilibrium_mol']
         - diagnostic['melt_oxygen_ledger_mol']
     )
-    # A floor ledger reports melt fO2 = P_transport, so the two boundary
-    # pressures are the same number.  The root then matches that pressure
-    # to a few ulps; an exact closed bracket rejects the rounding.
+    # The root stays inside the melt and transport pressures.  When those
+    # two pressures coincide, an exact closed bracket rejects the rounding.
     low_pO2_bar = min(transport_pO2_bar, melt_pO2_bar)
     high_pO2_bar = max(transport_pO2_bar, melt_pO2_bar)
     bracket_ulp = 8.0 * max(low_pO2_bar, high_pO2_bar, 1.0e-30) * 2.220446049250313e-16
