@@ -86,9 +86,14 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: &homma_pressure_interval
+      state:
+        tag: value
+        value: {kind: interval, interval_low: '0.1333223684210526315789473684', interval_high: '1.333223684210526315789473684'}
+      locator:
+        page: 516
+        section: 'II. Experimental method'
+        note: 'Printed $10^{-2} \sim 10^{-3}$ mmHg; converted to Pa'
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -128,9 +133,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -170,9 +173,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -212,9 +213,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -254,9 +253,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -296,9 +293,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -338,9 +333,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -380,9 +373,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -422,9 +413,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -464,9 +453,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -506,9 +493,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -548,9 +533,7 @@ experiments:
       state: {tag: value, value: cooled in crucible or cast in 100-mm-diameter mold}
       locator: *homma_apparatus
   pressure_environment:
-    total_pressure_Pa:
-      state: {tag: unknown, reason: not_published}
-      locator: {page: 516, section: 'II. Experimental method', note: 'Evacuated after argon at one atmosphere; no vacuum pressure printed'}
+    total_pressure_Pa: *homma_pressure_interval
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 516, section: 'II. Experimental method'}
@@ -619,10 +602,11 @@ species:
             paragraph: 市販アルミナるつぼ (CP-2)
             line_range: '27'
         chamber_pressure:
-          value: 0.01
+          value: {kind: interval, interval_low: '0.001', interval_high: '0.01'}
           units: mmHg
-          note: dissolution vacuum range 10^{-2}–10^{-3} mmHg (upper end pinned)
+          as_printed: '$10^{-2} \sim 10^{-3}$ mmHg'
           locator:
+            page: 516
             source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
             paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
             line_range: '29'
