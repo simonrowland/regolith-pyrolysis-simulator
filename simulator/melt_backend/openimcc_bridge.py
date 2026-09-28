@@ -266,7 +266,9 @@ def _cleaned_melt_projection(
         if name in OPENIMCC_PARENT_OXIDES and name != "FeO":
             cleaned_composition_mol[name] = mol
         elif name == "FeO":
-            cleaned_composition_mol["FeO"] = mol
+            # Accumulate: an Fe2O3 entry earlier in the mapping (or an FeO_total
+            # alias canonicalised to FeO) may already have folded Fe into FeO.
+            cleaned_composition_mol["FeO"] = cleaned_composition_mol.get("FeO", 0.0) + mol
         elif name == "Fe2O3":
             cleaned_composition_mol["FeO"] = (
                 cleaned_composition_mol.get("FeO", 0.0) + 2.0 * mol

@@ -606,3 +606,22 @@ def test_single_cation_gamma_ideal_pure_oxide_limit() -> None:
         composition_mol={"SiO2": 1.0}, temperature_K=1800.0
     )
     assert result.activity_coefficients["SiO2"]["value"] == 1.0
+
+
+@pytest.mark.parametrize(
+    "composition",
+    [
+        {"SiO2": 2.0, "FeO": 1.0, "Fe2O3": 1.0},
+        {"SiO2": 2.0, "Fe2O3": 1.0, "FeO": 1.0},
+        {"SiO2": 2.0, "FeO_total": 1.0, "Fe2O3": 1.0},
+        {"SiO2": 2.0, "Fe2O3": 1.0, "FeO_total": 1.0},
+    ],
+)
+def test_cleaned_melt_fe_fold_is_order_independent(composition) -> None:
+    # Fe-atom conservation: FeO_eq = FeO + 2*Fe2O3 = 1 + 2*1 = 3 mol, whatever the
+    # mapping insertion order and whether FeO arrives as FeO or the FeO_total alias.
+    from simulator.melt_backend.openimcc_bridge import _cleaned_melt_projection
+
+    _wt, moles = _cleaned_melt_projection(composition)
+    assert moles["FeO"] == pytest.approx(3.0, rel=0, abs=1e-12)
+    assert moles["SiO2"] == pytest.approx(2.0, rel=0, abs=1e-12)
