@@ -21,6 +21,7 @@ import inspect
 import json
 import math
 import os
+import re
 import signal
 import socket
 import subprocess
@@ -30,6 +31,7 @@ import time
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
@@ -211,9 +213,13 @@ class BatteryGrid:
 class Po2Request:
     mode: str
     po2_bar: float | None
+    cell_material: str | None = None
 
     def as_payload(self) -> dict[str, Any]:
-        return {"mode": self.mode, "po2_bar": self.po2_bar}
+        payload = {"mode": self.mode, "po2_bar": self.po2_bar}
+        if self.cell_material is not None:
+            payload["cell_material"] = self.cell_material
+        return payload
 
 
 @dataclass
@@ -322,6 +328,11 @@ class EquilibrateCell:
                     or PO2_ENGINE_DEFAULT
                 ),
                 po2_bar=None if po2_bar is None else float(po2_bar),
+                cell_material=(
+                    None
+                    if not isinstance(po2_raw, Mapping)
+                    else po2_raw.get("cell_material")
+                ),
             ),
             status=str(payload.get("status") or ""),
             refusal_reason=payload.get("refusal_reason"),
@@ -1424,6 +1435,281 @@ class _OxygenBalanceRefusal(RuntimeError):
         super().__init__(self.backend_status_reason)
 
 
+_CELL_OXIDE_GAS_TABLES: dict[str, tuple[tuple[str, str], ...]] = {
+    "W": (
+        ("WO", "O-027"),
+        ("WO2", "O-048"),
+        ("WO3", "O-068"),
+        ("W2O6", "O-088"),
+        ("W3O8", "O-092"),
+        ("W3O9", "O-093"),
+        ("W4O12", "O-096"),
+    ),
+    "Mo": (("MoO", "Mo-008"), ("MoO2", "Mo-010"), ("MoO3", "Mo-017")),
+}
+_CELL_OXIDE_BUFFER_TABLES: dict[str, tuple[tuple[str, str], ...]] = {
+    "W": (("WO2", "O-047"), ("WO3", "O-065")),
+    "Mo": (("MoO2", "Mo-009"),),
+}
+_CELL_GAS_CONSTANT_J_MOL_K = 8.31446261815324
+_CELL_ATOMIC_MASS_G_MOL = {"O": 15.999, "W": 183.84, "Mo": 95.95}
+
+
+def _cell_janaf_gibbs_points(table_id: str) -> tuple[Any, str]:
+    """Load JANAF ΔfG° points through the hash-checked compilation loader."""
+
+    from simulator.battery.generators.janaf import _fusion_table_points
+
+    return _fusion_table_points(table_id)
+
+
+def _cell_oxide_thermodynamics(
+    cell_material: str, temperature_K: float
+) -> tuple[dict[str, float], float, dict[str, Any]]:
+    """Build shared wall-oxide Kp values and the stable metal/oxide buffer.
+
+    Premise: unit-activity metal forms M_aO_b(g) by
+    ``a M(s) + b/2 O2(g) ⇌ M_aO_b(g)``. Thus
+    ``p_g/bar = exp(-ΔfG°/(RT)) (pO2/bar)^(b/2)``; JANAF ΔfG° is
+    interpolated in kJ/mol, converted to J/mol, and standard pressure is 1 bar.
+    Unit check: ΔfG°/(RT) and each pressure ratio are dimensionless. Sanity:
+    raising pO2 multiplies every cell-oxide pressure by its positive b/2
+    power, so each adds a positive, monotone oxygen-effusion term.
+    """
+
+    from simulator.reference_data.janaf import (
+        TABLES_DIR,
+        formula_composition,
+        load_table_document,
+        table_formula_normalised_value,
+    )
+    from simulator.battery.generators.janaf import _interpolate_formation_gibbs
+
+    if cell_material not in _CELL_OXIDE_GAS_TABLES:
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_cell_material_invalid",
+            f"unknown cell_material {cell_material!r}; expected None, 'W', or 'Mo'",
+        )
+    T = float(temperature_K)
+    if not math.isfinite(T) or T <= 0.0:
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_cell_thermodynamics_failed",
+            f"temperature must be finite and positive, got {temperature_K!r}",
+        )
+
+    def read(table_id: str, expected_formula: str, expected_state: str) -> tuple[float, str]:
+        document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+        table = document.get("table") or {}
+        entry = table.get("index_entry") or {}
+        state = str(entry.get("state") or "")
+        formula = table_formula_normalised_value(table)
+        if (
+            state != expected_state
+            or dict(formula_composition(formula) or ())
+            != dict(formula_composition(expected_formula) or ())
+        ):
+            raise ValueError(
+                f"{table_id}: expected {expected_formula}({expected_state}), "
+                f"found {formula}({state})"
+            )
+        points, digest = _cell_janaf_gibbs_points(table_id)
+        gibbs_kj = _interpolate_formation_gibbs(points, Decimal(str(T)))
+        return float(gibbs_kj) * 1000.0, digest
+
+    gas_data: dict[str, tuple[float, float]] = {}
+    sources: dict[str, Any] = {}
+    try:
+        for species, table_id in _CELL_OXIDE_GAS_TABLES[cell_material]:
+            formula = species
+            atoms = re.findall(r"([A-Z][a-z]?)(\d*)", formula)
+            oxygen_atoms = sum(
+                int(count or "1") for element, count in atoms if element == "O"
+            )
+            gibbs_j, digest = read(table_id, formula, "g")
+            gas_data[species] = (gibbs_j, float(oxygen_atoms))
+            sources[species] = {
+                "source_class": "cell_shared_janaf",
+                "table_id": table_id,
+                "source_sha256": digest,
+            }
+
+        buffers: list[tuple[float, str, str, str]] = []
+        for formula, table_id in _CELL_OXIDE_BUFFER_TABLES[cell_material]:
+            gibbs_j, digest = read(table_id, formula, "cr")
+            atoms = re.findall(r"([A-Z][a-z]?)(\d*)", formula)
+            oxygen_atoms = sum(
+                int(count or "1") for element, count in atoms if element == "O"
+            )
+            log10_p = (
+                2.0 * gibbs_j
+                / (oxygen_atoms * _CELL_GAS_CONSTANT_J_MOL_K * T * math.log(10.0))
+            )
+            buffers.append((log10_p, formula, table_id, digest))
+        # The first solid stable as oxygen potential rises is the M/MOx pair
+        # with the lowest JANAF coexistence pressure. This checks WO2(cr) vs
+        # WO3(cr) at the requested T instead of assuming one phase.
+        buffer_log10_bar, buffer_formula, buffer_table, buffer_digest = min(
+            buffers, key=lambda row: row[0]
+        )
+        sources["buffer_phase"] = {
+            "source_class": "cell_shared_janaf",
+            "formula": buffer_formula,
+            "table_id": buffer_table,
+            "source_sha256": buffer_digest,
+        }
+    except Exception as exc:  # noqa: BLE001 - report hash/domain errors as typed refusal
+        if isinstance(exc, _OxygenBalanceRefusal):
+            raise
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_cell_thermodynamics_failed",
+            f"cannot load hash-checked JANAF cell-oxide data: {exc}",
+        ) from exc
+
+    return gas_data, buffer_log10_bar, sources
+
+
+def _solve_cell_oxygen_balance(
+    pressure_model: Callable[[float], Mapping[str, float]],
+    species_metadata: Mapping[str, Any],
+    *,
+    temperature_K: float,
+    cell_material: str,
+    oxygen_balance_from_pressure_model: Callable[..., Any],
+) -> tuple[float, Mapping[str, float], Mapping[str, Any], float, dict[str, Any]]:
+    """Add shared JANAF wall gases to one engine's pressure model and solve."""
+
+    if cell_material not in _CELL_OXIDE_GAS_TABLES:
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_cell_material_invalid",
+            f"unknown cell_material {cell_material!r}; expected None, 'W', or 'Mo'",
+        )
+    gas_data, buffer_log10_bar, sources = _cell_oxide_thermodynamics(
+        cell_material, temperature_K
+    )
+    if not species_metadata:
+        raise _OxygenBalanceRefusal(
+            "imcc_gas_oxygen_balance_failed",
+            "engine returned no species metadata for the cell-oxide balance",
+        )
+    metadata_type = type(next(iter(species_metadata.values())))
+    cell_metadata: dict[str, Any] = {}
+    for species, (_gibbs_j, oxygen_atoms) in gas_data.items():
+        formula_atoms = re.findall(r"([A-Z][a-z]?)(\d*)", species)
+        if not formula_atoms or "".join(
+            element + count for element, count in formula_atoms
+        ) != species:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_cell_thermodynamics_failed",
+                f"cannot parse JANAF cell-oxide formula {species!r}",
+            )
+        try:
+            molar_mass = math.fsum(
+                _CELL_ATOMIC_MASS_G_MOL[element] * int(count or "1")
+                for element, count in formula_atoms
+            )
+        except KeyError as exc:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_cell_thermodynamics_failed",
+                f"no atomic mass for JANAF cell-oxide element {exc.args[0]!r}",
+            ) from exc
+        cell_metadata[species] = metadata_type(
+            molar_mass, oxygen_atoms, 0.0, oxygen_atoms / 2.0
+        )
+    all_metadata = {**species_metadata, **cell_metadata}
+
+    def combined_pressure_model(logp: float) -> dict[str, float]:
+        pressures = dict(pressure_model(logp))
+        for species, (gibbs_j, _oxygen_atoms) in gas_data.items():
+            log_pressure = (
+                -gibbs_j / (_CELL_GAS_CONSTANT_J_MOL_K * temperature_K)
+                + (math.log(10.0) * logp)
+                * cell_metadata[species].pO2_exponent
+            )
+            pressures[species] = (
+                0.0 if log_pressure < -745.0 else math.exp(log_pressure)
+            )
+        return pressures
+
+    try:
+        pO2_bar, pressures, balance = oxygen_balance_from_pressure_model(
+            combined_pressure_model, all_metadata, bracket=(-30.0, 0.0)
+        )
+    except Exception as exc:  # noqa: BLE001 - preserve engine refusal as typed
+        raise _OxygenBalanceRefusal(
+            str(getattr(exc, "code", "") or "imcc_gas_oxygen_balance_failed"),
+            str(exc),
+        ) from exc
+
+    buffer_pinned = math.log10(float(pO2_bar)) > buffer_log10_bar
+    if buffer_pinned:
+        pO2_bar = 10.0**buffer_log10_bar
+        pressures = combined_pressure_model(buffer_log10_bar)
+        oxygen_flux = math.fsum(
+            row.oxygen_atoms * pressures[name] / math.sqrt(row.molar_mass)
+            for name, row in all_metadata.items()
+        )
+        parent_flux = math.fsum(
+            row.parent_oxygen_demand * pressures[name] / math.sqrt(row.molar_mass)
+            for name, row in all_metadata.items()
+        )
+        # Pinned-branch residual = oxygen retained as condensed wall oxide.
+        # f(pO2) = oxygen_flux - parent_flux rises monotonically with pO2
+        # (sign rule, w*k >= 0) and vanishes at the free root. The buffer
+        # pins only when that root lies ABOVE the buffer, so at the buffer
+        # f < 0: the melt liberates more O than the effusing gas carries,
+        # and the deficit condenses as the buffer oxide (e.g. WO2(cr)) on
+        # the cell wall. The residual (parent - oxygen) / parent is therefore
+        # the fraction of liberated O the wall retains. It lies in [0, 1)
+        # and is 0 only at the free root. Sanity: a Mo cell with 0.5/0.5
+        # K2O/SiO2 at 1933 K gives ~0.9996, i.e. almost all O goes to MoO2.
+        residual = abs(oxygen_flux - parent_flux) / max(
+            oxygen_flux, parent_flux, 1e-300
+        )
+        balance = {
+            **dict(balance),
+            "residual": residual,
+            "bracket": list(balance["bracket"]),
+            "dominant_O_carriers": sorted(
+                (
+                    (name, row.oxygen_atoms * pressures[name] / math.sqrt(row.molar_mass))
+                    for name, row in all_metadata.items()
+                    if row.oxygen_atoms > 0
+                ),
+                key=lambda item: item[1],
+                reverse=True,
+            )[:5],
+            "dominant_metal_carriers": sorted(
+                (
+                    (name, row.parent_oxygen_demand * pressures[name] / math.sqrt(row.molar_mass))
+                    for name, row in all_metadata.items()
+                    if row.parent_oxygen_demand > 0
+                ),
+                key=lambda item: item[1],
+                reverse=True,
+            )[:5],
+        }
+
+    total_oxygen_flux = math.fsum(
+        row.oxygen_atoms * pressures[name] / math.sqrt(row.molar_mass)
+        for name, row in all_metadata.items()
+    )
+    cell_oxygen_flux = math.fsum(
+        cell_metadata[name].oxygen_atoms
+        * pressures[name]
+        / math.sqrt(cell_metadata[name].molar_mass)
+        for name in cell_metadata
+    )
+    fraction = cell_oxygen_flux / total_oxygen_flux if total_oxygen_flux else 0.0
+    info = {
+        "cell_material": cell_material,
+        "cell_oxide_flux_fraction": fraction,
+        "buffer_pinned": buffer_pinned,
+        "buffer_pO2_bar": 10.0**buffer_log10_bar,
+        "cell_oxide_janaf_sources": sources,
+    }
+    return float(pO2_bar), pressures, balance, fraction, info
+
+
 class _ImccBatteryBackend:
     """Thin MeltBackend-shaped wrapper around ``openimcc.evaluate``.
 
@@ -1597,6 +1883,7 @@ class _ImccBatteryBackend:
                     po2_request is not None
                     and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
                 ):
+                    cell_material = po2_request.cell_material
                     try:
                         from openimcc import (
                             oxygen_balance_from_pressure_model,
@@ -1663,17 +1950,36 @@ class _ImccBatteryBackend:
                             allow_extrapolation=True,
                         )
 
-                    try:
-                        po2_bar, gas_bar, balance = oxygen_balance_from_pressure_model(
-                            pressure_model, species, bracket=(-30.0, 0.0)
+                    if cell_material is None:
+                        try:
+                            po2_bar, gas_bar, balance = oxygen_balance_from_pressure_model(
+                                pressure_model, species, bracket=(-30.0, 0.0)
+                            )
+                        except Exception as exc:  # noqa: BLE001 - preserve typed solver refusal
+                            raise _OxygenBalanceRefusal(
+                                str(getattr(exc, "code", "") or "imcc_gas_oxygen_balance_failed"),
+                                str(exc),
+                            ) from exc
+                        cell_fraction = 0.0
+                        cell_info = {
+                            "cell_material": None,
+                            "cell_oxide_flux_fraction": 0.0,
+                            "buffer_pinned": False,
+                            "buffer_pO2_bar": None,
+                        }
+                    else:
+                        po2_bar, gas_bar, balance, cell_fraction, cell_info = (
+                            _solve_cell_oxygen_balance(
+                                pressure_model,
+                                species,
+                                temperature_K=temperature_K,
+                                cell_material=cell_material,
+                                oxygen_balance_from_pressure_model=(
+                                    oxygen_balance_from_pressure_model
+                                ),
+                            )
                         )
-                    except Exception as exc:  # noqa: BLE001 - preserve typed solver refusal
-                        raise _OxygenBalanceRefusal(
-                            str(getattr(exc, "code", "") or "imcc_gas_oxygen_balance_failed"),
-                            str(exc),
-                        ) from exc
-                    notices.append(
-                        {
+                    solved_notice = {
                             "kind": "fo2_oxygen_balance_effusion_solved",
                             "pO2_bar": float(po2_bar),
                             "relative_residual": float(balance["residual"]),
@@ -1684,8 +1990,16 @@ class _ImccBatteryBackend:
                             "dominant_metal_carriers": list(
                                 balance["dominant_metal_carriers"]
                             ),
+                            "cell_material": cell_material,
+                            "cell_oxide_flux_fraction": float(cell_fraction),
+                            "buffer_pinned": bool(cell_info["buffer_pinned"]),
+                            "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
                         }
-                    )
+                    if cell_material is not None:
+                        solved_notice["cell_oxide_janaf_sources"] = cell_info[
+                            "cell_oxide_janaf_sources"
+                        ]
+                    notices.append(solved_notice)
                 else:
                     fo2_bar = (
                         10.0 ** float(fO2_log)
@@ -1885,29 +2199,103 @@ class _OpenImccBatteryBackend:
             po2_request is not None
             and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
         ):
+            cell_material = po2_request.cell_material
             if self._gas is None:
                 raise _OxygenBalanceRefusal(
                     "openimcc_oxygen_balance_unavailable",
                     "openimcc gas datapack unavailable; remedy: install the "
                     f"solver-enabled openimcc pin {self._bridge.OPENIMCC_RECORDED_PIN}",
                 )
-            from simulator.melt_backend.openimcc_bridge import (
-                evaluate_gas_oxygen_balance,
-            )
+            if cell_material is None:
+                from simulator.melt_backend.openimcc_bridge import (
+                    evaluate_gas_oxygen_balance,
+                )
 
-            po2_bar, gas_result, balance = evaluate_gas_oxygen_balance(
-                result.parent_oxide_activities,
-                temperature_K,
-                self._gas,
-                parent_oxides=result.parent_oxides,
-            )
+                po2_bar, gas_result, balance = evaluate_gas_oxygen_balance(
+                    result.parent_oxide_activities,
+                    temperature_K,
+                    self._gas,
+                    parent_oxides=result.parent_oxides,
+                )
+                cell_fraction = 0.0
+                cell_info = {
+                    "cell_material": None,
+                    "cell_oxide_flux_fraction": 0.0,
+                    "buffer_pinned": False,
+                    "buffer_pO2_bar": None,
+                }
+                gas_pressures = dict(gas_result)
+            else:
+                try:
+                    from openimcc import (
+                        evaluate_gas,
+                        oxygen_balance_from_pressure_model,
+                        oxygen_balance_species_metadata,
+                    )
+                    from openimcc.gas import _default_reactions
+                except (ImportError, AttributeError) as exc:
+                    raise _OxygenBalanceRefusal(
+                        "openimcc_oxygen_balance_unavailable",
+                        "installed openimcc does not expose the generic pressure "
+                        "model and oxygen-balance core needed for a reactive cell",
+                    ) from exc
+
+                channels = _default_reactions(result.parent_oxides, self._gas)
+                base_species = oxygen_balance_species_metadata(
+                    {name: parent or None for name, (parent, _ng, _no2) in channels}
+                )
+                for name, (parent, n_gas, n_o2) in channels:
+                    expected = -n_o2 / n_gas if parent else (
+                        1.0 if name == "O2" else 0.5
+                    )
+                    if not math.isclose(
+                        base_species[name].pO2_exponent, expected, abs_tol=1e-12
+                    ):
+                        raise _OxygenBalanceRefusal(
+                            "imcc_gas_oxygen_balance_failed",
+                            f"openimcc reaction exponent for {name!r} "
+                            "does not match formula metadata",
+                        )
+
+                def pressure_model(logp: float) -> Mapping[str, float]:
+                    return evaluate_gas(
+                        result.parent_oxide_activities,
+                        temperature_K,
+                        10.0**logp,
+                        self._gas,
+                        parent_oxides=result.parent_oxides,
+                        allow_extrapolation=True,
+                    )
+
+                po2_bar, all_gas, balance, cell_fraction, cell_info = (
+                    _solve_cell_oxygen_balance(
+                        pressure_model,
+                        base_species,
+                        temperature_K=temperature_K,
+                        cell_material=cell_material,
+                        oxygen_balance_from_pressure_model=(
+                            oxygen_balance_from_pressure_model
+                        ),
+                    )
+                )
+                gas_result = evaluate_gas(
+                    result.parent_oxide_activities,
+                    temperature_K,
+                    po2_bar,
+                    self._gas,
+                    parent_oxides=result.parent_oxides,
+                    allow_extrapolation=True,
+                )
+                gas_pressures = dict(gas_result)
+                gas_pressures.update(
+                    {name: all_gas[name] for name in cell_info["cell_oxide_janaf_sources"] if name != "buffer_phase"}
+                )
             gas_diagnostics = {
-                "domain_flags": dict(gas_result.domain_flags),
-                "provenance_class": dict(gas_result.provenance_class),
+                "domain_flags": dict(getattr(gas_result, "domain_flags", {})),
+                "provenance_class": dict(getattr(gas_result, "provenance_class", {})),
                 "oxygen_balance": dict(balance),
             }
-            notices.append(
-                {
+            solved_notice = {
                     "kind": "fo2_oxygen_balance_effusion_solved",
                     "pO2_bar": float(po2_bar),
                     "relative_residual": float(balance["residual"]),
@@ -1916,18 +2304,35 @@ class _OpenImccBatteryBackend:
                     "dominant_metal_carriers": list(
                         balance["dominant_metal_carriers"]
                     ),
+                    "cell_material": cell_material,
+                    "cell_oxide_flux_fraction": float(cell_fraction),
+                    "buffer_pinned": bool(cell_info["buffer_pinned"]),
+                    "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
                 }
-            )
-            for name, value in dict(gas_result).items():
+            if cell_material is not None:
+                solved_notice["cell_oxide_janaf_sources"] = cell_info[
+                    "cell_oxide_janaf_sources"
+                ]
+            notices.append(solved_notice)
+            for name, value in gas_pressures.items():
                 number = _finite_float(value)
                 if number is None or number <= 0.0:
                     continue
                 pressures[str(name)] = number * PA_PER_BAR
-                vapor_sources[str(name)] = (
-                    f"openimcc:{self._gas.gas_path}:"
-                    f"{gas_result.provenance_class.get(name, 'unknown')}"
-                )
-            for name, flag in gas_result.domain_flags.items():
+                if cell_material is not None and name in cell_info[
+                    "cell_oxide_janaf_sources"
+                ]:
+                    source = cell_info["cell_oxide_janaf_sources"][name]
+                    vapor_sources[str(name)] = (
+                        f"cell_shared_janaf:{source['table_id']}:"
+                        f"{source['source_sha256']}"
+                    )
+                else:
+                    vapor_sources[str(name)] = (
+                        f"openimcc:{self._gas.gas_path}:"
+                        f"{getattr(gas_result, 'provenance_class', {}).get(name, 'unknown')}"
+                    )
+            for name, flag in getattr(gas_result, "domain_flags", {}).items():
                 if flag:
                     notices.append(
                         {
@@ -2223,6 +2628,7 @@ def _cell_identity_key(cell: EquilibrateCell | Mapping[str, Any]) -> tuple[Any, 
         float(payload.get("temperature_K") or 0.0),
         str(po2.get("mode") or ""),
         None if po2.get("po2_bar") is None else float(po2.get("po2_bar")),
+        str(po2.get("cell_material") or ""),
         str(payload.get("arm") or ARM_HEADLINE),
     )
 
@@ -2285,6 +2691,7 @@ def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
         po2_bar=(
             None if po2_raw.get("po2_bar") is None else float(po2_raw["po2_bar"])
         ),
+        cell_material=po2_raw.get("cell_material"),
     )
     handle = open_battery_engine(str(payload["engine"]))
     if (
@@ -2733,6 +3140,23 @@ def equilibrate_cell(
             certified_band=kwargs.pop("certified_band", None) or certified_band,
             model_id=kwargs.pop("model_id", None) or ALL_IMCC_MODEL_IDS.get(handle.name),
             **kwargs,
+        )
+
+    if (
+        po2.mode == PO2_OXYGEN_BALANCE_EFFUSION
+        and po2.cell_material not in {None, "W", "Mo"}
+    ):
+        return _done(
+            status="refusal",
+            refusal_reason="oxygen_balance_cell_material_invalid",
+            engine_status="input_refusal",
+            engine_reason=(
+                f"unknown cell_material {po2.cell_material!r}; "
+                "expected None, 'W', or 'Mo'"
+            ),
+            melt_activities={},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=None,
         )
 
     timeout = float(timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(handle.name, 30.0))
