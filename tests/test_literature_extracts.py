@@ -1491,6 +1491,73 @@ def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
     )
 
 
+
+
+def test_allibert_printed_point_phases_are_typed_at_migration(tmp_path: Path):
+    from decimal import Decimal
+    from simulator.battery.enums import Phase
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.migrate import _printed_point_phase_kind
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    assert _printed_point_phase_kind("melt") == "liquid"
+    assert _printed_point_phase_kind("CaO + melt") == "two_phase"
+    assert _printed_point_phase_kind("melt + CaO") == "two_phase"
+    assert (
+        _printed_point_phase_kind(
+            "liquid CaO-Al2O3 melt; final row is printed as CaO + melt"
+        )
+        is None
+    )
+    assert _printed_point_phase_kind("saturated vapour") is None
+
+    result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    source = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-051-allibert-1981"
+    ]
+    liquid = [
+        observation
+        for observation in source
+        if observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.L
+    ]
+    two_phase = [
+        observation
+        for observation in source
+        if observation.identity.species.phase.is_unknown
+        and "bulk_composition_in_two_phase_region"
+        in (observation.identity.species.phase.reason or "")
+    ]
+    assert len(liquid) == 14
+    assert len(two_phase) == 2
+    assert {observation.identity.species.formula for observation in two_phase} == {
+        "CaO",
+        "Al2O3",
+    }
+    marker = "two_phase_bulk_composition_not_liquid_composition"
+    assert all(
+        any(notice.band == marker for notice in observation.notices)
+        for observation in two_phase
+    )
+    assert all(
+        observation.identity.composition is not None
+        and observation.identity.composition.is_value
+        and any(
+            name == "CaO" and amount == Decimal("0.8")
+            for name, amount in observation.identity.composition.value.components
+        )
+        for observation in two_phase
+    )
+    assert all(
+        str(getattr(observation.locator, "table", None)) == "II"
+        and quantity_token(observation.identity) is not None
+        and quantity_token(observation.identity).value == "activity"
+        for observation in liquid
+    )
+
+
 def test_halwax_pure_solid_formation_enthalpies_are_symmetric():
     expected = {
         "halwax_2024_cao_third_law_formation_enthalpy": (-624.5, 3.5, "CaO(s)"),
