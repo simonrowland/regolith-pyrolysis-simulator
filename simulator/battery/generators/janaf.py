@@ -9,6 +9,7 @@ import time
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -56,6 +57,7 @@ from simulator.reference_data.janaf import (
     NON_DATA_MARKER_REASON,
     REFUSED_LAYOUT_KIND,
     SIDECAR_PATH,
+    TABLES_DIR,
     formula_composition,
     load_table_document,
     table_printed_temperatures,
@@ -2088,6 +2090,129 @@ def observations_from_table(
     """Return only the schema-v2.1 observations for one parsed JANAF table."""
 
     return list(generate_table(payload, source_path=source_path).observations)
+
+
+@dataclass(frozen=True)
+class JANAFFusionEnergy:
+    delta_g_fus_kJ_per_mol: Decimal
+    melting_temperature_K: Decimal
+    accepted_melting_temperature_K: Decimal
+    crystal_table: str
+    liquid_table: str
+    source_sha256: tuple[str, str]
+
+
+_FUSION_TABLES = {
+    "CaO": ("Ca-027", "Ca-028"),
+    "Al2O3": ("Al-096", "Al-100"),
+    # High cristobalite is the high-temperature solid branch immediately
+    # below the accepted SiO2 melting point; the quartz table is metastable.
+    "SiO2": ("O-035", "O-038"),
+}
+_ACCEPTED_MELTING_K = {
+    "CaO": Decimal("2886"),
+    "Al2O3": Decimal("2327"),
+    "SiO2": Decimal("1986"),
+}
+
+
+@lru_cache(maxsize=2 * len(_FUSION_TABLES))
+def _fusion_table_points(table_id: str) -> tuple[tuple[tuple[Decimal, Decimal], ...], str]:
+    path = TABLES_DIR / f"{table_id}.yaml"
+    document = load_table_document(path)
+    extraction = document.get("extraction")
+    table = document.get("table")
+    if not isinstance(extraction, Mapping) or not isinstance(table, Mapping):
+        raise ValueError(f"{table_id}: JANAF cached table is incomplete")
+    digest = str(extraction.get("source_sha256") or "")
+    expected = _sidecar_hashes().get(f"{table_id}.txt")
+    if not digest or digest != expected:
+        raise ValueError(f"{table_id}: JANAF cache hash does not match source sidecar")
+    rows = table.get("values")
+    if not isinstance(rows, list):
+        raise ValueError(f"{table_id}: JANAF table values are missing")
+    points: list[tuple[Decimal, Decimal]] = []
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        temperature = row.get("temperature")
+        gibbs = row.get("formation_gibbs_energy")
+        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+            continue
+        t_value, g_value = temperature.get("value"), gibbs.get("value")
+        if t_value is None or g_value is None:
+            continue
+        points.append((Decimal(str(t_value)), Decimal(str(g_value))))
+    points.sort()
+    if len(points) < 2:
+        raise ValueError(f"{table_id}: JANAF table has fewer than two Gibbs points")
+    return tuple(points), digest
+
+
+def _interpolate_formation_gibbs(
+    points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
+) -> Decimal:
+    if temperature_K < points[0][0] or temperature_K > points[-1][0]:
+        raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+    for (t0, g0), (t1, g1) in zip(points, points[1:]):
+        if t0 <= temperature_K <= t1:
+            if temperature_K == t0:
+                return g0
+            if temperature_K == t1:
+                return g1
+            return g0 + (g1 - g0) * (temperature_K - t0) / (t1 - t0)
+    raise ValueError(f"{temperature_K} K is not bracketed by JANAF table rows")
+
+
+def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy:
+    """Read ΔG_fus and its own cr/l table crossing from hash-checked JANAF rows."""
+
+    try:
+        crystal_table, liquid_table = _FUSION_TABLES[oxide]
+        accepted_tm = _ACCEPTED_MELTING_K[oxide]
+    except KeyError as exc:
+        raise ValueError(f"no JANAF fusion table pair for {oxide}") from exc
+    temperature_K = Decimal(str(temperature_K))
+    crystal, crystal_sha = _fusion_table_points(crystal_table)
+    liquid, liquid_sha = _fusion_table_points(liquid_table)
+    overlap = sorted(
+        {t for t, _ in crystal if liquid[0][0] <= t <= liquid[-1][0]}
+        | {t for t, _ in liquid if crystal[0][0] <= t <= crystal[-1][0]}
+    )
+    if len(overlap) < 2:
+        raise ValueError(f"{oxide}: JANAF crystal/liquid tables do not overlap")
+
+    def difference(t: Decimal) -> Decimal:
+        return _interpolate_formation_gibbs(liquid, t) - _interpolate_formation_gibbs(crystal, t)
+
+    crossings: list[Decimal] = []
+    for left, right in zip(overlap, overlap[1:]):
+        d_left, d_right = difference(left), difference(right)
+        if d_left == 0:
+            crossings.append(left)
+        elif d_left * d_right < 0:
+            crossings.append(left - d_left * (right - left) / (d_right - d_left))
+    if overlap and difference(overlap[-1]) == 0:
+        crossings.append(overlap[-1])
+    if len(crossings) != 1:
+        raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
+    tm = crossings[0]
+    try:
+        delta_g = difference(temperature_K)
+    except ValueError as exc:
+        raise ValueError(
+            f"{oxide}: {exc}; JANAF table ranges: "
+            f"{crystal_table} [{crystal[0][0]}, {crystal[-1][0]}] K; "
+            f"{liquid_table} [{liquid[0][0]}, {liquid[-1][0]}] K"
+        ) from exc
+    return JANAFFusionEnergy(
+        delta_g_fus_kJ_per_mol=delta_g,
+        melting_temperature_K=tm,
+        accepted_melting_temperature_K=accepted_tm,
+        crystal_table=crystal_table,
+        liquid_table=liquid_table,
+        source_sha256=(crystal_sha, liquid_sha),
+    )
 
 
 def _sidecar_hashes(path: Path = SIDECAR_PATH) -> dict[str, str]:
