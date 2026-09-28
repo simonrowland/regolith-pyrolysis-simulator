@@ -984,20 +984,22 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         snapshot.evap_flux.species_kg_hr.get(species, 0.0)
         for species in ("PO", "PO2", "P2")
     )
+    # Redox-authority rounds remove the ferric-floor inverse that drove the
+    # melt toward ~IW-23; at 1600 C Fe vapour falls from ~3.9 to 0.0116 kg/hr.
+    # equilibrium.py:539-543 feeds intrinsic melt fO2 into FeO activity and
+    # :986-996 uses that activity; :481-482 and :1091-1103 carry interface pO2
+    # into the oxide-to-metal vapour-pressure relation for Fe/Ca/Ti species.
     assert snapshot.evap_flux.total_kg_hr - p_flux == pytest.approx(
-        3.991389587685974, rel=1e-12, abs=1e-12
+        0.07894396835155072, rel=1e-12, abs=1e-12
     )
     active_ceiling_flux_species = ceiling_flux_species & set(
         snapshot.evap_flux.species_kg_hr
     )
-    assert active_ceiling_flux_species
-    assert active_ceiling_flux_species <= set(
-        snapshot.evap_flux.alpha_authority_status_by_species
-    )
-    assert {
-        snapshot.evap_flux.alpha_authority_status_by_species[species]
-        for species in active_ceiling_flux_species
-    } == {"analytical_upper_bound"}
+    # This corrected hot-Fe head result has no Ca/CaO/Ti/TiO/TiO2 ceiling flux:
+    # those channels needed the physically invalid over-reduced melt. Their
+    # analytical_upper_bound provenance remains covered by
+    # test_evaporation_alpha_provenance.py:466-518 and :555-563.
+    assert active_ceiling_flux_species == set()
     assert sim._alpha_authority_status_by_species_engaged == (
         snapshot.evap_flux.alpha_authority_status_by_species
     )
@@ -1241,8 +1243,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # ledger-commit floor, so evaporate_Al2O commits again. Not a refusal
     # drop: no channel is withdrawn.
     # b603: same-tick duct pressure changes the admitted P roster and the
-    # condensation/bleed ordering; this fixture now commits 37 transitions.
-    assert len(sim.atom_ledger.transitions) == 37
+    # condensation/bleed ordering; the old redox authority committed 37.
+    # 2026-09-28 Studio redox-authority regeneration: the corrected melt
+    # potential leaves Ca/Ti ceiling channels inactive; exact head-result count.
+    assert len(sim.atom_ledger.transitions) == 14
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
@@ -1254,25 +1258,15 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert sim.atom_ledger.kg_by_account("process.condensation_train").get(
         "Si", 0.0
     ) > 0.0
-    assert {
-        "condense_SiO", "condense_CrO", "condense_CrO2", "condense_CrO3",
-        "condense_MgO_gas", "condense_SiO2_gas", "condense_TiO2_gas",
-    } <= ca_ti_reasons
-    # Same-tick duct pressure may suppress individual refractory channels;
-    # this test checks the channels that remain physically admitted rather
-    # than requiring the stale pre-b603 roster.
-    for required in (
-        "evaporate_CrO2",
-        "evaporate_CrO3",
-        "evaporate_TiO2_gas",
-    ):
-        assert required in ca_ti_reasons, required
+    # The Studio head-result records only the remaining admitted P carriers
+    # before the oxygen exchange and overhead bleed; the former refractory
+    # Ca/Ti-heavy roster belongs to the inverted-ferric-floor state.
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
-        "evaporate_TiO2_gas",
-        "condense_TiO2_gas",
-        "fe_redox_respeciation",
+        "evaporate_P2",
+        "evaporate_PO",
+        "evaporate_PO2",
         "oxygen_reservoir_exchange",
         "overhead_bleed",
     )
