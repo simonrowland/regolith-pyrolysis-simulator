@@ -2197,7 +2197,14 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
     if len(crossings) != 1:
         raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
     tm = crossings[0]
-    delta_g = difference(temperature_K)
+    try:
+        delta_g = difference(temperature_K)
+    except ValueError as exc:
+        raise ValueError(
+            f"{oxide}: {exc}; JANAF table ranges: "
+            f"{crystal_table} [{crystal[0][0]}, {crystal[-1][0]}] K; "
+            f"{liquid_table} [{liquid[0][0]}, {liquid[-1][0]}] K"
+        ) from exc
     return JANAFFusionEnergy(
         delta_g_fus_kJ_per_mol=delta_g,
         melting_temperature_K=tm,

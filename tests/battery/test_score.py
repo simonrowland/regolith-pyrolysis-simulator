@@ -1319,6 +1319,151 @@ def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
     )] == [("catalogue-composition", 1)]
 
 
+def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        janaf_fusion_energy,
+    )
+    from simulator.battery.score import _fusion_comparison_reference
+
+    temperature = Decimal("2000")
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.8")), ("Al2O3", Decimal("0.2"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="CaO",
+        T_K=temperature,
+        endmember_phase=Phase.CR,
+        component_basis="CaO",
+        composition=composition,
+    )
+    reference = F.observation(
+        "other-source-cao-solid-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="another-source",
+    )
+
+    converted = _fusion_comparison_reference(reference)
+    delta_g = janaf_fusion_energy("CaO", temperature).delta_g_fus_kJ_per_mol
+    expected = (-delta_g * Decimal(1000) / (JANAF_R_J_PER_MOL_K * temperature)).exp()
+    assert converted.value.point == expected
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert converted.source_id == "another-source"
+
+
+def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="NaO0.5",
+        T_K=Decimal("1000"),
+        endmember_phase=Phase.CR,
+        component_basis="NaO0.5",
+    )
+    reference = F.observation(
+        "unsupported-solid-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.5"),
+        source_id="another-source",
+    )
+
+    result = _fusion_comparison_reference(reference)
+
+    assert result.value.point == reference.value.point
+    assert result.identity.reference_state.value.endmember.phase.value is Phase.CR
+    notice = next(n for n in result.notices if n.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN)
+    assert "NaO0.5" in notice.reason
+    assert "no JANAF fusion table pair" in notice.reason
+    assert notice.band
+
+
+def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import janaf
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="CaO",
+        T_K=Decimal("2000"),
+        endmember_phase=Phase.CR,
+        component_basis="CaO",
+    )
+    reference = F.observation(
+        "ambiguous-crossing-cao-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.5"),
+        source_id="another-source",
+    )
+
+    def no_unique_crossing(formula: str, temperature_K: Decimal):
+        raise ValueError(f"{formula}: expected one JANAF cr/l crossing, got []")
+
+    monkeypatch.setattr(janaf, "janaf_fusion_energy", no_unique_crossing)
+    result = _fusion_comparison_reference(reference)
+
+    assert result.value.point == reference.value.point
+    assert result.identity.reference_state.value.endmember.phase.value is Phase.CR
+    notice = next(n for n in result.notices if n.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN)
+    assert "CaO" in notice.reason
+    assert "expected one JANAF cr/l crossing" in notice.reason
+
+
+def test_out_of_janaf_range_activity_notice_does_not_abort_score_store() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        _fusion_comparison_reference,
+    )
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="CaO",
+        T_K=Decimal("100"),
+        endmember_phase=Phase.CR,
+        component_basis="CaO",
+    )
+    reference = F.observation(
+        "out-of-janaf-range-cao-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="another-source",
+    )
+
+    unconverted = _fusion_comparison_reference(reference)
+    assert unconverted.value.point == reference.value.point
+    assert unconverted.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert not any(
+        notice.reason.startswith(f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION};")
+        for notice in unconverted.notices
+    )
+
+    residuals, _ = score_store(
+        _context(F.work(), experiment, reference, review="reviewed"),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+    )
+    assert len(residuals) == 1
+    notice = next(
+        notice
+        for notice in residuals[0].notices
+        if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    )
+    assert "CaO" in notice.reason
+    assert "outside the JANAF table range" in notice.reason
+    assert "JANAF table ranges" in notice.band
+
+
 def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1328,7 +1473,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     )
     from simulator.battery.score import (
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
-        _allibert_fusion_comparison_reference,
+        _fusion_comparison_reference,
         flagged_stratum_rows,
         headline_rows,
     )
@@ -1371,7 +1516,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         ),
     )
     assert (
-        _allibert_fusion_comparison_reference(at_melting_reference).value.point
+        _fusion_comparison_reference(at_melting_reference).value.point
         == Decimal("1")
     )
     alumina_fusion = janaf_fusion_energy("Al2O3", Decimal("2060"))
@@ -1389,7 +1534,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
             composition=composition,
         ),
     )
-    converted_alumina = _allibert_fusion_comparison_reference(alumina_reference)
+    converted_alumina = _fusion_comparison_reference(alumina_reference)
     alumina_notice = next(
         notice
         for notice in converted_alumina.notices
@@ -1403,7 +1548,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     assert silica_fusion.delta_g_fus_kJ_per_mol == Decimal("0.27784")
     assert Decimal("1994.4") < silica_fusion.melting_temperature_K < Decimal("1994.5")
     assert silica_fusion.accepted_melting_temperature_K == Decimal("1986")
-    converted = _allibert_fusion_comparison_reference(reference)
+    converted = _fusion_comparison_reference(reference)
     expected = (
         -fusion.delta_g_fus_kJ_per_mol
         * Decimal(1000)
@@ -1473,7 +1618,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         ),
         point_conditions={"composition": Located(State.of(composition))},
     )
-    converted_source_point = _allibert_fusion_comparison_reference(
+    converted_source_point = _fusion_comparison_reference(
         source_point_reference
     )
     assert converted_source_point.identity.composition.is_value
@@ -1495,7 +1640,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         ),
         point_conditions={"composition": Located(State.of(composition))},
     )
-    converted_alumina_source_point = _allibert_fusion_comparison_reference(
+    converted_alumina_source_point = _fusion_comparison_reference(
         alumina_source_point
     )
     assert (

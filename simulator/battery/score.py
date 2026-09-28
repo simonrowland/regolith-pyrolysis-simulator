@@ -873,13 +873,12 @@ def _is_flagged_stratum_notice(notice: Notice) -> bool:
     )
 
 
-def _allibert_fusion_comparison_reference(reference: Observation) -> Observation:
-    """Return an in-memory liquid-reference view of admitted solid Allibert activities."""
+def _fusion_comparison_reference(reference: Observation) -> Observation:
+    """Return an in-memory liquid-reference view when JANAF supports conversion."""
 
     identity = reference.identity
     if (
-        reference.source_id != "kems-051-allibert-1981"
-        or reference.admission.status is not AdmissionStatus.ADMITTED
+        reference.admission.status is not AdmissionStatus.ADMITTED
         or not isinstance(identity, Identity)
         or quantity_token(identity) is not Quantity.ACTIVITY
         or identity.reference_state is None
@@ -888,13 +887,11 @@ def _allibert_fusion_comparison_reference(reference: Observation) -> Observation
     ):
         return reference
     standard_state = identity.reference_state.value
-    formula = identity.species.formula
+    formula = standard_state.endmember.formula
     if (
-        formula not in {"CaO", "Al2O3"}
-        or phase_token(identity.species) not in {None, Phase.L}
-        or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        identity.species.formula != formula
         or standard_state.component_basis != formula
-        or standard_state.endmember.formula != formula
+        or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
         or phase_token(standard_state.endmember) is not Phase.CR
         or reference.value.kind is not ValueKind.POINT
         or reference.value.point is None
@@ -910,7 +907,30 @@ def _allibert_fusion_comparison_reference(reference: Observation) -> Observation
         janaf_fusion_energy,
     )
 
-    fusion = janaf_fusion_energy(formula, temperature_K)
+    try:
+        fusion = janaf_fusion_energy(formula, temperature_K)
+    except ValueError as exc:
+        reason = str(exc)
+        if not any(
+            expected in reason
+            for expected in (
+                f"no JANAF fusion table pair for {formula}",
+                "JANAF crystal/liquid tables do not overlap",
+                "expected one JANAF cr/l crossing",
+                "outside the JANAF table range",
+                "is not bracketed by JANAF table rows",
+            )
+        ):
+            raise
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=f"fusion conversion for {formula} was skipped: {reason}",
+            origin=reference.observation_id,
+            band=f"JANAF fusion data for {formula}: {reason}",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+
     delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
 
     # Premise: at a common T and pressure, μ=G°+RT ln(a) is unchanged when
@@ -933,26 +953,33 @@ def _allibert_fusion_comparison_reference(reference: Observation) -> Observation
     liquid_state = replace(
         standard_state,
         endmember=liquid_endmember,
-        component_basis="oxide",
     )
-    comparison_species = identity.species
-    if phase_token(comparison_species) is None:
-        # The source describes these admitted Table II points as melt
-        # activities, but the prose phase string is not in the closed parser
-        # map. Type that printed liquid phase on this comparison view only.
-        # At the final CaO-saturation point, this names the activity-bearing
-        # melt component, not the full CaO(s)+melt assemblage.
-        comparison_species = replace(comparison_species, phase=State.of(Phase.L))
-    comparison_identity = replace(identity, species=comparison_species)
-    point_composition = (reference.point_conditions or {}).get("composition")
-    if (
-        (identity.composition is None or not identity.composition.is_value)
-        and isinstance(point_composition, Located)
-        and point_composition.state.is_value
-    ):
-        comparison_identity = replace(
-            comparison_identity, composition=point_composition.state
-        )
+    comparison_identity = identity
+    if reference.source_id == "kems-051-allibert-1981":
+        # Preserve Allibert's existing comparison-view repairs. They do not
+        # decide whether the generic typed fusion conversion is eligible.
+        liquid_state = replace(liquid_state, component_basis="oxide")
+        comparison_species = identity.species
+        if phase_token(comparison_species) is None:
+            # The source describes these admitted Table II points as melt
+            # activities, but the prose phase string is not in the closed parser
+            # map. Type that printed liquid phase on this comparison view only.
+            # At the final CaO-saturation point, this names the activity-bearing
+            # melt component, not the full CaO(s)+melt assemblage.
+            comparison_species = replace(comparison_species, phase=State.of(Phase.L))
+        comparison_identity = replace(identity, species=comparison_species)
+        point_composition = (reference.point_conditions or {}).get("composition")
+        if (
+            (identity.composition is None or not identity.composition.is_value)
+            and isinstance(point_composition, Located)
+            and point_composition.state.is_value
+        ):
+            comparison_identity = replace(
+                comparison_identity, composition=point_composition.state
+            )
+    comparison_identity = replace(
+        comparison_identity, reference_state=State.of(liquid_state)
+    )
     mismatch_K = fusion.melting_temperature_K - fusion.accepted_melting_temperature_K
     extrapolation_K = fusion.melting_temperature_K - temperature_K
     notice = Notice(
@@ -976,7 +1003,7 @@ def _allibert_fusion_comparison_reference(reference: Observation) -> Observation
     )
     return replace(
         reference,
-        identity=replace(comparison_identity, reference_state=State.of(liquid_state)),
+        identity=comparison_identity,
         value=replace(reference.value, point=converted_activity),
         evidence=replace(
             reference.evidence,
@@ -2861,7 +2888,7 @@ def compile_residual(
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
     derived_band: DecisionBand | None = None,
 ) -> tuple[Residual, Observation | None]:
-    reference = _allibert_fusion_comparison_reference(reference)
+    reference = _fusion_comparison_reference(reference)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     formula = identity.species.formula if isinstance(identity, Identity) else ""
@@ -3347,9 +3374,12 @@ def score_store(
                 refs.append(obs)
                 seen.add(obs.observation_id)
         for obs in context.observations.values():
-            converted = _allibert_fusion_comparison_reference(obs)
+            converted = _fusion_comparison_reference(obs)
             if converted is not obs:
-                fusion_diagnostic_ids.add(obs.observation_id)
+                if any(
+                    _is_fusion_conversion_notice(notice) for notice in converted.notices
+                ):
+                    fusion_diagnostic_ids.add(obs.observation_id)
                 if obs.observation_id not in seen:
                     refs.append(converted)
                     seen.add(obs.observation_id)
