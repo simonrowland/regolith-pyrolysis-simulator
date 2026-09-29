@@ -22,6 +22,7 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
     objective_definitions,
+    objective_scores,
     pareto_front,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
@@ -2097,6 +2098,100 @@ def test_staged_beam_furnace_cost_is_tunable_and_not_a_hard_block() -> None:
         objective_definitions(PROFILE),
     )
     assert [member.candidate.id for member in archive] == ["satisfies"]
+
+
+def test_finite_infeasible_objectives_guide_stage_archive_below_feasible_results() -> None:
+    definitions = objective_definitions(PROFILE)
+    schema = RecipeSchema()
+    feasible_candidate = Candidate("feasible", RecipePatch({}))
+    strong_candidate = Candidate("strong-infeasible", RecipePatch({}))
+    weak_candidate = Candidate("weak-infeasible", RecipePatch({}))
+    feasible = _scored(
+        feasible_candidate.patch,
+        candidate_id=feasible_candidate.id,
+        cache_key_value="cache-feasible",
+        oxygen=0.0,
+        energy=50.0,
+    )
+
+    def failed(candidate: Candidate, key: str, oxygen: float, energy: float) -> ScoredResult:
+        return replace(
+            _scored(
+                candidate.patch,
+                candidate_id=candidate.id,
+                cache_key_value=key,
+                oxygen=oxygen,
+                energy=energy,
+            ),
+            feasible=False,
+            failure_category=FailureCategory.INFEASIBLE_RECIPE,
+            feasibility_margins={
+                "delivered_stream_purity": replace(
+                    _margin(),
+                    feasible=False,
+                    margin=-1.0,
+                )
+            },
+            failing_gates=("delivered_stream_purity",),
+        )
+
+    strong = failed(strong_candidate, "cache-strong", oxygen=20.0, energy=1.0)
+    weak = failed(weak_candidate, "cache-weak", oxygen=10.0, energy=2.0)
+    ranked = staged_module._rank_stage_results(
+        (
+            (weak_candidate, weak),
+            (strong_candidate, strong),
+            (feasible_candidate, feasible),
+        ),
+        definitions,
+        beam_width=3,
+    )
+
+    assert [candidate.id for _, candidate, _ in ranked] == [
+        "feasible",
+        "strong-infeasible",
+        "weak-infeasible",
+    ]
+    score_key = staged_module._score_key(strong_candidate, strong, definitions)
+    member = staged_module._ArchiveMember(
+        candidate=strong_candidate,
+        scored=strong,
+        node=staged_module._node_from_candidate(
+            strong_candidate,
+            strong,
+            score_key,
+            schema,
+        ),
+        joint_refine_trace_signals=(),
+    )
+    archive = staged_module._pareto_archive((member,), definitions)
+    assert [item.candidate.id for item in archive] == ["strong-infeasible"]
+    assert not archive[0].scored.feasible
+    assert archive[0].scored.failing_gates == ("delivered_stream_purity",)
+
+    missing_furnace = replace(
+        strong,
+        run_reference=replace(strong.run_reference, product_summary={}),
+    )
+    assert staged_module._scored_objective_scores(missing_furnace, definitions) == (
+        objective_scores(missing_furnace.objectives, definitions)
+    )
+    missing_furnace_member = replace(
+        member,
+        scored=missing_furnace,
+        node=staged_module._node_from_candidate(
+            strong_candidate,
+            missing_furnace,
+            staged_module._score_key(strong_candidate, missing_furnace, definitions),
+            schema,
+        ),
+    )
+    missing_furnace_archive = staged_module._pareto_archive(
+        (missing_furnace_member,), definitions
+    )
+    assert [item.candidate.id for item in missing_furnace_archive] == [
+        "strong-infeasible"
+    ]
 
 
 def test_child_cache_key_duplicate_parent_raises() -> None:

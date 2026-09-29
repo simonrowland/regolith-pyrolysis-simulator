@@ -14,6 +14,7 @@ from simulator.optimize.objective import (
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
     objective_definitions,
+    objective_scores,
 )
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
@@ -413,9 +414,11 @@ def _objective_values_for_definitions(
     scored: "ScoredResult",
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[float, ...] | None:
-    if not bool(getattr(scored, "feasible", False)):
+    feasible = bool(getattr(scored, "feasible", False))
+    objectives = getattr(scored, "objectives", None)
+    if objectives is None and not feasible:
         return tuple(_bad_objective_value(definition) for definition in definitions)
-    if getattr(scored, "objectives", None) is None:
+    if objectives is None:
         return None
 
     mapping = _objective_mapping(scored)
@@ -424,16 +427,21 @@ def _objective_values_for_definitions(
     reference = getattr(scored, "run_reference", None)
     product_summary = getattr(reference, "product_summary", {}) if reference else {}
     if product_summary.get("furnace_amortization_status") != "available":
-        # Production results carry available furnace evidence. Direct/replayed or
-        # degraded results that do not remain unscoreable, not ranked as if capital
-        # were free. Once evidence claims to be available, malformed values are
-        # corruption and must propagate from the scorer instead of failing a trial.
-        return None
-    scores = cost_adjusted_objective_scores(
-        mapping,
-        definitions,
-        product_summary=product_summary,
-    )
+        if feasible:
+            # Production results carry available furnace evidence. Direct/replayed
+            # or degraded feasible results stay unscoreable, not ranked as if
+            # capital were free. Once evidence claims to be available, malformed
+            # values must propagate from the scorer instead of failing a trial.
+            return None
+        # An infeasible run can still guide the sampler with measured objectives;
+        # keep those raw because missing furnace evidence cannot support a cost.
+        scores = objective_scores(objectives, definitions)
+    else:
+        scores = cost_adjusted_objective_scores(
+            mapping,
+            definitions,
+            product_summary=product_summary,
+        )
     if any(score is None for score in scores):
         return None
     return tuple(

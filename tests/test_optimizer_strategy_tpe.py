@@ -5,6 +5,7 @@ import math
 import re
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -17,7 +18,13 @@ from simulator.optimize import (
     Strategy,
     ThresholdSpec,
 )
-from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.optimize.evaluate import (
+    FailureCategory,
+    RunReference,
+    ScoredResult,
+    evaluate,
+)
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     LEGACY_ENERGY_KWH_METRIC,
@@ -25,10 +32,12 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
 )
+from simulator.optimize.profiles import load_profile
 from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.strategy.bayesian import (
     _BAD_MAXIMIZE_VALUE,
     _BAD_MINIMIZE_VALUE,
+    _CONSTRAINT_NAMES_ATTR,
     _CANDIDATE_ID_ATTR,
     _CONSTRAINT_VALUES_ATTR,
     _NONFINITE_INFEASIBLE_CONSTRAINT_VIOLATION,
@@ -38,6 +47,7 @@ from simulator.optimize.strategy.bayesian import (
     OPTUNA_REQUIRED_MESSAGE,
     OptunaUnavailableError,
 )
+from simulator.optimize.strategy.protocol import WarmStartSeed
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -608,6 +618,163 @@ def test_tpe_infeasible_result_uses_directional_worst_values_not_zero() -> None:
     trial = _trials_by_candidate(strategy)[candidate.id]
     assert trial.values == [_BAD_MAXIMIZE_VALUE, _BAD_MINIMIZE_VALUE]
     assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR] == (1.0,)
+
+
+def _lunar_profile_for_hours(hours: int, *, gates: tuple[str, ...] | None = None):
+    profile = dict(load_profile("lunar_mare_low_ti"))
+    fidelities = {
+        name: dict(options)
+        for name, options in profile["fidelities"].items()
+    }
+    selected = dict(fidelities[ANALYTICAL_BACKEND_SERIALIZATION_TOKEN])
+    selected["hours"] = hours
+    fidelities[ANALYTICAL_BACKEND_SERIALIZATION_TOKEN] = selected
+    profile["fidelities"] = fidelities
+    if gates is not None:
+        constraints = dict(profile["constraints"])
+        constraints["gates"] = list(gates)
+        profile["constraints"] = constraints
+    return profile
+
+
+def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> None:
+    furnace_path = ("furnace_max_T_C",)
+    schema = RecipeSchema(
+        allowlist=(
+            KnobSpec(
+                path=furnace_path,
+                kind="float",
+                low=1200.0,
+                high=2200.0,
+                bounds_source="C5 acceptance",
+            ),
+        )
+    )
+    profile = _lunar_profile_for_hours(60)
+    gates = set(profile["constraints"]["gates"])
+    assert {"delivered_stream_purity", "extraction_completeness"} <= gates
+
+    strategy = OptunaTPEStrategy(
+        schema,
+        seed=5505,
+        objective_profile=profile,
+        n_startup_trials=0,
+        warm_start_seeds=(
+            WarmStartSeed(
+                id="nonbinding-1800-cap",
+                patch=RecipePatch({furnace_path: 1800.0}),
+                proposal_source="seed_recipe",
+            ),
+            WarmStartSeed(
+                id="furnace-cap-1200",
+                patch=RecipePatch({furnace_path: 1200.0}),
+                proposal_source="seed_recipe",
+            ),
+        ),
+    )
+    candidates = strategy.ask(2)
+    results = [
+        evaluate(
+            candidate.patch,
+            "lunar_mare_low_ti",
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            profile=profile,
+            candidate_id=candidate.id,
+        )
+        for candidate in candidates
+    ]
+
+    for result in results:
+        assert result.eval_spec is not None and result.eval_spec.hours == 60
+        assert not result.feasible
+        assert result.objectives is not None
+        assert {"delivered_stream_purity", "extraction_completeness"} & set(
+            result.failing_gates
+        )
+
+    strategy.tell(list(zip(candidates, results, strict=True)))
+    trials = _trials_by_candidate(strategy)
+    metals_index = strategy.objective_metrics.index("metals_total_kg")
+    stored_metals = []
+    for candidate, result in zip(candidates, results, strict=True):
+        trial = trials[candidate.id]
+        assert trial.state.name == "COMPLETE"
+        assert trial.values is not None
+        value = trial.values[metals_index]
+        assert math.isfinite(value)
+        assert value not in (_BAD_MAXIMIZE_VALUE, _BAD_MINIMIZE_VALUE)
+        assert set(result.failing_gates) <= set(
+            trial.user_attrs[_CONSTRAINT_NAMES_ATTR]
+        )
+        assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR]
+        stored_metals.append(value)
+    # Identical deterministic patches have zero repeat spread at one cache key.
+    assert stored_metals[0] != stored_metals[1]
+
+    short_profile = _lunar_profile_for_hours(
+        1,
+        gates=("knudsen_viscous", "furnace_temperature"),
+    )
+    short_results = [
+        evaluate(
+            candidate.patch,
+            "lunar_mare_low_ti",
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            profile=short_profile,
+            candidate_id=f"short-{candidate.id}",
+        )
+        for candidate in candidates
+    ]
+    assert all(result.feasible and result.objectives is not None for result in short_results)
+    assert all(
+        result.run_reference is not None
+        and result.run_reference.product_summary.get("furnace_amortization_status")
+        == "available"
+        for result in short_results
+    )
+    short_metals = [
+        result.objectives.as_mapping()["metals_total_kg"]
+        for result in short_results
+    ]
+    short_oxygen = [
+        result.objectives.as_mapping()["oxygen_kg"]
+        for result in short_results
+    ]
+    assert short_metals[0] == short_metals[1]
+    assert short_oxygen[0] == short_oxygen[1]
+    assert all(
+        result.objectives.as_mapping()["duration_h"] == result.eval_spec.hours
+        for result in short_results
+    )
+
+
+def test_tpe_infeasible_objectives_without_furnace_cost_use_raw_metrics() -> None:
+    strategy = OptunaTPEStrategy(_simple_schema(), seed=5506, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+    raw = _no_objective_infeasible_result(candidate)
+    scored = replace(
+        raw,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue(metric="yield", sense="maximize", value=2.5),
+                ObjectiveValue(metric="energy", sense="minimize", value=8.0),
+            )
+        ),
+        feasibility_margins={
+            "gate": _gate_margin(margin=-0.5, tolerance=0.0, feasible=False)
+        },
+        run_reference=_available_run_reference(furnace_status=None),
+    )
+
+    strategy.tell([(candidate, scored)])
+
+    trial = _trials_by_candidate(strategy)[candidate.id]
+    assert trial.state.name == "COMPLETE"
+    assert trial.values == [
+        scored.objectives.as_mapping()["yield"],
+        scored.objectives.as_mapping()["energy"],
+    ]
+    assert any(value > 0.0 for value in trial.user_attrs[_CONSTRAINT_VALUES_ATTR])
 
 
 def test_tpe_feasible_unscoreable_result_fails_trial_without_bad_objective_values() -> None:

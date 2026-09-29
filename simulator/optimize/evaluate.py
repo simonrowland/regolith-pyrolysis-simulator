@@ -630,9 +630,6 @@ class ScoredResult:
                 raise ValueError("feasible result cannot carry failure_category")
             if self.objectives is None:
                 raise ValueError("feasible result requires objectives")
-        else:
-            if self.objectives is not None:
-                raise ValueError("infeasible result must not carry objectives")
         if self.failure_category is FailureCategory.PROPOSED:
             pumping_margin = self.feasibility_margins.get(PUMPING_FEASIBILITY_GATE)
             pressure_proposal = (
@@ -722,7 +719,7 @@ def evaluate(
     cost_parameters: Mapping[str, Any] | None = None,
     conditional_context: ConditionalExecutionContext | None = None,
 ) -> ScoredResult:
-    """Run one recipe candidate and return its feasible-only score."""
+    """Run one candidate and return feasibility plus any available objectives."""
 
     active_schema = schema or RecipeSchema()
     try:
@@ -1101,7 +1098,32 @@ def evaluate(
             cache_key_value=key,
         ) from exc
     if not feasibility.feasible:
-        return _infeasible_result(candidate_id, spec, key, feasibility, run_execution, profile)
+        objectives = None
+        try:
+            pumping_diagnostic = _pumping_diagnostic_for_gate(
+                run_execution,
+                feedstock_id=spec.feedstock_id,
+            )
+            computed_objectives = _compute_objective_vector(
+                run_execution,
+                objective_profile,
+                pumping_diagnostic,
+                spec,
+            )
+            if all(value.value is not None for value in computed_objectives.values):
+                objectives = computed_objectives
+        except (OverflowError, ObjectiveComputationError):
+            # Keep the failed gate result; an unavailable vector remains unscored.
+            pass
+        return _infeasible_result(
+            candidate_id,
+            spec,
+            key,
+            feasibility,
+            run_execution,
+            profile,
+            objectives=objectives,
+        )
     pumping_diagnostic = _pumping_diagnostic_for_gate(
         run_execution,
         feedstock_id=spec.feedstock_id,
@@ -1154,15 +1176,12 @@ def evaluate(
             )
 
     try:
-        objectives = compute_objectives(
+        objectives = _compute_objective_vector(
+            run_execution,
             objective_profile,
-            _CertifiedPumpingDiagnosticRunExecution(
-                run_execution,
-                pumping_diagnostic,
-            ),
-            cost_parameters=spec.cost_parameters,
+            pumping_diagnostic,
+            spec,
         )
-        objectives = _objectives_with_thermal_window_metadata(objectives, spec)
         trace_payload = _composition_target_trace_payload(
             objective_profile,
             objectives,
@@ -4137,6 +4156,7 @@ def _infeasible_result(
     *,
     notes: tuple[str, ...] = (),
     trace_payload: Mapping[str, Any] | None = None,
+    objectives: ObjectiveVector | None = None,
 ) -> ScoredResult:
     trace_payload = _trace_payload_with_interpolation_feasibility(
         trace_payload,
@@ -4149,11 +4169,29 @@ def _infeasible_result(
         cache_key=key,
         feasible=False,
         failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        objectives=objectives,
         feasibility_margins=feasibility.margins,
         failing_gates=feasibility.failing_gates,
         run_reference=_run_reference(run_execution, profile, trace_payload=trace_payload),
         notes=notes,
     )
+
+
+def _compute_objective_vector(
+    run_execution: Any,
+    objective_profile: Mapping[str, Any],
+    pumping_diagnostic: Mapping[str, Any],
+    spec: EvalSpec,
+) -> ObjectiveVector:
+    objectives = compute_objectives(
+        objective_profile,
+        _CertifiedPumpingDiagnosticRunExecution(
+            run_execution,
+            pumping_diagnostic,
+        ),
+        cost_parameters=spec.cost_parameters,
+    )
+    return _objectives_with_thermal_window_metadata(objectives, spec)
 
 
 def _target_infeasible_result(

@@ -2413,7 +2413,7 @@ def test_failed_runtime_backend_prefixed_message_is_engine_bug() -> None:
     assert raised.value.category is FailureCategory.ENGINE_BUG
 
 
-def test_objectives_populated_only_for_feasible_runs() -> None:
+def test_completed_infeasible_run_retains_derived_objectives() -> None:
     feasible = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
@@ -2435,17 +2435,32 @@ def test_objectives_populated_only_for_feasible_runs() -> None:
     assert "not product" in notes
     assert "missing recorded pO2-hold -> pN2 SiO-release switch" in notes
 
+    mixed_stream_execution = _execution(trace=_trace(mixed_stream=True))
     infeasible = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
         profile=PROFILE,
-        executor=FakeExecutor(_execution(trace=_trace(mixed_stream=True))),
+        executor=FakeExecutor(mixed_stream_execution),
+    )
+    same_run_without_purity_gate = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(mixed_stream_execution),
+        constraints=PhysicsConstraintSet(active_gates=("knudsen_viscous",)),
     )
 
     assert not infeasible.feasible
     assert infeasible.failure_category is FailureCategory.INFEASIBLE_RECIPE
-    assert infeasible.objectives is None
+    assert infeasible.objectives is not None
+    assert same_run_without_purity_gate.feasible
+    assert same_run_without_purity_gate.objectives is not None
+    assert (
+        infeasible.objectives.as_mapping()
+        == same_run_without_purity_gate.objectives.as_mapping()
+    )
     assert infeasible.failing_gates == ("delivered_stream_purity",)
     assert infeasible.feasibility_margins["delivered_stream_purity"].margin < 0.0
 
@@ -3563,6 +3578,7 @@ def test_real_backend_not_converged_is_timeout_not_unavailable() -> None:
     assert not result.feasible
     assert result.failure_category is FailureCategory.TIMEOUT
     assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
+    assert result.objectives is None
     assert result.run_reference is not None
     assert result.run_reference.backend_status == "not_converged"
     assert any("not_converged" in note for note in result.notes)
@@ -3877,6 +3893,7 @@ def test_engine_worker_timeout_exception_is_not_unavailable() -> None:
     assert result.failure_category is FailureCategory.TIMEOUT
     assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
     assert result.failure_category is not FailureCategory.ENGINE_BUG
+    assert result.objectives is None
     assert result.run_reference is not None
     assert result.run_reference.backend_status == "not_converged"
 
