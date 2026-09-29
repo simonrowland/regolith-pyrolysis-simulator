@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import platform
 import re
@@ -49,6 +50,9 @@ from simulator.state import (
 BASELINE_PATH = REPO_ROOT / "tests" / "perf" / "perf_ratchet_baselines.json"
 POWER_SOC_MIN_PERCENT = 20
 MEASUREMENT_INVALID_EXIT_CODE = 75
+OPTIMIZER_STAGE_NAME = "optimizer_60h_eval"
+OPTIMIZER_STAGE_HORIZON_HOURS = 60
+OPTIMIZER_STAGE_TRIALS = 5
 # Corrected 2026-07-25 (milestone review F1 follow-through): the loose
 # substring match had classified this M5 MAX box as plain "M5", so the
 # baselines were seeded under a wrong label. The canonical class is
@@ -60,6 +64,7 @@ STAGE_NAMES = (
     "sim_step_c2a_hour",
     "condensation_route_hour",
     "runner_fixture_replay",
+    OPTIMIZER_STAGE_NAME,
 )
 TEMPERATURES_K = (1273.15, 1573.15, 1873.15)
 # Premise: one runner replay is about 5 s wall and its isolated
@@ -131,6 +136,10 @@ PROTOCOL = {
         "sim_step_c2a_hour": 1,
         "condensation_route_hour": 5,
         "runner_fixture_replay": 3,
+        OPTIMIZER_STAGE_NAME: 1,
+    },
+    "stage_trial_counts": {
+        OPTIMIZER_STAGE_NAME: OPTIMIZER_STAGE_TRIALS,
     },
     "stage_work_units_per_trial": {
         "internal_analytical_equilibrium": 500,
@@ -138,6 +147,7 @@ PROTOCOL = {
         "sim_step_c2a_hour": 1,
         "condensation_route_hour": 4,
         "runner_fixture_replay": 1,
+        OPTIMIZER_STAGE_NAME: OPTIMIZER_STAGE_HORIZON_HOURS,
     },
     "hot_path_calls_per_trial": {
         "internal_analytical_equilibrium": 500,
@@ -145,6 +155,7 @@ PROTOCOL = {
         "sim_step_c2a_hour": 1,
         "condensation_route_hour": 164,
         "runner_fixture_replay": 24,
+        OPTIMIZER_STAGE_NAME: OPTIMIZER_STAGE_HORIZON_HOURS,
     },
 }
 
@@ -842,7 +853,131 @@ def _measure_stage(
     }
 
 
+def _measure_optimizer_60h_eval_stage() -> dict[str, Any]:
+    from datetime import datetime, timezone
+    from unittest.mock import patch
+
+    from simulator.core import PyrolysisSimulator
+    from simulator.optimize.evaluate import evaluate
+    from simulator.optimize.profiles import load_profile
+    from simulator.optimize.results_store import ResultStore
+    from simulator.recipe import RecipePatch
+
+    profile = load_profile(
+        REPO_ROOT / "data" / "optimize_profiles" / "lunar_highland.yaml"
+    )
+    run_hours = int(profile["run"]["hours"])
+    fidelity_hours = int(profile["fidelities"]["internal-analytical"]["hours"])
+    assert run_hours == fidelity_hours == OPTIMIZER_STAGE_HORIZON_HOURS
+    patch_value = RecipePatch({})
+    trial_records = []
+
+    def total_cpu_seconds() -> float:
+        own = resource.getrusage(resource.RUSAGE_SELF)
+        children = resource.getrusage(resource.RUSAGE_CHILDREN)
+        # Premise: evaluation CPU includes the worker and its children.
+        # Algebra: CPU = own(user + sys) + children(user + sys). Units: s.
+        return float(
+            own.ru_utime
+            + own.ru_stime
+            + children.ru_utime
+            + children.ru_stime
+        )
+
+    for trial_index in range(OPTIMIZER_STAGE_TRIALS):
+        trial_time = datetime.now(timezone.utc)
+        step_calls = {"count": 0}
+        original_step = PyrolysisSimulator.step
+
+        def counted_step(simulator, *args, **kwargs):
+            step_calls["count"] += 1
+            return original_step(simulator, *args, **kwargs)
+
+        with tempfile.TemporaryDirectory(prefix="rpp-optimizer-ratchet-") as temp_dir:
+            store = ResultStore(Path(temp_dir) / "cache.sqlite")
+            assert store.query("lunar_highland") == []
+            with patch.object(PyrolysisSimulator, "step", counted_step):
+                cpu_before = total_cpu_seconds()
+                wall_before = time.perf_counter()
+                scored = evaluate(
+                    patch_value,
+                    "lunar_highland",
+                    "internal-analytical",
+                    profile=profile,
+                )
+                wall_seconds = time.perf_counter() - wall_before
+                cpu_seconds = total_cpu_seconds() - cpu_before
+
+            assert scored.eval_spec is not None and scored.cache_key
+            assert step_calls["count"] == run_hours
+            assert math.isfinite(cpu_seconds) and cpu_seconds > 0.0
+            assert math.isfinite(wall_seconds) and wall_seconds > 0.0
+            assert store.lookup(scored.eval_spec) is None
+            store.store(
+                scored.eval_spec,
+                scored,
+                created_at=datetime.now(timezone.utc).isoformat(),
+            )
+            cached = store.lookup(scored.eval_spec)
+            assert cached is not None and cached.cache_key == scored.cache_key
+            assert step_calls["count"] == run_hours
+
+        # Premise: each step call is one completed profile hour. Algebra:
+        # wall/CPU = elapsed wall seconds / user+system CPU seconds; units cancel.
+        trial_records.append(
+            {
+                "trial": trial_index + 1,
+                "date": trial_time.date().isoformat(),
+                "hostname": platform.node(),
+                "work_units": step_calls["count"],
+                "hot_path_calls": step_calls["count"],
+                "cpu_seconds": cpu_seconds,
+                "wall_seconds": wall_seconds,
+                "wall_cpu_ratio": wall_seconds / cpu_seconds,
+                "cold_cache_miss": True,
+                "same_patch_cache_hit": True,
+                "cache_hit_counted": False,
+                "cache_hit_work_units": 0,
+            }
+        )
+
+    cpu_values = [float(record["cpu_seconds"]) for record in trial_records]
+    wall_values = [float(record["wall_seconds"]) for record in trial_records]
+    # Premise: the profile horizon is fixed across trials. Algebra: rate is
+    # completed hours / CPU seconds; spread is max CPU - min CPU, both in s.
+    rates = [
+        float(record["work_units"]) / float(record["cpu_seconds"])
+        for record in trial_records
+    ]
+    median_cpu = statistics.median(cpu_values)
+    return {
+        "rate": statistics.median(rates),
+        "rate_unit": "work_units_per_cpu_second",
+        "work_units": sum(int(record["work_units"]) for record in trial_records),
+        "hot_path_calls": sum(
+            int(record["hot_path_calls"]) for record in trial_records
+        ),
+        "cpu_seconds": median_cpu,
+        "cpu_seconds_median": median_cpu,
+        "cpu_seconds_min": min(cpu_values),
+        "cpu_seconds_max": max(cpu_values),
+        "cpu_seconds_spread": max(cpu_values) - min(cpu_values),
+        "wall_seconds_median": statistics.median(wall_values),
+        "wall_cpu_ratio_median": statistics.median(
+            float(record["wall_cpu_ratio"]) for record in trial_records
+        ),
+        "trial_count": len(trial_records),
+        "trial_rates": rates,
+        "details": {
+            "hot_path": "PyrolysisSimulator.step during optimizer evaluate",
+            "trial_records": trial_records,
+        },
+    }
+
+
 def _measure_one(stage: str) -> dict[str, Any]:
+    if stage == OPTIMIZER_STAGE_NAME:
+        return _measure_optimizer_60h_eval_stage()
     bundle = load_config_bundle()
     trial_factories = {
         "internal_analytical_equilibrium": _internal_equilibrium_trial_factory(
