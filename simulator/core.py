@@ -7304,6 +7304,100 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             return None
 
+        if (
+            endpoint_clamped
+            and raw_ferric >= 1.0 - KRESS91_FERRIC_FRACTION_EPSILON
+        ):
+            # Premise: a near-ferric ledger is outside Kress91's open
+            # interval, so its epsilon edge is a one-sided lower bound, not
+            # an equilibrium fO2. Capacity: hand over only when this tick's
+            # transfer exceeds the noop and exhausts the directional
+            # inventory: release n_Fe2O3/2 or uptake n_FeO/4. Limiting case:
+            # 2 mol Fe2O3 gives 1 mol release capacity, so 0 and 0.1 mol
+            # transfers keep the bound while 2 mol hands over to the gas.
+            ledger_comp = self._cleaned_melt_ledger_wt_pct()
+            mol_fractions = melt_mol_fractions_for_kress91(
+                ledger_comp or comp
+            )
+            if not mol_fractions:
+                return None
+            lower_bound_fO2_log = kress91_log_fO2_from_fe3_over_sigma_fe(
+                fe3_over_sigma_fe=(
+                    1.0 - KRESS91_FERRIC_FRACTION_EPSILON
+                ),
+                mol_fractions=mol_fractions,
+                T_K=temperature_K,
+                pressure_bar=pressure_bar,
+            )
+            lower_bound_fO2_log = self._finite_oxygen_reservoir_fO2_log(
+                lower_bound_fO2_log,
+                context='ledger_near_ferric_lower_bound',
+            )
+            transport_pO2_bar = self._melt_redox_transport_pO2_bar(reservoir)
+            per_tick_transfer = self._handover_o2_transfer_mol()
+            directional_capacity = (
+                self._melt_redox_directional_inventory_capacity_mol(
+                    fO2_log=lower_bound_fO2_log,
+                    transport_pO2_bar=transport_pO2_bar,
+                    per_tick_o2_transfer_mol=per_tick_transfer,
+                )
+            )
+            gas_owns_melt = (
+                self._melt_redox_transfer_exhausts_directional_capacity(
+                    directional_capacity_mol=directional_capacity,
+                    per_tick_o2_transfer_mol=per_tick_transfer,
+                    native_buffer_active=False,
+                )
+            )
+            capacity_text = (
+                'unavailable'
+                if directional_capacity is None
+                else f'{directional_capacity:.17g}'
+            )
+            handover_text = (
+                f'capacity_O2={capacity_text}; '
+                f'per_tick_o2_transfer_mol={per_tick_transfer:.17g}'
+            )
+            if gas_owns_melt:
+                fO2_log = math.log10(transport_pO2_bar)
+                self._last_redox_domain = self._redox_domain_record(
+                    fO2_log=fO2_log,
+                    basis='no_melt_redox_buffer',
+                    endpoint_clamped=True,
+                    endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
+                    endpoint_provenance=endpoint_provenance,
+                    authority_level='gas_interface_controlled',
+                    reason=(
+                        'out_of_domain:no_melt_redox_buffer; '
+                        'this tick interface O2 transfer meets or exceeds '
+                        'the near-ferric directional O2 capacity; '
+                        'kress91_inverse_not_evaluated; '
+                        f'{handover_text}; '
+                        f'{endpoint_provenance}'
+                    ),
+                    status_override='out_of_domain',
+                )
+                return fO2_log
+            self._last_redox_domain = self._redox_domain_record(
+                fO2_log=None,
+                fO2_log_lower_bound=lower_bound_fO2_log,
+                basis='ferrous_free_lower_bound',
+                endpoint_clamped=True,
+                endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
+                endpoint_provenance=endpoint_provenance,
+                authority_level='extrapolated',
+                reason=(
+                    'out_of_domain:ferrous_free_lower_bound; '
+                    'near-ferric Kress epsilon edge is a one-sided lower '
+                    'bound, not an equality; the fO2 scalar is absent; '
+                    'kress91_inverse_not_evaluated; '
+                    f'{handover_text}; '
+                    f'{endpoint_provenance}'
+                ),
+                status_override='out_of_domain',
+            )
+            return None
+
         if endpoint_clamped:
             transport_pO2_bar = self._melt_redox_transport_pO2_bar(reservoir)
             fO2_log = math.log10(transport_pO2_bar)

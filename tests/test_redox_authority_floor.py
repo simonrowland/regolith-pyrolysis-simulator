@@ -742,6 +742,28 @@ def _fully_ferric_sim() -> PyrolysisSimulator:
     return sim
 
 
+def _near_ferric_sim(n_feo_mol: float) -> PyrolysisSimulator:
+    sim = _fully_ferric_sim()
+    _set_melt_iron_oxides(
+        sim,
+        n_feo_mol=n_feo_mol,
+        n_fe2o3_mol=2.0,
+    )
+    return sim
+
+
+def _near_ferric_lower_bound_log10(sim: PyrolysisSimulator) -> float:
+    composition = melt_mol_fractions_for_kress91(
+        sim._cleaned_melt_ledger_wt_pct()
+    )
+    return kress91_log_fO2_from_fe3_over_sigma_fe(
+        fe3_over_sigma_fe=1.0 - KRESS91_FERRIC_FRACTION_EPSILON,
+        mol_fractions=composition,
+        T_K=float(sim.melt.temperature_C) + 273.15,
+        pressure_bar=_pressure_bar(sim),
+    )
+
+
 def test_fully_ferric_zero_transfer_stays_on_the_lower_bound() -> None:
     """A zero transfer does not copy the gas into a ferrous-free melt."""
 
@@ -805,6 +827,84 @@ def test_fully_ferric_release_below_capacity_stays_on_the_bound() -> None:
     assert sim._last_redox_domain["fO2_log_lower_bound"] != pytest.approx(
         math.log10(TRANSPORT_PO2_BAR)
     )
+
+
+@pytest.mark.parametrize("n_feo_mol", [1.0e-12, 1.0e-9, 4.0e-6])
+def test_near_ferric_zero_transfer_stays_on_the_lower_bound(
+    n_feo_mol: float,
+) -> None:
+    sim = _near_ferric_sim(n_feo_mol)
+    expected = _near_ferric_lower_bound_log10(sim)
+
+    fO2_log = sim._melt_fO2_from_ledger()
+    domain = sim._last_redox_domain
+
+    assert domain["basis"] == "ferrous_free_lower_bound"
+    assert domain["status"] == "out_of_domain"
+    assert domain["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
+    assert "capacity_O2=1" in domain["reason"]
+    assert "per_tick_o2_transfer_mol=0" in domain["reason"]
+    assert fO2_log is None
+    assert domain["derived_fO2_log"] is None
+
+
+def test_near_ferric_release_below_capacity_stays_on_the_lower_bound() -> None:
+    sim = _near_ferric_sim(1.0e-9)
+    expected = _near_ferric_lower_bound_log10(sim)
+    sim.melt.oxygen_reservoir.exchange_o2_mol = 0.1
+
+    fO2_log = sim._melt_fO2_from_ledger()
+    domain = sim._last_redox_domain
+
+    assert domain["basis"] == "ferrous_free_lower_bound"
+    assert domain["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
+    assert "capacity_O2=1" in domain["reason"]
+    assert "per_tick_o2_transfer_mol=0.1" in domain["reason"]
+    assert fO2_log is None
+
+
+def test_near_ferric_release_above_capacity_follows_the_gas() -> None:
+    sim = _near_ferric_sim(1.0e-9)
+    sim.melt.oxygen_reservoir.exchange_o2_mol = 2.0
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert sim._last_redox_domain["basis"] == "no_melt_redox_buffer"
+    assert sim._last_redox_domain["authority"] == "gas_interface_controlled"
+    assert fO2_log == pytest.approx(math.log10(TRANSPORT_PO2_BAR))
+
+
+def test_near_ferric_interface_holds_transport_pressure() -> None:
+    sim = _near_ferric_sim(1.0e-9)
+    _finite_gas_film(sim)
+
+    assert sim._melt_fO2_from_ledger() is None
+    sim._sync_oxygen_reservoir_mirror()
+    state = sim._oxygen_interface_state(TRANSPORT_PO2_BAR)
+
+    assert sim._last_redox_domain["basis"] == "ferrous_free_lower_bound"
+    assert state["interface_pO2_bar"] == pytest.approx(TRANSPORT_PO2_BAR)
+    assert state["limiting_regime"] == "gas_side_ferrous_free_lower_bound"
+    assert state["melt_intrinsic_pO2_bar"] is None
+
+
+def test_near_ferric_inventory_inside_kress_interval_is_unchanged() -> None:
+    sim = _near_ferric_sim(1.0e-4)
+    ferric_fraction, *_ = _ferric_state(sim)
+    expected = kress91_log_fO2_from_fe3_over_sigma_fe(
+        fe3_over_sigma_fe=ferric_fraction,
+        mol_fractions=melt_mol_fractions_for_kress91(
+            sim._melt_oxide_wt_pct()
+        ),
+        T_K=float(sim.melt.temperature_C) + 273.15,
+        pressure_bar=_pressure_bar(sim),
+    )
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert sim._last_redox_domain["basis"] == "kress91_inverse"
+    assert not sim._last_redox_domain["endpoint_clamped"]
+    assert fO2_log == pytest.approx(expected, abs=1.0e-8)
 
 
 def test_fully_ferric_release_above_capacity_follows_the_gas() -> None:
