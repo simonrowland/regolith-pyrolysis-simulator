@@ -22,6 +22,7 @@ from simulator.core import (
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.mass_balance import MassBalance, ZERO_INPUT_BASIS_BREACH
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.physical_constants import MELT_DISSOCIATION_PO2_MAX_BAR
 from simulator.runner import build_sio_yield_report
 from simulator.state import (
     Atmosphere,
@@ -410,6 +411,54 @@ def test_directionally_available_fe2o3_releases_o2_after_larger_prior_tick(
     )
 
 
+def test_fully_ferric_fe2o3_release_publishes_committed_interface_root():
+    sim = _oxygen_exchange_sim("Fe2O3", mass_kg=1.0e-11)
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.pO2_mbar = 0.001
+    sim.melt.p_total_mbar = 100.0
+    sim._melt_headspace_composition_mbar = {"N2": 1.0}
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0e-7, "N2": 1.0e-7},
+        source="test finite low-pO2 gas film",
+        material_origin="feedstock",
+    )
+    gas_k, _ = sim._oxygen_interface_gas_side_k_m_s(
+        sim.melt.temperature_C + 273.15
+    )
+    assert math.isfinite(gas_k) and gas_k > 0.0
+    melt_before = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    shadow = reservoir.shadow_oxygen_transfer
+    transfer_mol = reservoir.exchange_o2_mol
+    assert reservoir.redox_buffer_status == "available"
+    assert shadow["status"] == "ok"
+    assert transfer_mol > OXYGEN_RESERVOIR_NOOP_MOL
+    assert transfer_mol <= melt_before["Fe2O3"] / 2.0
+    melt_after = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    assert melt_after["FeO"] > 0.0
+    assert melt_after["FeO"] == pytest.approx(4.0 * transfer_mol)
+    assert melt_after["Fe2O3"] == pytest.approx(
+        melt_before["Fe2O3"] - 2.0 * transfer_mol
+    )
+    interface = sim._last_oxygen_interface_diagnostic
+    assert reservoir.interface_pO2_bar == pytest.approx(
+        interface["interface_pO2_bar"], rel=1.0e-12, abs=1.0e-20
+    )
+    assert interface["interface_root_clamped"] is False
+    assert interface["interface_root_residual_mol_m2_s"] == pytest.approx(
+        0.0, abs=2.0e-14
+    )
+    assert math.isfinite(shadow["interface_pO2_bar"])
+    assert (
+        reservoir.headspace_transport_pO2_bar
+        < reservoir.interface_pO2_bar
+        <= MELT_DISSOCIATION_PO2_MAX_BAR
+    )
+
+
 def test_trace_fe_directional_release_preserves_atom_closure():
     sim = _oxygen_exchange_sim("Fe2O3", mass_kg=1.0e-11)
     sim.melt.atmosphere = Atmosphere.PN2_SWEEP
@@ -523,6 +572,30 @@ def test_hard_vacuum_has_zero_passive_exchange_and_preserves_ledger():
     )
     assert sim.atom_ledger.mol_by_account() == before
     assert len(sim.atom_ledger.transitions) == transitions_before
+
+
+def test_zero_committed_hard_vacuum_release_publishes_gas_pressure():
+    sim = _oxygen_exchange_sim("Fe2O3")
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 0.0
+    sim.melt.pO2_mbar = 0.0
+    sim._melt_headspace_composition_mbar = {}
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.05},
+        source="test explicit vacuum-side oxygen",
+        material_origin="feedstock",
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.shadow_oxygen_transfer["status"] == (
+        "hard_vacuum_no_passive_exchange"
+    )
+    assert reservoir.exchange_o2_mol == 0.0
+    assert reservoir.interface_pO2_bar == pytest.approx(
+        reservoir.headspace_transport_pO2_bar
+    )
 
 
 def _assert_transitional_evaporation_notice(

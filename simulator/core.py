@@ -391,6 +391,7 @@ from simulator.condensation_routing import (
 from simulator.cost_ledger import CostImportContext, CostLedger
 from simulator.feedstock_guard import assert_feedstock_loadable
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
+from simulator.physical_constants import MELT_DISSOCIATION_PO2_MAX_BAR
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
     KRESS91_LN_FO2_COEFFICIENT,
@@ -4511,19 +4512,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         flux root is 9.91e-5 bar (9.9e4x). The discrepancy is the omitted
         gas/melt concentration ratio, not a tuning factor.
 
-        The interpolation is not allowed to turn a ratio-limit redox state into
-        an artificial pressure source.  Basis ferrous_free_lower_bound is that
-        endpoint: the edge is not an fO2 equality, and the interface holds
-        p_i = p_g instead of the 100 bar dissociation clamp.  Kress91's Fe3+/ΣFe fraction is a
-        finite-buffer indicator; when either ferric or ferrous inventory is at
-        or below one part per million, the corresponding melt-side endpoint is
-        exhausted.  In that limit the formal ``ln(p_m)`` endpoint can run to
-        +/- infinity while the bulk melt no longer has the inventory required
-        to sustain it.  The physically bounded continuation is the gas-side
-        hold: ``p_i = p_g`` (the declared transport pressure), with a typed
-        diagnostic regime.  This keeps the interface in
-        ``[p_floor, p_headspace_or_hold]`` and prevents ratio-limit Kress91
-        inversions from driving surface release pressures.
+        A ferrous-free lower bound is not an fO2 equality: Kress91's
+        ``ln(Fe2O3/FeO)`` diverges as FeO tends to zero. The bound replaces
+        only the reported fO2 scalar; release remains available while
+        ``n_Fe2O3/2 > 0``. Use the physical dissociation ceiling as its
+        saturated melt-side drive, solve the finite two-film root, then limit
+        the committed release by that directional capacity. The published
+        interface departs from the gas pressure only when this solve commits
+        release: the zero-transfer limits (hard vacuum, no gas film, or no
+        capacity) publish the gas pressure.
 
         The gas coefficient is the same ``Sh D_AB / L`` coefficient used by
         ``engines.builtin.evaporation_flux`` for O2 as the tracer. At a vacuum
@@ -4552,8 +4549,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if intrinsic_fO2_log is None:
             current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
             if callable(current_fO2):
-                # ferrous-free scalar: None is not a pressure. The branch
-                # below holds p_i at the gas pressure.
+                # ferrous-free scalar: None is not a pressure. The lower-bound
+                # branch below supplies a saturated physical drive instead.
                 intrinsic_fO2_log = current_fO2()
             else:
                 reservoir = getattr(self.melt, 'oxygen_reservoir', None)
@@ -4572,22 +4569,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'invalid_oxygen_interface_pressure',
                 'transport and intrinsic pressures must be numeric',
             ) from exc
+        melt_mol = self.atom_ledger.project_account_mol(
+            'process.cleaned_melt'
+        )
+        n_feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
+        n_fe2o3_mol = max(
+            0.0,
+            float(melt_mol.get('Fe2O3', 0.0) or 0.0),
+        )
         if ferrous_free_bound:
-            # Premise: n_FeO = 0 has no finite Kress equilibrium. Kress91 is
-            # ln(r) = 0.196 ln(fO2) + b, r = n_Fe2O3/n_FeO, so log10(fO2)
-            # diverges as n_FeO -> 0. The ledger edge
-            # log10(fO2/bar) > [ln(r_floor) - b] / (0.196 ln 10) is only the
-            # last ferrous state this ledger would still record.
-            # physical_melt_dissociation_pO2_bar clamps that edge to
-            # MELT_DISSOCIATION_PO2_MAX_BAR (100 bar). With Fe2O3 still
-            # present the two-film root on [p_g, 100 bar] is not p_g, and
-            # SiO then applies sqrt(p_ref / p_i).
-            # Algebra: no measurable melt potential and no committed transfer
-            # means J_m = 0, so J_g = k_g (p_g - p_i) / (R T_g) = 0 requires
-            # p_i = p_g. The 100 bar ceiling is a dissociation clamp, not
-            # this bound.
-            # Units: bar. Limiting case: 2 mol Fe2O3, 0 FeO, finite k_g,
-            # transport 1e-8 bar holds the interface at 1e-8 bar.
+            # q=1 is only a one-sided inventory bound, not an fO2 equality.
+            # Thus the bound replaces only the reported fO2 scalar. Its
+            # saturated-drive interpretation is the physical dissociation
+            # ceiling; the two-film root solves the gas-film-limited flux and
+            # release is capped by n_Fe2O3/2. Only an actually committed
+            # transfer can move the published Pi away from Pg.
             intrinsic_fO2_log = None
             if (
                 not math.isfinite(transport_pO2_bar)
@@ -4599,13 +4595,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'invalid_oxygen_interface_pressure',
                     f'transport={transport_pO2_bar!r} k_O={k_O!r}',
                 )
-            melt_pO2_bar = None
+            melt_pO2_bar = max(
+                self._vacuum_floor_bar(),
+                MELT_DISSOCIATION_PO2_MAX_BAR,
+            )
+            release_capacity_mol = n_fe2o3_mol / 2.0
             redox_buffer_state = {
-                'status': 'ferrous_free_lower_bound',
+                'status': (
+                    'available' if release_capacity_mol > 0.0 else 'exhausted'
+                ),
                 'inventory_mol': self._cleaned_melt_fe_atom_mol(),
                 'capacity_mol_per_ln_fO2': None,
                 'per_tick_o2_transfer_mol': self._per_tick_o2_transfer_mol(),
-                'capacity_negligible': False,
+                'directional_capacity_mol': release_capacity_mol,
+                'capacity_negligible': (
+                    release_capacity_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                ),
             }
         else:
             try:
@@ -4641,14 +4646,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         redox_buffer_status = str(redox_buffer_state['status'])
         redox_buffer_exhausted = redox_buffer_status == 'exhausted'
-        melt_mol = self.atom_ledger.project_account_mol(
-            'process.cleaned_melt'
-        )
-        n_feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
-        n_fe2o3_mol = max(
-            0.0,
-            float(melt_mol.get('Fe2O3', 0.0) or 0.0),
-        )
         pressure_bar = floor_vacuum_pressure_bar(
             float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0)
             / 1000.0,
@@ -4679,7 +4676,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt_oxygen_ledger_mol = None
         interface_root_clamped = False
         interface_root_residual_mol_m2_s = None
-        if ferrous_free_bound:
+        if (
+            ferrous_free_bound
+            and abs(self._handover_o2_transfer_mol())
+            <= OXYGEN_RESERVOIR_NOOP_MOL
+        ):
             interface_pO2_bar = transport_pO2_bar
             limiting_regime = 'gas_side_ferrous_free_lower_bound'
         elif redox_buffer_status == 'no_fe_redox_buffer':
@@ -4711,13 +4712,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 raise OxygenInterfaceConfigurationError(
                     'invalid_oxygen_interface_gas_transport',
                     f'headspace_temperature_K={gas_temperature_K!r}',
-                )
+            )
             melt_volume_m3 = (
                 surface_area_m2 * self._oxygen_exchange_effective_melt_depth_m()
             )
-            melt_reference_concentration_mol_m3_per_ln = (
+            melt_capacity_mol_per_ln_fO2 = (
                 redox_buffer_state['capacity_mol_per_ln_fO2']
-                / melt_volume_m3
+            )
+            if melt_capacity_mol_per_ln_fO2 is None:
+                # The one-sided endpoint has finite directional inventory but
+                # no finite differential Kress capacity. C_m is diagnostic;
+                # the root's finite inventory difference remains authoritative.
+                melt_capacity_mol_per_ln_fO2 = 0.0
+            melt_reference_concentration_mol_m3_per_ln = (
+                float(melt_capacity_mol_per_ln_fO2) / melt_volume_m3
             )
             finite_root = self._oxygen_finite_interface_root(
                 gas_pO2_bar=transport_pO2_bar,
@@ -4733,7 +4741,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 n_feo_mol=n_feo_mol,
                 n_fe2o3_mol=n_fe2o3_mol,
                 capacity_mol_per_ln_fO2=float(
-                    redox_buffer_state['capacity_mol_per_ln_fO2']
+                    melt_capacity_mol_per_ln_fO2
                 ),
             )
             interface_pO2_bar = float(finite_root['interface_pO2_bar'])
@@ -5038,20 +5046,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         if intrinsic_fO2_log is None:
             intrinsic_fO2_log = self._current_melt_redox_fO2_log()
-        if intrinsic_fO2_log is None and self._ferrous_free_scalar_absent():
-            # ferrous-free scalar: J_m = 0. Interface pO2 is the gas
-            # pressure. Do not float the absent melt scalar into 0 or -9.
-            return {
-                'authority': 'diagnostic_only',
-                'status': 'ferrous_free_lower_bound',
-                'transfer_o2_mol': 0.0,
-                'transfer_o2_kg': 0.0,
-                'direction': 'none:ferrous_free_lower_bound',
-                'substeps': 0,
-                'bounded': True,
-                'finite': True,
-            }
-        intrinsic_fO2_log = float(intrinsic_fO2_log)
+        ferrous_free_bound = (
+            intrinsic_fO2_log is None and self._ferrous_free_scalar_absent()
+        )
+        if not ferrous_free_bound:
+            intrinsic_fO2_log = float(intrinsic_fO2_log)
         if transport_pO2_bar is None:
             transport_pO2_bar = getattr(
                 self.melt.oxygen_reservoir,
@@ -5126,8 +5125,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             physical_melt_dissociation_pO2_bar,
         )
 
-        melt_pO2_bar, _ = physical_melt_dissociation_pO2_bar(
-            intrinsic_fO2_log
+        melt_pO2_bar = (
+            MELT_DISSOCIATION_PO2_MAX_BAR
+            if ferrous_free_bound
+            else physical_melt_dissociation_pO2_bar(intrinsic_fO2_log)[0]
         )
         k_m, melt_source, melt_transport = self._oxygen_exchange_k_m_s(T_K)
         h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
@@ -5166,14 +5167,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'headspace_temperature_K={gas_temperature_K!r}',
             )
         if capacity_mol_per_ln_fO2 is None:
-            capacity_state = self._melt_redox_buffer_capacity_state(
-                fO2_log=intrinsic_fO2_log,
-                T_K=T_K,
-                transport_pO2_bar=transport_pO2_bar,
-            )
-            capacity_mol_per_ln_fO2 = float(
-                capacity_state['capacity_mol_per_ln_fO2']
-            )
+            if ferrous_free_bound:
+                # There is no finite derivative at q=1. The finite root uses
+                # N_eq(Pi)-N_ledger directly, so C_m stays diagnostic only.
+                capacity_mol_per_ln_fO2 = 0.0
+            else:
+                capacity_state = self._melt_redox_buffer_capacity_state(
+                    fO2_log=intrinsic_fO2_log,
+                    T_K=T_K,
+                    transport_pO2_bar=transport_pO2_bar,
+                )
+                capacity_mol_per_ln_fO2 = float(
+                    capacity_state['capacity_mol_per_ln_fO2']
+                )
         capacity_mol_per_ln_fO2 = max(
             0.0,
             float(capacity_mol_per_ln_fO2),
@@ -7199,16 +7205,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # fO2 below Kress(r_floor) would put FeO above the noop, and
             # this ledger would not be ferrous-free:
             #   log10(fO2/bar) > [ln(r_floor) - b] / (0.196 ln 10).
-            # The edge is a one-sided lower bound, not an equality, and it
-            # is not the fO2 scalar. b is the stored composition. The noop
-            # enters only as r_floor. Direction compares headspace with the
-            # edge. The scalar stays absent. The interface holds p_i = p_g
-            # because the melt offers no measurable potential.
-            # Direction uses the edge as the comparison pressure. Headspace below
-            # the edge is release, capacity n_Fe2O3/2 mol O2. Headspace
-            # above it is uptake, capacity n_FeO/4 = 0. The gas owns the
-            # melt only when |this tick's transfer| > 1e-15 mol and that
-            # capacity <= |transfer|. A zero transfer never does.
+            # The edge is a one-sided lower bound, not an equality or the
+            # reported fO2 scalar. b is the stored composition; the noop enters
+            # only as r_floor. Headspace below the edge means release is
+            # directionally available, with capacity n_Fe2O3/2: from
+            # 2 Fe2O3 -> 4 FeO + O2, each mole Fe2O3 releases at most 1/2 mol
+            # O2. The lower bound therefore supplies a saturated-drive input
+            # at MELT_DISSOCIATION_PO2_MAX_BAR to the gas-film-limited
+            # two-film solve; the committed amount is still capped by that
+            # ledger capacity. Its interface root is published only for the
+            # amount actually committed, and zero transfer publishes p_g.
+            # Headspace above the edge is uptake, capacity n_FeO/4 = 0. The
+            # gas owns the melt only when |this tick's transfer| > 1e-15 mol
+            # and that capacity <= |transfer|. A zero transfer never does.
             # Units: mol O2 and log10(bar). Limiting case: 2 mol Fe2O3,
             # 0 FeO, transfer 0, transport 1e-8 bar stays on this bound.
             ledger_comp = self._cleaned_melt_ledger_wt_pct()
@@ -10093,19 +10102,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_authority=gate_authority,
         )
         base_fO2_log = self._current_melt_redox_fO2_log()
+        ferrous_free_bound = (
+            base_fO2_log is None and self._ferrous_free_scalar_absent()
+        )
         reference_T_K = self._current_melt_redox_reference_T_K()
         control_floor = self._headspace_control_floor_pO2_bar()
-        if base_fO2_log is None and self._ferrous_free_scalar_absent():
-            # ferrous-free scalar: no Kress equality, so no differential
-            # capacity and J_m = 0. Interface pO2 stays the gas pressure.
+        melt_mol = self.atom_ledger.project_account_mol(
+            'process.cleaned_melt'
+        )
+        n_fe2o3_mol = max(
+            0.0,
+            float(melt_mol.get('Fe2O3', 0.0) or 0.0),
+        )
+        if ferrous_free_bound:
+            release_capacity_mol = n_fe2o3_mol / 2.0
+            # The absent fO2 has no finite differential capacity, but the
+            # ferric ledger still has a directional release inventory.
             redox_buffer_state = {
-                'status': 'ferrous_free_lower_bound',
+                'status': (
+                    'available' if release_capacity_mol > 0.0 else 'exhausted'
+                ),
                 'liquid_active': True,
                 'inventory_mol': self._cleaned_melt_fe_atom_mol(),
                 'capacity_mol_per_ln_fO2': None,
                 'per_tick_o2_transfer_mol': self._per_tick_o2_transfer_mol(),
-                'directional_capacity_mol': None,
-                'capacity_negligible': False,
+                'directional_capacity_mol': release_capacity_mol,
+                'capacity_negligible': (
+                    release_capacity_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                ),
             }
         else:
             redox_buffer_state = self._melt_redox_buffer_capacity_state(
@@ -10124,12 +10148,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         k_O, k_source, melt_transport = self._oxygen_exchange_k_m_s(T_K)
         h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
         tau_s = h_eff_m / k_O
+        # At the ferrous-free edge C_m has no derivative, but positive
+        # n_Fe2O3/2 remains a directional inventory. Do not let the ordinary
+        # capacity floor bypass its transfer solver or hard-vacuum status.
         capacity_floor_engaged = bool(
             redox_buffer_state.get('capacity_negligible', False)
-        )
+        ) and not ferrous_free_bound
         liquid_active = bool(redox_buffer_state.get('liquid_active', True))
         effective_floor_mol = self._effective_headspace_floor_o2_mol()
         C_h = max(head_o2_mol, effective_floor_mol)
+        bypass_gas_k = None
+        bypass_gas_source = ''
+        # The early no-liquid and zero-capacity paths skip the shadow solver,
+        # where the hard-vacuum status normally has precedence. Check its gas
+        # film before either path can replace that status.
+        if not liquid_active or capacity_floor_engaged:
+            bypass_gas_k, bypass_gas_source = (
+                self._oxygen_interface_gas_side_k_m_s(T_K)
+            )
 
         reservoir = OxygenReservoirState(
             melt_intrinsic_fO2_log=base_fO2_log,
@@ -10171,24 +10207,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             headspace_capacity_mol_per_ln_pO2=C_h,
         )
         self._apply_headspace_transport_diagnostic(reservoir)
-        if redox_buffer_status == 'ferrous_free_lower_bound':
-            # ferrous-free scalar: zero transfer. Not a frozen melt.
+        if math.isinf(float(bypass_gas_k or 0.0)):
             finite_transfer = {
                 'authority': 'diagnostic_only',
-                'status': 'ferrous_free_lower_bound',
+                'status': 'hard_vacuum_no_passive_exchange',
                 'transfer_o2_mol': 0.0,
                 'transfer_o2_kg': 0.0,
                 'requested_transfer_o2_mol': 0.0,
                 'unbacked_transfer_o2_mol': 0.0,
                 'availability_clamped': False,
-                'direction': 'none:ferrous_free_lower_bound',
+                'direction': 'none:hard_vacuum_no_passive_exchange',
                 'substeps': 0,
                 'bounded': True,
                 'finite': True,
-                'capacity_mol_per_ln_fO2': None,
-                'per_tick_o2_transfer_mol': float(
-                    redox_buffer_state['per_tick_o2_transfer_mol']
-                ),
+                'interface_pO2_bar': transport_pO2,
+                'gas_side_k_m_s': float(bypass_gas_k),
+                'gas_side_source': str(bypass_gas_source),
+                'melt_side_k_m_s': k_O,
+                'melt_side_source': k_source,
+                'melt_side_transport': dict(melt_transport),
             }
         elif not liquid_active:
             finite_transfer = {
@@ -10235,7 +10272,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 dt_s=3600.0,
                 transport_pO2_bar=transport_pO2,
                 intrinsic_fO2_log=base_fO2_log,
-                capacity_mol_per_ln_fO2=C_m,
+                capacity_mol_per_ln_fO2=(
+                    0.0 if C_m is None else C_m
+                ),
             )
         finite_transfer = dict(finite_transfer)
         if liquid_active and not capacity_floor_engaged:
@@ -10255,6 +10294,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         if C_h <= 0.0:
             reservoir.exchange_direction = 'none:no_headspace_capacity'
+            reservoir.interface_pO2_bar = max(
+                self._vacuum_floor_bar(),
+                transport_pO2,
+            )
             self.melt.oxygen_reservoir = reservoir
             self._sync_oxygen_reservoir_mirror()
             return reservoir
@@ -10426,12 +10469,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
         self._apply_headspace_transport_diagnostic(reservoir)
+        # The initial ferrous-free basis pins a no-key liquidus result for this
+        # hour. A committed release changes the FeO/Fe2O3 ratio, so refresh the
+        # gate against that real post-commit state before evaluating its next
+        # interface root. If the ledger remains past the Kress edge, the
+        # refreshed authority correctly remains the r8 lower-bound band.
+        if (
+            ferrous_free_bound
+            and transfer_mol > OXYGEN_RESERVOIR_NOOP_MOL
+        ):
+            self._melt_redox_gate_authority_this_tick = (
+                _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+            )
+            self._melt_redox_gate_authority_tick_hour = None
+            gate_authority = self._establish_melt_redox_gate_authority_for_current_hour()
         self._apply_oxygen_interface_diagnostic(
             reservoir,
             transport_pO2_bar=reservoir.headspace_transport_pO2_bar,
-            # ferrous-free scalar: None. Interface holds p_i at the gas pressure.
             intrinsic_fO2_log=self._current_melt_redox_fO2_log(),
         )
+        if abs(transfer_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+            reservoir.interface_pO2_bar = max(
+                self._vacuum_floor_bar(),
+                float(reservoir.headspace_transport_pO2_bar),
+            )
         reservoir.exchange_o2_mol = transfer_mol
         reservoir.exchange_o2_kg = (
             transfer_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL

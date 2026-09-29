@@ -62,7 +62,19 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
         if reservoir.get("reference_T_K") is None:
             # The staged ramp keeps the feedstock fO2 as a bootstrap value
             # until the first liquid tick establishes the ledger reference.
-            assert fO2_log == pytest.approx(-9.0, abs=2.0e-12)
+            # A committed ferrous-free release can form an interior ledger
+            # ratio first; that real ratio is authoritative even while the
+            # liquidus reference temperature remains unset.
+            redox_domain = dict(
+                (row.get("fe_redox_split") or {}).get("redox_domain") or {}
+            )
+            if redox_domain.get("basis") == "kress91_inverse":
+                assert redox_domain["derived_fO2_log"] == pytest.approx(
+                    fO2_log,
+                    abs=2.0e-12,
+                )
+            else:
+                assert fO2_log == pytest.approx(-9.0, abs=2.0e-12)
             continue
 
         redox_domains = (
