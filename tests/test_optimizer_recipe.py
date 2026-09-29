@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 import pytest
 
+import simulator.optimize.doe as doe_module
 import simulator.optimize.study as study_module
 from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
@@ -92,22 +93,19 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     assert hashlib.sha256(resolved).hexdigest() == (
         "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
     )
-    # bounds_digest moved with the knob bounds themselves: the furnace envelope
-    # top (2000 -> catalog max) and the hot-wall ceiling (1750 -> inherited).
-    # This digest IS the cache-invalidation lever for a bounds change -- it fires
-    # automatically, which is why no allowlist_version bump is warranted here:
-    # the set of tunable PATHS did not change, only two paths' bounds.
+    # C2's loader-scalar pressure pairs add coupled constraints to the sampling
+    # domain, which the bounds digest tracks without an allowlist_version bump.
     assert schema.bounds_digest == (
-        "9d87f2394cc45bc6a4d99a3dfa287ed304aa1a5473182c4b1eda2d04df66cccd"
+        "21c0c4905a878d30051332ef69cc25cbd395a52ed5fd0f9a68484280efa7e0dc"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
-    # tracks the schema. Recomputed 2026-08-29 (b-329).
+    # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
     assert empty.recipe_id(schema) == (
-        "d71962c0eb855b0260adc13d4036800e331b948c48d3f2a8e7fb617dee494b78"
+        "be70d44b9d30688788e535c9e84b42d51111956487b2b7e962deb1a70790d95e"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -118,10 +116,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     identity_digest = hashlib.sha256(
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
-    # Fourth and last digest in this test to move with the b-329 bounds change,
-    # for the same reason as the three above. Recomputed 2026-08-29.
+    # Identity digest follows the C2 pressure constraints through the bounds digest.
     assert identity_digest == (
-        "f25190100b5ee2a9cbb7b8d877dfa6a65a1926501c0c6b8ad7a43a16c6fa8669"
+        "ca70bad3a0f62a72d0bb470b08ce742ecbd04614187e2953cba094f7ed952b44"
     )
     assert identity_digest != (
         "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
@@ -1671,10 +1668,11 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # inherits the furnace-material envelope, taking offset_min -443 -> -800 with
     # it. Note the -443 above was itself a re-derivation of this same pin: a
     # difference between two moving numbers, written down as a constant, goes
-    # stale every time either moves. It is now evaluated, not pinned.
+    # stale every time either moves. It is now evaluated, not pinned. Recomputed
+    # 2026-09-29 for C2 loader-scalar pressure coupling.
     assert (
         first.recipe_id()
-                == "c9d30fc5ce7426f78c331b7d3a441f293d9fe0512bb255fae315e1cfd214904b"
+                == "cb77c9b93e43903f3820c491df51dce7a7a3d4f8784d9b55121f64906bca7b6d"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
@@ -2084,22 +2082,72 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
 def test_pressure_default_pair_map_covers_allowlisted_siblings() -> None:
     schema = RecipeSchema()
     allowlisted = {spec.path for spec in schema.allowlist}
+    searchable = {spec.path for spec in schema.search_allowlist}
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     expected_pairs = {}
 
     for path in allowlisted:
         if len(path) != 3:
             continue
-        if path[0] != "campaigns" or path[2] != "pO2_mbar_default":
+        if path[0] != "campaigns":
             continue
-        total_path = (path[0], path[1], "p_total_mbar_default")
-        if total_path not in allowlisted:
+        if path[2] == "pO2_mbar_default":
+            total_path = path[:2] + ("p_total_mbar_default",)
+            if total_path not in allowlisted:
+                continue
+        elif path[2] == "pO2_mbar" and path in searchable:
+            campaign = _lookup_setpoint(setpoints, ".".join(path[:2]))
+            total_key = (
+                "p_total_mbar"
+                if "p_total_mbar" in campaign
+                else "p_total_mbar_default"
+            )
+            total_path = path[:2] + (total_key,)
+        else:
             continue
         _lookup_setpoint(setpoints, ".".join(path))
         _lookup_setpoint(setpoints, ".".join(total_path))
         expected_pairs[path] = total_path
 
     assert dict(schema.PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT) == expected_pairs
+
+
+def test_pressure_conditioning_caps_searchable_scalar_draws() -> None:
+    schema = RecipeSchema()
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    searchable = {spec.path: spec for spec in schema.search_allowlist}
+    scalar_po2_paths = tuple(
+        path
+        for path in searchable
+        if len(path) == 3
+        and path[0] == "campaigns"
+        and path[2] == "pO2_mbar"
+        and _lookup_setpoint(setpoints, ".".join(path)) is not None
+    )
+
+    assert scalar_po2_paths
+    for path in scalar_po2_paths:
+        campaign = _lookup_setpoint(setpoints, ".".join(path[:2]))
+        total_key = (
+            "p_total_mbar"
+            if "p_total_mbar" in campaign
+            else "p_total_mbar_default"
+        )
+        total_path = path[:2] + (total_key,)
+        total = float(_lookup_setpoint(setpoints, ".".join(total_path)))
+        spec = searchable[path]
+        unit_draw = 1.0
+        assert float(spec.high) > total
+        values = {path: float(spec.high)}
+
+        doe_module._condition_pressure_pair_values(
+            schema,
+            (spec,),
+            values,
+            {path: unit_draw},
+        )
+
+        assert values[path] <= total, (path, values[path], total_path, total)
 
 
 def test_to_setpoints_patch_validates_before_rendering_forbidden_paths() -> None:
