@@ -2342,6 +2342,7 @@ def _fe_redox_split_observables(snapshot: HourSnapshot) -> dict[str, Any]:
         return {}
     numeric_fields = {
         "fO2_log",
+        "fO2_log_lower_bound",
         "fe3_over_sigma_fe",
         "ferric_frac",
         "ferrous_frac",
@@ -2356,10 +2357,13 @@ def _fe_redox_split_observables(snapshot: HourSnapshot) -> dict[str, Any]:
     exported: dict[str, Any] = {}
     for key, value in sorted(summary.items()):
         if key in numeric_fields:
-            exported[key] = _finite_export_float(
-                value,
-                field=f"fe_redox_split {key}",
-            )
+            if value is None:
+                exported[key] = None
+            else:
+                exported[key] = _finite_export_float(
+                    value,
+                    field=f"fe_redox_split {key}",
+                )
         elif isinstance(value, bool):
             exported[key] = bool(value)
         elif (

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 from pathlib import Path
 from typing import Any
@@ -768,12 +769,17 @@ def test_fully_ferric_zero_transfer_stays_on_the_lower_bound() -> None:
     assert domain["status"] == "out_of_domain"
     assert domain["authority"] == "extrapolated"
     assert "one-sided lower bound, not an equality" in domain["reason"]
+    assert "the fO2 scalar is absent" in domain["reason"]
     assert "kress91_inverse_not_evaluated" in domain["reason"]
     assert "capacity_O2=1" in domain["reason"]
     assert "per_tick_o2_transfer_mol=0" in domain["reason"]
-    assert fO2_log == pytest.approx(expected, abs=1.0e-8)
-    assert fO2_log != pytest.approx(math.log10(TRANSPORT_PO2_BAR))
-    assert abs(fO2_log - clamped) > 1.0
+    assert fO2_log is None
+    assert domain["derived_fO2_log"] is None
+    assert domain["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
+    assert domain["fO2_log_lower_bound"] != pytest.approx(
+        math.log10(TRANSPORT_PO2_BAR)
+    )
+    assert abs(domain["fO2_log_lower_bound"] - clamped) > 1.0
 
 
 def test_fully_ferric_release_below_capacity_stays_on_the_bound() -> None:
@@ -792,8 +798,13 @@ def test_fully_ferric_release_below_capacity_stays_on_the_bound() -> None:
     assert sim._last_redox_domain["basis"] == "ferrous_free_lower_bound"
     assert "capacity_O2=1" in sim._last_redox_domain["reason"]
     assert "per_tick_o2_transfer_mol=0.1" in sim._last_redox_domain["reason"]
-    assert fO2_log == pytest.approx(expected, abs=1.0e-8)
-    assert fO2_log != pytest.approx(math.log10(TRANSPORT_PO2_BAR))
+    assert fO2_log is None
+    assert sim._last_redox_domain["fO2_log_lower_bound"] == pytest.approx(
+        expected, abs=1.0e-8
+    )
+    assert sim._last_redox_domain["fO2_log_lower_bound"] != pytest.approx(
+        math.log10(TRANSPORT_PO2_BAR)
+    )
 
 
 def test_fully_ferric_release_above_capacity_follows_the_gas() -> None:
@@ -835,3 +846,103 @@ def test_fully_ferric_respeciation_does_not_mint_feo(
     assert _oxide_mol(sim, "FeO") == 0.0
     assert _oxide_mol(sim, "Fe2O3") == pytest.approx(2.0)
     assert sim.atom_ledger.mol_by_account() == before
+
+
+def _finite_gas_film(sim: PyrolysisSimulator) -> None:
+    """100 mbar N2 puts the duct on a finite Sherwood film, not k_g = inf."""
+
+    sim.melt.p_total_mbar = 100.0
+    sim._melt_headspace_composition_mbar = {"N2": 1.0}
+    sim.overhead.composition = {"N2": 1.0e6}
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = TRANSPORT_PO2_BAR
+
+
+def test_ferrous_free_interface_holds_transport_pressure_with_a_finite_gas_film() -> None:
+    """The edge is not a melt pressure. A finite gas film must not solve [p_g, 100 bar]."""
+
+    sim = _fully_ferric_sim()
+    _finite_gas_film(sim)
+    expected = _ferrous_free_lower_bound_log10(
+        sim,
+        n_fe2o3_mol=2.0,
+        temperature_C=1400.0,
+    )
+
+    assert sim._melt_fO2_from_ledger() is None
+    sim._sync_oxygen_reservoir_mirror()
+    state = sim._oxygen_interface_state(TRANSPORT_PO2_BAR)
+
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log is None
+    assert sim._current_melt_redox_fO2_log() is None
+    assert math.isfinite(state["gas_side_k_m_s"])
+    assert state["gas_side_k_m_s"] > 0.0
+    assert not math.isinf(state["gas_side_k_m_s"])
+    assert state["interface_pO2_bar"] == pytest.approx(TRANSPORT_PO2_BAR)
+    assert state["limiting_regime"] == "gas_side_ferrous_free_lower_bound"
+    assert state["melt_intrinsic_pO2_bar"] is None
+    assert sim._last_redox_domain["fO2_log_lower_bound"] == pytest.approx(
+        expected, abs=1.0e-8
+    )
+    assert expected > 70.0
+
+
+def test_ferrous_free_sio_factor_uses_transport_pressure() -> None:
+    """SiO applies sqrt(p_ref / p_i). At this edge p_i is p_g, not 100 bar."""
+
+    sim = _fully_ferric_sim()
+    _finite_gas_film(sim)
+    p_ref_bar = 1.0e-9
+    sim._melt_fO2_from_ledger()
+
+    live = sim._internal_analytical_equilibrium()
+    interface_pO2_bar = float(live.diagnostics["interface_pO2_bar"])
+    live_sio = float(live.vapor_pressures_Pa["SiO"])
+    factor = math.sqrt(p_ref_bar / interface_pO2_bar)
+
+    assert interface_pO2_bar == pytest.approx(TRANSPORT_PO2_BAR)
+    assert factor == pytest.approx(math.sqrt(p_ref_bar / TRANSPORT_PO2_BAR))
+    assert factor > math.sqrt(p_ref_bar / 100.0) * 1.0e3
+
+    sim._interface_pO2_bar = lambda: 100.0  # type: ignore[method-assign]
+    clamped = sim._internal_analytical_equilibrium()
+    clamped_sio = clamped.vapor_pressures_Pa.get("SiO")
+    if clamped_sio is None:
+        assert live_sio > 0.0
+    else:
+        assert live_sio / float(clamped_sio) == pytest.approx(
+            math.sqrt(100.0 / TRANSPORT_PO2_BAR),
+            rel=1.0e-6,
+        )
+
+
+def test_ferrous_free_split_and_per_hour_summary_publish_the_bound() -> None:
+    """The +78 edge is a bound field. The summary writer must not treat it as fO2_log."""
+
+    from simulator.runner import build_per_hour_summary
+    from simulator.state import CampaignPhase, HourSnapshot
+
+    sim = _fully_ferric_sim()
+    expected = _ferrous_free_lower_bound_log10(
+        sim,
+        n_fe2o3_mol=2.0,
+        temperature_C=1400.0,
+    )
+    assert sim._melt_fO2_from_ledger() is None
+    sim._sync_oxygen_reservoir_mirror()
+    split = sim._compute_fe_redox_split_diagnostic()
+
+    assert split["fO2_log"] is None
+    assert split["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
+    assert split["redox_domain"]["basis"] == "ferrous_free_lower_bound"
+    assert split["redox_domain"]["derived_fO2_log"] is None
+    assert "fO2_log_lower_bound" in split["redox_domain"]
+
+    snapshot = HourSnapshot(hour=1, campaign=CampaignPhase.C2A)
+    snapshot.fe_redox_split = split
+    summary = build_per_hour_summary(sim, snapshot)
+    exported = summary["fe_redox_split"]
+
+    assert exported["fO2_log"] is None
+    assert exported["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
+    assert exported["redox_domain"]["basis"] == "ferrous_free_lower_bound"
+    json.dumps(summary, allow_nan=False)

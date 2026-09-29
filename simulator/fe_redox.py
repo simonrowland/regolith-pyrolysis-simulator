@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
-from typing import Literal, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 
@@ -54,11 +54,16 @@ REDOX_CERTIFIED_PO2_BAND_BAR = (1.0e-12, 100.0)
 
 
 class RedoxDomainRecord(TypedDict):
-    """Typed provenance for the fO2 value consumed by downstream chemistry."""
+    """Typed provenance for melt fO2.
+
+    ``derived_fO2_log`` is an equilibrium value when one exists. A one-sided
+    edge is ``fO2_log_lower_bound`` and the scalar is absent.
+    """
 
     status: Literal['ok', 'out_of_domain']
-    derived_fO2_log: float
-    equivalent_pO2_bar: float
+    derived_fO2_log: float | None
+    equivalent_pO2_bar: float | None
+    fO2_log_lower_bound: NotRequired[float]
     basis: Literal[
         'fe_feo_buffer',
         'fe_saturation_bound',

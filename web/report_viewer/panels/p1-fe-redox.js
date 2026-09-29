@@ -304,6 +304,20 @@
     return `<span class="chip sec-p1-flag ${cautious ? "sec-p1-flag-caution" : "sec-p1-flag-clear"}" title="${esc(authorityTooltip(redox))}">${esc(label)} · ${esc(state)}</span>`;
   }
 
+  function meltFugacityValue(redox) {
+    const domain = isRecord(redox.redox_domain) ? redox.redox_domain : {};
+    const basis = typeof domain.basis === "string" ? domain.basis : "";
+    const bound = hasOwn(redox, "fO2_log_lower_bound") && isNumber(redox.fO2_log_lower_bound)
+      ? redox.fO2_log_lower_bound
+      : (isNumber(domain.fO2_log_lower_bound) ? domain.fO2_log_lower_bound : null);
+    if (basis === "ferrous_free_lower_bound") {
+      return bound === null
+        ? esc("not available (lower bound, ferrous-free)")
+        : esc(`> ${fmtNum(bound)} (lower bound, ferrous-free)`);
+    }
+    return numberValue(redox, "fO2_log");
+  }
+
   function renderCore(redox, selected = false) {
     if (!isRecord(redox)) {
       return pendingBlock(
@@ -313,8 +327,12 @@
     }
     const fe2o3 = esc(prettySpecies("Fe2O3"));
     const feo = esc(prettySpecies("FeO"));
+    const domain = isRecord(redox.redox_domain) ? redox.redox_domain : {};
+    const basisText = typeof domain.basis === "string" && domain.basis
+      ? esc(domain.basis)
+      : pendingValue();
     const headline = [
-      metric("Melt log₁₀ fO₂", numberValue(redox, "fO2_log")),
+      metric("Melt log₁₀ fO₂", meltFugacityValue(redox)),
       metric("Fe³⁺ / ΣFe", numberValue(redox, "fe3_over_sigma_fe")),
       metric("Ferric fraction", numberValue(redox, "ferric_frac")),
       metric("Ferrous fraction", numberValue(redox, "ferrous_frac")),
@@ -329,7 +347,8 @@
       [`${fe2o3} equivalent`, numberValue(redox, "fe2o3_equiv_wt_pct", "wt%")],
       [`${feo} equivalent`, numberValue(redox, "feo_equiv_wt_pct", "wt%")],
       ["Native Fe saturation", booleanValue(redox, "native_fe_saturation")],
-      ["Native Fe threshold", textValue(redox, "native_fe_threshold")]
+      ["Native Fe threshold", textValue(redox, "native_fe_threshold")],
+      ["Redox basis", basisText]
     ];
     return `<div class="sec-p1-headline">${headline}</div>${factsTable(detailRows, `${selected ? "Selected timestep" : "Terminal"} Fe-redox state detail`)}`;
   }

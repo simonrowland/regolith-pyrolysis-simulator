@@ -1420,3 +1420,32 @@ def test_p1_partial_inputs_never_drive_viewer_derivations() -> None:
     )
     _assert_fact_not_value(redox_summary, "Change in log₁₀ fO₂", "3.457")
     _assert_metric_not_value(terminal, "Stage 3 Fe concentration", "25 wt%")
+
+
+def test_ferrous_free_lower_bound_renders_as_a_bound() -> None:
+    summary = {
+        "fe_redox_split": {
+            "fO2_log": None,
+            "fO2_log_lower_bound": 78.57,
+            "fe3_over_sigma_fe": 1.0,
+            "ferric_frac": 1.0,
+            "ferrous_frac": 0.0,
+            "native_fe_frac": 0.0,
+            "status": "ferrous_free_lower_bound",
+            "redox_domain": {
+                "basis": "ferrous_free_lower_bound",
+                "derived_fO2_log": None,
+                "fO2_log_lower_bound": 78.57,
+                "status": "out_of_domain",
+            },
+        }
+    }
+    html = _render_panel(_artifact(summary, hour=4))
+    _assert_metric_value(
+        html,
+        "Melt log₁₀ fO₂",
+        "&gt; 78.57 (lower bound, ferrous-free)",
+    )
+    assert "ferrous_free_lower_bound" in html
+    _assert_metric_not_value(html, "Melt log₁₀ fO₂", "78.57")
+    _assert_metric_not_value(html, "Melt log₁₀ fO₂", "0")

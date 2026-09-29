@@ -483,29 +483,45 @@ class EquilibriumMixin:
         vacuum_floor_bar = self._vacuum_floor_bar()
         current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
         if callable(current_fO2):
-            intrinsic_fO2_log = float(current_fO2())
+            raw_intrinsic_fO2_log = current_fO2()
         else:
             reservoir = getattr(self.melt, "oxygen_reservoir", None)
-            intrinsic_fO2_value = getattr(
+            raw_intrinsic_fO2_log = getattr(
                 reservoir, "melt_intrinsic_fO2_log", None
             )
-            if intrinsic_fO2_value is None:
-                intrinsic_fO2_value = getattr(self.melt, 'melt_fO2_log', None)
-            if intrinsic_fO2_value is None:
-                intrinsic_fO2_log = float(getattr(self.melt, 'fO2_log', -9.0))
-            else:
-                intrinsic_fO2_log = float(intrinsic_fO2_value)
-
-        melt_dissociation_pO2_bar, melt_pO2_clamped = (
-            physical_melt_dissociation_pO2_bar(intrinsic_fO2_log)
+            if raw_intrinsic_fO2_log is None:
+                raw_intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
+            if raw_intrinsic_fO2_log is None:
+                raw_intrinsic_fO2_log = getattr(self.melt, 'fO2_log', -9.0)
+        redox_basis = str(
+            (getattr(self, '_last_redox_domain', {}) or {}).get('basis') or ''
         )
-        if melt_pO2_clamped:
-            # b-148: do not feed the 1e300 float sentinel into mass action.
+        if (
+            raw_intrinsic_fO2_log is None
+            and redox_basis == 'ferrous_free_lower_bound'
+        ):
+            # Surface release already used interface_pO2_bar. Do not turn
+            # the missing equilibrium into 0 or into the 100 bar clamp.
+            intrinsic_fO2_log = None
+        else:
+            intrinsic_fO2_log = float(raw_intrinsic_fO2_log)
+
+        if intrinsic_fO2_log is None:
             warnings.append(
-                "melt_dissociation_pO2_clamped_to_physical_envelope: "
-                f"fO2_log={intrinsic_fO2_log:.6g} "
-                f"pO2_bar={melt_dissociation_pO2_bar:g}"
+                'melt_fO2_absent: ferrous_free_lower_bound has no '
+                'equilibrium fO2; dissociation clamp not applied'
             )
+        else:
+            melt_dissociation_pO2_bar, melt_pO2_clamped = (
+                physical_melt_dissociation_pO2_bar(intrinsic_fO2_log)
+            )
+            if melt_pO2_clamped:
+                # b-148: do not feed the 1e300 float sentinel into mass action.
+                warnings.append(
+                    "melt_dissociation_pO2_clamped_to_physical_envelope: "
+                    f"fO2_log={intrinsic_fO2_log:.6g} "
+                    f"pO2_bar={melt_dissociation_pO2_bar:g}"
+                )
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
             pressure_bar=floor_vacuum_pressure_bar(
                 float(self.melt.p_total_mbar) / 1000.0,
@@ -536,13 +552,21 @@ class EquilibriumMixin:
                 if oxide in MOLAR_MASS and float(wt_pct) > 0.0
             }
         cation_mol_fraction = single_cation_mole_fractions(melt_account_mol)
-        feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
-            comp_wt=comp_wt,
-            fO2_log=intrinsic_fO2_log,
-            T_K=T_K,
-            pressure_bar=feo_activity_pressure_bar,
-            floor_bar=vacuum_floor_bar,
-        )
+        if intrinsic_fO2_log is None:
+            feo_activity_diagnostic = {
+                'status': 'unavailable',
+                'reason': 'ferrous_free_lower_bound_has_no_equilibrium_fO2',
+                'a_FeO_authoritative': None,
+                'sources': {},
+            }
+        else:
+            feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
+                comp_wt=comp_wt,
+                fO2_log=intrinsic_fO2_log,
+                T_K=T_K,
+                pressure_bar=feo_activity_pressure_bar,
+                floor_bar=vacuum_floor_bar,
+            )
 
         # ================================================================
         # METAL SPECIES: Ellingham equilibrium + Antoine               [ELLI]

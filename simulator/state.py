@@ -451,7 +451,7 @@ class ProcessInventory:
 
 @dataclass
 class OxygenReservoirState:
-    melt_intrinsic_fO2_log: float = -9.0
+    melt_intrinsic_fO2_log: float | None = -9.0
     reference_T_K: float | None = None
     headspace_ledger_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
     headspace_transport_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
@@ -536,10 +536,10 @@ class MeltState:
     atmosphere: Atmosphere = Atmosphere.HARD_VACUUM
     pO2_mbar: float = 0.0          # Controlled oxygen partial pressure
     p_total_mbar: float = 0.0      # Total pressure above melt
-    fO2_log: float = -9.0          # log₁₀(fO₂/bar) for MELTS calc
+    fO2_log: float | None = -9.0  # log₁₀(fO₂/bar) for MELTS calc; None if absent
     # SSO-R intrinsic melt redox state, log10(fO2/bar); seeded from the
     # legacy intrinsic estimate, then advanced by the oxygen reservoir.
-    melt_fO2_log: float = -9.0
+    melt_fO2_log: float | None = -9.0
     oxygen_reservoir: OxygenReservoirState = field(
         default_factory=OxygenReservoirState)
     ambient_pressure_mbar: float = 0.0
