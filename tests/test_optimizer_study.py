@@ -37,6 +37,7 @@ from simulator.electrolysis import (
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize import cli as optimizer_cli
 from simulator.optimize import physics as physics_module
+from simulator.optimize import pool as optimizer_pool
 from simulator.optimize import study
 from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
 from simulator.optimize.evalspec import EvalSpec, cache_key
@@ -791,6 +792,170 @@ def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
     ]
     assert state_rows[-1]["strategy_state"] == dict(replay.strategy_state)
     assert state_rows[-1]["strategy_state"]["strategies"][0]["ask_cursor"] == 4
+
+
+def test_study_stops_after_scalar_and_pareto_stalls(tmp_path: Path) -> None:
+    definitions = study.objective_definitions(PROFILE)
+    budget = 8
+
+    class ProgressStrategy:
+        name = "synthetic-progress"
+        seed = 0
+
+        def __init__(self) -> None:
+            self.next_index = 0
+            self.told_batches: list[tuple[Any, ...]] = []
+
+        def ask(self, n: int) -> list[Candidate]:
+            count = min(n, budget - self.next_index)
+            candidates = [
+                Candidate(
+                    id=f"progress-{index}",
+                    patch=RecipePatch(
+                        {
+                            ("campaigns", "C0", "temp_range_C"): [
+                                900.0 - index,
+                                950.0 - index,
+                            ]
+                        }
+                    ),
+                )
+                for index in range(self.next_index, self.next_index + count)
+            ]
+            self.next_index += count
+            return candidates
+
+        def tell(self, results) -> None:
+            self.told_batches.append(tuple(results))
+
+    def run_case(name: str, objective_values_for: Any) -> tuple[Any, ProgressStrategy]:
+        strategy = ProgressStrategy()
+
+        def scored_evaluator(
+            patch: RecipePatch,
+            feedstock: str,
+            fidelity: str,
+            *,
+            profile: Mapping[str, Any],
+            candidate_id: str | None = None,
+            **kwargs: Any,
+        ) -> ScoredResult:
+            scored = _evaluator()(
+                patch,
+                feedstock,
+                fidelity,
+                profile=profile,
+                candidate_id=candidate_id,
+                **kwargs,
+            )
+            values = objective_values_for(_sequence(candidate_id))
+            objectives = ObjectiveVector(
+                tuple(
+                    ObjectiveValue(
+                        definition.metric,
+                        definition.sense,
+                        values[ordinal],
+                        definition.units,
+                        ordinal=definition.ordinal,
+                    )
+                    for ordinal, definition in enumerate(definitions)
+                )
+            )
+            reference = scored.run_reference
+            assert reference is not None
+            product_summary = dict(reference.product_summary)
+            product_summary.update(
+                {
+                    definition.metric: values[ordinal]
+                    for ordinal, definition in enumerate(definitions)
+                }
+            )
+            return replace(
+                scored,
+                objectives=objectives,
+                run_reference=replace(reference, product_summary=product_summary),
+            )
+
+        result = study.run(
+            PROFILE,
+            FEEDSTOCK,
+            strategy,
+            "internal-analytical",
+            parallel=1,
+            budget=budget,
+            out_dir=tmp_path / name,
+            evaluator=scored_evaluator,
+        )
+        return result, strategy
+
+    stalled, stalled_strategy = run_case("scalar-stall", lambda _index: (0.0, 0.0))
+    assert len(stalled.records) == 4  # First score, then three unchanged batches.
+    assert len(stalled_strategy.told_batches) == len(stalled.records)
+
+    improving, improving_strategy = run_case(
+        "scalar-improves",
+        lambda index: (float(index + 1), 0.0),
+    )
+    assert len(improving.records) == budget
+    assert len(improving_strategy.told_batches) == budget
+
+    pareto_values = ((1.0, 1.0), (2.0, 3.0), (3.0, 5.0))
+    pareto, pareto_strategy = run_case(
+        "pareto-stall",
+        lambda index: pareto_values[min(index, len(pareto_values) - 1)],
+    )
+    # Two frontier advances beat the stalled scalar; three repeated fronts stop it.
+    assert len(pareto.records) == 6
+    assert len(pareto_strategy.told_batches) == len(pareto.records)
+
+
+def test_study_reuses_one_engine_worker_generation_across_batches(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    created_pools: list[Any] = []
+    submitted_pools: list[Any] = []
+    original_pool_type = optimizer_pool.EngineWorkerPool
+    original_submit = original_pool_type.submit
+
+    class RecordingEngineWorkerPool(original_pool_type):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            created_pools.append(self)
+
+    def record_submit(self: Any, *args: Any, **kwargs: Any) -> Any:
+        submitted_pools.append(self)
+        return original_submit(self, *args, **kwargs)
+
+    monkeypatch.setattr(optimizer_pool, "EngineWorkerPool", RecordingEngineWorkerPool)
+    monkeypatch.setattr(original_pool_type, "submit", record_submit)
+    budget = 4
+    parallel = 2
+    out = tmp_path / "one-worker-generation"
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=parallel,
+        budget=budget,
+        out_dir=out,
+        seed=7,
+    )
+
+    events = [
+        json.loads(line)
+        for line in (out / "study.events.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    asked = [row for row in events if row["event_kind"] == "candidate_asked"]
+    batch_count = len({row["batch_seq"] for row in asked})
+    assert len(result.records) == budget
+    # Each loop asks up to `parallel` candidates, so batches are ceil(budget / parallel).
+    assert batch_count == math.ceil(budget / parallel)
+    assert len(created_pools) == 1
+    assert {id(pool) for pool in submitted_pools} == {id(created_pools[0])}
+    assert created_pools[0]._closed
 
 
 def test_study_journal_replay_fails_closed_on_strategy_state_mismatch(
@@ -3417,12 +3582,13 @@ def test_degenerate_furnace_lifetimes_complete_study_with_bounded_ordering(
             ),
         )
 
+    # This fixture compares every lifetime case, so tell its full derived set at once.
     result = study.run(
         PROFILE,
         FEEDSTOCK,
         "random",
         "internal-analytical",
-        1,
+        len(cases),
         len(cases),
         tmp_path / "degenerate-lifetime",
         seed=7,

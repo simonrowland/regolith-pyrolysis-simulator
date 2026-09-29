@@ -69,6 +69,7 @@ from simulator.optimize.objective import (
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
     objective_definitions,
+    objective_importance_evidence,
     objective_scores,
     objective_value_for_metric,
     pareto_front,
@@ -76,7 +77,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.pool import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
     PoolEvaluationRequest,
-    evaluate_batch,
+    _evaluate_batch,
     evaluate_request_supervised,
     resolve_eval_timeout_seconds,
 )
@@ -597,6 +598,12 @@ def run(
         cli_pinned_paths=_cli_pinned_paths(pinned_paths),
     )
     definitions = objective_definitions(resolved_profile)
+    importance_by_metric = {
+        row.metric: row.weight for row in objective_importance_evidence(resolved_profile)
+    }
+    objective_weights = tuple(
+        importance_by_metric[definition.metric] for definition in definitions
+    )
     two_phase = _resolve_two_phase_config(resolved_profile, two_phase_certify)
     _validate_inputs(config, resolved_profile)
     try:
@@ -732,6 +739,14 @@ def run(
         provenance_mode = "a"
         if not pending_resume_candidates and evaluated == config.budget:
             provenance_mode = "r"
+    best_scalarized_score, best_pareto_signature = _study_progress(
+        records,
+        definitions,
+        objective_weights,
+    )
+    use_pareto_stall = len(best_pareto_signature) > 1
+    stalled_batches = 0
+    engine_worker_pool = None
     try:
         provenance_writer = _LockedLineWriter(provenance_path, provenance_mode, store)
         events_writer = _LockedLineWriter(events_path, journal_mode, store)
@@ -786,7 +801,7 @@ def run(
                     strategy=active_strategy,
                     staged_strategies=staged_strategies,
                 )
-            results, prefix_evals_in_batch = _evaluate_candidates(
+            results, prefix_evals_in_batch, engine_worker_pool = _evaluate_candidates(
                 candidates,
                 profile=loop_profile,
                 feedstock=config.feedstock,
@@ -800,6 +815,8 @@ def run(
                 definitions=definitions,
                 prefix_replay_cache=prefix_replay_cache,
                 per_eval_timeout_seconds=config.per_eval_timeout_seconds,
+                engine_worker_pool=engine_worker_pool,
+                retain_engine_worker_pool=True,
             )
             # Owner decision deferred: debit config.budget here if prefix evals join it.
             prefix_evals_run += prefix_evals_in_batch
@@ -866,6 +883,36 @@ def run(
                 staged_strategies=staged_strategies,
             )
             evaluated += len(candidates)
+            scalarized_score, pareto_signature = _study_progress(
+                records,
+                definitions,
+                objective_weights,
+            )
+            if not use_pareto_stall and len(pareto_signature) > 1:
+                # Multiple distinct non-dominated score vectors mean at least two
+                # objectives now provide separate ranking signals.
+                use_pareto_stall = True
+                best_pareto_signature = pareto_signature
+                stalled_batches = 0
+            elif use_pareto_stall:
+                if pareto_signature != best_pareto_signature:
+                    best_pareto_signature = pareto_signature
+                    stalled_batches = 0
+                else:
+                    stalled_batches += 1
+            elif scalarized_score is None:
+                # Refusals and incomplete objective vectors do not establish a stalled best.
+                pass
+            elif scalarized_score is not None and (
+                best_scalarized_score is None
+                or scalarized_score > best_scalarized_score
+            ):
+                best_scalarized_score = scalarized_score
+                stalled_batches = 0
+            else:
+                stalled_batches += 1
+            if stalled_batches >= 3:
+                break
     except (KeyboardInterrupt, StudyAbort):
         _write_aborted_artifacts_from_cache(
             out,
@@ -890,6 +937,9 @@ def run(
             prefix_evals_run=prefix_evals_run,
         )
         raise
+    finally:
+        if engine_worker_pool is not None:
+            engine_worker_pool.close()
 
     failure_counts = _failure_counts(records)
     feasible = tuple(record for record in records if record.feasible)
@@ -2584,7 +2634,7 @@ def _run_exact_certification(
 
     for explore_record in certification_pool:
         candidate = _certification_candidate_from_record(explore_record)
-        results, _ = _evaluate_candidates(
+        results, _, _ = _evaluate_candidates(
             [candidate],
             profile=profile,
             feedstock=feedstock,
@@ -3362,7 +3412,9 @@ def _evaluate_candidates(
     prefix_replay_cache: dict[str, ScoredResult],
     skip_store_lookup: bool = False,
     per_eval_timeout_seconds: float | None = None,
-) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int]:
+    engine_worker_pool: Any = None,
+    retain_engine_worker_pool: bool = False,
+) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int, Any]:
     results: list[tuple[Candidate, ScoredResult, bool] | None] = [None] * len(candidates)
     misses: list[tuple[int, Candidate]] = []
     staged_prefixes: dict[str, ScoredResult] = {}
@@ -3449,7 +3501,7 @@ def _evaluate_candidates(
                     evaluator_kwargs=evaluator_kwargs,
                 )
             )
-        batch = evaluate_batch(
+        batch, engine_worker_pool = _evaluate_batch(
             requests,
             profile=profile,
             max_workers=parallel,
@@ -3458,36 +3510,51 @@ def _evaluate_candidates(
             schema=schema,
             constraints=constraints,
             per_eval_timeout_seconds=per_eval_timeout_seconds,
+            engine_worker_pool=engine_worker_pool,
+            retain_engine_worker_pool=retain_engine_worker_pool,
         )
-        for (index, candidate), scored in zip(misses, batch):
-            scored = _with_candidate_id(scored, candidate.id)
-            staged_prefix = staged_prefixes.get(candidate.id)
-            if staged_prefix is not None and scored.eval_spec is not None:
-                try:
-                    spec, _ = _build_eval_inputs(
-                        candidate.patch.validated(schema),
-                        feedstock,
-                        fidelity,
-                        profile,
-                        schema,
-                        constraints=constraints,
-                        conditional_context=_full_evaluation_conditional_context(
-                            candidate
-                        ),
-                    )
-                except ProfileValidationError as exc:
-                    if _is_stale_profile_refusal(exc):
-                        scored = _stale_profile_result(candidate.id, str(exc))
+        try:
+            for (index, candidate), scored in zip(misses, batch):
+                scored = _with_candidate_id(scored, candidate.id)
+                staged_prefix = staged_prefixes.get(candidate.id)
+                if staged_prefix is not None and scored.eval_spec is not None:
+                    try:
+                        spec, _ = _build_eval_inputs(
+                            candidate.patch.validated(schema),
+                            feedstock,
+                            fidelity,
+                            profile,
+                            schema,
+                            constraints=constraints,
+                            conditional_context=_full_evaluation_conditional_context(
+                                candidate
+                            ),
+                        )
+                    except ProfileValidationError as exc:
+                        if _is_stale_profile_refusal(exc):
+                            scored = _stale_profile_result(candidate.id, str(exc))
+                        else:
+                            raise
                     else:
-                        raise
-                else:
-                    scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
-            results[index] = (candidate, scored, False)
+                        scored = replace(
+                            scored,
+                            eval_spec=spec,
+                            cache_key=cache_key(spec),
+                        )
+                results[index] = (candidate, scored, False)
 
-    completed = tuple(result for result in results if result is not None)
-    if len(completed) != len(candidates):
-        raise RuntimeError("study evaluation ended without all candidate results")
-    return completed, prefix_evals_run
+            completed = tuple(result for result in results if result is not None)
+            if len(completed) != len(candidates):
+                raise RuntimeError("study evaluation ended without all candidate results")
+        except BaseException:
+            if retain_engine_worker_pool and engine_worker_pool is not None:
+                engine_worker_pool.close(cancel_pending=True)
+            raise
+    else:
+        completed = tuple(result for result in results if result is not None)
+        if len(completed) != len(candidates):
+            raise RuntimeError("study evaluation ended without all candidate results")
+    return completed, prefix_evals_run, engine_worker_pool
 
 
 def _ensure_staged_prefix_replay(
@@ -4738,6 +4805,40 @@ def _record_objective_scores(
         )
     except ObjectiveComputationError:
         return (None,) * len(definitions)
+
+
+def _study_progress(
+    records: Sequence[StudyRecord],
+    definitions: Sequence[ObjectiveDefinition],
+    weights: Sequence[float],
+) -> tuple[float | None, frozenset[tuple[float, ...]]]:
+    scored_records: list[StudyRecord] = []
+    scores_by_candidate: dict[str, tuple[float, ...]] = {}
+    scalarized_scores: list[float] = []
+    for record in records:
+        scores = _record_objective_scores(record, definitions)
+        if len(scores) != len(weights) or any(score is None for score in scores):
+            continue
+        score_row = tuple(float(score) for score in scores)
+        # Objective scores already reverse minimized metrics; summing each by its
+        # profile weight makes larger weighted totals better across all objectives.
+        scalarized_scores.append(
+            math.fsum(weight * score for weight, score in zip(weights, score_row))
+        )
+        scored_records.append(record)
+        scores_by_candidate[record.candidate_id] = score_row
+    if not scored_records:
+        return None, frozenset()
+    front = pareto_front(
+        scored_records,
+        definitions,
+        objective_getter=lambda record: record.objectives,
+        score_getter=lambda record: scores_by_candidate[record.candidate_id],
+    )
+    pareto_signature = frozenset(
+        scores_by_candidate[record.candidate_id] for record in front
+    )
+    return max(scalarized_scores), pareto_signature
 
 
 def _rank_score_components(
