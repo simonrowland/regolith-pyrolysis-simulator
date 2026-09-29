@@ -173,8 +173,6 @@ ENGINE_POINT_CONSUMERS = (
     "vaporock",
     "magemin",
     "cached-real",
-    "imcc_sf04",
-    "imcc_sf04_ext",
     "openimcc",
 )
 # Engines whose equilibrate result fills activity_coefficients.
@@ -182,8 +180,6 @@ ENGINE_POINT_CONSUMERS = (
 MELT_ACTIVITY_ENGINES = (
     "alphamelts",
     "thermoengine",
-    "imcc_sf04",
-    "imcc_sf04_ext",
     "openimcc",
 )
 # Activity and activity coefficient only. Interaction parameters stay on

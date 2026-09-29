@@ -116,15 +116,13 @@ from simulator.battery.validity import (
 )
 from simulator.reference_data.janaf import formula_composition
 
-# Explicit closed set. IMCC is first-class. Do not build this from
+# Explicit closed set. openimcc is the only IMCC producer. Do not build this from
 # resolve_backend, BATTERY_ENGINE_NAMES, or any probe of installed backends.
 SCORE_ENGINE_SET: tuple[Engine, ...] = (
     Engine.VAPOROCK,
     Engine.ALPHAMELTS,
     Engine.THERMOENGINE,
     Engine.MAGEMIN,
-    Engine.IMCC_SF04,
-    Engine.IMCC_SF04_EXT,
     Engine.OPENIMCC,
     Engine.INTERNAL_ANALYTICAL,
 )
@@ -302,8 +300,6 @@ ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.ALPHAMELTS: "alphamelts",
     Engine.THERMOENGINE: "thermoengine",
     Engine.MAGEMIN: "magemin",
-    Engine.IMCC_SF04: "imcc_sf04",
-    Engine.IMCC_SF04_EXT: "imcc_sf04_ext",
     Engine.OPENIMCC: "openimcc",
     Engine.INTERNAL_ANALYTICAL: "internal-analytical",
 }
@@ -312,8 +308,6 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.ALPHAMELTS: ("alphamelts",),
     Engine.THERMOENGINE: ("thermoengine",),
     Engine.MAGEMIN: ("magemin",),
-    Engine.IMCC_SF04: ("imcc-sf04-v1.0.2",),
-    Engine.IMCC_SF04_EXT: ("imcc-sf04-ext-v4",),
     Engine.OPENIMCC: ("openimcc-v1.0.2",),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
@@ -454,6 +448,33 @@ def parse_engine(name: str) -> Engine:
     return Engine(str(name).strip())
 
 
+_RETIRED_SCORE_ENGINES: frozenset[Engine] = frozenset(
+    {Engine.IMCC_SF04, Engine.IMCC_SF04_EXT}
+)
+
+
+def _require_score_engine(engine: Engine) -> None:
+    if engine in _RETIRED_SCORE_ENGINES:
+        raise ValueError(
+            f"engine {engine.value!r} is retired; use {Engine.OPENIMCC.value!r}"
+        )
+    if engine not in SCORE_ENGINE_SET:
+        raise ValueError(
+            f"engine {engine.value!r} is not in the explicit SCORE_ENGINE_SET"
+        )
+
+
+def _validated_score_engines(engines: Sequence[Engine]) -> tuple[Engine, ...]:
+    out: list[Engine] = []
+    seen: set[Engine] = set()
+    for engine in engines:
+        _require_score_engine(engine)
+        if engine not in seen:
+            seen.add(engine)
+            out.append(engine)
+    return tuple(out)
+
+
 def engines_from_names(names: Sequence[str] | None) -> tuple[Engine, ...]:
     if not names:
         return SCORE_ENGINE_SET
@@ -461,10 +482,7 @@ def engines_from_names(names: Sequence[str] | None) -> tuple[Engine, ...]:
     seen: set[Engine] = set()
     for raw in names:
         engine = parse_engine(raw)
-        if engine not in SCORE_ENGINE_SET:
-            raise ValueError(
-                f"engine {engine.value!r} is not in the explicit SCORE_ENGINE_SET"
-            )
+        _require_score_engine(engine)
         if engine not in seen:
             seen.add(engine)
             out.append(engine)
@@ -2346,6 +2364,7 @@ def predict_with_engine(
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
+    _require_score_engine(engine)
     from simulator.diagnostic_helpers.binary_pot_battery import (
         ARM_HEADLINE,
         ARM_QUALIFICATION,
@@ -3176,6 +3195,7 @@ def compile_residual(
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
     derived_band: DecisionBand | None = None,
 ) -> tuple[Residual, Observation | None]:
+    _require_score_engine(engine)
     reference = _fusion_comparison_reference(reference)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
@@ -3713,7 +3733,11 @@ def score_store(
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
 ) -> tuple[tuple[Residual, ...], dict[str, Observation]]:
-    engine_set = tuple(engines) if engines is not None else SCORE_ENGINE_SET
+    engine_set = (
+        _validated_score_engines(tuple(engines))
+        if engines is not None
+        else SCORE_ENGINE_SET
+    )
     refs = list(comparison_candidates(context))
     fusion_diagnostic_ids: set[str] = set()
     admitted_model_derived_ids: set[str] = set()

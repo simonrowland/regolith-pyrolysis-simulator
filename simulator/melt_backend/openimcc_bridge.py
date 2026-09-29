@@ -27,6 +27,13 @@ from simulator.composition_projection import (
     projected_component_moles_per_kg,
 )
 from simulator.state import MOLAR_MASS
+from simulator.melt_backend.imcc_adapter_labels import ImccAdapterLabels
+from simulator.melt_backend.base import (
+    DEFAULT_BACKEND_CAPABILITIES,
+    EquilibriumResult,
+    MeltBackend,
+    split_cleaned_melt_account,
+)
 
 try:  # Optional dependency: C1 must remain importable without openimcc.
     import openimcc as _openimcc
@@ -664,8 +671,6 @@ def evaluate(
             },
         }
     package_labels = result.labels
-    from simulator.melt_backend.imcc_sf04.adapter import ImccAdapterLabels
-
     labels = ImccAdapterLabels(
         identity=package_labels.identity,
         coverage=package_labels.coverage,
@@ -703,9 +708,120 @@ def evaluate(
 evaluate_openimcc = evaluate
 
 
+class OpenImccMeltBackend(MeltBackend):
+    """Simulator MeltBackend wrapper around the packaged openimcc datapack."""
+
+    name = "openimcc"
+    backend_name = "openimcc"
+
+    def __init__(self) -> None:
+        self._available = False
+        self._pack: Any | None = None
+        self._last_error: str | None = None
+
+    def initialize(self, config: dict) -> bool:
+        del config
+        self._available = False
+        self._pack = None
+        self._last_error = None
+        try:
+            self._pack = _load_pack("v1.0.2")
+        except OpenImccUnavailableError as exc:
+            self._last_error = str(exc)
+            return False
+        self._available = True
+        return True
+
+    def is_available(self) -> bool:
+        return self._available and self._pack is not None
+
+    def get_vapor_species(self) -> list[str]:
+        return []
+
+    def capabilities(self) -> dict[str, bool]:
+        return dict(DEFAULT_BACKEND_CAPABILITIES)
+
+    def get_engine_version(self) -> str:
+        if self._pack is None:
+            return "unavailable"
+        return f"{self._pack.model_id} {self._pack.version}"
+
+    def equilibrate(
+        self,
+        temperature_C: float,
+        composition_kg: dict[str, float] | None = None,
+        fO2_log: float | None = -9.0,
+        pressure_bar: float = 1e-6,
+        *,
+        composition_mol: dict[str, float] | None = None,
+        composition_mol_by_account: Mapping[str, Mapping[str, float]] | None = None,
+        species_formula_registry: Mapping[str, Any] | None = None,
+    ) -> EquilibriumResult:
+        del species_formula_registry
+        if composition_mol_by_account is not None:
+            composition_mol, _ = split_cleaned_melt_account(composition_mol_by_account)
+        if not self.is_available():
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status="unavailable",
+                warnings=[self._last_error or "openimcc backend not initialized"],
+                phase_assemblage_available=False,
+            )
+        if not composition_mol and not composition_kg:
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status="out_of_domain",
+                warnings=["openimcc received empty melt composition"],
+                phase_assemblage_available=False,
+            )
+
+        _require_openimcc()
+        from openimcc.kernel import ImccNonconvergenceError, ImccRefusal
+
+        try:
+            result = evaluate(
+                composition_mol=composition_mol,
+                composition_kg=None if composition_mol else composition_kg,
+                temperature_K=float(temperature_C) + 273.15,
+                pack="v1.0.2",
+            )
+        except ImccNonconvergenceError as exc:
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status="not_converged",
+                warnings=[str(exc)],
+                phase_assemblage_available=False,
+            )
+        except (ImccRefusal, OpenImccCompositionPolicyRefusal) as exc:
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status="out_of_domain",
+                warnings=[str(exc)],
+                phase_assemblage_available=False,
+            )
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            status="ok",
+            activity_coefficients=dict(result.parent_oxide_activities),
+            phase_assemblage_available=False,
+            liquid_fraction=None,
+        )
+
+
 __all__ = [
     "OPENIMCC_INSTALL_HINT",
     "OpenImccBridgeResult",
+    "OpenImccMeltBackend",
     "OpenImccCleanedMeltResult",
     "OpenImccCompositionPolicyRefusal",
     "OpenImccUnavailableError",

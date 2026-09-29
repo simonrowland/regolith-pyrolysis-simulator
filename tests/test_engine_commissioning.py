@@ -131,6 +131,14 @@ def test_melt_envelope_t_max_reads_commissioning_snapshot() -> None:
     )
 
 
+def test_openimcc_inherits_retired_imcc_uncommissioned_status() -> None:
+    table = load_engine_commissioning()
+    assert 'openimcc' not in table.engines
+    for name in ('imcc_sf04', 'openimcc'):
+        with pytest.raises(EngineCommissioningError, match='no commissioning row'):
+            engine_commissioning(name)
+
+
 def test_table_loads_and_pins_published_defaults() -> None:
     """Pin table defaults to the adapter/domain constants they replace.
 

@@ -14,8 +14,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     DEFAULT_POTS_PATH,
     FINDING_CLASS_FALLBACK_VS_SPECIATION,
-    IMCC_ENGINE_NAMES,
-    IMCC_MODEL_IDS,
+    OPENIMCC_ENGINE_NAMES,
+    OPENIMCC_MODEL_IDS,
     QUALIFICATION_SIO2_SWEEP_WT_PCT,
     QUANTITY_ACTIVITY,
     QUANTITY_PRESSURE,
@@ -478,9 +478,8 @@ def test_battery_engine_names_match_backends_py_surface() -> None:
         "magemin",
         "cached-real",
     )
-    assert BATTERY_ENGINE_NAMES[-len(IMCC_ENGINE_NAMES):] == IMCC_ENGINE_NAMES
-    assert IMCC_MODEL_IDS["imcc_sf04"] == "IMCC-SF04"
-    assert IMCC_MODEL_IDS["imcc_sf04_ext"] == "IMCC-SF04-EXT"
+    assert BATTERY_ENGINE_NAMES[-len(OPENIMCC_ENGINE_NAMES):] == OPENIMCC_ENGINE_NAMES
+    assert OPENIMCC_MODEL_IDS == {"openimcc": "IMCC-SF04"}
 
 
 def _ok_cell(
@@ -1159,7 +1158,7 @@ def test_equilibrate_cell_payload_round_trip_keeps_flags() -> None:
     ].startswith("antoine_fallback_from_vaporock")
 
 
-def test_imcc_cell_round_trips_through_harness() -> None:
+def test_openimcc_cell_round_trips_through_harness() -> None:
     pot = BinaryPot(
         pot_id="mgo_sio2_40_60",
         kato_1993_table4_system="MgO-SiO2",
@@ -1167,13 +1166,13 @@ def test_imcc_cell_round_trips_through_harness() -> None:
         composition_wt_pct={"MgO": 40.0, "SiO2": 60.0},
     )
     po2 = Po2Request(mode="engine_default", po2_bar=None)
-    handle = open_battery_engine("imcc_sf04")
+    handle = open_battery_engine("openimcc")
     assert handle.available is True
     assert handle.backend is not None
     cell = equilibrate_cell(
         handle, pot, temperature_K=1700.0, po2=po2, isolated=False
     )
-    assert cell.engine == "imcc_sf04"
+    assert cell.engine == "openimcc"
     assert cell.model_id == "IMCC-SF04"
     if cell.status == "ok":
         assert cell.melt_activities
@@ -1185,17 +1184,7 @@ def test_imcc_cell_round_trips_through_harness() -> None:
     assert rebuilt.as_payload() == cell.as_payload()
     assert rebuilt.model_id == "IMCC-SF04"
 
-    ext = open_battery_engine("imcc_sf04_ext")
-    assert ext.available is True
-    ext_cell = equilibrate_cell(
-        ext, pot, temperature_K=1700.0, po2=po2, isolated=False
-    )
-    assert ext_cell.model_id == "IMCC-SF04-EXT"
-    rebuilt_ext = EquilibrateCell.from_payload(ext_cell.as_payload())
-    assert rebuilt_ext.as_payload() == ext_cell.as_payload()
-
-
-def test_imcc_refuses_species_outside_parent_basis() -> None:
+def test_openimcc_refuses_species_outside_parent_basis() -> None:
     pot = BinaryPot(
         pot_id="pbo_p2o5",
         kato_1993_table4_system=None,
@@ -1203,7 +1192,7 @@ def test_imcc_refuses_species_outside_parent_basis() -> None:
         composition_wt_pct={"PbO": 73.75, "P2O5": 26.25},
     )
     po2 = Po2Request(mode="engine_default", po2_bar=None)
-    handle = open_battery_engine("imcc_sf04")
+    handle = open_battery_engine("openimcc")
     cell = equilibrate_cell(
         handle, pot, temperature_K=1573.0, po2=po2, isolated=False
     )
