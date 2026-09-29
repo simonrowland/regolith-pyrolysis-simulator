@@ -93,6 +93,7 @@ class OptunaTPEStrategy:
             n_startup_trials=n_startup_trials,
             n_ei_candidates=n_ei_candidates,
             constraints_func=_constraints_for_trial,
+            constant_liar=True,
         )
         self._study = optuna.create_study(
             directions=self._directions,

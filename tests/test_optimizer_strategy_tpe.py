@@ -323,6 +323,43 @@ def test_tpe_ask_returns_schema_valid_unique_deterministic_candidates() -> None:
                 assert float(value) <= float(spec.high)
 
 
+def test_tpe_ask_batch_after_startup_does_not_duplicate_parameters() -> None:
+    schema = RecipeSchema(
+        allowlist=(
+            KnobSpec(
+                path=PATH,
+                kind="categorical",
+                choices=("low", "high"),
+                bounds_source="test",
+            ),
+        )
+    )
+    strategy = OptunaTPEStrategy(
+        schema,
+        seed=0,
+        objective_profile=PROFILE,
+        n_startup_trials=10,
+    )
+    startup_candidates = strategy.ask(10)
+    strategy.tell(
+        [
+            (
+                candidate,
+                _feasible_result(
+                    candidate,
+                    yield_value=float(index),
+                    energy=float(10 - index),
+                ),
+            )
+            for index, candidate in enumerate(startup_candidates)
+        ]
+    )
+
+    batch = strategy.ask(2)
+
+    assert len({candidate.patch.canonical_json() for candidate in batch}) == 2
+
+
 def test_tpe_pressure_conditioning_updates_recorded_trial_params() -> None:
     strategy = OptunaTPEStrategy(RecipeSchema(), seed=17, objective_profile=PROFILE)
     candidates = strategy.ask(4)
