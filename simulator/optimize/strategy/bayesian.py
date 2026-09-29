@@ -129,6 +129,7 @@ class OptunaTPEStrategy:
         self._trial_by_candidate_id: dict[str, Any] = {}
         self._result_by_id: dict[str, ScoredResult] = {}
         self._results: list[tuple[Candidate, ScoredResult]] = []
+        self._held_knob_paths: set[KeyPath] = set()
 
     @property
     def seed(self) -> int:
@@ -174,11 +175,17 @@ class OptunaTPEStrategy:
     def results(self) -> tuple[tuple[Candidate, "ScoredResult"], ...]:
         return tuple(self._results)
 
-    def ask(self, n: int) -> list[Candidate]:
+    def ask(
+        self,
+        n: int,
+        *,
+        knob_saturation_payloads: Sequence[Mapping[str, Any] | None] = (),
+    ) -> list[Candidate]:
         if isinstance(n, bool) or not isinstance(n, int) or n < 0:
             raise ValueError("n must be a non-negative int")
         if n == 0:
             return []
+        self._hold_objectively_flat_saturated_knobs(knob_saturation_payloads)
 
         candidates: list[Candidate] = []
         for _ in range(n):
@@ -188,11 +195,14 @@ class OptunaTPEStrategy:
                 if trial.number < len(self._warm_start_seeds)
                 else None
             )
-            values = {
-                spec.path: _suggest_value(trial, spec)
-                for spec in self._specs
-                if not self.schema.is_forbidden(spec.path)
-            }
+            values: dict[KeyPath, Any] = {}
+            for spec in self._specs:
+                if (
+                    self.schema.is_forbidden(spec.path)
+                    or spec.path in self._held_knob_paths
+                ):
+                    continue
+                values[spec.path] = _suggest_value(trial, spec)
             raw_values = dict(values)
             _couple_suggested_pressure_defaults(self.schema, values)
             _sync_conditioned_trial_params(trial, values, raw_values)
@@ -224,6 +234,79 @@ class OptunaTPEStrategy:
             self._trial_by_candidate_id[candidate.id] = trial
             candidates.append(candidate)
         return candidates
+
+    def _hold_objectively_flat_saturated_knobs(
+        self,
+        payloads: Sequence[Mapping[str, Any] | None],
+    ) -> None:
+        if not payloads:
+            return
+        if len(payloads) != len(self._results):
+            raise ValueError("knob saturation payloads must align with told results")
+
+        for current_index, (candidate, scored) in enumerate(self._results):
+            saturation = payloads[current_index]
+            if not isinstance(saturation, Mapping):
+                continue
+            objective_values = self._objective_values(scored)
+            if objective_values is None:
+                continue
+            for knob in saturation.get("knobs", ()):
+                if (
+                    not isinstance(knob, Mapping)
+                    or knob.get("pinned") not in {"low", "high"}
+                ):
+                    continue
+                knob_key = knob.get("key")
+                spec = next(
+                    (
+                        item
+                        for item in self._specs
+                        if ".".join(item.path) == knob_key
+                    ),
+                    None,
+                )
+                if spec is None:
+                    continue
+                candidate_context = {
+                    path: value
+                    for path, value in candidate.patch.values.items()
+                    if path != spec.path
+                }
+                for prior_index, (prior_candidate, prior_scored) in enumerate(
+                    self._results
+                ):
+                    if prior_index == current_index:
+                        continue
+                    prior_saturation = payloads[prior_index]
+                    if not isinstance(prior_saturation, Mapping):
+                        continue
+                    prior_knob = next(
+                        (
+                            row
+                            for row in prior_saturation.get("knobs", ())
+                            if isinstance(row, Mapping) and row.get("key") == knob_key
+                        ),
+                        None,
+                    )
+                    if (
+                        not isinstance(prior_knob, Mapping)
+                        or prior_knob.get("pinned") != "none"
+                    ):
+                        continue
+                    if prior_knob.get("value") == knob.get("value"):
+                        continue
+                    prior_context = {
+                        path: value
+                        for path, value in prior_candidate.patch.values.items()
+                        if path != spec.path
+                    }
+                    if prior_context != candidate_context:
+                        continue
+                    if self._objective_values(prior_scored) != objective_values:
+                        continue
+                    self._held_knob_paths.add(spec.path)
+                    break
 
     def tell(self, results: Sequence[tuple[Candidate, "ScoredResult"]]) -> None:
         batch: list[TellBatchRow] = []

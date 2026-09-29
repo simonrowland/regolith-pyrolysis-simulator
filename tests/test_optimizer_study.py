@@ -43,6 +43,7 @@ from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.evaluate import evaluate
+from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     LEGACY_ENERGY_KWH_METRIC,
@@ -71,6 +72,7 @@ from simulator.optimize.strategy import (
     OptunaTPEStrategy,
     RandomStrategy,
     StagedStrategy,
+    WarmStartSeed,
 )
 from simulator.transport_regime import TransportRegimeRefusal
 
@@ -3306,6 +3308,120 @@ def test_study_surfaces_knob_saturation_in_pareto_and_provenance(tmp_path) -> No
 
     header = (tmp_path / "leaderboard.csv").read_text().splitlines()[0]
     assert "knob_saturation" not in header
+
+
+@pytest.mark.parametrize("saturated_at_high_bound", (True, False))
+def test_study_hands_knob_saturation_to_next_bayesian_ask(
+    tmp_path,
+    saturated_at_high_bound: bool,
+) -> None:
+    schema = RecipeSchema(
+        allowlist=tuple(
+            spec
+            for spec in RecipeSchema().allowlist
+            if spec.path == ("furnace_max_T_C",)
+        )
+    )
+    knob = schema.search_allowlist[0]
+    assert knob.low is not None and knob.high is not None
+    # The midpoint gives the control candidate equal margin from either bound.
+    interior_value = (knob.low + knob.high) / 2
+    saturated_value = knob.high if saturated_at_high_bound else knob.low
+    # The synthetic unbound trajectory reaches the interior cap; a higher cap
+    # cannot move metals, while a lower cap reduces them.
+    trajectory_limit = interior_value
+    objective_profile = {
+        **PROFILE,
+        "profile_id": "c14-saturation",
+        "seed_recipes": [
+            {
+                "id": "c14-profile-seed",
+                "source_campaign": "C0",
+                "patch": {"furnace_max_T_C": interior_value},
+            }
+        ],
+        "objectives": [
+            {
+                "metric": "metals_total_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "synthetic saturation test",
+            }
+        ],
+    }
+    strategy = OptunaTPEStrategy(
+        schema,
+        seed=41,
+        objective_profile=objective_profile,
+        warm_start_seeds=(
+            WarmStartSeed(
+                "interior",
+                RecipePatch({knob.path: interior_value}),
+                "seed_recipe",
+            ),
+            WarmStartSeed(
+                "saturated",
+                RecipePatch({knob.path: saturated_value}),
+                "seed_recipe",
+            ),
+        ),
+    )
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        cap = patch.values.get(knob.path, trajectory_limit)
+        objective = min(float(cap), trajectory_limit)
+        saturation = compute_knob_saturation(
+            patch,
+            schema,
+            active_objective_metrics=("metals_total_kg",),
+        )
+        spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=True,
+            objectives=ObjectiveVector(
+                (ObjectiveValue("metals_total_kg", "maximize", objective, "kg"),)
+            ),
+            feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=_run_reference(
+                status="ok",
+                trace={"backend_status": "ok", "knob_saturation": saturation},
+            ),
+        )
+
+    result = study.run(
+        objective_profile,
+        FEEDSTOCK,
+        strategy,
+        "internal-analytical",
+        1,
+        3,
+        tmp_path / ("high" if saturated_at_high_bound else "low"),
+        seed=41,
+        evaluator=evaluator,
+        schema=schema,
+    )
+
+    assert result.records[0].patch.values[knob.path] == interior_value
+    assert result.records[1].patch.values[knob.path] == saturated_value
+    if saturated_at_high_bound:
+        assert result.records[1].objectives["metals_total_kg"] == trajectory_limit
+        assert result.records[2].objectives["metals_total_kg"] == trajectory_limit
+        assert knob.path not in result.records[2].patch.values
+    else:
+        assert result.records[1].objectives["metals_total_kg"] < trajectory_limit
+        assert knob.path in result.records[2].patch.values
 
 
 def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(tmp_path) -> None:

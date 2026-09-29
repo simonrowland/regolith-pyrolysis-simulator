@@ -116,6 +116,7 @@ from simulator.optimize.results_store import (
 from simulator.optimize.strategy import (
     Candidate,
     MorrisScreenStrategy,
+    OptunaTPEStrategy,
     RandomStrategy,
     Strategy,
     WarmStartSeed,
@@ -781,10 +782,10 @@ def run(
                         batch_size=batch_size,
                     )
                 else:
-                    candidates = active_strategy.ask(batch_size)
+                    candidates = _ask_strategy_candidates(active_strategy, batch_size)
                     if not candidates and isinstance(active_strategy, StagedStrategy):
                         if active_strategy.run_backward_pass() or active_strategy.joint_refine():
-                            candidates = active_strategy.ask(batch_size)
+                            candidates = _ask_strategy_candidates(active_strategy, batch_size)
                 if not candidates:
                     break
                 batch_seq += 1
@@ -1925,11 +1926,27 @@ def _replay_ask_batch(
             batch_size=batch_size,
         )
         return candidates, topology_cursor, owners
-    candidates = active_strategy.ask(batch_size)
+    candidates = _ask_strategy_candidates(active_strategy, batch_size)
     if not candidates and isinstance(active_strategy, StagedStrategy):
         if active_strategy.run_backward_pass() or active_strategy.joint_refine():
-            candidates = active_strategy.ask(batch_size)
+            candidates = _ask_strategy_candidates(active_strategy, batch_size)
     return candidates, topology_cursor, owners
+
+
+def _ask_strategy_candidates(
+    active_strategy: Strategy,
+    batch_size: int,
+) -> list[Candidate]:
+    if isinstance(active_strategy, OptunaTPEStrategy):
+        saturation_payloads = tuple(
+            _trace_summary_mapping(scored).get("knob_saturation")
+            for _, scored in active_strategy.results
+        )
+        return active_strategy.ask(
+            batch_size,
+            knob_saturation_payloads=saturation_payloads,
+        )
+    return active_strategy.ask(batch_size)
 
 
 def _replay_tell_batch(
