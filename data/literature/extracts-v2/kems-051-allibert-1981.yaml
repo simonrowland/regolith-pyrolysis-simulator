@@ -8473,7 +8473,7 @@ observations:
       formula: Al2O3
       phase:
         tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        reason: phase string 'CaO + melt' is bulk_composition_in_two_phase_region
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -8518,8 +8518,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.8'
+        - - Al2O3
+          - '0.2'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8569,6 +8576,12 @@ observations:
     - activity
     reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=0ecd876f0b9c
+  - kind: out_of_certified_band
+    affected_quantities:
+    - activity
+    reason: printed phase 'CaO + melt' is a two-phase assemblage; the bulk composition is not the liquid composition
+    origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=0ecd876f0b9c
+    band: two_phase_bulk_composition_not_liquid_composition
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -8635,11 +8648,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8681,8 +8694,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.548'
+        - - Al2O3
+          - '0.452'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8798,11 +8818,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8844,8 +8864,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.578'
+        - - Al2O3
+          - '0.422'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8961,11 +8988,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9007,8 +9034,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.645'
+        - - Al2O3
+          - '0.355'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9124,11 +9158,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9170,8 +9204,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.495'
+        - - Al2O3
+          - '0.505'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9287,11 +9328,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9333,8 +9374,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.438'
+        - - Al2O3
+          - '0.562'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9450,11 +9498,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9496,8 +9544,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.414'
+        - - Al2O3
+          - '0.586'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9613,11 +9668,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9659,8 +9714,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.352'
+        - - Al2O3
+          - '0.648'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9776,11 +9838,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9822,8 +9884,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.548'
+        - - Al2O3
+          - '0.452'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9940,11 +10009,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9986,8 +10055,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.438'
+        - - Al2O3
+          - '0.562'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10104,11 +10180,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10150,8 +10226,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.414'
+        - - Al2O3
+          - '0.586'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10268,11 +10351,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10314,8 +10397,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.645'
+        - - Al2O3
+          - '0.355'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10432,11 +10522,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10478,8 +10568,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.578'
+        - - Al2O3
+          - '0.422'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10597,7 +10694,7 @@ observations:
       formula: CaO
       phase:
         tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        reason: phase string 'CaO + melt' is bulk_composition_in_two_phase_region
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -10642,8 +10739,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.8'
+        - - Al2O3
+          - '0.2'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10694,6 +10798,12 @@ observations:
     - activity
     reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=a5963b5fa0df
+  - kind: out_of_certified_band
+    affected_quantities:
+    - activity
+    reason: printed phase 'CaO + melt' is a two-phase assemblage; the bulk composition is not the liquid composition
+    origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=a5963b5fa0df
+    band: two_phase_bulk_composition_not_liquid_composition
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -10760,11 +10870,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10806,8 +10916,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.495'
+        - - Al2O3
+          - '0.505'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10924,11 +11041,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt; final row is printed as CaO + melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10970,8 +11087,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.352'
+        - - Al2O3
+          - '0.648'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
