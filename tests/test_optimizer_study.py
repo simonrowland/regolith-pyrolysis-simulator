@@ -2951,11 +2951,15 @@ def test_profile_seed_epoch_stamp_mismatch_warns_but_reevaluates(
     assert any("stale advisory seed_recipes" in message for message in messages)
 
 
-def test_optuna_incomplete_warm_start_drop_counted_in_search_provenance(
+def test_optuna_partial_warm_start_is_admitted_in_search_provenance(
     tmp_path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     pytest.importorskip("optuna")
+    expected_seed_count = min(
+        1,
+        len(study._profile_warm_start_seeds(PROFILE, schema=RecipeSchema())),
+    )
 
     with caplog.at_level(logging.WARNING):
         result = study.run(
@@ -2970,13 +2974,15 @@ def test_optuna_incomplete_warm_start_drop_counted_in_search_provenance(
             evaluator=_evaluator(),
         )
     payload = json.loads(result.artifacts["search_provenance"].read_text())
-    strategy_provenance = payload["strategy_provenance"]
+    strategy_provenance = payload.get("strategy_provenance", {})
 
-    assert strategy_provenance["optuna_incomplete_seed_dropped_count"] == 1
-    assert strategy_provenance["optuna_incomplete_seed_dropped_ids"] == [
-        "study-c0-seed"
-    ]
-    assert any(
+    assert (
+        payload["proposal_source_counts"].get("optuna_enqueued", 0)
+        == expected_seed_count
+    )
+    assert strategy_provenance.get("optuna_incomplete_seed_dropped_count", 0) == 0
+    assert strategy_provenance.get("optuna_incomplete_seed_dropped_ids", []) == []
+    assert not any(
         "optuna_warm_start_seed_dropped" in record.getMessage()
         for record in caplog.records
     )

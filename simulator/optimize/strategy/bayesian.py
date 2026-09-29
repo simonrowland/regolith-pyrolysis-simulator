@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib
 import logging
 import math
+from numbers import Real
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
@@ -16,7 +17,14 @@ from simulator.optimize.objective import (
     objective_definitions,
     objective_scores,
 )
-from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    KeyPath,
+    KnobSpec,
+    RecipePatch,
+    RecipeSchema,
+    RecipeValidationError,
+    _default_setpoint_value,
+)
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
 if TYPE_CHECKING:
@@ -297,20 +305,41 @@ def _optuna_params_from_seed(
     schema: RecipeSchema,
 ) -> dict[str, Any]:
     patch = seed.patch.validated(schema)
-    missing = [spec.path for spec in specs if spec.path not in patch.values]
-    if missing:
-        missing_names = ", ".join(".".join(path) for path in missing[:5])
-        if len(missing) > 5:
-            missing_names += ", ..."
-        raise ValueError(
-            f"warm-start seed {seed.id!r} is incomplete for Optuna enqueue: "
-            f"{missing_names}"
-        )
-    return {
-        ".".join(spec.path): patch.values[spec.path]
-        for spec in specs
-        if not schema.is_forbidden(spec.path)
-    }
+    params: dict[str, Any] = {}
+    for spec in specs:
+        if schema.is_forbidden(spec.path):
+            continue
+        if spec.path in patch.values:
+            value = patch.values[spec.path]
+        else:
+            try:
+                value = _default_setpoint_value(spec.path)
+            except RecipeValidationError as exc:
+                if str(exc).startswith(
+                    "recipe_pressure_total_default_missing: missing YAML default for "
+                ):
+                    continue
+                raise
+        # Optuna's distributions consume scalars; a valid pair-valued recipe patch
+        # does not identify one value for this search parameter.
+        if spec.kind == "float":
+            has_scalar_value = isinstance(value, Real) and not isinstance(value, bool)
+        elif spec.kind == "int":
+            # An integer knob can use an integral scalar, but no fractional part.
+            has_scalar_value = (
+                isinstance(value, Real)
+                and not isinstance(value, bool)
+                and float(value).is_integer()
+            )
+        elif spec.kind == "categorical":
+            has_scalar_value = value in (spec.choices or ())
+        else:
+            has_scalar_value = False
+        if not has_scalar_value:
+            continue
+
+        params[".".join(spec.path)] = value
+    return params
 
 
 def _require_optuna() -> Any:

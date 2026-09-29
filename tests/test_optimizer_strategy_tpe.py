@@ -6,6 +6,7 @@ import re
 import subprocess
 import sys
 from dataclasses import replace
+from numbers import Real
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -14,6 +15,7 @@ import pytest
 from simulator.optimize import (
     Candidate,
     GateMargin,
+    OptunaNSGA2Strategy,
     OptunaTPEStrategy,
     Strategy,
     ThresholdSpec,
@@ -33,7 +35,13 @@ from simulator.optimize.objective import (
     ObjectiveVector,
 )
 from simulator.optimize.profiles import load_profile
-from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    KnobSpec,
+    RecipePatch,
+    RecipeSchema,
+    RecipeValidationError,
+    _default_setpoint_value,
+)
 from simulator.optimize.strategy.bayesian import (
     _BAD_MAXIMIZE_VALUE,
     _BAD_MINIMIZE_VALUE,
@@ -48,6 +56,7 @@ from simulator.optimize.strategy.bayesian import (
     OptunaUnavailableError,
 )
 from simulator.optimize.strategy.protocol import WarmStartSeed
+from simulator.optimize.study import _profile_warm_start_seeds
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -910,6 +919,127 @@ def test_tpe_scores_legacy_energy_cache_objective_against_canonical_profile() ->
     assert trial.state.name == "COMPLETE"
     assert trial.values == [1.25, 2.5]
     assert strategy.tell_count == 1
+
+
+@pytest.mark.parametrize("strategy_class", [OptunaTPEStrategy, OptunaNSGA2Strategy])
+def test_highland_profile_seed_enqueues_seed_values_and_loaded_defaults(strategy_class) -> None:
+    pytest.importorskip("optuna")
+    profile = load_profile("lunar_highland")
+    schema = RecipeSchema()
+    (seed,) = _profile_warm_start_seeds(profile, schema=schema)
+    expected_params: dict[str, object] = {}
+    no_default_paths: set[str] = set()
+    missing_default_marker = object()
+
+    for spec in schema.search_allowlist:
+        name = ".".join(spec.path)
+        if spec.path in seed.patch.values:
+            expected_params[name] = seed.patch.values[spec.path]
+            continue
+        try:
+            default = _default_setpoint_value(spec.path)
+        except RecipeValidationError as exc:
+            if not str(exc).startswith("recipe_pressure_total_default_missing:"):
+                raise
+            default = missing_default_marker
+        if default is missing_default_marker:
+            no_default_paths.add(name)
+            continue
+        if spec.kind == "float":
+            has_unambiguous_default = isinstance(default, Real) and not isinstance(
+                default, bool
+            )
+        elif spec.kind == "int":
+            has_unambiguous_default = (
+                isinstance(default, Real)
+                and not isinstance(default, bool)
+                and float(default).is_integer()
+            )
+        else:
+            has_unambiguous_default = default in (spec.choices or ())
+        if has_unambiguous_default:
+            expected_params[name] = default
+        else:
+            no_default_paths.add(name)
+
+    hold_path = ("campaigns", "C6", "default_hold_T_C")
+    hold_spec = schema.spec_for(hold_path)
+    assert hold_spec.high is not None
+    bad_values = dict(seed.patch.values)
+    # Use the next representable float above the schema maximum to avoid a copied bound.
+    bad_values[hold_path] = math.nextafter(float(hold_spec.high), math.inf)
+    bad_seed = replace(
+        seed,
+        id=f"{seed.id}-out-of-bounds",
+        patch=RecipePatch(bad_values),
+    )
+
+    strategy = strategy_class(
+        schema,
+        seed=451,
+        objective_profile=profile,
+        warm_start_seeds=(seed, bad_seed),
+    )
+    assert strategy.warm_start_rejected_seed_ids == (bad_seed.id,)
+    waiting = strategy._study.get_trials(deepcopy=False)
+    assert len(waiting) == 1
+    assert waiting[0].state.name == "WAITING"
+    enqueued_params = waiting[0].system_attrs["fixed_params"]
+
+    assert enqueued_params == expected_params
+    search_paths = {spec.path for spec in schema.search_allowlist}
+    expected_c6_seed_params = {
+        ".".join(path): value
+        for path, value in seed.patch.values.items()
+        if path in search_paths and path[:2] == ("campaigns", "C6")
+    }
+    assert {
+        name: enqueued_params[name] for name in expected_c6_seed_params
+    } == expected_c6_seed_params
+    assert {".".join(spec.path) for spec in schema.search_allowlist} - set(
+        enqueued_params
+    ) == no_default_paths
+
+
+@pytest.mark.parametrize("strategy_class", [OptunaTPEStrategy, OptunaNSGA2Strategy])
+def test_partial_seed_trial_samples_unset_knobs(strategy_class) -> None:
+    pytest.importorskip("optuna")
+    seeded_path = ("optimizer_test", "seeded")
+    sampled_path = ("optimizer_test", "sampled")
+    schema = RecipeSchema(
+        allowlist=(
+            KnobSpec(
+                path=seeded_path,
+                kind="float",
+                low=0.0,
+                high=1.0,
+                bounds_source="C11 partial seed test",
+            ),
+            KnobSpec(
+                path=sampled_path,
+                kind="float",
+                low=0.0,
+                high=1.0,
+                bounds_source="C11 partial seed test",
+            ),
+        )
+    )
+    seed = WarmStartSeed(
+        id="partial-seed",
+        patch=RecipePatch({seeded_path: 0.25}),
+        proposal_source="seed_recipe",
+    )
+    strategy = strategy_class(
+        schema,
+        seed=452,
+        objective_profile=PROFILE,
+        warm_start_seeds=(seed,),
+    )
+
+    (candidate,) = strategy.ask(1)
+
+    assert candidate.patch.values[seeded_path] == 0.25
+    assert 0.0 <= candidate.patch.values[sampled_path] <= 1.0
 
 
 def test_tpe_import_boundary_is_lazy_without_optuna() -> None:
