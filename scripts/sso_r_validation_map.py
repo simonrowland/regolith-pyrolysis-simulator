@@ -22,6 +22,7 @@ from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.core import (
     PyrolysisSimulator,
 )
+from simulator.state import EvaporationFlux  # noqa: E402
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.sso_r_owner_surface import (
     OWNER_CERTIFICATION_ASSERTION,
@@ -490,17 +491,46 @@ def run_row(
     split = sim._apply_native_fe_saturation_split(sample_time_h=SAMPLE_TIME_H)
     sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
     equilibrium = sim._get_equilibrium()
-    raw_evap_flux = sim._calculate_evaporation(equilibrium)
-    vapor_pressure_diagnostic = dict(
-        getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
-    )
-    evaporation_diagnostic = dict(
-        getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
-    )
-    freeze_gate_diagnostic = dict(
-        getattr(sim, "_last_freeze_gate_diagnostic", {}) or {}
-    )
-    evap_flux = sim._apply_analytic_evaporation_depletion(raw_evap_flux)
+    # J = (P_eq - P_bulk) / (r_interface + r_gas + r_melt). The live hour
+    # solves P_bulk as this tick's headspace partial. P_bulk = 0 is only
+    # that solver's seed. The returned flux is already depleted; the
+    # evaporation diagnostic is the pre-depletion flux at the solved partial.
+    # Headspace off keeps the zero-bulk call plus one depletion.
+    if sim._overhead_headspace_enabled():
+        evap_flux, _same_tick_partials = (
+            sim._calculate_evaporation_with_same_tick_headspace(equilibrium)
+        )
+        vapor_pressure_diagnostic = dict(
+            getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
+        )
+        evaporation_diagnostic = dict(
+            getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+        )
+        freeze_gate_diagnostic = dict(
+            getattr(sim, "_last_freeze_gate_diagnostic", {}) or {}
+        )
+        pre_depletion = dict(
+            evaporation_diagnostic.get("evaporation_flux_kg_hr") or {}
+        )
+        raw_evap_flux = EvaporationFlux(
+            species_kg_hr={
+                str(species): float(rate)
+                for species, rate in pre_depletion.items()
+            }
+        )
+        raw_evap_flux.update_totals()
+    else:
+        raw_evap_flux = sim._calculate_evaporation(equilibrium)
+        vapor_pressure_diagnostic = dict(
+            getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
+        )
+        evaporation_diagnostic = dict(
+            getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+        )
+        freeze_gate_diagnostic = dict(
+            getattr(sim, "_last_freeze_gate_diagnostic", {}) or {}
+        )
+        evap_flux = sim._apply_analytic_evaporation_depletion(raw_evap_flux)
     if evap_flux.total_kg_hr > 0.0:
         sim._configure_condensation_operating_conditions(evap_flux)
         sim._apply_lab_surface_temperatures(sample_time_h=SAMPLE_TIME_H)

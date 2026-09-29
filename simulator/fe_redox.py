@@ -62,6 +62,7 @@ class RedoxDomainRecord(TypedDict):
     basis: Literal[
         'fe_feo_buffer',
         'fe_saturation_bound',
+        'ferrous_free_lower_bound',
         'kress91_inverse',
         'no_melt_redox_buffer',
         'no_modelled_redox_couple',

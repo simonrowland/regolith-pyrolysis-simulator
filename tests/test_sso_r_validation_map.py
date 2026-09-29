@@ -544,7 +544,8 @@ def test_map_live_semantics_parity_is_computed_from_live_owner_tick(smoke_payloa
 
     # The observed split is the metallic tap of dose Fe. It credits no O2,
     # so it is not the deferred FeO -> Fe + 1/2 O2 saturation split.
-    # Map and live native mols agree. Parity still fails on the SiO flux.
+    # Map and live both solve J = (P_eq - P_bulk) / (r_interface + r_gas + r_melt)
+    # at this tick's headspace partial, so the published SiO fluxes agree.
     owner = _owner_recipe_row(smoke_payload)
     assert probe["native_split_observed"] is True
     assert probe["native_split_o2_mol"] == pytest.approx(0.0, abs=1.0e-12)
@@ -552,7 +553,13 @@ def test_map_live_semantics_parity_is_computed_from_live_owner_tick(smoke_payloa
     assert probe["native_fe_tap_mol"] + probe["native_fe_vapor_mol"] == pytest.approx(
         probe["native_fe_pool_mol"]
     )
-    assert parity["passed"] is False
+    assert parity["passed"] is True
+    assert math.isclose(
+        probe["SiO_flux_kg_hr"],
+        owner["SiO_flux_kg_hr"],
+        rel_tol=validation_map.MAP_LIVE_PARITY_SIO_REL_TOL,
+        abs_tol=validation_map.MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR,
+    )
     assert "map_pO2_bar=" in parity["detail"]
     assert "live_pO2_bar=" in parity["detail"]
     assert "map_SiO_kg_hr=" in parity["detail"]
@@ -607,8 +614,8 @@ def test_owner_live_probe_is_recipe_reachable(smoke_payload):
     assert probe["SiO_provider_pO2_bar"] == pytest.approx(
         owner["SiO_provider_pO2_bar"]
     )
-    # This probe claims recipe reachability; map/live parity remains a separate
-    # reported gate while the staged-Na/native-Fe semantics are unresolved.
+    # Reachability is this probe's claim. SiO parity is the separate gate,
+    # and both sides now publish the same-tick headspace flux.
     assert probe["SiO_flux_kg_hr"] >= validation_map.OWNER_RECIPE_MIN_SIO_KG_HR
 
 
@@ -634,13 +641,14 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     window = _assertion(smoke_payload, "grind_ready_target_window")
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
 
-    # The metallic tap is observed. Certification still requires live parity,
-    # and the SiO map/live residual leaves that parity missing.
+    # The metallic tap is observed and the SiO fluxes agree. Certification
+    # still fails because the owner escape fraction is above the cap, so
+    # the grind window stays shut with parity confirmed.
     assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
-    assert parity["passed"] is False
+    assert parity["passed"] is True
     assert window["passed"] is False
     assert "window under PN2 sweep transport semantics" in window["detail"]
-    assert "live parity=missing" in window["detail"]
+    assert "live parity=confirmed" in window["detail"]
 
 
 def test_certification_surfaces_require_owner_pass_and_live_parity(
@@ -668,12 +676,13 @@ def test_certification_surfaces_require_owner_pass_and_live_parity(
 
     by_name = {a["name"]: a for a in assertions}
     assert by_name["owner_pN2_recipe_point_requested_pO2_semantics"]["passed"] is False
-    # b-598/t-992 staged Na-shuttle deferral keeps the real live-parity blocker visible in certification output.
-    assert by_name["map_live_semantics_parity"]["passed"] is False
+    # The integrity failure keeps certification shut. SiO parity is a
+    # separate predicate and stays confirmed.
+    assert by_name["map_live_semantics_parity"]["passed"] is True
     assert by_name["grind_ready_target_window"]["passed"] is False
     validation_map.write_markdown(payload, report_path, command="pytest synthetic")
     report = report_path.read_text(encoding="utf-8")
-    assert "classification=current_physics_blocker; live parity=PENDING" in report
+    assert "classification=current_physics_blocker; live parity=confirmed" in report
     golden = validation_map.golden_payload(payload)
     assert golden["owner_pn2_row"]["owner_recipe_pass"] is False
     assert golden["owner_pn2_row"]["classification"] == "current_physics_blocker"
