@@ -3416,6 +3416,42 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     )
 
 
+# Scorer reads these tokens from an unknown phase reason or a notice band.
+# Kept here as the same literals; migrate must not import score (score imports migrate).
+_TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
+_TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
+_PRINTED_SINGLE_MELT_PHASES = frozenset({"melt"})
+
+
+def _printed_point_phase_text(item: Mapping[str, Any]) -> str | None:
+    raw = item.get("phase_as_printed")
+    if not isinstance(raw, str):
+        return None
+    text = " ".join(raw.split())
+    return text or None
+
+
+def _printed_point_phase_kind(text: str) -> str | None:
+    """Type a printed per-point phase. None means leave the parent phase.
+
+    ``melt`` is the printed single liquid. ``X + melt`` / ``melt + X`` is a
+    two-phase assemblage. The whole string must be that phrase: a sentence
+    that merely mentions the words is not a phase.
+    """
+
+    parts = " ".join(text.split()).casefold().split(" ")
+    if len(parts) == 1 and parts[0] in _PRINTED_SINGLE_MELT_PHASES:
+        return "liquid"
+    if (
+        len(parts) == 3
+        and parts[1] == "+"
+        and (parts[0] == "melt") != (parts[2] == "melt")
+        and "melt" in parts
+    ):
+        return "two_phase"
+    return None
+
+
 def _source_standard_state_phase(raw: object, phase: str) -> str | None:
     text = " ".join(str(raw).split())
     match = re.search(
@@ -11952,6 +11988,27 @@ class Migrator:
                 ident_kwargs["composition"] = State.unknown(
                     composition_unknown_reason()
                 )
+        printed_phase_text = (
+            _printed_point_phase_text(raw_item)
+            if isinstance(raw_item, Mapping)
+            else None
+        )
+        printed_phase_kind = (
+            _printed_point_phase_kind(printed_phase_text)
+            if printed_phase_text is not None
+            else None
+        )
+        if printed_phase_kind == "liquid":
+            species = make_species(species.formula, Phase.L, charge=species.charge)
+        elif printed_phase_kind == "two_phase":
+            species = make_species(
+                species.formula,
+                State.unknown(
+                    f"phase string {printed_phase_text!r} is "
+                    f"{_TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER}"
+                ),
+                charge=species.charge,
+            )
         identity = fill_identity(quantity, species, **ident_kwargs)
         converted: Derivation | None = None
         if value_sel is not None and value_sel.available:
@@ -12115,6 +12172,15 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
+        if printed_phase_kind is not None and (
+            identity.composition is None or not identity.composition.is_value
+        ):
+            located_composition = (point_conditions or {}).get("composition")
+            if (
+                isinstance(located_composition, Located)
+                and located_composition.state.is_value
+            ):
+                identity = replace(identity, composition=located_composition.state)
         child_notices = list(notices)
         if _is_source_internally_inconsistent(
             NoticeKind.SOURCE_DISAGREEMENT, parent_reason
@@ -12174,6 +12240,19 @@ class Migrator:
                     ),
                     origin=point_id,
                     source=composition.proxy_source,
+                )
+            )
+        if printed_phase_kind == "two_phase" and isinstance(q_token_point, Quantity):
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(q_token_point,),
+                    reason=(
+                        f"printed phase {printed_phase_text!r} is a two-phase "
+                        "assemblage; the bulk composition is not the liquid composition"
+                    ),
+                    origin=point_id,
+                    band=_TWO_PHASE_BULK_COMPOSITION_STATUS,
                 )
             )
         observation = Observation(

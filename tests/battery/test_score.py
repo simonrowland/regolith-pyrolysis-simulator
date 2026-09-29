@@ -3177,6 +3177,10 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         render_score_report_from_payloads,
     )
 
+    assert "kems-051-allibert-1981" not in inspect.getsource(
+        _fusion_comparison_reference
+    )
+
     temperature = Decimal("2000")
     composition = Composition(
         basis="printed_mole_fraction",
@@ -3349,12 +3353,15 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     converted_source_point = _fusion_comparison_reference(
         source_point_reference
     )
-    assert converted_source_point.identity.composition.is_value
-    assert converted_source_point.identity.composition.value == composition
-    assert converted_source_point.identity.species.phase.value is Phase.L
+    assert not converted_source_point.identity.composition.is_value
+    assert converted_source_point.identity.species.phase.is_unknown
     assert (
         converted_source_point.identity.reference_state.value.component_basis
-        == "oxide"
+        == "CaO"
+    )
+    assert (
+        converted_source_point.identity.reference_state.value.endmember.phase.value
+        is Phase.L
     )
     alumina_source_point = replace(
         alumina_reference,
@@ -3373,18 +3380,21 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     )
     assert (
         converted_alumina_source_point.identity.reference_state.value.component_basis
-        == "oxide"
+        == "Al2O3"
     )
-    assert converted_alumina_source_point.identity.species.phase.value is Phase.L
+    assert converted_alumina_source_point.identity.species.phase.is_unknown
     from simulator.battery.generators.bench import activity_request_for_engine
 
     activity_request = activity_request_for_engine(
-        experiment, converted_alumina_source_point, Engine.ALPHAMELTS.value
+        experiment, converted_alumina, Engine.ALPHAMELTS.value
     )
     assert activity_request is not None and activity_request.payload is not None
+    assert (
+        converted_alumina.identity.reference_state.value.component_basis == "Al2O3"
+    )
 
     model_derived_reference = replace(
-        source_point_reference,
+        reference,
         observation_id="allibert-cao-model-derived-diagnostic",
         evidence=replace(
             reference.evidence,
@@ -3403,6 +3413,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         assert point.identity.reference_state.value.endmember.phase.value is Phase.L
         assert point.identity.composition.is_value
         assert point.identity.composition.value == composition
+        assert point.identity.reference_state.value.component_basis == "CaO"
         return EnginePrediction(
             engine=engine,
             channel="internal-analytical",
@@ -3652,10 +3663,23 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert len(allibert_rows) == 16
         assert {row.reference for row in allibert_rows} == allibert_admitted
         assert all(row.status is ResidualStatus.REFUSED for row in allibert_rows)
-        assert all(
-            row.refusal is not None
-            and row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
-            for row in allibert_rows
+        # b-617 types Allibert's printed per-point phases: the two xCaO = 0.80
+        # "CaO + melt" points refuse as two-phase bulk compositions; the 14
+        # single-phase points keep the identity refusal in this reduced context.
+        assert all(row.refusal is not None for row in allibert_rows)
+        assert (
+            sum(
+                row.refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+                for row in allibert_rows
+            )
+            == 2
+        )
+        assert (
+            sum(
+                row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+                for row in allibert_rows
+            )
+            == 14
         )
         assert all(not row.score_eligible for row in allibert_rows)
         assert all(
@@ -3700,3 +3724,72 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             for row in activity_rows
         )
         assert all(not row.score_eligible for row in stolyarova_rows)
+
+
+def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Path) -> None:
+    """Printed 'CaO + melt' is the two-phase marker. The scorer does not stamp it liquid."""
+
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.score import compile_residual
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    rows = []
+    for observation in result.observations.values():
+        if observation.source_id != "kems-051-allibert-1981":
+            continue
+        if quantity_token(observation.identity) is not Quantity.ACTIVITY:
+            continue
+        if str(getattr(observation.locator, "table", None)) != "II":
+            continue
+        holders = [observation.identity.composition]
+        holders.append((observation.point_conditions or {}).get("composition"))
+        cao = None
+        for holder in holders:
+            state = getattr(holder, "state", holder)
+            if state is None or not getattr(state, "is_value", False) or state.value is None:
+                continue
+            cao = next(
+                (amount for name, amount in state.value.components if name == "CaO"),
+                None,
+            )
+            if cao is not None:
+                break
+        if cao is None:
+            continue
+        if cao == Decimal("0.8"):
+            rows.append(observation)
+    assert len(rows) == 2
+    assert {observation.identity.species.formula for observation in rows} == {
+        "CaO",
+        "Al2O3",
+    }
+
+    def predict_must_not_run(*args, **kwargs):
+        raise AssertionError("two-phase bulk row reached the engine")
+
+    context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations={observation.observation_id: observation for observation in rows},
+        extract_review={"kems-051-allibert-1981": "reviewed"},
+    )
+    for observation in rows:
+        assert observation.identity.species.phase.is_unknown
+        assert "bulk_composition_in_two_phase_region" in (
+            observation.identity.species.phase.reason or ""
+        )
+        for engine in (Engine.IMCC_SF04, Engine.OPENIMCC):
+            residual, _candidate = compile_residual(
+                observation,
+                engine,
+                context=context,
+                predict=predict_must_not_run,
+            )
+            assert residual.status is ResidualStatus.REFUSED
+            assert residual.numeric is None
+            assert residual.refusal is not None
+            assert (
+                residual.refusal.reason
+                is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+            )

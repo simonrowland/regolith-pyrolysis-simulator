@@ -970,38 +970,12 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
         phase=Phase.L,
         polymorph=None,
     )
-    # The extract records the oxide formula as its basis token. Melt engines
-    # identify the equivalent parent-oxide basis with the canonical "oxide"
-    # token; normalize only this in-memory comparison view.
     liquid_state = replace(
         standard_state,
         endmember=liquid_endmember,
     )
-    comparison_identity = identity
-    if reference.source_id == "kems-051-allibert-1981":
-        # Preserve Allibert's existing comparison-view repairs. They do not
-        # decide whether the generic typed fusion conversion is eligible.
-        liquid_state = replace(liquid_state, component_basis="oxide")
-        comparison_species = identity.species
-        if phase_token(comparison_species) is None:
-            # The source describes these admitted Table II points as melt
-            # activities, but the prose phase string is not in the closed parser
-            # map. Type that printed liquid phase on this comparison view only.
-            # At the final CaO-saturation point, this names the activity-bearing
-            # melt component, not the full CaO(s)+melt assemblage.
-            comparison_species = replace(comparison_species, phase=State.of(Phase.L))
-        comparison_identity = replace(identity, species=comparison_species)
-        point_composition = (reference.point_conditions or {}).get("composition")
-        if (
-            (identity.composition is None or not identity.composition.is_value)
-            and isinstance(point_composition, Located)
-            and point_composition.state.is_value
-        ):
-            comparison_identity = replace(
-                comparison_identity, composition=point_composition.state
-            )
     comparison_identity = replace(
-        comparison_identity, reference_state=State.of(liquid_state)
+        identity, reference_state=State.of(liquid_state)
     )
     mismatch_K = fusion.melting_temperature_K - fusion.accepted_melting_temperature_K
     extrapolation_K = fusion.melting_temperature_K - temperature_K
