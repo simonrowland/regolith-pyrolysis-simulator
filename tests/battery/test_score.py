@@ -3780,3 +3780,60 @@ def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Pa
                 residual.refusal.reason
                 is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
             )
+
+
+def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
+    """An unlinked experiment does not inherit its work's only typed bench.
+
+    Restoring the sole-bench adoption in _bench_for_score makes this red:
+    the W bench would be attached and the refusal would not be
+    cell_material_unknown.
+    """
+    from simulator.battery.enums import BenchIdentityBasis, CellMaterial
+    from simulator.battery.records import Bench, BenchIdentity
+
+    experiment = F.kems_experiment()
+    assert experiment.bench_id is None
+    bench = Bench(
+        id="sole-w",
+        work_id=experiment.work_id or "work-1",
+        identity=BenchIdentity(
+            BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
+            reason="test fixture",
+        ),
+        cell_materials=(F.located(CellMaterial.W),),
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("K2O", Decimal("0.2")), ("SiO2", Decimal("0.8"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    ident = replace(
+        F.activity_identity(
+            formula="K",
+            composition=composition,
+            component_basis="K2O",
+        ),
+        quantity=Quantity.P_PARTIAL,
+        species=Species("K", Phase.G),
+        fO2_Pa=State.unknown("no fO2 printed"),
+    )
+    reference = F.observation(
+        "unlinked-sole-bench",
+        experiment.experiment_id,
+        ident,
+        Decimal("1e-6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="sole-bench-work",
+    )
+    context = replace(
+        _context(F.work(), experiment, reference, review="reviewed"),
+        benches={bench.id: bench},
+    )
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+    )
+    assert residual.refusal is not None
+    assert residual.refusal.detail.get("reason") == "cell_material_unknown"

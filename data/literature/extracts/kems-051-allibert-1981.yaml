@@ -94,6 +94,16 @@ benches:
       pdf_page_index: 2
       section: II Mass-Spectrometric Measurements
       note: 'Section II: “Six effusion cells were drilled in a molybdenum block.”'
+
+experiments:
+- experiment_id: allibert-1981-mo-kems
+  bench_id: allibert-1981-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 308
+    pdf_page_index: 2
+    section: II Mass-Spectrometric Measurements
+    note: 'Section II: "Six effusion cells were drilled in a molybdenum block."'
 species:
   CaO:
     context:
@@ -192,6 +202,7 @@ species:
         reference_reaction_as_printed: CaF2(s) + O2(g) -> CaO(s) + F2(g)
     observations:
     - observation_id: allibert_1981_table2_cao_activity_kems
+      experiment: allibert-1981-mo-kems
       type: activity_coefficient
       locator:
         published_page: 309
@@ -891,6 +902,7 @@ species:
   Al2O3:
     observations:
     - observation_id: allibert_1981_table2_alumina_activity_kems
+      experiment: allibert-1981-mo-kems
       type: activity_coefficient
       locator:
         published_page: 309

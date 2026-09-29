@@ -59,6 +59,13 @@ benches:
       source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
       page: 1-7
       note: 'Table footnote: “there is a thin graphite coating on the inner surface of the lid of the iridium cell”; a thin graphite disc later replaced the coating.'
+
+experiments:
+- experiment_id: bencze-2016-ir-kems
+  bench_id: bencze-2016-supplement-kems
+  locator:
+    page: 1-7
+    note: 'Table footnote: "there is a thin graphite coating on the inner surface of the lid of the iridium cell"; a thin graphite disc later replaced the coating.'
 species:
   Na:
     observations:
@@ -76,6 +83,7 @@ species:
         basis: source_supplement_only
         note: The supplement identifies solidified gasifier slags but does not print the phase assemblage or run-state phase.
       standard_state: Na2O activity and Na(g) vapor pressure basis as printed in Table S-I
+      experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; equation coefficients as printed'
       values:
@@ -154,6 +162,7 @@ species:
       type: psat_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
       phase: solidified_gasifier_slag_selected_subsamples
+      experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; uncertainty as printed'
       values:
@@ -175,6 +184,7 @@ species:
       type: psat_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 1-6, table: S-I, note: 'Columns: ln(p(K(g))/Pa)=A+B/T; vapor pressure p(K(g))/Pa at 1273 K; activity a(K2O) at 1273 K.'}
       phase: solidified_gasifier_slag_subsamples
+      experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; equation coefficients as printed'
       values:
@@ -191,6 +201,7 @@ species:
       type: psat_series
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
       phase: solidified_gasifier_slag_selected_subsamples
+      experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
       units: 'pressure in Pa; temperature in K; activity dimensionless; uncertainty as printed'
       values:

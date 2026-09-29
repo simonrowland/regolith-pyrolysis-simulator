@@ -82,6 +82,15 @@ benches:
       published_page: 3710
       section: Experimental
       note: Samples evaporated from tungsten effusion cells.
+
+experiments:
+- experiment_id: stolyarova-1991-w-cell
+  bench_id: stolyarova-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 3710
+    section: Experimental
+    note: Samples evaporated from tungsten effusion cells.
 species:
   Ca:
     observations:
@@ -96,6 +105,7 @@ species:
       - 1993.0
       - 1993.0
       phase: CaO-SiO2 liquid oxide melt
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: atm as printed (P_Ca · 10^7)
       values:
@@ -257,6 +267,7 @@ species:
       - 1993.0
       - 1993.0
       phase: CaO-SiO2 liquid oxide melt
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: atm as printed (P_Ca · 10^7)
       values:
@@ -420,6 +431,7 @@ species:
       - 1993.0
       - 1993.0
       phase: CaO-SiO2 liquid oxide melt
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: atm as printed (P_CaO · 10^8)
       reason: >-
@@ -583,6 +595,7 @@ species:
       - 1993.0
       - 1993.0
       phase: CaO-SiO2 liquid oxide melt
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: atm as printed (P_CaO · 10^8)
       reason: >-
@@ -748,6 +761,7 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: atm as printed (P_SiO · 10^6)
       values:
@@ -893,6 +907,7 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: atm as printed (P_SiO · 10^6)
       values:
@@ -1040,6 +1055,7 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: atm as printed (P_SiO2 · 10^9)
       values:
@@ -1160,6 +1176,7 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: atm as printed (P_O · 10^10)
       values:
@@ -1306,6 +1323,7 @@ species:
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711, Eq. [2a]: "a_CaO = P_CaO/P°_CaO" (P° is the individual-oxide vapor pressure); whether the pure-oxide reference is solid or liquid is not stated.'
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: dimensionless activity as printed
       values:
@@ -1418,6 +1436,7 @@ species:
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure CaO reference for the Gibbs-Duhem comparison is not stated.'
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: dimensionless activity as printed
       values:
@@ -1529,6 +1548,7 @@ species:
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure CaO reference for the Belton-Fruehan comparison is not stated.'
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: dimensionless activity as printed
       values:
@@ -1660,6 +1680,7 @@ species:
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711, Eq. [2b]: "a_SiO2 = P_SiO2/P°_SiO2" (P° is the individual-oxide reference pressure); whether the pure-oxide reference is solid or liquid is not stated.'
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: dimensionless activity as printed
       values:
@@ -1773,6 +1794,7 @@ species:
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure SiO2 reference for the Gibbs-Duhem comparison is not stated.'
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: dimensionless activity as printed
       values:
@@ -1885,6 +1907,7 @@ species:
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
       standard_state: 'Unspecified condensed reference phase; p. 3711: "The integration limits were taken from the pure components up to corresponding compositions." The condensed phase of the pure SiO2 reference for the Belton-Fruehan comparison is not stated.'
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: dimensionless activity as printed
       values:
@@ -1995,6 +2018,7 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: kcal/mole as plotted
       values:
@@ -2049,6 +2073,7 @@ species:
       - 1823.0
       - 1933.0
       phase: binary oxide systems
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: species names as printed
       values:
@@ -2078,6 +2103,7 @@ species:
       - 1933.0
       phase: CaO-SiO2 liquid oxide melt
       standard_state: O2(g) partial pressure relative to ideal-gas standard at 1 bar
+      experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: Lg P_O2, atm as plotted
       values:
