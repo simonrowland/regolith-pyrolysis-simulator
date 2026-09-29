@@ -410,7 +410,11 @@ def _numeric_bounds(spec: KnobSpec) -> tuple[float, float]:
 
 
 def _log_scale(spec: KnobSpec) -> bool:
-    return bool(getattr(spec, "log", False) or getattr(spec, "log_scale", False))
+    return bool(
+        getattr(spec, "log", False)
+        or getattr(spec, "log_scale", False)
+        or spec.scale == "log"
+    )
 
 
 def _objective_mapping(scored: "ScoredResult") -> Mapping[str, float | None]:

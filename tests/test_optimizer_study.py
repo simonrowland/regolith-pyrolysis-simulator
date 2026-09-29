@@ -6766,8 +6766,11 @@ def _contains_key(value: Any, key: str) -> bool:
     if is_dataclass(value) and not isinstance(value, type):
         return any(_contains_key(getattr(value, field.name), key) for field in fields(value))
     return False
-def test_t155_tpe_and_nsga2_defer_scale_and_guard_metadata() -> None:
-    """Both Optuna strategies share this intentionally legacy-linear suggester."""
+
+
+@pytest.mark.parametrize("scale", ("log", "log10", "zero-inflated"))
+def test_suggest_value_uses_only_declared_log_scale(scale: str) -> None:
+    """Both Optuna strategies share this suggester; only `log` is logarithmic."""
     from simulator.optimize.recipe import GuardSpec, KnobSpec
     from simulator.optimize.strategy.bayesian import _suggest_value
 
@@ -6783,11 +6786,70 @@ def test_t155_tpe_and_nsga2_defer_scale_and_guard_metadata() -> None:
         kind="float",
         low=1.0,
         high=100.0,
-        scale="log",
+        scale=scale,
         guard=GuardSpec(parent_paths=(("parent",),), canonicalizer_id="test"),
     )
     assert _suggest_value(Trial(), spec) == pytest.approx(50.5)
-    assert calls == [("deferred", 1.0, 100.0, False)]
+    assert calls == [("deferred", 1.0, 100.0, spec.scale == "log")]
+
+
+def test_log_scale_sampling_is_uniform_in_log_bins() -> None:
+    optuna = pytest.importorskip("optuna")
+    from simulator.optimize.recipe import KnobSpec
+    from simulator.optimize.strategy.bayesian import _suggest_value
+
+    low, high = 1.0, 10.0
+    draw_count = 500
+    bin_count = 10
+    log_spec = KnobSpec(
+        path=("log_sample",),
+        kind="float",
+        low=low,
+        high=high,
+        scale="log",
+    )
+    linear_spec = KnobSpec(
+        path=("linear_sample",),
+        kind="float",
+        low=low,
+        high=high,
+        scale="linear",
+    )
+
+    def draw_samples(spec: KnobSpec) -> list[float]:
+        samples: list[float] = []
+        study = optuna.create_study(
+            direction="minimize",
+            sampler=optuna.samplers.RandomSampler(seed=12012),
+        )
+
+        def objective(trial) -> float:
+            sample = _suggest_value(trial, spec)
+            samples.append(sample)
+            return sample
+
+        study.optimize(objective, n_trials=draw_count, show_progress_bar=False)
+        return samples
+
+    def log_bin_counts(samples: list[float]) -> list[int]:
+        counts = [0] * bin_count
+        for sample in samples:
+            # Bounds 1–10 map to log10 interval [0, 1]; equal bins test
+            # uniformity in log space instead of in the original values.
+            log_sample = math.log10(sample)
+            assert 0.0 <= log_sample <= 1.0
+            bin_index = min(int(log_sample * bin_count), bin_count - 1)
+            counts[bin_index] += 1
+        return counts
+
+    log_counts = log_bin_counts(draw_samples(log_spec))
+    linear_counts = log_bin_counts(draw_samples(linear_spec))
+    expected_uniform_count = draw_count / bin_count
+
+    # A 1.5x allowance separates the near-uniform bins from the linear
+    # sampler's upper-decade pile-up while tolerating ordinary sample variance.
+    assert max(log_counts) < 1.5 * expected_uniform_count
+    assert linear_counts[-1] > 1.5 * expected_uniform_count
 
 
 def test_t155_search_provenance_round_trips_conditional_context() -> None:
