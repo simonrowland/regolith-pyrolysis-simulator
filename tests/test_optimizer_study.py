@@ -49,6 +49,7 @@ from simulator.optimize.objective import (
     ObjectiveVector,
     compute_objectives,
     furnace_amortization_cost_per_run,
+    objective_definitions,
 )
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.physics import physics_constraints_digest
@@ -5024,6 +5025,198 @@ def test_invalid_recipe_result_continues_and_counts_failure(tmp_path) -> None:
         row.failure_category is FailureCategory.INVALID_RECIPE
         for row in stored
     )
+
+
+@pytest.mark.parametrize(
+    ("bad_patch", "hours"),
+    [
+        pytest.param(
+            RecipePatch({("campaigns", "C0", "temp_range_C"): 900.0}),
+            1,
+            id="scalar-campaign-temperature-range",
+        ),
+        pytest.param(
+            RecipePatch(
+                {
+                    ("campaigns", "C0b_p_cleanup", "pO2_mbar"): 6.628,
+                    ("campaigns", "C0b_p_cleanup", "pO2_mbar_default"): 4.108,
+                    ("campaigns", "C0b_p_cleanup", "p_total_mbar_default"): 4.108,
+                }
+            ),
+            30,
+            id="runtime-oxygen-partial-above-total",
+        ),
+    ],
+)
+def test_bad_recipe_candidate_is_scored_and_study_reaches_budget(
+    tmp_path: Path,
+    bad_patch: RecipePatch,
+    hours: int,
+) -> None:
+    budget = 4
+    profile = yaml.safe_load(
+        Path("data/optimize_profiles/lunar_highland.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    feedstock = str(profile["feedstock"])
+    profile["run"]["hours"] = hours
+    profile["fidelities"][ANALYTICAL_BACKEND_SERIALIZATION_TOKEN]["hours"] = hours
+    bad_candidate_id = "fixed-000000"
+    bad_result = evaluate(
+        bad_patch,
+        feedstock,
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        profile=profile,
+        candidate_id=bad_candidate_id,
+    )
+    assert not bad_result.feasible, bad_result
+    assert bad_result.failure_category is FailureCategory.INVALID_RECIPE
+    assert bad_result.eval_spec is not None
+    assert bad_result.cache_key == cache_key(bad_result.eval_spec)
+    assert bad_result.run_reference is not None
+    assert bad_result.run_reference.backend_status == "unavailable"
+    assert bad_result.run_reference.backend_authoritative is not True
+    candidates = [
+        Candidate(
+            id=f"fixed-{index:06d}",
+            patch=(
+                bad_patch
+                if index == 0
+                else RecipePatch(
+                    {
+                        ("campaigns", "C0", "temp_range_C"):
+                            [900.0 + index, 940.0 + index]
+                    }
+                )
+            ),
+        )
+        for index in range(budget)
+    ]
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        if candidate_id == bad_candidate_id:
+            return bad_result
+        cached_result = _journal_cache_evaluator(
+            patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            **kwargs,
+        )
+        objectives = ObjectiveVector(
+            values=tuple(
+                ObjectiveValue(
+                    definition.metric,
+                    definition.sense,
+                    0.0,
+                    definition.units,
+                    ordinal=definition.ordinal,
+                )
+                for definition in objective_definitions(profile)
+            )
+        )
+        return replace(cached_result, objectives=objectives)
+
+    result = study.run(
+        profile,
+        feedstock,
+        _FixedCandidateStrategy(tuple(candidates)),
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        parallel=1,
+        budget=budget,
+        out_dir=tmp_path / "bad-recipe-budget",
+        evaluator=evaluator,
+    )
+
+    assert result.status == study.COMPLETED_STATUS
+    assert len(result.records) == budget
+    bad_result = next(
+        record for record in result.records if record.candidate_id == bad_candidate_id
+    )
+    assert not bad_result.feasible
+    assert bad_result.failure_category == FailureCategory.INVALID_RECIPE.value
+    assert bad_result.eval_spec is not None
+    assert bad_result.cache_key == cache_key(bad_result.eval_spec)
+
+
+def test_invalid_patch_without_artifacts_does_not_abort_study(tmp_path: Path) -> None:
+    budget = 4
+    bad_candidate_id = "fixed-000000"
+    bad_patch = RecipePatch(
+        {("campaigns", "C0b_p_cleanup", "p_total_mbar_default"): 4.108}
+    )
+    candidates = [
+        Candidate(
+            id=f"fixed-{index:06d}",
+            patch=(
+                RecipePatch(
+                    {
+                        ("campaigns", "C0", "temp_range_C"):
+                            [900.0 + index, 940.0 + index]
+                    }
+                )
+            ),
+        )
+        for index in range(budget)
+    ]
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        if candidate_id == bad_candidate_id:
+            return evaluate(
+                bad_patch,
+                feedstock,
+                fidelity,
+                profile=profile,
+                candidate_id=candidate_id,
+                schema=kwargs.get("schema"),
+                constraints=kwargs.get("constraints"),
+            )
+        return _journal_cache_evaluator(
+            patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            **kwargs,
+        )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        _FixedCandidateStrategy(tuple(candidates)),
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        parallel=1,
+        budget=budget,
+        out_dir=tmp_path / "invalid-patch-budget",
+        evaluator=evaluator,
+    )
+
+    assert result.status == study.COMPLETED_STATUS
+    assert len(result.records) == budget
+    bad_result = next(
+        record for record in result.records if record.candidate_id == bad_candidate_id
+    )
+    assert bad_result.failure_category == FailureCategory.INVALID_PATCH.value
+    assert bad_result.eval_spec is None
+    assert bad_result.cache_key is None
 
 
 def test_typed_physics_refusals_are_stored_and_study_continues(tmp_path) -> None:
