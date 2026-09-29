@@ -76,7 +76,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.pool import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
     PoolEvaluationRequest,
-    evaluate_batch,
+    _evaluate_batch,
     evaluate_request_supervised,
     resolve_eval_timeout_seconds,
 )
@@ -732,6 +732,7 @@ def run(
         provenance_mode = "a"
         if not pending_resume_candidates and evaluated == config.budget:
             provenance_mode = "r"
+    engine_worker_pool = None
     try:
         provenance_writer = _LockedLineWriter(provenance_path, provenance_mode, store)
         events_writer = _LockedLineWriter(events_path, journal_mode, store)
@@ -786,7 +787,7 @@ def run(
                     strategy=active_strategy,
                     staged_strategies=staged_strategies,
                 )
-            results, prefix_evals_in_batch = _evaluate_candidates(
+            results, prefix_evals_in_batch, engine_worker_pool = _evaluate_candidates(
                 candidates,
                 profile=loop_profile,
                 feedstock=config.feedstock,
@@ -800,6 +801,8 @@ def run(
                 definitions=definitions,
                 prefix_replay_cache=prefix_replay_cache,
                 per_eval_timeout_seconds=config.per_eval_timeout_seconds,
+                engine_worker_pool=engine_worker_pool,
+                retain_engine_worker_pool=True,
             )
             # Owner decision deferred: debit config.budget here if prefix evals join it.
             prefix_evals_run += prefix_evals_in_batch
@@ -890,6 +893,9 @@ def run(
             prefix_evals_run=prefix_evals_run,
         )
         raise
+    finally:
+        if engine_worker_pool is not None:
+            engine_worker_pool.close()
 
     failure_counts = _failure_counts(records)
     feasible = tuple(record for record in records if record.feasible)
@@ -2584,7 +2590,7 @@ def _run_exact_certification(
 
     for explore_record in certification_pool:
         candidate = _certification_candidate_from_record(explore_record)
-        results, _ = _evaluate_candidates(
+        results, _, _ = _evaluate_candidates(
             [candidate],
             profile=profile,
             feedstock=feedstock,
@@ -3362,7 +3368,9 @@ def _evaluate_candidates(
     prefix_replay_cache: dict[str, ScoredResult],
     skip_store_lookup: bool = False,
     per_eval_timeout_seconds: float | None = None,
-) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int]:
+    engine_worker_pool: Any = None,
+    retain_engine_worker_pool: bool = False,
+) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int, Any]:
     results: list[tuple[Candidate, ScoredResult, bool] | None] = [None] * len(candidates)
     misses: list[tuple[int, Candidate]] = []
     staged_prefixes: dict[str, ScoredResult] = {}
@@ -3449,7 +3457,7 @@ def _evaluate_candidates(
                     evaluator_kwargs=evaluator_kwargs,
                 )
             )
-        batch = evaluate_batch(
+        batch, engine_worker_pool = _evaluate_batch(
             requests,
             profile=profile,
             max_workers=parallel,
@@ -3458,36 +3466,51 @@ def _evaluate_candidates(
             schema=schema,
             constraints=constraints,
             per_eval_timeout_seconds=per_eval_timeout_seconds,
+            engine_worker_pool=engine_worker_pool,
+            retain_engine_worker_pool=retain_engine_worker_pool,
         )
-        for (index, candidate), scored in zip(misses, batch):
-            scored = _with_candidate_id(scored, candidate.id)
-            staged_prefix = staged_prefixes.get(candidate.id)
-            if staged_prefix is not None and scored.eval_spec is not None:
-                try:
-                    spec, _ = _build_eval_inputs(
-                        candidate.patch.validated(schema),
-                        feedstock,
-                        fidelity,
-                        profile,
-                        schema,
-                        constraints=constraints,
-                        conditional_context=_full_evaluation_conditional_context(
-                            candidate
-                        ),
-                    )
-                except ProfileValidationError as exc:
-                    if _is_stale_profile_refusal(exc):
-                        scored = _stale_profile_result(candidate.id, str(exc))
+        try:
+            for (index, candidate), scored in zip(misses, batch):
+                scored = _with_candidate_id(scored, candidate.id)
+                staged_prefix = staged_prefixes.get(candidate.id)
+                if staged_prefix is not None and scored.eval_spec is not None:
+                    try:
+                        spec, _ = _build_eval_inputs(
+                            candidate.patch.validated(schema),
+                            feedstock,
+                            fidelity,
+                            profile,
+                            schema,
+                            constraints=constraints,
+                            conditional_context=_full_evaluation_conditional_context(
+                                candidate
+                            ),
+                        )
+                    except ProfileValidationError as exc:
+                        if _is_stale_profile_refusal(exc):
+                            scored = _stale_profile_result(candidate.id, str(exc))
+                        else:
+                            raise
                     else:
-                        raise
-                else:
-                    scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
-            results[index] = (candidate, scored, False)
+                        scored = replace(
+                            scored,
+                            eval_spec=spec,
+                            cache_key=cache_key(spec),
+                        )
+                results[index] = (candidate, scored, False)
 
-    completed = tuple(result for result in results if result is not None)
-    if len(completed) != len(candidates):
-        raise RuntimeError("study evaluation ended without all candidate results")
-    return completed, prefix_evals_run
+            completed = tuple(result for result in results if result is not None)
+            if len(completed) != len(candidates):
+                raise RuntimeError("study evaluation ended without all candidate results")
+        except BaseException:
+            if retain_engine_worker_pool and engine_worker_pool is not None:
+                engine_worker_pool.close(cancel_pending=True)
+            raise
+    else:
+        completed = tuple(result for result in results if result is not None)
+        if len(completed) != len(candidates):
+            raise RuntimeError("study evaluation ended without all candidate results")
+    return completed, prefix_evals_run, engine_worker_pool
 
 
 def _ensure_staged_prefix_replay(

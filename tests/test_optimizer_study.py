@@ -37,6 +37,7 @@ from simulator.electrolysis import (
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize import cli as optimizer_cli
 from simulator.optimize import physics as physics_module
+from simulator.optimize import pool as optimizer_pool
 from simulator.optimize import study
 from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
 from simulator.optimize.evalspec import EvalSpec, cache_key
@@ -791,6 +792,55 @@ def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
     ]
     assert state_rows[-1]["strategy_state"] == dict(replay.strategy_state)
     assert state_rows[-1]["strategy_state"]["strategies"][0]["ask_cursor"] == 4
+
+
+def test_study_reuses_one_engine_worker_generation_across_batches(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    created_pools: list[Any] = []
+    submitted_pools: list[Any] = []
+    original_pool_type = optimizer_pool.EngineWorkerPool
+    original_submit = original_pool_type.submit
+
+    class RecordingEngineWorkerPool(original_pool_type):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            created_pools.append(self)
+
+    def record_submit(self: Any, *args: Any, **kwargs: Any) -> Any:
+        submitted_pools.append(self)
+        return original_submit(self, *args, **kwargs)
+
+    monkeypatch.setattr(optimizer_pool, "EngineWorkerPool", RecordingEngineWorkerPool)
+    monkeypatch.setattr(original_pool_type, "submit", record_submit)
+    budget = 4
+    parallel = 2
+    out = tmp_path / "one-worker-generation"
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=parallel,
+        budget=budget,
+        out_dir=out,
+        seed=7,
+    )
+
+    events = [
+        json.loads(line)
+        for line in (out / "study.events.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    asked = [row for row in events if row["event_kind"] == "candidate_asked"]
+    batch_count = len({row["batch_seq"] for row in asked})
+    assert len(result.records) == budget
+    # Each loop asks up to `parallel` candidates, so batches are ceil(budget / parallel).
+    assert batch_count == math.ceil(budget / parallel)
+    assert len(created_pools) == 1
+    assert {id(pool) for pool in submitted_pools} == {id(created_pools[0])}
+    assert created_pools[0]._closed
 
 
 def test_study_journal_replay_fails_closed_on_strategy_state_mismatch(
