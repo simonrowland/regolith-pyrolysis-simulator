@@ -1316,9 +1316,17 @@ def _validate_physics_key(row: sqlite3.Row, key: dict[str, Any]) -> None:
     raw = row["physics_key_bytes"]
     if raw is None:
         return
+    schema_version = row["physics_bucket_schema_version"]
+    if not isinstance(schema_version, str) or not schema_version:
+        raise ConversionError("physics bucket schema version missing")
     physics = json.loads(bytes(raw))
-    _expect_keys(physics, {"schema_version", "physics_bucket", "replay_scope"}, "physics_key")
-    if physics["schema_version"] != row["physics_bucket_schema_version"]:
+    physics = _expect_subset_keys(
+        physics,
+        {"physics_bucket", "replay_scope"},
+        {"schema_version"},
+        "physics_key",
+    )
+    if physics.get("schema_version", schema_version) != schema_version:
         raise ConversionError("physics bucket schema version mismatch")
     if sha256_bytes(bytes(raw)) != row["physics_bucket_sha256"]:
         raise ConversionError("physics bucket SHA mismatch")
