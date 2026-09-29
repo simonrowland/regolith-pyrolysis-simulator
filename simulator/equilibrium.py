@@ -500,8 +500,9 @@ class EquilibriumMixin:
             raw_intrinsic_fO2_log is None
             and redox_basis == 'ferrous_free_lower_bound'
         ):
-            # Surface release already used interface_pO2_bar. Do not turn
-            # the missing equilibrium into 0 or into the 100 bar clamp.
+            # ferrous-free scalar: surface release already used
+            # interface_pO2_bar (the gas pressure). Do not turn the
+            # missing equilibrium into 0 or into the 100 bar clamp.
             intrinsic_fO2_log = None
         else:
             intrinsic_fO2_log = float(raw_intrinsic_fO2_log)

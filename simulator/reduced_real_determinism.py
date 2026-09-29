@@ -282,6 +282,13 @@ def _authoritative_melt_fO2_log(sim: Any) -> float:
         value = getattr(reservoir, "melt_intrinsic_fO2_log", None)
         if value is None:
             value = getattr(getattr(sim, "melt", None), "melt_fO2_log", None)
+    absent = getattr(sim, "_ferrous_free_scalar_absent", None)
+    if value is None and callable(absent) and absent():
+        # ferrous-free scalar: a cache key cannot invent 0 or -9.
+        # There is no finite melt fO2 on this basis.
+        raise PT0InvalidControls(
+            "ferrous_free_lower_bound has no equilibrium fO2 for a PT-0 cache key"
+        )
     try:
         fO2_log = float(value)
     except (TypeError, ValueError) as exc:

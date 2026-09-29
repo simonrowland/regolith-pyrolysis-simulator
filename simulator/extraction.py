@@ -1819,7 +1819,14 @@ class ExtractionMixin:
         if not is_plant:
             electrolysis_controls['commit_empty_transition'] = True
         melt_fO2_log = self._current_melt_redox_fO2_log()
-        electrolysis_controls['melt_fO2_log'] = float(melt_fO2_log)
+        if melt_fO2_log is None and self._ferrous_free_scalar_absent():
+            # ferrous-free scalar: MRE keeps the absent melt equality.
+            # The provider and dispatch fO2 already accept None.
+            # Do not pass 0 or -9.
+            electrolysis_controls['melt_fO2_log'] = None
+        else:
+            melt_fO2_log = float(melt_fO2_log)
+            electrolysis_controls['melt_fO2_log'] = melt_fO2_log
         if is_plant and c5_allowed_oxides is not None:
             electrolysis_controls['allowed_oxides'] = c5_allowed_oxides
             from engines.builtin.metallothermic_step import (
@@ -1871,7 +1878,7 @@ class ExtractionMixin:
         kernel_result = self._dispatch_only(
             ChemistryIntent.ELECTROLYSIS_STEP,
             control_inputs=electrolysis_controls,
-            fO2_log=float(melt_fO2_log),
+            fO2_log=melt_fO2_log,
             fe_redox_policy='kress91_live',
         )
         diagnostic = dict(kernel_result.diagnostic or {})

@@ -946,3 +946,182 @@ def test_ferrous_free_split_and_per_hour_summary_publish_the_bound() -> None:
     assert exported["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
     assert exported["redox_domain"]["basis"] == "ferrous_free_lower_bound"
     json.dumps(summary, allow_nan=False)
+
+
+def test_ferrous_free_hour_does_not_float_the_absent_scalar() -> None:
+    """One step must finish, and every absent-scalar caller must stay flagged."""
+
+    from simulator.evaporation import EvaporationFluxRefusal
+    from simulator.reduced_real_determinism import (
+        PT0InvalidControls,
+        _authoritative_melt_fO2_log,
+    )
+    from simulator.runner import build_per_hour_summary
+
+    sim = _fully_ferric_sim()
+    expected = _ferrous_free_lower_bound_log10(
+        sim,
+        n_fe2o3_mol=2.0,
+        temperature_C=1400.0,
+    )
+    assert sim._melt_fO2_from_ledger() is None
+
+    snapshot = sim.step()
+    summary = build_per_hour_summary(sim, snapshot)
+    json.dumps(summary, allow_nan=False)
+
+    reservoir = sim.melt.oxygen_reservoir
+    exported = summary["fe_redox_split"]
+    assert sim._current_melt_redox_fO2_log() is None
+    assert exported["fO2_log"] is None
+    assert exported["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
+    assert exported["redox_domain"]["basis"] == "ferrous_free_lower_bound"
+    assert sim._last_melt_redox_liquidus_gate_diagnostic["source"] == (
+        "none:ferrous_free_lower_bound"
+    )
+    assert reservoir.interface_pO2_limiting_regime == (
+        "gas_side_ferrous_free_lower_bound"
+    )
+    assert reservoir.interface_pO2_bar == pytest.approx(
+        reservoir.headspace_transport_pO2_bar
+    )
+    assert reservoir.interface_pO2_bar != pytest.approx(100.0)
+    assert reservoir.melt_intrinsic_fO2_log is None
+    assert sim._last_oxygen_interface_diagnostic[
+        "redox_buffer_capacity_mol_per_ln_fO2"
+    ] is None
+    assert sim._last_native_fe_saturation_event["native_fe_event"] == (
+        "skipped_ferrous_free_lower_bound"
+    )
+    assert _oxide_mol(sim, "FeO") == 0.0
+    assert _oxide_mol(sim, "Fe2O3") == pytest.approx(2.0)
+
+    with pytest.raises(EvaporationFluxRefusal) as curve_refusal:
+        sim._freeze_gate_curve()
+    assert curve_refusal.value.diagnostic["source"] == (
+        "none:ferrous_free_lower_bound"
+    )
+    with pytest.raises(EvaporationFluxRefusal) as key_refusal:
+        sim._freeze_gate_redox_key_fO2_log()
+    assert key_refusal.value.diagnostic["source"] == (
+        "none:ferrous_free_lower_bound"
+    )
+    with pytest.raises(EvaporationFluxRefusal) as factor_refusal:
+        sim._melt_redox_liquid_fraction_factor(1400.0 + 273.15)
+    assert factor_refusal.value.diagnostic["source"] == (
+        "none:ferrous_free_lower_bound"
+    )
+
+    shadow = sim._oxygen_shadow_transfer()
+    assert shadow["status"] == "ferrous_free_lower_bound"
+    assert shadow["transfer_o2_mol"] == 0.0
+
+    extent = sim._compute_native_fe_saturation_extent()
+    assert extent["native_fe_saturation"] is False
+    assert extent["native_fe_frac"] == 0.0
+
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    sim._melt_redox_gate_authority_this_tick = None
+    sim._record_phase_context_diagnostic("ferrous_free_probe")
+    phase = sim._last_phase_context_diagnostic["ferrous_free_probe"]
+    assert phase["source"] == "none:ferrous_free_lower_bound"
+    assert phase["status"] == "unavailable"
+
+    sim.campaign_mgr.o2_bubbler_controls = lambda _campaign: {
+        "o2_bubbler_kg_per_hr": 1.0,
+        "o2_bubbler_eta_absorb_default": 1.0,
+        "o2_bubbler_target_fO2_log": -5.0,
+    }
+    bubbler = sim._apply_o2_bubbler()
+    assert bubbler["reason"] == "ferrous_free_lower_bound"
+    assert bubbler["injected_mol"] == 0.0
+
+    source = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test": 1.0}
+    )
+    assert source.redox_source_skip_reason == "ferrous_free_lower_bound"
+    assert _oxide_mol(sim, "FeO") == 0.0
+
+    class _Result:
+        def __init__(self, liquid_fraction):
+            self.liquid_fraction = liquid_fraction
+            self.warnings: list[str] = []
+
+    sim._stage0_sulfur_input_ppm = lambda: 10.0
+    sim._attach_post_equilibrium_sulfsat(_Result(None))
+    assert sim._last_melt_redox_liquid_fraction_diagnostic["source"] == (
+        "none:ferrous_free_lower_bound"
+    )
+    assert sim._last_sulfur_saturation_result.calibration_status == (
+        "not_evaluated"
+    )
+    sim._attach_post_equilibrium_sulfsat(_Result(1.0))
+    assert sim._last_sulfur_saturation_result.not_evaluated_reason == (
+        "ferrous_free_lower_bound"
+    )
+
+    with pytest.raises(PT0InvalidControls, match="ferrous_free_lower_bound"):
+        _authoritative_melt_fO2_log(sim)
+
+    fresh = _fully_ferric_sim()
+    assert fresh._melt_fO2_from_ledger() is None
+    calls: list[dict] = []
+
+    def _equilibrate(**kwargs):
+        calls.append(kwargs)
+        raise AssertionError("phase engine must not receive an invented fO2")
+
+    fresh.backend.is_available = lambda: True
+    fresh.backend.equilibrate = _equilibrate
+    fresh._get_equilibrium()
+    assert calls == []
+    assert fresh._current_melt_redox_fO2_log() is None
+
+    from simulator.mre_reproduction import MREReproductionInterval
+    from simulator.runner import _apply_sio_wall_sweep_controls
+
+    captured_mre: list[dict] = []
+
+    def _stop_mre(
+        intent,
+        *,
+        control_inputs,
+        fO2_log=None,
+        fe_redox_policy="intrinsic",
+        temperature_C_override=None,
+    ):
+        captured_mre.append({
+            "melt_fO2_log": control_inputs.get("melt_fO2_log", "MISSING"),
+            "fO2_log": fO2_log,
+        })
+        raise RuntimeError("mre_dispatch_stop")
+
+    mre_sim = _fully_ferric_sim()
+    mre_sim._dispatch_only = _stop_mre
+    with pytest.raises(RuntimeError, match="mre_dispatch_stop"):
+        mre_sim._execute_mre_interval(
+            MREReproductionInterval(
+                start_h=0.0,
+                end_h=1.0,
+                dt_h=1.0,
+                applied_current_A=0.0,
+                applied_voltage_V=0.0,
+                temperature_C=float(mre_sim.melt.temperature_C),
+                pO2_bar=1.0e-8,
+                source_locator="r7b-ferrous-free",
+            ),
+            execution_origin="literature-reproduction",
+        )
+    assert captured_mre[0]["melt_fO2_log"] is None
+    assert captured_mre[0]["fO2_log"] is None
+
+    sweep = _fully_ferric_sim()
+    _apply_sio_wall_sweep_controls(sweep, pO2_mbar=1.0)
+    assert sweep.melt.oxygen_reservoir.melt_intrinsic_fO2_log is None
+    assert sweep._current_melt_redox_fO2_log() is None
+
+    assert reservoir.shadow_oxygen_transfer["status"] == (
+        "ferrous_free_lower_bound"
+    )
+    assert reservoir.shadow_oxygen_transfer["requested_transfer_o2_mol"] == 0.0
+    assert reservoir.shadow_oxygen_transfer["capacity_mol_per_ln_fO2"] is None
