@@ -424,8 +424,8 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
 def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     _openimcc_or_skip()
     from dataclasses import replace
+    import openimcc
     from openimcc import label_research_datapack, load_datapack
-    from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
 
     fixture = json.loads("\n".join(
         line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
@@ -434,7 +434,7 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     row = fixture["rows"][0]
     composition, basis_type = COMPOSITIONS[row["composition"]]
     pack = load_datapack()
-    baseline = evaluate_imcc(
+    baseline = openimcc.evaluate(
         composition, row["temperature_K"], pack, basis_type=basis_type
     )
     baseline_hex = {
@@ -447,7 +447,7 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     mutated_pack = label_research_datapack(
         kernel, model_id="IMCC-SF04-mutation", coverage="mutation-probe"
     )
-    mutated = evaluate_imcc(
+    mutated = openimcc.evaluate(
         composition, row["temperature_K"], mutated_pack, basis_type=basis_type
     )
     mutated_hex = {

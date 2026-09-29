@@ -23,8 +23,8 @@ from enum import StrEnum
 class Engine(StrEnum):
     """Closed first-class engine tokens. Not derived from resolve_backend.
 
-    Includes IMCC-SF04 / IMCC-SF04-EXT (simulator/melt_backend/imcc_sf04/)
-    alongside the analytical, builtin, and melt-engine identities.
+    Retired IMCC-SF04 / IMCC-SF04-EXT values remain so historical ledgers
+    load. New IMCC predictions use OPENIMCC.
     """
 
     INTERNAL_ANALYTICAL = "internal-analytical"
@@ -36,6 +36,7 @@ class Engine(StrEnum):
     THERMOENGINE = "thermoengine"
     VAPOROCK = "vaporock"
     MAGEMIN = "magemin"
+    # Retired producer identities; retained for historical ledger decoding.
     IMCC_SF04 = "imcc_sf04"
     IMCC_SF04_EXT = "imcc_sf04_ext"
     OPENIMCC = "openimcc"

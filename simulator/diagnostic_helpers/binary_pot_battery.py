@@ -60,23 +60,12 @@ BATTERY_ENGINE_NAMES: tuple[str, ...] = (
     "vaporock",
     "magemin",
     "cached-real",
-    "imcc_sf04",
-    "imcc_sf04_ext",
     "openimcc",
 )
-LEGACY_IMCC_ENGINE_NAMES: tuple[str, ...] = ("imcc_sf04", "imcc_sf04_ext")
 OPENIMCC_ENGINE_NAMES: tuple[str, ...] = ("openimcc",)
-IMCC_ENGINE_NAMES: tuple[str, ...] = (*LEGACY_IMCC_ENGINE_NAMES, *OPENIMCC_ENGINE_NAMES)
-IMCC_MODEL_IDS: dict[str, str] = {
-    "imcc_sf04": "IMCC-SF04",
-    "imcc_sf04_ext": "IMCC-SF04-EXT",
-}
-IMCC_DATAPACK_LABELS: dict[str, str] = {
-    "imcc_sf04": "data/melt_activity/imcc/imcc-sf04-v1.0.2.json",
-    "imcc_sf04_ext": "data/melt_activity/imcc/imcc-sf04-ext-v4.json",
-}
+IMCC_ENGINE_NAMES: tuple[str, ...] = OPENIMCC_ENGINE_NAMES
 OPENIMCC_MODEL_IDS: dict[str, str] = {"openimcc": "IMCC-SF04"}
-ALL_IMCC_MODEL_IDS: dict[str, str] = {**IMCC_MODEL_IDS, **OPENIMCC_MODEL_IDS}
+ALL_IMCC_MODEL_IDS: dict[str, str] = OPENIMCC_MODEL_IDS
 MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
 ARM_HEADLINE = "headline"
 ARM_QUALIFICATION = "qualification"
@@ -160,8 +149,6 @@ _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
     "vaporock": 70.0,
     "magemin": 20.0,
     "cached-real": 30.0,
-    "imcc_sf04": 15.0,
-    "imcc_sf04_ext": 15.0,
     "openimcc": 15.0,
 }
 
@@ -1710,353 +1697,6 @@ def _solve_cell_oxygen_balance(
     return float(pO2_bar), pressures, balance, fraction, info
 
 
-class _ImccBatteryBackend:
-    """Thin MeltBackend-shaped wrapper around ``openimcc.evaluate``.
-
-    Not registered in ``simulator.backends``: IMCC is a diagnostic shadow
-    and has no ledger authority. The engine arm is the first caller.
-    """
-
-    supports_intrinsic_fO2 = False
-
-    def __init__(self, engine_name: str) -> None:
-        if engine_name not in IMCC_MODEL_IDS:
-            raise BinaryPotBatteryError(f"unknown IMCC engine {engine_name!r}")
-        self.engine_name = engine_name
-        self.model_id = IMCC_MODEL_IDS[engine_name]
-        self._pack: Any = None
-        self._gas: Any = None
-        self._gas_error: str | None = None
-        self._identity: dict[str, str] = {
-            "name": self.model_id,
-            "version": "",
-            "digest": "",
-        }
-        self._load()
-
-    def _load(self) -> None:
-        from simulator.melt_backend.openimcc_bridge import _require_openimcc
-
-        openimcc = _require_openimcc()
-        from importlib import resources
-
-        pack_name = (
-            "imcc-sf04-v1.0.2.json"
-            if self.engine_name == "imcc_sf04"
-            else "imcc-sf04-ext-v4.json"
-        )
-        pack_resource = resources.files("openimcc").joinpath(
-            "data", "packs", pack_name
-        )
-        with resources.as_file(pack_resource) as pack_path:
-            pack = openimcc.load_datapack(pack_path)
-        self._pack = pack
-        self._identity = {
-            "name": str(pack.model_id),
-            "version": str(pack.version),
-            "digest": str(
-                getattr(pack.kernel_datapack, "published_manifest_sha256", "") or ""
-            ),
-            "model_id": str(pack.model_id),
-                "datapack": IMCC_DATAPACK_LABELS[self.engine_name],
-        }
-        try:
-            from simulator.melt_backend.imcc_sf04.gas import load_gas_datapack
-
-            self._gas = load_gas_datapack()
-            self._gas_error = None
-        except Exception as exc:  # noqa: BLE001 - gas is optional; activities still run
-            self._gas = None
-            self._gas_error = f"{type(exc).__name__}: {exc}"
-
-    def equilibrate(
-        self,
-        temperature_C: float,
-        composition_kg: Mapping[str, float] | None = None,
-        fO2_log: float | None = None,
-        pressure_bar: float = 1.0e-6,
-        *,
-        composition_mol: Mapping[str, float] | None = None,
-        po2_request: Po2Request | None = None,
-        **_unused: object,
-    ) -> Any:
-        from types import SimpleNamespace
-
-        import openimcc
-        from openimcc.kernel import ImccRefusal
-
-        del pressure_bar
-        if self._pack is None:
-            raise RuntimeError("IMCC datapack failed to load")
-        if composition_mol:
-            composition = {
-                str(name): float(amount)
-                for name, amount in composition_mol.items()
-                if float(amount) > 0.0
-            }
-            basis_type = "mol"
-        else:
-            composition = {
-                str(name): float(mass_kg) * 100.0
-                for name, mass_kg in dict(composition_kg or {}).items()
-                if float(mass_kg) > 0.0
-            }
-            basis_type = "wt"
-        total = sum(composition.values())
-        temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
-        enable_sp = self.engine_name == "imcc_sf04_ext"
-        from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
-
-        result = evaluate_imcc(
-            composition,
-            temperature_K,
-            self._pack,
-            basis=total if total > 0.0 else None,
-            basis_type=basis_type,
-            enable_sp_extension=enable_sp,
-            allow_extrapolation=True,
-            allow_out_of_envelope=True,
-        )
-        activities: dict[str, float] = {}
-        for name, value in zip(
-            result.parent_oxides, result.parent_activity, strict=True
-        ):
-            number = _finite_float(value)
-            if number is not None and number > 0.0:
-                activities[str(name)] = number
-        if composition_mol is None:
-            from simulator.accounting.formulas import resolve_species_formula
-
-            composition_mol = {
-                name: mass / resolve_species_formula(name).molar_mass_kg_per_mol()
-                for name, mass in (composition_kg or {}).items()
-                if float(mass) > 0.0
-            }
-        gammas, gamma_details = _imcc_activity_coefficient_reports(
-            activities, composition_mol
-        )
-        notices: list[dict[str, Any]] = []
-        if result.extrapolated:
-            notices.append(
-                {
-                    "kind": "imcc_temperature_extrapolated",
-                    "authority": AUTHORITY_EXTRAPOLATED,
-                    "reason": "T outside datapack T_domain_K; evaluate(allow_extrapolation=True)",
-                }
-            )
-        envelope = getattr(getattr(result, "labels", None), "envelope_status", None)
-        if envelope == "outside_validated":
-            notices.append(
-                {
-                    "kind": "imcc_composition_outside_validated_envelope",
-                    "authority": AUTHORITY_EXTRAPOLATED,
-                    "reason": "X_Me2O above the validated 0.5 bound; evaluate(allow_out_of_envelope=True)",
-                }
-            )
-        from simulator.melt_backend.openimcc_bridge import (
-            imcc_complex_saturation_notice,
-        )
-
-        saturation_notice = imcc_complex_saturation_notice(
-            tuple(getattr(getattr(result, "labels", None), "flags", ()) or ()),
-            getattr(getattr(result, "labels", None), "acid_sink_ratio", None),
-        )
-        if saturation_notice is not None:
-            notices.append(saturation_notice)
-        pressures: dict[str, float] = {}
-        gas_error: str | None = None
-        if self._gas is None:
-            gas_error = self._gas_error or "imcc_gas_datapack_unavailable"
-            if (
-                po2_request is not None
-                and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
-            ):
-                raise _OxygenBalanceRefusal(
-                    "imcc_gas_datapack_unavailable",
-                    gas_error,
-                )
-        else:
-            try:
-                from simulator.melt_backend.imcc_sf04.gas import evaluate_gas
-
-                if (
-                    po2_request is not None
-                    and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
-                ):
-                    cell_material = po2_request.cell_material
-                    try:
-                        from openimcc import (
-                            oxygen_balance_from_pressure_model,
-                            oxygen_balance_species_metadata,
-                        )
-                    except (ImportError, AttributeError) as exc:
-                        from simulator.melt_backend.openimcc_bridge import (
-                            OPENIMCC_RECORDED_PIN,
-                        )
-
-                        raise _OxygenBalanceRefusal(
-                            "openimcc_oxygen_balance_unavailable",
-                            "installed openimcc does not expose the generic "
-                            "oxygen-balance core; remedy: install the recorded pin "
-                            f"{OPENIMCC_RECORDED_PIN}",
-                        ) from exc
-
-                    from simulator.melt_backend.imcc_sf04.gas import _SF04_REACTIONS
-
-                    try:
-                        species = oxygen_balance_species_metadata(
-                            {
-                                name: parent or None
-                                for name, (parent, _n_gas, _n_o2)
-                                in _SF04_REACTIONS.items()
-                            }
-                        )
-                    except Exception as exc:  # noqa: BLE001 - typed gas refusal
-                        raise _OxygenBalanceRefusal(
-                            "imcc_gas_oxygen_balance_failed",
-                            "cannot derive oxygen-balance metadata for VapoRock "
-                            f"species: {exc}",
-                        ) from exc
-                    missing_species = set(_SF04_REACTIONS) - set(species)
-                    if missing_species:
-                        missing = sorted(missing_species)[0]
-                        raise _OxygenBalanceRefusal(
-                            "imcc_gas_oxygen_balance_failed",
-                            f"VapoRock species {missing!r} has no oxygen-balance metadata",
-                        )
-
-                    for name, (_parent, n_gas, n_o2) in _SF04_REACTIONS.items():
-                        expected = (
-                            -n_o2 / n_gas
-                            if _parent
-                            else (1.0 if name == "O2" else 0.5)
-                        )
-                        if not math.isclose(
-                            species[name].pO2_exponent, expected, abs_tol=1e-12
-                        ):
-                            raise _OxygenBalanceRefusal(
-                                "imcc_gas_oxygen_balance_failed",
-                                f"VapoRock reaction exponent for species {name!r} "
-                                "does not match formula metadata",
-                            )
-
-                    def pressure_model(logp: float) -> Mapping[str, float]:
-                        return evaluate_gas(
-                            activities,
-                            temperature_K,
-                            10.0**logp,
-                            self._gas,
-                            parent_oxides=result.parent_oxides,
-                            allow_extrapolation=True,
-                        )
-
-                    if cell_material is None:
-                        try:
-                            po2_bar, gas_bar, balance = oxygen_balance_from_pressure_model(
-                                pressure_model, species, bracket=(-30.0, 0.0)
-                            )
-                        except Exception as exc:  # noqa: BLE001 - preserve typed solver refusal
-                            raise _OxygenBalanceRefusal(
-                                str(getattr(exc, "code", "") or "imcc_gas_oxygen_balance_failed"),
-                                str(exc),
-                            ) from exc
-                        cell_fraction = 0.0
-                        cell_info = {
-                            "cell_material": None,
-                            "cell_oxide_flux_fraction": 0.0,
-                            "buffer_pinned": False,
-                            "buffer_pO2_bar": None,
-                        }
-                    else:
-                        po2_bar, gas_bar, balance, cell_fraction, cell_info = (
-                            _solve_cell_oxygen_balance(
-                                pressure_model,
-                                species,
-                                temperature_K=temperature_K,
-                                cell_material=cell_material,
-                                oxygen_balance_from_pressure_model=(
-                                    oxygen_balance_from_pressure_model
-                                ),
-                            )
-                        )
-                    solved_notice = {
-                            "kind": "fo2_oxygen_balance_effusion_solved",
-                            "pO2_bar": float(po2_bar),
-                            "relative_residual": float(balance["residual"]),
-                            "bracket_log10_bar": list(balance["bracket"]),
-                            "dominant_O_carriers": list(
-                                balance["dominant_O_carriers"]
-                            ),
-                            "dominant_metal_carriers": list(
-                                balance["dominant_metal_carriers"]
-                            ),
-                            "cell_material": cell_material,
-                            "cell_oxide_flux_fraction": float(cell_fraction),
-                            "buffer_pinned": bool(cell_info["buffer_pinned"]),
-                            "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
-                        }
-                    if cell_material is not None:
-                        solved_notice["cell_oxide_janaf_sources"] = cell_info[
-                            "cell_oxide_janaf_sources"
-                        ]
-                    notices.append(solved_notice)
-                else:
-                    fo2_bar = (
-                        10.0 ** float(fO2_log)
-                        if fO2_log is not None and math.isfinite(float(fO2_log))
-                        else 10.0 ** _DEFAULT_FO2_LOG
-                    )
-                    gas_bar = evaluate_gas(
-                        activities,
-                        temperature_K,
-                        fo2_bar,
-                        self._gas,
-                        parent_oxides=result.parent_oxides,
-                        allow_extrapolation=True,
-                    )
-                for name, value in dict(gas_bar).items():
-                    number = _finite_float(value)
-                    if number is not None and number > 0.0:
-                        pressures[str(name)] = number * PA_PER_BAR
-            except _OxygenBalanceRefusal:
-                raise
-            except ImccRefusal as exc:
-                gas_error = f"{getattr(exc, 'code', type(exc).__name__)}: {exc}"
-            except Exception as exc:  # noqa: BLE001 - gas is optional
-                gas_error = f"{type(exc).__name__}: {exc}"
-        if gas_error:
-            notices.append(
-                {
-                    "kind": "imcc_gas_unavailable",
-                    "authority": None,
-                    "reason": gas_error,
-                }
-            )
-        labels = getattr(result, "labels", None)
-        identity = dict(getattr(labels, "identity", None) or {})
-        diagnostics = {
-            "imcc_model_id": identity.get("model_id") or self.model_id,
-            "imcc_datapack_version": identity.get("datapack_version")
-            or self._identity.get("version"),
-            "imcc_extrapolated": bool(result.extrapolated),
-            "imcc_envelope_status": envelope,
-            "imcc_notices": notices,
-        }
-        return SimpleNamespace(
-            status="ok",
-            diagnostics=diagnostics,
-            warnings=[],
-            activity_coefficients=activities,
-            reported_activity_coefficients=gammas,
-            activity_coefficient_details=gamma_details,
-            vapor_pressures_Pa=pressures,
-            liquid_fraction=1.0,
-            phase_assemblage_available=True,
-            imcc_notices=notices,
-            imcc_model_id=identity.get("model_id") or self.model_id,
-        )
-
-
 # ---------------------------------------------------------------------------
 # openimcc battery adapter
 # ---------------------------------------------------------------------------
@@ -2970,8 +2610,6 @@ def _open_resolved_backend(name: str) -> Any:
 
     if name in OPENIMCC_ENGINE_NAMES:
         return _OpenImccBatteryBackend(name)
-    if name in LEGACY_IMCC_ENGINE_NAMES:
-        return _ImccBatteryBackend(name)
     if name == "vaporock":
         return open_warm_vaporock_backend(warm_pool_size=1)
     if name == "magemin":
@@ -3775,18 +3413,6 @@ def qualification_section(
             ],
             "residuals_vs_imcc": rows_vs_imcc[:20],
             "residuals_vs_vaporock": rows_vs_vaporock[:20],
-            "residual_shift_vs_imcc": _residual_shift_in_vs_out_of_band(
-                headline_residuals,
-                qual_residuals,
-                engine=name,
-                peer="imcc_sf04",
-            ),
-            "residual_shift_vs_imcc_ext": _residual_shift_in_vs_out_of_band(
-                headline_residuals,
-                qual_residuals,
-                engine=name,
-                peer="imcc_sf04_ext",
-            ),
             "residual_shift_vs_vaporock": _residual_shift_in_vs_out_of_band(
                 headline_residuals,
                 qual_residuals,
@@ -4324,8 +3950,6 @@ def _render_qualification_markdown(
     for name in engine_names:
         block = per_engine.get(name) or {}
         for key, peer in (
-            ("residual_shift_vs_imcc", "imcc_sf04"),
-            ("residual_shift_vs_imcc_ext", "imcc_sf04_ext"),
             ("residual_shift_vs_vaporock", "vaporock"),
         ):
             shift = block.get(key) or {}

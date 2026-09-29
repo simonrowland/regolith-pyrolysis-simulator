@@ -2893,7 +2893,7 @@ def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -
         composition = obs.identity.composition
         assert composition is not None and composition.is_unknown
         assert "partial_composition" in (composition.reason or "")
-        prediction = predict_with_engine(Engine.IMCC_SF04, obs)
+        prediction = predict_with_engine(Engine.OPENIMCC, obs)
         assert prediction.execution.state is ExecutionState.NOT_PROBED
         assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
         assert prediction.requested_composition == composition

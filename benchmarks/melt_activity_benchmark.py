@@ -395,7 +395,7 @@ def execute_engine(
 
 
 class ImccEngine:
-    """Published or explicitly labelled research IMCC-SF04 adapter."""
+    """Use openimcc to evaluate published or labelled research IMCC-SF04 packs."""
 
     def __init__(
         self,
@@ -479,8 +479,8 @@ class ImccEngine:
             ImccNonconvergenceError,
             ImccRefusal,
             ImccTOutsideDatapackDomainError,
+            evaluate,
         )
-        from simulator.melt_backend.imcc_sf04.adapter import evaluate
 
         pack = self._load()
         try:
@@ -517,7 +517,7 @@ class ImccEngine:
         details: dict[str, Any] = {
             "model_id": labels.identity["model_id"],
             "datapack_version": labels.identity["datapack_version"],
-            "trust": labels.trust,
+            "trust": "internal-analytical",
             "envelope_status": labels.envelope_status,
             "pack_sha256": _imcc_pack_sha256(self.pack_path),
             "observable_family": "activity",

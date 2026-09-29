@@ -46,7 +46,7 @@ _REQUIRED_ENGINES: frozenset[str] = frozenset(
     {'alphamelts', 'thermoengine', 'vaporock'}
 )
 _OPTIONAL_ENGINES: frozenset[str] = frozenset(
-    {'magemin', 'imcc_sf04', 'imcc_sf04_ext'}
+    {'magemin', 'openimcc'}
 )
 _ALLOWED_ENGINES: frozenset[str] = _REQUIRED_ENGINES | _OPTIONAL_ENGINES
 
