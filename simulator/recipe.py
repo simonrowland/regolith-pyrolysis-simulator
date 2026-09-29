@@ -605,6 +605,7 @@ class RecipeSchema:
             high=950,
             units="C",
             bounds_source="setpoints:campaigns.C0.temp_range_C",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C0.dT_dt_C_per_hr",
@@ -722,6 +723,7 @@ class RecipeSchema:
             high=20,
             units="C/hr",
             bounds_source="setpoints:campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.p_total_mbar",

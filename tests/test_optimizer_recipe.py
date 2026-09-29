@@ -116,10 +116,35 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     identity_digest = hashlib.sha256(
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
-    # Identity digest follows the C2 pressure constraints through the bounds digest.
-    assert identity_digest == (
+    c3_list_shaped_paths = {
+        ("campaigns", "C0", "temp_range_C"),
+        (
+            "campaigns",
+            "C2A_continuous",
+            "dT_dt_C_per_hr",
+            "early_ramp_1050_1320C",
+        ),
+    }
+    legacy_identity = dict(identity)
+    legacy_identity["search_knob_paths"] = [
+        ".".join(spec.path)
+        for spec in schema.allowlist
+        if spec.search_enabled or spec.path in c3_list_shaped_paths
+    ]
+    assert identity["search_knob_paths"] == [
+        path
+        for path in legacy_identity["search_knob_paths"]
+        if tuple(path.split(".")) not in c3_list_shaped_paths
+    ]
+    legacy_identity_digest = hashlib.sha256(
+        canonical_json_dumps(legacy_identity).encode()
+    ).hexdigest()
+    # Reconstruct the C2 search surface so its identity remains pinned while
+    # C3's two removed list-shaped paths derive the current identity movement.
+    assert legacy_identity_digest == (
         "ca70bad3a0f62a72d0bb470b08ce742ecbd04614187e2953cba094f7ed952b44"
     )
+    assert identity_digest != legacy_identity_digest
     assert identity_digest != (
         "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
     )
@@ -468,6 +493,36 @@ def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable() -> None:
     ) not in {spec.path for spec in schema.allowlist}
 
 
+def test_c3_list_shaped_fields_are_not_searched_or_scalar_written() -> None:
+    schema = RecipeSchema()
+    c0_temp_range = ("campaigns", "C0", "temp_range_C")
+    c2a_early_rate_band = (
+        "campaigns",
+        "C2A_continuous",
+        "dT_dt_C_per_hr",
+        "early_ramp_1050_1320C",
+    )
+    c0_scalar_rate = ("campaigns", "C0", "dT_dt_C_per_hr")
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    assert c0_temp_range not in search_paths
+    assert c2a_early_rate_band not in search_paths
+    assert c0_scalar_rate in search_paths
+    rate_spec = schema.spec_for(c0_scalar_rate)
+    rendered = schema.to_setpoints_patch(
+        RecipePatch({c0_scalar_rate: rate_spec.low}).validated(schema)
+    )
+
+    assert "temp_range_C" not in rendered["campaigns"]["C0"]
+    loaded = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        setpoints_patch=rendered,
+    )._session_config().setpoints
+    c0_loaded_temp_range = loaded["campaigns"]["C0"]["temp_range_C"]
+    assert isinstance(c0_loaded_temp_range, list)
+    assert len(c0_loaded_temp_range) == 2
+
+
 def test_numerical_depletion_tolerance_is_runtime_only_not_searchable() -> None:
     schema = RecipeSchema()
     tolerance_paths = {
@@ -534,11 +589,31 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     schema = RecipeSchema()
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
+    c3_list_shaped_paths = {
+        ("campaigns", "C0", "temp_range_C"),
+        (
+            "campaigns",
+            "C2A_continuous",
+            "dT_dt_C_per_hr",
+            "early_ramp_1050_1320C",
+        ),
+    }
+    legacy_paths = [
+        ".".join(spec.path)
+        for spec in unpinned.allowlist
+        if spec.search_enabled or spec.path in c3_list_shaped_paths
+    ]
 
     assert unpinned is schema
-    assert len(paths) == 67
+    assert len(legacy_paths) == 67
+    assert len(paths) == len(legacy_paths) - len(c3_list_shaped_paths)
+    assert paths == [
+        path
+        for path in legacy_paths
+        if tuple(path.split(".")) not in c3_list_shaped_paths
+    ]
     assert (
-        hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
+        hashlib.sha256(canonical_json_dumps(legacy_paths).encode("utf-8")).hexdigest()
         == "1bc920bf1a0c96b9d4dd0f9679cf9d5495478f79fa6d56294d53a9cd6e7d5c78"
     )
     spec, _ = _build_eval_inputs(
