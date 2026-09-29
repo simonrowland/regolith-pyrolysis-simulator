@@ -1515,30 +1515,77 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
     row = json.loads(scratch.read_text(encoding="utf-8"))["hand_rows"][0]
     composition_wt = {"K2O": float(row["K2O_wt_pct"]), "SiO2": float(row["SiO2_wt_pct"])}
     composition_kg, composition_mol = composition_kg_and_mol(composition_wt)
+    import openimcc
+    import openimcc.gas as openimcc_gas
+    from openimcc import IMCC_GAS_CHANNEL_SPECIES, evaluate
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
 
     monkeypatch.delenv("OPENIMCC_VAPOROCK_ROOT", raising=False)
     packaged = _OpenImccBatteryBackend("openimcc")
+    monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(VAPOROCK_ROOT))
+    mutated = _OpenImccBatteryBackend("openimcc")
+    temperature_K = float(row["T_K"])
+    melt = evaluate(
+        composition_mol,
+        temperature_K,
+        packaged._pack,
+        basis_type="mol",
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    packaged_channels = dict(
+        openimcc_gas._default_reactions(melt.parent_oxides, packaged._gas)
+    )
+    vaporock_channels = dict(
+        openimcc_gas._default_reactions(melt.parent_oxides, mutated._gas)
+    )
+    common_channels = tuple(
+        name
+        for name in IMCC_GAS_CHANNEL_SPECIES
+        if name in packaged_channels
+        and name in vaporock_channels
+        and packaged_channels[name] == vaporock_channels[name]
+        and f"{name}(g)" in packaged._gas.gas_df.index
+        and f"{name}(g)" in mutated._gas.gas_df.index
+        and (
+            not packaged_channels[name][0]
+            or (
+                packaged_channels[name][0] in melt.parent_oxides
+                and f"{packaged_channels[name][0]}(l)"
+                in packaged._gas.oxide_df.index
+                and f"{packaged_channels[name][0]}(l)" in mutated._gas.oxide_df.index
+            )
+        )
+    )
+    assert "K" in common_channels
+
+    evaluate_gas = openimcc.evaluate_gas
+
+    def evaluate_common_channels(*args, **kwargs):
+        kwargs["gas_species"] = common_channels
+        return evaluate_gas(*args, **kwargs)
+
+    monkeypatch.setattr(openimcc, "evaluate_gas", evaluate_common_channels)
+
     packaged_result = packaged.equilibrate(
-        temperature_C=float(row["T_K"]) - 273.15,
+        temperature_C=temperature_K - 273.15,
         composition_kg=composition_kg,
         composition_mol=composition_mol,
         fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
     )
-    packaged_pressure = float(packaged_result.vapor_pressures_Pa["K"])
-    assert packaged_pressure > 0.0
-
-    monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(VAPOROCK_ROOT))
-    mutated = _OpenImccBatteryBackend("openimcc")
     mutated_result = mutated.equilibrate(
-        temperature_C=float(row["T_K"]) - 273.15,
+        temperature_C=temperature_K - 273.15,
         composition_kg=composition_kg,
         composition_mol=composition_mol,
         fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
     )
     assert "VapoRock" in mutated._identity["gas_table_source"]
+    packaged_pressure = float(packaged_result.vapor_pressures_Pa["K"])
+    mutated_pressure = float(mutated_result.vapor_pressures_Pa["K"])
+    assert packaged_pressure > 0.0
+    assert mutated_pressure > 0.0
     assert abs(
-        math.log10(float(mutated_result.vapor_pressures_Pa["K"]) / packaged_pressure)
+        math.log10(mutated_pressure / packaged_pressure)
     ) > 1.0e-9
 
 
