@@ -69,6 +69,7 @@ from simulator.optimize.objective import (
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
     objective_definitions,
+    objective_importance_evidence,
     objective_scores,
     objective_value_for_metric,
     pareto_front,
@@ -597,6 +598,12 @@ def run(
         cli_pinned_paths=_cli_pinned_paths(pinned_paths),
     )
     definitions = objective_definitions(resolved_profile)
+    importance_by_metric = {
+        row.metric: row.weight for row in objective_importance_evidence(resolved_profile)
+    }
+    objective_weights = tuple(
+        importance_by_metric[definition.metric] for definition in definitions
+    )
     two_phase = _resolve_two_phase_config(resolved_profile, two_phase_certify)
     _validate_inputs(config, resolved_profile)
     try:
@@ -732,6 +739,13 @@ def run(
         provenance_mode = "a"
         if not pending_resume_candidates and evaluated == config.budget:
             provenance_mode = "r"
+    best_scalarized_score, best_pareto_signature = _study_progress(
+        records,
+        definitions,
+        objective_weights,
+    )
+    use_pareto_stall = len(best_pareto_signature) > 1
+    stalled_batches = 0
     engine_worker_pool = None
     try:
         provenance_writer = _LockedLineWriter(provenance_path, provenance_mode, store)
@@ -869,6 +883,36 @@ def run(
                 staged_strategies=staged_strategies,
             )
             evaluated += len(candidates)
+            scalarized_score, pareto_signature = _study_progress(
+                records,
+                definitions,
+                objective_weights,
+            )
+            if not use_pareto_stall and len(pareto_signature) > 1:
+                # Multiple distinct non-dominated score vectors mean at least two
+                # objectives now provide separate ranking signals.
+                use_pareto_stall = True
+                best_pareto_signature = pareto_signature
+                stalled_batches = 0
+            elif use_pareto_stall:
+                if pareto_signature != best_pareto_signature:
+                    best_pareto_signature = pareto_signature
+                    stalled_batches = 0
+                else:
+                    stalled_batches += 1
+            elif scalarized_score is None:
+                # Refusals and incomplete objective vectors do not establish a stalled best.
+                pass
+            elif scalarized_score is not None and (
+                best_scalarized_score is None
+                or scalarized_score > best_scalarized_score
+            ):
+                best_scalarized_score = scalarized_score
+                stalled_batches = 0
+            else:
+                stalled_batches += 1
+            if stalled_batches >= 3:
+                break
     except (KeyboardInterrupt, StudyAbort):
         _write_aborted_artifacts_from_cache(
             out,
@@ -4761,6 +4805,40 @@ def _record_objective_scores(
         )
     except ObjectiveComputationError:
         return (None,) * len(definitions)
+
+
+def _study_progress(
+    records: Sequence[StudyRecord],
+    definitions: Sequence[ObjectiveDefinition],
+    weights: Sequence[float],
+) -> tuple[float | None, frozenset[tuple[float, ...]]]:
+    scored_records: list[StudyRecord] = []
+    scores_by_candidate: dict[str, tuple[float, ...]] = {}
+    scalarized_scores: list[float] = []
+    for record in records:
+        scores = _record_objective_scores(record, definitions)
+        if len(scores) != len(weights) or any(score is None for score in scores):
+            continue
+        score_row = tuple(float(score) for score in scores)
+        # Objective scores already reverse minimized metrics; summing each by its
+        # profile weight makes larger weighted totals better across all objectives.
+        scalarized_scores.append(
+            math.fsum(weight * score for weight, score in zip(weights, score_row))
+        )
+        scored_records.append(record)
+        scores_by_candidate[record.candidate_id] = score_row
+    if not scored_records:
+        return None, frozenset()
+    front = pareto_front(
+        scored_records,
+        definitions,
+        objective_getter=lambda record: record.objectives,
+        score_getter=lambda record: scores_by_candidate[record.candidate_id],
+    )
+    pareto_signature = frozenset(
+        scores_by_candidate[record.candidate_id] for record in front
+    )
+    return max(scalarized_scores), pareto_signature
 
 
 def _rank_score_components(
