@@ -303,6 +303,16 @@ benches:
       figure: '20'
       pdf_page_index: 59
       note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
+
+experiments:
+- experiment_id: hastie-1981-pt-kms
+  bench_id: hastie-1981-kms
+  method: knudsen_effusion
+  locator:
+    page: 53
+    figure: '20'
+    pdf_page_index: 59
+    note: 'Figure 20 caption: "KMS data with Pt-cell orifice diameter of 0.34 mm."'
 species:
   K:
     observations:
@@ -541,6 +551,7 @@ species:
       uncertainty:
         note: not applicable
     - observation_id: hastie_1981_k2_slag_orifice_0p34mm
+      experiment: hastie-1981-pt-kms
       type: psat_series
       locator:
         page: 28
@@ -1004,6 +1015,7 @@ species:
         A_as_printed: '6.350'
         note: Printed spelling only; numeric value unchanged.
     - observation_id: hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906
+      experiment: hastie-1981-pt-kms
       supersedes: hastie_1981_k2_slag_orifice_0p34mm
       type: psat_series
       class_tag: derived

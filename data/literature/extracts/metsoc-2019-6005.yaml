@@ -104,10 +104,20 @@ benches:
       pdf_page_index: 1
       section: Results and discussion
       note: Method section identifies a Knudsen molybdenum effusion cell.
+
+experiments:
+- experiment_id: shornikov-2019-mo-kems
+  bench_id: shornikov-yakovlev-2019-kems
+  method: knudsen_effusion
+  locator:
+    pdf_page_index: 1
+    section: Results and discussion
+    note: Method section identifies a Knudsen molybdenum effusion cell.
 species:
   CaTiO3:
     observations:
     - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fH
+      experiment: shornikov-2019-mo-kems
       type: gibbs_table
       locator:
         pdf_page_index: 1
@@ -131,6 +141,7 @@ species:
           Derived by authors from CaO, TiO2, CaTiO3 activities calculated from
           measured partial pressures; central printed value retained.
     - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
+      experiment: shornikov-2019-mo-kems
       type: gibbs_table
       locator:
         pdf_page_index: 1
@@ -151,6 +162,7 @@ species:
         delta_fS_uncertainty_J_mol_K_as_printed: 0.28
         basis_as_printed: per 1 mol compound
     - observation_id: shornikov_yakovlev_2019_metsoc6005_perovskite_melting
+      experiment: shornikov-2019-mo-kems
       type: transition_point
       locator:
         pdf_page_index: 1

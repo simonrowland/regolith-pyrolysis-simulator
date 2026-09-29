@@ -1453,7 +1453,7 @@ def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
     assert figure2_rows
     assert all("composition" not in (row.get("point_conditions") or {}) for row in figure2_rows)
 
-    result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    result = _migrate_real_extract(tmp_path / "allibert-unlinked", "kems-051-allibert-1981.yaml")
     typed_migrated = [
         observation
         for observation in result.observations.values()
@@ -3042,3 +3042,89 @@ def test_singleton_series_disagreement_is_none():
     view = em.build_by_species(extracts, source_priority={"alpha": ["only-src"]})
     g = view["species"]["Fe"]["observable_groups"][0]
     assert g["disagreement_dex"] is None
+
+
+def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
+    """Experiment.bench_id is the printed cell assignment, with its locator.
+
+    A sole typed bench is not enough: Hastie Table 2 and Allibert EMF stay
+    unlinked because those rows are not the printed cell experiment.
+    """
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    def experiment_named(result, local):
+        rows = [
+            item
+            for item in result.experiments.values()
+            if item.experiment_id.endswith("::experiment::" + local)
+        ]
+        assert len(rows) == 1, local
+        return rows[0]
+
+    def observations_named(result, local):
+        rows = [
+            item
+            for item in result.observations.values()
+            if local in item.observation_id.split("::")
+        ]
+        assert rows, local
+        return rows
+
+    linked = (
+        (
+            "kems-053-stolyarova-1991.yaml",
+            "stolyarova-1991-w-cell",
+            "stolyarova-kems",
+            "Samples evaporated from tungsten effusion cells.",
+            "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
+        ),
+        (
+            "kems-051-allibert-1981.yaml",
+            "allibert-1981-mo-kems",
+            "allibert-1981-kems",
+            "Six effusion cells were drilled in a molybdenum block.",
+            "allibert_1981_table2_cao_activity_kems",
+        ),
+        (
+            "kems-020-hastie-1981-nbsir.yaml",
+            "hastie-1981-pt-kms",
+            "hastie-1981-kms",
+            "KMS data with Pt-cell orifice diameter of 0.34 mm.",
+            "hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906",
+        ),
+        (
+            "metsoc-2019-6005.yaml",
+            "shornikov-2019-mo-kems",
+            "shornikov-yakovlev-2019-kems",
+            "Method section identifies a Knudsen molybdenum effusion cell.",
+            "shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fH",
+        ),
+        (
+            "bencze-yazhenskikh-2016.yaml",
+            "bencze-2016-ir-kems",
+            "bencze-2016-supplement-kems",
+            "there is a thin graphite coating on the inner surface of the lid of the iridium cell",
+            "bencze_2016_table_s1_na_all_subsamples",
+        ),
+    )
+    for filename, exp_local, bench_local, quote, obs_local in linked:
+        result = _migrate_real_extract(tmp_path / Path(filename).stem, filename)
+        experiment = experiment_named(result, exp_local)
+        assert experiment.bench_id is not None
+        assert experiment.bench_id.endswith("::bench::" + bench_local)
+        assert experiment.locator is not None
+        assert quote in (experiment.locator.note or "")
+        assert experiment.bench_id in result.benches
+        for observation in observations_named(result, obs_local):
+            assert observation.experiment_id == experiment.experiment_id
+
+    hastie = _migrate_real_extract(tmp_path / "hastie-unlinked", "kems-020-hastie-1981-nbsir.yaml")
+    table2 = observations_named(hastie, "hastie_1981_table2_k_logP_coefficients")
+    table2_experiment = hastie.experiments[table2[0].experiment_id]
+    assert table2_experiment.bench_id is None
+
+    allibert = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    emf = observations_named(allibert, "allibert_1981_table3_emf_solid_cells")
+    mo = experiment_named(allibert, "allibert-1981-mo-kems")
+    assert all(item.experiment_id != mo.experiment_id for item in emf)
+    assert allibert.experiments[emf[0].experiment_id].bench_id is None

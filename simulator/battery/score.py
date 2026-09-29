@@ -2070,28 +2070,11 @@ def _bench_for_score(
     experiment: Experiment,
     benches: Mapping[str, Bench],
 ) -> Bench | None:
-    """Bench the scorer may read for a Knudsen oxygen-balance decision.
+    """Bench the experiment records. An unset bench_id stays unresolved."""
 
-    An explicit experiment.bench_id wins. A synthesized experiment often
-    omits that id even when the work declares one bench (Stolyarova W).
-    Adopt that bench only when it is uniformly W or uniformly Mo, the
-    metals the engine models as a cell-oxide reservoir. Any other unlinked
-    bench stays unresolved.
-    """
-
-    if experiment.bench_id is not None:
-        return benches.get(experiment.bench_id)
-    matched = [
-        bench
-        for bench in benches.values()
-        if bench.work_id == experiment.work_id and bench.cell_materials
-    ]
-    if len(matched) != 1:
+    if experiment.bench_id is None:
         return None
-    bench = matched[0]
-    if _uniform_modelled_reactive_cell(bench.cell_materials) is None:
-        return None
-    return bench
+    return benches.get(experiment.bench_id)
 
 
 def _printed_point_composition(observation: Observation) -> State[Composition] | None:
@@ -3338,12 +3321,10 @@ def compile_residual(
             "handles": handles,
             "experiment": experiment,
         }
-        if predict is None and experiment is not None and experiment.bench_id is not None:
-            predictor_kwargs["bench"] = context.benches.get(experiment.bench_id)
-        elif predict is None and experiment is not None:
-            adopted = _bench_for_score(experiment, context.benches)
-            if adopted is not None:
-                predictor_kwargs["bench"] = adopted
+        if predict is None and experiment is not None:
+            recorded = _bench_for_score(experiment, context.benches)
+            if recorded is not None:
+                predictor_kwargs["bench"] = recorded
         prediction = predictor(
             engine,
             implied_alpha_reference or reference,
