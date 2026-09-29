@@ -50,6 +50,7 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
     canonical_backend_name,
 )
@@ -901,6 +902,12 @@ def _cache_write_rejections(scored_result: ScoredResult) -> tuple[str, ...]:
     reasons: list[str] = []
     backend_status = _agreed_carrier_value(trust.backend_statuses)
     backend_authoritative = _agreed_carrier_value(trust.backend_authorities)
+    allow_internal_analytical_cache = (
+        _agreed_carrier_value(trust.evidence_classes)
+        == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        and backend_authoritative is False
+        and not any(trust.certification_allowances)
+    )
     if backend_authoritative is not True:
         reasons.append("non_authoritative_backend")
     contradiction = _backend_authority_contradiction(
@@ -918,6 +925,20 @@ def _cache_write_rejections(scored_result: ScoredResult) -> tuple[str, ...]:
         reasons.append(closure_rejection)
     if _has_out_of_domain_provenance(scored_result):
         reasons.append("out_of_domain_provenance")
+    if allow_internal_analytical_cache:
+        # Keep analytical results reusable within their own evidence class;
+        # authority and certification remain false, and all other admission
+        # rejections continue to apply.
+        reasons = [
+            reason
+            for reason in reasons
+            if reason
+            not in {
+                "non_authoritative_backend",
+                "certification_forbidden",
+                "backend_name_non_authoritative:internal-analytical",
+            }
+        ]
     return tuple(dict.fromkeys(reasons))
 
 
