@@ -19,7 +19,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1149/1.2085485
 experiments:
-- experiment_id: 10.1149/1.2085485::kems-053-stolyarova-1991
+- experiment_id: 10.1149/1.2085485::experiment::stolyarova-1991-w-cell
   kind: literature
   method:
     tag: value
@@ -29,7 +29,7 @@ experiments:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -48,10 +48,10 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 10.1149/1.2085485
   locator:
-    page: 3711
-    published_page: 3711
-    pdf_page_index: 2
-    table: Ia
+    published_page: 3710
+    section: Experimental
+    note: Samples evaporated from tungsten effusion cells.
+  bench_id: 10.1149/1.2085485::bench::stolyarova-kems
 benches:
 - id: 10.1149/1.2085485::bench::stolyarova-kems
   work_id: 10.1149/1.2085485

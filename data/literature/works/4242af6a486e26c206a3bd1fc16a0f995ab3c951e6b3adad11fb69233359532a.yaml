@@ -17,17 +17,17 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 4242af6a486e26c206a3bd1fc16a0f995ab3c951e6b3adad11fb69233359532a::bencze-yazhenskikh-2016
+- experiment_id: 4242af6a486e26c206a3bd1fc16a0f995ab3c951e6b3adad11fb69233359532a::experiment::bencze-2016-ir-kems
   kind: literature
   method:
-    tag: value
-    value: knudsen_effusion
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -46,10 +46,10 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: 4242af6a486e26c206a3bd1fc16a0f995ab3c951e6b3adad11fb69233359532a
   locator:
-    page: 1-6
-    table: S-I
-    note: 'Columns: ln(p(Na(g))/Pa)=A+B/T; vapor pressure p(Na(g))/Pa at 1273 K; activity a(Na2O) at 1273 K.'
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+    page: 1-7
+    note: 'Table footnote: "there is a thin graphite coating on the inner surface of the lid of the iridium cell"; a thin
+      graphite disc later replaced the coating.'
+  bench_id: 4242af6a486e26c206a3bd1fc16a0f995ab3c951e6b3adad11fb69233359532a::bench::bencze-2016-supplement-kems
 benches:
 - id: 4242af6a486e26c206a3bd1fc16a0f995ab3c951e6b3adad11fb69233359532a::bench::bencze-2016-supplement-kems
   work_id: 4242af6a486e26c206a3bd1fc16a0f995ab3c951e6b3adad11fb69233359532a
