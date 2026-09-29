@@ -1214,6 +1214,28 @@ def test_pt2_physics_bucket_partitions_real_determinants() -> None:
     assert _physics_bucket_hash(solver_version_changed) == baseline
 
 
+def test_pt2_physics_bucket_key_ignores_schema_version(monkeypatch) -> None:
+    key = _c3a_ladder_key(
+        "schema-version",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    monkeypatch.setattr(rrd, "PHYSICS_BUCKET_SCHEMA_VERSION", "test-bucket-v1")
+    first = canonical_physics_bucket_key_from_replay_key(key)
+    first_ladder = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key, "h40"
+    )
+
+    monkeypatch.setattr(rrd, "PHYSICS_BUCKET_SCHEMA_VERSION", "test-bucket-v2")
+    second = canonical_physics_bucket_key_from_replay_key(key)
+    second_ladder = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key, "h40"
+    )
+
+    assert first == second
+    assert first_ladder == second_ladder
+
+
 def test_pt2_physics_bucket_partitions_stage0_inventory_values() -> None:
     key = _silicate_equilibrium_key(
         _CountingSilicateEquilibriumProvider(
