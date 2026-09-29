@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, replace
 import math
 from types import SimpleNamespace
@@ -29,6 +30,7 @@ from simulator.chemistry.kernel import (
 )
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.config import load_config_bundle
+from simulator.core import PoisonedHourError, PoisonedHourState
 from simulator.electrolysis import (
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
@@ -3302,6 +3304,57 @@ def test_invalid_patch_rejected_before_run() -> None:
     assert executor.calls == 0
 
 
+@pytest.mark.parametrize(
+    "exc",
+    [
+        ValueError("Malformed campaign temperature range: C0.temp_range_C"),
+        ValueError("Malformed campaign rate band C2A.early: expected [low, high]"),
+        PoisonedHourError(
+            PoisonedHourState(
+                hour=18,
+                committed_transition_count=1,
+                aborting_exception_summary=(
+                    "ValueError: melt_pressure_partial_exceeds_total: "
+                    "pO2_mbar=6.628 > p_total_mbar=4.108"
+                ),
+            )
+        ),
+    ],
+    ids=(
+        "malformed-temperature-range",
+        "malformed-rate-band",
+        "poisoned-hour-pressure-total",
+    ),
+)
+def test_recipe_value_error_raised_by_executor_is_scored_with_artifacts(
+    exc: Exception,
+) -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(exc=exc),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INVALID_RECIPE
+    assert result.eval_spec is not None
+    assert result.cache_key == cache_key(result.eval_spec)
+    assert result.notes
+
+
+def test_unknown_value_error_still_aborts_as_engine_bug() -> None:
+    with pytest.raises(EngineBugAbort):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(exc=ValueError("unexpected evaluator bug")),
+        )
+
+
 def test_backend_unavailable_aborts_distinct_from_engine_bug() -> None:
     with pytest.raises(BackendUnavailableAbort) as raised:
         evaluate(
@@ -4879,6 +4932,32 @@ def test_cached_real_profile_builds_honest_evalspec_and_cache_config(
     assert result.eval_spec.backend_name == "cached-real"
     assert executor.config.backend_name == "cached-real"
     assert executor.config.reduced_real_cache == cache_config
+
+
+def test_empty_cached_real_store_miss_still_aborts(tmp_path) -> None:
+    cache_config = {
+        "db_path": str(tmp_path / "empty-pt0-cache.sqlite"),
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "alphamelts",
+    }
+    profile = copy.deepcopy(PROFILE)
+    profile["fidelities"] = {
+        "high": {
+            "backend_name": "cached-real",
+            "hours": 1,
+            "reduced_real_cache": cache_config,
+        }
+    }
+
+    with pytest.raises(EvaluationAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=profile,
+        )
+
+    assert "PT-0 cached replay miss" in str(raised.value)
 
 
 def test_stub_fidelity_drops_inherited_cached_real_cache_config(tmp_path) -> None:

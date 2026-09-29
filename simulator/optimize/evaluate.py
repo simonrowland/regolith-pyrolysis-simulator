@@ -44,6 +44,7 @@ from simulator.condensation import (
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.core import PoisonedHourError
 from simulator.cost_energy import unavailable_quantity
 from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import default_cost_parameters_block
@@ -916,6 +917,14 @@ def evaluate(
             message,
         )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
+        if _is_malformed_recipe_value_error(exc):
+            return _malformed_recipe_result(
+                candidate_id,
+                spec,
+                key,
+                f"{type(exc).__name__}: {exc}",
+                profile=profile,
+            )
         honest = _result_from_honest_engine_exception(
             candidate_id,
             spec,
@@ -937,6 +946,15 @@ def evaluate(
     error_message = str(getattr(run_execution, "error_message", ""))
     if status == "failed":
         failure_exc = getattr(run_execution, "failure_exception", None)
+        if _is_malformed_recipe_value_error(failure_exc):
+            return _malformed_recipe_result(
+                candidate_id,
+                spec,
+                key,
+                str(failure_exc),
+                run_execution=run_execution,
+                profile=profile,
+            )
         if _is_backend_unavailable(failure_exc, carrier=run_execution):
             raise BackendUnavailableAbort(
                 error_message or "backend unavailable",
@@ -5603,6 +5621,79 @@ def _invalid_recipe_result(
         failing_gates=("inventory_overdraw",),
         run_reference=run_reference,
         notes=tuple(notes),
+    )
+
+
+def _is_malformed_recipe_value_error(exc: BaseException) -> bool:
+    if isinstance(exc, (*_TYPED_ABSENCE_EXCEPTION_CLASSES, EngineBugAbort)):
+        return False
+    if isinstance(exc, PoisonedHourError):
+        summary = exc.state.aborting_exception_summary
+        if not summary.startswith("ValueError: "):
+            return False
+        message = summary.removeprefix("ValueError: ")
+    elif isinstance(exc, ValueError):
+        message = str(exc)
+    else:
+        return False
+    return message.startswith(
+        (
+            "melt_pressure_partial_exceeds_total:",
+            "Malformed campaign temperature range:",
+            "Malformed campaign rate band ",
+        )
+    )
+
+
+def _malformed_recipe_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    error_message: str,
+    *,
+    run_execution: Any | None = None,
+    profile: Mapping[str, Any] | None = None,
+) -> ScoredResult:
+    gate = "recipe_configuration_valid"
+    run_reference = (
+        _run_reference(run_execution, profile or {})
+        if run_execution is not None
+        else RunReference(
+            status="failed",
+            error_message=error_message,
+            reason="malformed_recipe",
+            trace=_synthetic_not_run_trace(),
+            backend_name=spec.backend_name,
+            backend_status=SYNTHETIC_BACKEND_NOT_RUN,
+            backend_authoritative=False,
+        )
+    )
+    threshold = ThresholdSpec(
+        id=gate,
+        value=1.0,
+        units="boolean",
+        source="code_default",
+        source_ref="simulator.optimize.evaluate: recipe configuration validity",
+    )
+    # Validity is boolean: invalid configuration is 0 against the required 1.
+    margin = GateMargin(
+        gate=gate,
+        feasible=False,
+        margin=-1.0,
+        threshold=threshold,
+        observed=0.0,
+        detail=error_message,
+    )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.INVALID_RECIPE,
+        feasibility_margins={gate: margin},
+        failing_gates=(gate,),
+        run_reference=run_reference,
+        notes=(error_message,),
     )
 
 

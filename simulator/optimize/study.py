@@ -3994,6 +3994,12 @@ def _assert_honest_result(
         if not scored.notes:
             raise StudyAbort("timeout result missing reason-coded note")
         return
+    if scored.failure_category is FailureCategory.INVALID_PATCH:
+        if scored.feasible:
+            raise StudyAbort("invalid_patch result cannot be feasible")
+        if not scored.notes:
+            raise StudyAbort("invalid_patch result missing refusal message")
+        return
     _assert_result_artifact_floor(scored)
     if scored.failure_category in {
         FailureCategory.ENGINE_BUG,
