@@ -3451,29 +3451,16 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
 def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     import simulator.battery.score as score_module
 
-    context = load_score_context()
-    observations = {
-        key: obs
-        for key, obs in context.observations.items()
-        if any(
-            source in key.casefold()
-            for source in (
-                "allibert",
-                "stolyarova",
-                "kems-ms2000-044",
-                "kems-012-sossi-2019",
-            )
+    context = load_score_context(
+        sources=(
+            "allibert",
+            "stolyarova",
+            "kems-ms2000-044",
+            "kems-012-sossi-2019",
         )
-    }
-    filtered = replace(
-        context,
-        observations=observations,
-        origins={
-            key: value
-            for key, value in context.origins.items()
-            if key in observations
-        },
     )
+    observations = context.observations
+    filtered = context
     admitted_model_derived = {
         key
         for key, obs in observations.items()

@@ -47,7 +47,7 @@ from enum import Enum
 from fractions import Fraction
 from pathlib import Path
 from types import UnionType
-from typing import Any, Iterable, Iterator, Mapping, Union, get_args, get_origin, get_type_hints
+from typing import Any, Iterable, Iterator, Mapping, Sequence, Union, get_args, get_origin, get_type_hints
 
 import yaml
 
@@ -1901,12 +1901,71 @@ def observation_from_plain(payload: object) -> Observation:
     )
 
 
+def source_filter_tokens(sources: Sequence[str] | None) -> tuple[str, ...] | None:
+    """Casefolded substring tokens, or None when the caller wants the full store.
+
+    An empty token matches every path, so a blank entry is rejected rather
+    than silently loading everything.
+    """
+
+    if sources is None:
+        return None
+    tokens = tuple(str(source).strip().casefold() for source in sources)
+    if not tokens or any(token == "" for token in tokens):
+        raise ValueError("sources must be a non-empty sequence of non-blank tokens")
+    return tokens
+
+
+def path_matches_source_tokens(
+    path: Path,
+    directory: Path,
+    tokens: tuple[str, ...] | None,
+) -> bool:
+    """True when ``tokens`` is None or any token is in the path under ``directory``.
+
+    Store files are named ``<source_id>.yaml``, so a source substring selects
+    those files and skips the rest of the store.
+    """
+
+    if tokens is None:
+        return True
+    try:
+        relative = path.relative_to(directory).as_posix()
+    except ValueError:
+        relative = path.name
+    folded = relative.casefold()
+    return any(token in folded for token in tokens)
+
+
+def observation_matches_source_tokens(
+    observation_id: str,
+    source_id: str | None,
+    tokens: tuple[str, ...] | None,
+) -> bool:
+    """True when ``tokens`` is None or any token is in the id or source id."""
+
+    if tokens is None:
+        return True
+    folded_id = observation_id.casefold()
+    folded_source = (source_id or "").casefold()
+    return any(token in folded_id or token in folded_source for token in tokens)
+
+
 def load_migrated_store(
     root: Path | None = None,
+    *,
+    sources: Sequence[str] | None = None,
 ) -> tuple[dict[str, Work], dict[str, Experiment], dict[str, Observation]]:
-    """Deserialize the persisted v2.1 YAML store into typed records."""
+    """Deserialize the persisted v2.1 YAML store into typed records.
+
+    ``sources`` limits observation files to those whose store-relative path
+    contains a token, then drops rows whose id and source id contain none of the tokens. Works
+    and experiments stay complete so a kept observation's experiment_id
+    still resolves. ``None`` loads every observation file.
+    """
 
     root = root or REPO_ROOT
+    tokens = source_filter_tokens(sources)
     works: dict[str, Work] = {}
     experiments: dict[str, Experiment] = {}
     observations: dict[str, Observation] = {}
@@ -1929,11 +1988,17 @@ def load_migrated_store(
         if not directory.is_dir():
             continue
         for path in iter_observation_store_paths(directory):
+            if not path_matches_source_tokens(path, directory, tokens):
+                continue
             doc = load_yaml(path)
             if not isinstance(doc, Mapping):
                 continue
             for raw_obs in doc.get("observations") or []:
                 obs = observation_from_plain(raw_obs)
+                if not observation_matches_source_tokens(
+                    obs.observation_id, obs.source_id, tokens
+                ):
+                    continue
                 observations[obs.observation_id] = obs
     return works, experiments, observations
 

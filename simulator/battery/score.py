@@ -65,6 +65,9 @@ from simulator.battery.migrate import (
     load_migrated_benches,
     load_migrated_store,
     load_yaml,
+    observation_matches_source_tokens,
+    path_matches_source_tokens,
+    source_filter_tokens,
     to_plain,
 )
 from simulator.battery.records import (
@@ -3644,9 +3647,22 @@ def _gate_tables(
     return _table_payloads(reference, observations, table_index)
 
 
-def load_score_context(root: Path | None = None) -> ScoreContext:
+def load_score_context(
+    root: Path | None = None,
+    *,
+    sources: Sequence[str] | None = None,
+) -> ScoreContext:
+    """Load the scoring store.
+
+    ``sources`` is a case-insensitive substring filter on observation-store
+    and extract filenames (``<source_id>.yaml``). Matching rows are kept
+    when the token also appears in the observation id or source id. Works,
+    experiments, and benches stay complete. ``None`` loads the full store.
+    """
+
     root = root or REPO_ROOT
-    works, experiments, observations = load_migrated_store(root)
+    tokens = source_filter_tokens(sources)
+    works, experiments, observations = load_migrated_store(root, sources=sources)
     benches = load_migrated_benches(root)
     origins: dict[str, str] = {}
     extract_review: dict[str, str | None] = {}
@@ -3655,6 +3671,8 @@ def load_score_context(root: Path | None = None) -> ScoreContext:
         if not directory.is_dir():
             continue
         for path in iter_observation_store_paths(directory):
+            if not path_matches_source_tokens(path, directory, tokens):
+                continue
             doc = load_yaml(path)
             if not isinstance(doc, Mapping):
                 continue
@@ -3664,10 +3682,20 @@ def load_score_context(root: Path | None = None) -> ScoreContext:
                 origin_key = path.name
             for raw in doc.get("observations") or []:
                 if isinstance(raw, Mapping) and raw.get("observation_id"):
-                    origins[str(raw["observation_id"])] = origin_key
+                    observation_id = str(raw["observation_id"])
+                    raw_source = raw.get("source_id")
+                    if not observation_matches_source_tokens(
+                        observation_id,
+                        None if raw_source is None else str(raw_source),
+                        tokens,
+                    ):
+                        continue
+                    origins[observation_id] = origin_key
     extracts = literature / "extracts"
     if extracts.is_dir():
         for path in sorted(extracts.glob("*.yaml")):
+            if not path_matches_source_tokens(path, extracts, tokens):
+                continue
             doc = load_yaml(path)
             if not isinstance(doc, Mapping):
                 continue
