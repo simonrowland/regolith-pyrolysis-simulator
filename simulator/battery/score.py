@@ -3636,7 +3636,12 @@ def load_score_context(
 
     root = root or REPO_ROOT
     tokens = source_filter_tokens(sources)
-    works, experiments, observations = load_migrated_store(root, sources=sources)
+    # The unfiltered path keeps the historical call exactly, so callers and test
+    # doubles that replace load_migrated_store(root) see no signature change.
+    if sources is None:
+        works, experiments, observations = load_migrated_store(root)
+    else:
+        works, experiments, observations = load_migrated_store(root, sources=sources)
     benches = load_migrated_benches(root)
     origins: dict[str, str] = {}
     extract_review: dict[str, str | None] = {}
