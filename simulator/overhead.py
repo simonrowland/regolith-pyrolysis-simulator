@@ -858,6 +858,27 @@ class OverheadGasModel:
     ) -> Optional[EffectiveTransportCapacity]:
         """Return the one-tick flow boundary for controlled-pO2 operation."""
 
+        return self._controlled_o2_transport_capacity(
+            evap_flux,
+            melt,
+            cold_train_capacity=cold_train_capacity,
+            retained_holdup_kg=retained_holdup_kg,
+            upstream_pressure_Pa=None,
+            dt_hr=dt_hr,
+        )
+
+    def _controlled_o2_transport_capacity(
+        self,
+        evap_flux: EvaporationFlux,
+        melt: MeltState,
+        *,
+        cold_train_capacity,
+        retained_holdup_kg: float = 0.0,
+        upstream_pressure_Pa: Optional[float] = None,
+        dt_hr: float = 1.0,
+    ) -> Optional[EffectiveTransportCapacity]:
+        """Apply controlled-flow capacity with an optional ledger pressure."""
+
         if self._downstream_pressure_override is not None:
             return None
         if getattr(melt.atmosphere, 'name', '') not in {
@@ -866,7 +887,11 @@ class OverheadGasModel:
             'O2_BACKPRESSURE',
         }:
             return None
-        allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
+        commanded_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
+        allowed_pressure_Pa = max(
+            commanded_pressure_Pa,
+            0.0 if upstream_pressure_Pa is None else float(upstream_pressure_Pa),
+        )
         pipe_capacity_kg_hr = (
             max(0.0, float(self._conductance_override)) * 3600.0
             if self._conductance_override is not None

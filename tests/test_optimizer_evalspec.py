@@ -2644,16 +2644,7 @@ def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
     assert temperatures[0] == pytest.approx(625.0)
     assert temperatures[1] == pytest.approx(1225.0)
     assert temperatures[2] == pytest.approx(1320.0)
-    # Evaporative oxygen can throttle the requested ramp. Derive the measured
-    # endpoint from the per-hour applied-ramp telemetry instead of assuming
-    # the nominal target is reachable in the scheduled window.
-    expected_endpoint_C = temperatures[2]
-    for snapshot in snapshots[3:]:
-        expected_endpoint_C = min(
-            1480.0,
-            expected_endpoint_C + snapshot.actual_ramp_rate_C_hr,
-        )
-    assert temperatures[-1] == pytest.approx(expected_endpoint_C)
+    assert temperatures[-1] == pytest.approx(1480.0)
     assert temperatures[-1] <= 1480.0
     assert max(temperatures) >= 1320.0
 

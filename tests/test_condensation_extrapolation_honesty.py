@@ -434,6 +434,13 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         )
     assert document["per_hour_summary"][0]["T_C"] == 2200.0
     if hours == 24:
+        total_pressures_bar = [
+            float(row["P_total_bar"])
+            for row in document["per_hour_summary"]
+        ]
+        commanded_pressure_bar = 13.0 / 1000.0
+        assert max(total_pressures_bar) <= commanded_pressure_bar * 1.1
+        assert min(total_pressures_bar) >= commanded_pressure_bar * 0.9
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
                        for records in refused.values() for record in records.values())
         active_sio_rows = [

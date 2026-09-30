@@ -3927,6 +3927,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.overhead.composition = composition
         self.overhead.pressure_mbar = p_total_mbar
 
+    def _headspace_upstream_pressure_Pa(self) -> float:
+        commanded_pressure_Pa = max(
+            float(self.melt.p_total_mbar) * 100.0,
+            1.0,
+        )
+        if not self._overhead_headspace_enabled():
+            return commanded_pressure_Pa
+        n_gas_mol = sum(self._overhead_holdup_mol().values())
+        if n_gas_mol <= 0.0:
+            return commanded_pressure_Pa
+
+        # Flow is driven by actual upstream pressure: the ledger's n_gas R T/V
+        # [Pa] supplies P_up, while the pipe law is k(P_up²-P_down²) [kg/s].
+        # Thus an empty ledger falls back exactly to the commanded setpoint;
+        # a large bolus drains back toward it within one tick when the pipe can
+        # carry the excess inventory at its true pressure.
+        ledger_pressure_Pa = (
+            n_gas_mol
+            * GAS_CONSTANT
+            * self._headspace_temperature_K()
+            / self._headspace_volume_m3()
+        )
+        return max(commanded_pressure_Pa, ledger_pressure_Pa)
+
     def _headspace_bleed_conductance_kg_s(
         self,
         *,
@@ -3948,14 +3972,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return value
         if species_kg_for_M_avg is None:
             species_kg_for_M_avg = self._overhead_holdup_species_kg()
-        p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
+        p_upstream_Pa = self._headspace_upstream_pressure_Pa()
         # This is the upstream-to-vacuum carrying limit C0. Controlled-pO2
         # runtime passes it through the provider-owned flow-capacity result;
         # pressure-bound modes retain the provider's finite-P2 derate.
         return max(
             0.0,
             float(self.overhead_model._pipe_conductance(
-                p_mean_Pa,
+                p_upstream_Pa,
                 self.melt.temperature_C,
                 p_downstream_Pa=0.0,
                 species_kg_for_M_avg=species_kg_for_M_avg,
@@ -10550,11 +10574,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             max(0.0, float(mass_kg))
             for mass_kg in self._overhead_holdup_species_kg().values()
         )
-        return self.overhead_model.controlled_o2_transport_capacity(
+        return self.overhead_model._controlled_o2_transport_capacity(
             evap_flux,
             self.melt,
             cold_train_capacity=capacity,
             retained_holdup_kg=retained_holdup_kg,
+            upstream_pressure_Pa=self._headspace_upstream_pressure_Pa(),
             dt_hr=dt_hr,
         )
 

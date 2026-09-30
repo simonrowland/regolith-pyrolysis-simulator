@@ -268,6 +268,102 @@ def test_venting_refuses_missing_duct_geometry():
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
 
 
+def test_large_o2_headspace_bolus_pumps_down_and_is_credited_once():
+    sim = _transport_sim()
+    sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})
+    sim.overhead_model.pipe_diameter_m = 0.01
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.p_total_mbar = 13.0
+    sim.melt.pO2_mbar = 13.0
+
+    commanded_pressure_Pa = sim.melt.p_total_mbar * 100.0
+    assert sim._headspace_upstream_pressure_Pa() == pytest.approx(
+        commanded_pressure_Pa
+    )
+    o2_kg_per_mol = sim._overhead_holdup_species_kg({"O2": 1.0})["O2"]
+    commanded_pipe_capacity_kg_hr = sim.overhead_model._pipe_conductance(
+        commanded_pressure_Pa,
+        sim.melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg={"O2": 1.0},
+    ) * 3600.0
+    bolus_kg = max(2.0 * commanded_pipe_capacity_kg_hr, 0.1)
+    bolus_mol = bolus_kg / o2_kg_per_mol
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": bolus_mol},
+        source="test finite headspace O2 bolus",
+        material_origin="feedstock",
+    )
+
+    initial_pressure_Pa = sim._headspace_upstream_pressure_Pa()
+    initial_species_kg = sim._overhead_holdup_species_kg()
+    initial_mass_kg = sum(initial_species_kg.values())
+    true_pipe_capacity_kg_hr = sim.overhead_model._pipe_conductance(
+        initial_pressure_Pa,
+        sim.melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=initial_species_kg,
+    ) * 3600.0
+    assert commanded_pipe_capacity_kg_hr < initial_mass_kg
+    # k(P_up²-P_down²) makes the one-tick capacity exceed the whole bolus at
+    # its true pressure, so the bounded result is the 13 mbar setpoint.
+    assert true_pipe_capacity_kg_hr >= initial_mass_kg
+
+    flux = EvaporationFlux(species_kg_hr={"O2": 1.0})
+    flux.update_totals()
+    true_controlled_pipe_capacity_kg_hr = sim.overhead_model._pipe_conductance(
+        initial_pressure_Pa,
+        sim.melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=flux.species_kg_hr,
+    ) * 3600.0
+    controlled = sim._controlled_o2_transport_capacity(flux)
+    assert controlled is not None
+    assert controlled.upstream_pressure_bar == pytest.approx(
+        initial_pressure_Pa / 1.0e5
+    )
+    assert controlled.pipe_capacity_kg_hr == pytest.approx(
+        true_controlled_pipe_capacity_kg_hr
+    )
+
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    assert sim._headspace_bleed_conductance_kg_s() * 3600.0 == pytest.approx(
+        true_pipe_capacity_kg_hr
+    )
+    transitions_before = len(sim.atom_ledger.transitions)
+    terminal_accounts = (
+        "terminal.oxygen_melt_offgas_stored",
+        "terminal.oxygen_melt_offgas_vented_to_vacuum",
+    )
+    terminal_before_mol = sum(
+        sim.atom_ledger.mol_by_account(account).get("O2", 0.0)
+        for account in terminal_accounts
+    )
+
+    sim._dispatch_overhead_bleed()
+
+    remaining_mol = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    removed_mol = bolus_mol - remaining_mol
+    terminal_after_mol = sum(
+        sim.atom_ledger.mol_by_account(account).get("O2", 0.0)
+        for account in terminal_accounts
+    )
+    assert remaining_mol == pytest.approx(0.0, abs=1e-10)
+    assert terminal_after_mol - terminal_before_mol == pytest.approx(
+        removed_mol
+    )
+    assert sim._headspace_upstream_pressure_Pa() == pytest.approx(
+        commanded_pressure_Pa
+    )
+    for transition in sim.atom_ledger.transitions[transitions_before:]:
+        transition.validate_conservation(sim.atom_ledger.registry)
+
+
 def test_evaporation_buffer_source_reaches_transport_ledger():
     """The existing evaporation ledger source is flushed before transport."""
 

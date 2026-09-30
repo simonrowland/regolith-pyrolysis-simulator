@@ -113,6 +113,7 @@ def test_disabled_runtime_policy_stays_on_no_equipment_path():
             temperature_C=1500.0,
         ),
         _overhead_holdup_species_kg=lambda: {},
+        _headspace_upstream_pressure_Pa=lambda: 45_000.0,
     )
     sim._cold_train_capacity_policy = MethodType(
         PyrolysisSimulator._cold_train_capacity_policy,
