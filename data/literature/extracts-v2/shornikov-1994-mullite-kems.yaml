@@ -1,0 +1,4532 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-1994-mullite-kems.yaml
+observations:
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1833k::T=1833.0:h=7d5682e2072f
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Al2O3 activity relative to the pure oxide reference defined by p_i° in
+        equations (12)–(13).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.05'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.07'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1833k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 479
+    published_page: 479
+    pdf_page_index: 1
+    table: '6'
+    note: Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+        note: Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07
+  derived_from:
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.0:h=b88c911ec335
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=5434ab0a4925
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters: []
+    output_unit: dimensionless activity, as printed
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1933k::T=1933.0:h=964791e2b98a
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Al2O3 activity relative to the pure oxide reference defined by p_i° in
+        equations (12)–(13).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.01'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.05'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1933k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 479
+    published_page: 479
+    pdf_page_index: 1
+    table: '6'
+    note: Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+        note: Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05
+  derived_from:
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.0:h=b97d68fa976a
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=cd77705b953e
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters: []
+    output_unit: dimensionless activity, as printed
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1983k::T=1983.0:h=1b3299377aeb
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Al2O3 activity relative to the pure oxide reference defined by p_i° in
+        equations (12)–(13).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.01'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.05'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_1983k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 479
+    published_page: 479
+    pdf_page_index: 1
+    table: '6'
+    note: Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+        note: Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05
+  derived_from:
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.0:h=20d6618bbbb1
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=19f9a01ddfe7
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters: []
+    output_unit: dimensionless activity, as printed
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_2033k::T=2033.0:h=af5051576046
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Al2O3 activity relative to the pure oxide reference defined by p_i° in
+        equations (12)–(13).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.01'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.03'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al2o3_activity_2033k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 479
+    published_page: 479
+    pdf_page_index: 1
+    table: '6'
+    note: Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+        note: Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03
+  derived_from:
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.0:h=85daaf6bbad4
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=fa86784dd138
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters: []
+    output_unit: dimensionless activity, as printed
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1933k::T=1933.0:h=e7132e9ce3a1
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.002127825000000000303975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.0000000015'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1933k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000021000000000000003'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1983k::T=1983.0:h=b9748d956acd
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.004529227499999999696025'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.0000000025'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1983k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000044699999999999997'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_2033k::T=2033.0:h=535e3a22d7c0
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.01469212500000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 8e-9
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_2033k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000014500000000000001'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.0:h=b88c911ec335
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00035970375'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.00000000018'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000355'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.0:h=b97d68fa976a
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.003333592500000000303975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.0000000015'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000032900000000000003'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.0:h=20d6618bbbb1
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.007599375'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 3e-9
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000075'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.0:h=85daaf6bbad4
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0213795750000000020265'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 8e-9
+      parent: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000021100000000000002'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1933k::T=1933.0:h=6aa2ae8a0d30
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0005603272500000000506625'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 4e-10
+      parent: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1933k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000055300000000000005'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1983k::T=1983.0:h=fefae60d03a4
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.001600935000000000303975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 9e-10
+      parent: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1983k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000015800000000000003'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_2033k::T=2033.0:h=4479dd896464
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0042657825'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.0000000018'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_2033k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000421'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1933k::T=1933.0:h=cb22ef895c11
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlSiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlSiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlSiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000034551825000000004053'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 3e-12
+      parent: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1933k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000034100000000000004'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1983k::T=1983.0:h=0c3dabf3da51
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlSiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlSiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlSiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000014286825'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.000000000011'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1983k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000141'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_2033k::T=2033.0:h=60e2d3190883
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlSiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlSiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlSiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00005410755'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.000000000040000000000000004'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_2033k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000000534'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=5434ab0a4925
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00003799687500000000506625'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.000000000040000000000000004'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000037500000000000005'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=cd77705b953e
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00026851125'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.00000000015'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000265'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=19f9a01ddfe7
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000692049750000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: 3e-10
+      parent: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000006830000000000001'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=fa86784dd138
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.001600935000000000303975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.0000000008000000000000001'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000015800000000000003'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1833k::T=1833.0:h=e68f8087a949
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: SiO2 activity relative to the pure oxide reference defined by p_i° in equations
+        (12)–(13).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.37'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.09'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1833k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 479
+    published_page: 479
+    pdf_page_index: 1
+    table: '6'
+    note: Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+        note: Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09
+  derived_from:
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.0:h=3165dd1c75a9
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=5434ab0a4925
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters: []
+    output_unit: dimensionless activity, as printed
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1933k::T=1933.0:h=1146ac75825f
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: SiO2 activity relative to the pure oxide reference defined by p_i° in equations
+        (12)–(13).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.19'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1933k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 479
+    published_page: 479
+    pdf_page_index: 1
+    table: '6'
+    note: Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+        note: Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02
+  derived_from:
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.0:h=ad3bf4c24fa3
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=cd77705b953e
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters: []
+    output_unit: dimensionless activity, as printed
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1983k::T=1983.0:h=adcda04a9bab
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: SiO2 activity relative to the pure oxide reference defined by p_i° in equations
+        (12)–(13).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.18'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_1983k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 479
+    published_page: 479
+    pdf_page_index: 1
+    table: '6'
+    note: Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+        note: Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02
+  derived_from:
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.0:h=82e368317a80
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=19f9a01ddfe7
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters: []
+    output_unit: dimensionless activity, as printed
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_2033k::T=2033.0:h=0c654364c902
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2); phase not specified by the article' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: SiO2 activity relative to the pure oxide reference defined by p_i° in equations
+        (12)–(13).'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.17'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_sio2_activity_2033k
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: derived
+    model: derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 479
+    published_page: 479
+    pdf_page_index: 1
+    table: '6'
+    note: Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 479
+        published_page: 479
+        pdf_page_index: 1
+        table: '6'
+        note: Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01
+  derived_from:
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.0:h=1fc1f540f2e3
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=fa86784dd138
+  derivation:
+    relation: as_published
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters: []
+    output_unit: dimensionless activity, as printed
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.0:h=3165dd1c75a9
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '4.002337500000000506625'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.000008000000000000001'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000039500000000000005'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.0:h=ad3bf4c24fa3
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '4.13406'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.0000015'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000408'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.0:h=82e368317a80
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '8.69368500000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.0000025'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00008580000000000001'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.0:h=1fc1f540f2e3
+  experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '23.5074'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.000007'
+      parent: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+  notices: []
+  source_id: shornikov-1994-mullite-kems
+  locator:
+    page: 478
+    published_page: 478
+    pdf_page_index: 0
+    table: '2'
+    note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
+  read_from: unknown:shornikov-1994-mullite-kems
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1994-mullite-kems
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000232'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          table: '2'
+          note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
+    output_unit: Pa
+  provenance:
+    canonical_source: Rapid Communications in Mass Spectrometry 8 (1994), 478–480; this is the canonical extract.
+    related_doklady_paper: Shul'ts, Shornikov, and Stolyarova, Doklady Physical Chemistry 336 (1994), 95–98.
+    overlap: Doklady Table 2 on translated p.96 (PDF page index 1) repeats the Rapid Communications Table 2 Al, AlO, Al2O,
+      and AlSiO rows. The Al value at 1833 K is rounded there to 0.36 ± 0.02 versus 0.355 ± 0.018 here; the other row cells
+      are repeated. Doklady labels its Al2O scale as ×10^9 while this canonical paper visibly prints p_Al2O · 10^-8; retain
+      this paper's label and values, do not merge or silently rescale.
+    sample_composition: The paper identifies the sample as mullite, 3Al2O3·2SiO2. Table 2 and Table 6 report no row-specific
+      mole fraction or weight percent.
+    sample_phase: The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4
+      K; all Table 2 and Table 6 temperatures are below that value.
+    cell_and_orifice: The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of
+      400:1; no separate orifice material is stated.
+    table_6_derivation: Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures
+      over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria;
+      p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not
+      printed as Table 2 pressure cells.
