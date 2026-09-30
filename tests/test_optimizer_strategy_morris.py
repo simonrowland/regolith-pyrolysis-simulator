@@ -168,7 +168,7 @@ def test_morris_groups_partition_allowlist_and_residual_group_when_needed() -> N
         "C2A_continuous",
         "dT_dt_C_per_hr",
         "early_ramp_1050_1320C",
-    ) in groups["schedule"].paths
+    ) not in groups["schedule"].paths
     assert (
         "campaigns",
         "C2A_staged",

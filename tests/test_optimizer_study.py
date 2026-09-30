@@ -4874,7 +4874,7 @@ def test_feasible_analytical_cache_hit_skips_evaluation_and_splits_keys(
         evaluator_calls += 1
         raise AssertionError("a cache hit must not evaluate the candidate")
 
-    results, prefix_evals_run = study._evaluate_candidates(
+    results, prefix_evals_run, _engine_worker_pool = study._evaluate_candidates(
         [candidate],
         profile=PROFILE,
         feedstock=FEEDSTOCK,
@@ -4955,7 +4955,7 @@ def test_profile_constraint_threshold_change_changes_cache_digest() -> None:
     assert cache_key(spec_loose) != cache_key(spec_tight)
 
 
-def test_physics_policy_version_change_invalidates_eval_cache_key(
+def test_physics_policy_version_is_excluded_from_eval_cache_key(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     schema = RecipeSchema()
@@ -4968,6 +4968,7 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
     constraints = physics_constraints_from_profile(profile)
     validated = patch.validated(schema)
     current_version = physics_module.PHYSICS_GATE_VERSION
+    changed_version = f"{current_version}-test-change"
 
     def build_for_version(version: str) -> tuple[str, str, str]:
         monkeypatch.setattr(physics_module, "PHYSICS_GATE_VERSION", version)
@@ -4981,17 +4982,16 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
         )
         return physics_constraints_digest(constraints), spec.recipe_id, cache_key(spec)
 
-    old_digest, old_recipe_id, old_cache_key = build_for_version(
-        "physics-feasibility-v1"
+    current_digest, current_recipe_id, current_cache_key = build_for_version(
+        current_version
     )
-    new_digest, new_recipe_id, new_cache_key = build_for_version(current_version)
+    changed_digest, changed_recipe_id, changed_cache_key = build_for_version(
+        changed_version
+    )
 
-    # v4 2026-07-12: bumped when t-005 wired the body-aware sub-ambient pumping
-    # hard gate; pre-wiring cached feasibility verdicts must not be served.
-    assert current_version == "physics-feasibility-v5-continuous-transport"
-    assert old_digest != new_digest
-    assert old_cache_key != new_cache_key
-    assert old_recipe_id == new_recipe_id
+    assert current_digest == changed_digest
+    assert current_cache_key == changed_cache_key
+    assert current_recipe_id == changed_recipe_id
 
 
 def test_stub_smoke_selector_is_retired_from_live_profiles() -> None:

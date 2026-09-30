@@ -725,7 +725,8 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # payload is unreachable: current canonical_evalspec_json does not
     # serialize those fingerprints, and the June corpus is not interoperable.
     # Pin recomputed from this tree's executable cache_key(spec).
-    assert cache_key(spec) == "8cd68431dc39a32ed8addb05ccfd936b6ad8d866569cac6473fbb7c4cc671baf"
+    # 2026-09-30 C7d removed the physics-gate version and class from this digest.
+    assert cache_key(spec) == "f6d1c88ba2fcbcca5ae07e720bfe53a721601506fbd93611c907e8869352c7a3"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

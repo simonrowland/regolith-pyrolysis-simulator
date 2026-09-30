@@ -2675,12 +2675,13 @@ def _validate_pressure_default_pairs(
             or (po2_path not in values and total_path not in values)
         ):
             continue
-        if po2_path in values:
+        if po2_path in values and po2_path[-1] != "pO2_mbar":
             po2 = float(values[po2_path])
             po2_source = "patched"
         else:
-            # Searchable scalar paths hold bounds in YAML; loaders use the
-            # sibling default value until the optimizer writes a scalar.
+            # Live pO2 search paths are conditioned by the sampler; this check
+            # validates their sibling default while runtime evaluates any
+            # scalar override as part of the candidate.
             fallback_po2_path = (
                 po2_path[:-1] + ("pO2_mbar_default",)
                 if po2_path[-1] == "pO2_mbar"

@@ -403,7 +403,9 @@ def test_stage0_seed_beam_entry_is_prefix_projected_with_exploration_floor() -> 
         if candidate.metadata["parent_candidate_id"] in seed_parent_ids
     )
     prefix_values = seed_child.metadata["prefix_patch_values"]
-    assert "campaigns.C0.temp_range_C" in prefix_values
+    seed_parent = next(candidate for candidate in stage0 if candidate.id in seed_parent_ids)
+    assert "campaigns.C0.temp_range_C" in seed_parent.metadata["stage_patch_values"]
+    assert "campaigns.C0.temp_range_C" not in prefix_values
     assert not any(key.startswith("campaigns.C0b_p_cleanup.") for key in prefix_values)
     assert seed_child.metadata["seed_lineage"] is True
 
@@ -2388,6 +2390,19 @@ def test_beam_width_1_vs_k(tmp_path) -> None:
 
 def test_one_topology_vs_all_topologies_study(tmp_path) -> None:
     topologies = enumerate_topologies()
+    topology_rank = {topology.id: index for index, topology in enumerate(topologies)}
+
+    class IncreasingSpyEvaluator(SpyEvaluator):
+        def __call__(self, *args: Any, **kwargs: Any) -> ScoredResult:
+            scored = super().__call__(*args, **kwargs)
+            assert scored.candidate_id is not None
+            rank = topology_rank[_topology_id_from_candidate_id(scored.candidate_id)]
+            score = 100.0 + rank
+            return replace(
+                scored,
+                objectives=_objectives(oxygen=score, energy=score),
+            )
+
     store = SpyStore(tmp_path / "topologies.sqlite")
     profile = {
         **PROFILE,
@@ -2421,7 +2436,7 @@ def test_one_topology_vs_all_topologies_study(tmp_path) -> None:
         budget=len(topologies),
         out_dir=tmp_path / "all",
         seed=59,
-        evaluator=SpyEvaluator(),
+        evaluator=IncreasingSpyEvaluator(),
         result_store=store,
         topologies=topologies,
     )
