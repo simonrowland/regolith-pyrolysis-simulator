@@ -67,6 +67,41 @@ def _na2o_liquid(quantity: Quantity = Quantity.DELTA_FG):
     return identity
 
 
+def _pure_phase_identity(
+    quantity: Quantity = Quantity.CP,
+    *,
+    polymorph: str | None = Polymorph.PERICLASE.value,
+):
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=(
+            Polymorph.PERICLASE.value if polymorph is None else polymorph
+        ),
+    )
+    if polymorph is None:
+        identity = replace(
+            identity,
+            species=replace(
+                identity.species,
+                polymorph=State.unknown("printed polymorph unknown"),
+            ),
+        )
+    return _pure_standard_identity(identity, quantity)
+
+
+def _pure_standard_identity(identity, quantity: Quantity):
+    return replace(
+        identity,
+        quantity=quantity,
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+
+
 def _context(*observations, works=None, experiments=None, origins=None):
     work = replace(
         F.work(),
@@ -254,6 +289,27 @@ def test_zero_kelvin_row_does_not_blank_later_series_points() -> None:
     assert row["refused"]["unsupported:engine-thermo-does-not-emit"] == 1
 
 
+def test_compilation_census_counts_measured_candidates_without_a_rail() -> None:
+    from simulator.battery.compilation_tier import compilation_tier_census
+
+    identity = _na2o_liquid(Quantity.VISCOSITY)
+    observation = F.observation(
+        "viscosity-no-rail",
+        "exp-1",
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    result = compilation_tier_census(
+        _context(observation),
+        engines=(Engine.MAGEMIN,),
+        audit_compile_residual=False,
+    )
+
+    assert result["comparison_candidates"] == 1
+    assert result["measured_candidates_by_rail"] == {"none": 1}
+
+
 def test_non_positive_temperature_is_a_refusal_not_an_exception() -> None:
     identity = replace(_na2o_liquid(), temperature_K=State.of(Decimal("0")))
     attempt = predict_thermo_attempt(
@@ -318,7 +374,10 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
             self.S_J_K_mol = 30.0
             self.absences = ()
 
+    calls = []
+
     def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        calls.append(temperature_K)
         if abs(temperature_K - 298.15) < 1e-6:
             return _Props(1000.0)
         return _Props(5000.0)
@@ -331,6 +390,190 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
     assert attempt.value == Decimal("4")
     assert attempt.unit == "kJ_per_declared_mol_basis"
     assert attempt.refusal_reason is None
+    assert calls == [1000.0, 298.15]
+
+    calls.clear()
+    refused = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo", "exp-1", identity, Decimal("4")),
+        invoke_pure_phase=False,
+        pure_phase=pure_phase,
+    )
+    assert refused.refusal_detail["reason"] == "pure-phase-call-required"
+    assert calls == []
+
+
+def test_thermoengine_import_failure_is_typed_in_score_and_census(monkeypatch) -> None:
+    from simulator.battery import compilation_tier
+
+    identity = _pure_phase_identity()
+    observation = F.observation(
+        "mgo-cp-import-failure",
+        "exp-1",
+        identity,
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+
+    def fail_thermoengine_import(*_args, **_kwargs):
+        raise ImportError("No module named 'thermoengine'")
+
+    monkeypatch.setattr(
+        compilation_tier, "default_pure_phase", fail_thermoengine_import
+    )
+    residual, _ = compile_residual(
+        observation,
+        Engine.THERMOENGINE,
+        context=_context(observation),
+        comparison_ids=set(),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert residual.refusal.detail["reason"] == "pure-phase-unavailable"
+
+    census = compilation_tier.compilation_tier_census(
+        _context(observation),
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=True,
+        audit_compile_residual=False,
+    )
+    row = next(row for row in census["rows"] if row["quantity"] == Quantity.CP.value)
+    assert row["numeric"] == 0
+    assert row["refused"]["attempted_unavailable:pure-phase-unavailable"] == 1
+
+
+def test_compilation_census_calls_only_resolved_pure_phases(monkeypatch) -> None:
+    from simulator.battery.compilation_tier import compilation_tier_census
+
+    identity = _pure_phase_identity()
+    crystal = F.observation(
+        "mgo-cp",
+        "exp-1",
+        identity,
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    liquid = F.observation(
+        "na2o-cp",
+        "exp-1",
+        _pure_standard_identity(_na2o_liquid(Quantity.CP), Quantity.CP),
+        Decimal("80"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    calls = []
+
+    class _Props:
+        formula = "MgO"
+        Cp_J_K_mol = 40.0
+        H_J_mol = 0.0
+        S_J_K_mol = 30.0
+        absences = ()
+
+    def pure_phase(engine, symbol, temperature_K, pressure_bar):
+        calls.append((engine, symbol, temperature_K, pressure_bar))
+        return _Props()
+
+    monkeypatch.setattr(
+        "simulator.battery.compilation_tier.default_pure_phase", pure_phase
+    )
+    result = compilation_tier_census(
+        _context(crystal, liquid),
+        engines=(Engine.MAGEMIN,),
+        invoke_pure_phase=True,
+        audit_compile_residual=False,
+    )
+
+    assert len(calls) == 1
+    assert calls[0][0] is Engine.MAGEMIN
+    row = next(row for row in result["rows"] if row["quantity"] == Quantity.CP.value)
+    assert row["numeric"] == 1
+    assert row["refused"]["unsupported:pure-phase-is-crystal-only"] == 1
+
+
+def test_compilation_census_does_not_call_pure_phase_by_default(monkeypatch) -> None:
+    from simulator.battery import compilation_tier
+
+    observation = F.observation(
+        "mgo-cp-default-census",
+        "exp-1",
+        _pure_phase_identity(),
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    calls = []
+
+    class _Props:
+        formula = "MgO"
+        Cp_J_K_mol = 40.0
+        H_J_mol = 0.0
+        S_J_K_mol = 30.0
+        absences = ()
+
+    def pure_phase(engine, symbol, temperature_K, pressure_bar):
+        calls.append((engine, symbol, temperature_K, pressure_bar))
+        return _Props()
+
+    monkeypatch.setattr(compilation_tier, "default_pure_phase", pure_phase)
+    result = compilation_tier.compilation_tier_census(
+        _context(observation),
+        engines=(Engine.MAGEMIN,),
+        audit_compile_residual=False,
+    )
+    row = next(row for row in result["rows"] if row["quantity"] == Quantity.CP.value)
+
+    assert calls == []
+    assert row["numeric"] == 0
+    assert row["refused"]["not_probed:pure-phase-call-required"] == 1
+
+
+def test_compilation_census_requires_identity_equal_before_pure_phase(monkeypatch) -> None:
+    from simulator.battery import compilation_tier
+    from simulator.battery.enums import IdentityEqualKind
+    from simulator.battery.identity import identity_equal
+
+    identity = _pure_phase_identity(polymorph=None)
+    assert identity_equal(identity, identity).kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    observation = F.observation(
+        "mgo-cp-unknown-polymorph",
+        "exp-1",
+        identity,
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    calls = []
+
+    class _Props:
+        formula = "MgO"
+        Cp_J_K_mol = 40.0
+        H_J_mol = 0.0
+        S_J_K_mol = 30.0
+        absences = ()
+
+    def pure_phase(engine, symbol, temperature_K, pressure_bar):
+        calls.append((engine, symbol, temperature_K, pressure_bar))
+        return _Props()
+
+    monkeypatch.setattr(compilation_tier, "default_pure_phase", pure_phase)
+    for engine in (Engine.THERMOENGINE, Engine.MAGEMIN):
+        assert compilation_tier._resolve_symbol(engine, identity)[0] is not None
+        result = compilation_tier.compilation_tier_census(
+            _context(observation),
+            engines=(engine,),
+            invoke_pure_phase=True,
+            audit_compile_residual=False,
+        )
+        row = next(
+            row for row in result["rows"] if row["quantity"] == Quantity.CP.value
+        )
+        assert row["numeric"] == 0
+        assert row["refused"]["identity_unknown:identity_equal"] == 1
+    assert calls == []
 
 
 def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> None:
@@ -684,7 +927,10 @@ def test_pure_phase_value_is_not_reused_at_the_next_temperature(monkeypatch) -> 
         )
 
     monkeypatch.setattr("simulator.battery.compilation_tier.predict_thermo_attempt", fake)
-    identity = replace(_na2o_liquid(Quantity.CP), temperature_K=State.unknown("series"))
+    identity = replace(
+        _pure_phase_identity(),
+        temperature_K=State.unknown("series"),
+    )
     series = F.observation(
         "cp-series",
         "exp-1",
@@ -707,7 +953,7 @@ def test_pure_phase_value_is_not_reused_at_the_next_temperature(monkeypatch) -> 
     ctx = _context(series)
     compilation_tier_census(
         ctx,
-        engines=(Engine.VAPOROCK,),
+        engines=(Engine.MAGEMIN,),
         invoke_pure_phase=True,
         audit_compile_residual=False,
     )
@@ -715,7 +961,7 @@ def test_pure_phase_value_is_not_reused_at_the_next_temperature(monkeypatch) -> 
     calls.clear()
     compilation_tier_census(
         ctx,
-        engines=(Engine.VAPOROCK,),
+        engines=(Engine.MAGEMIN,),
         invoke_pure_phase=False,
         audit_compile_residual=False,
     )
