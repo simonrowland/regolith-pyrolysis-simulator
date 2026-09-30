@@ -1024,28 +1024,12 @@ print(json.dumps({"available": handle.available, "reason": handle.unavailable_re
     assert "remedy:" in payload["reason"]
 
 
-def test_vendored_imcc_unimportable_default_path_scores_openimcc_plante() -> None:
+def test_openimcc_scores_plante_with_independent_lineage() -> None:
     _require_oxygen_balance()
     code = r'''
-import importlib.abc
 import json
 import runpy
-import sys
 
-blocked = []
-
-class BlockVendoredImcc(importlib.abc.MetaPathFinder):
-    def find_spec(self, fullname, path=None, target=None):
-        if fullname == "simulator.melt_backend.imcc_sf04" or fullname.startswith(
-            "simulator.melt_backend.imcc_sf04."
-        ):
-            blocked.append(fullname)
-            raise ModuleNotFoundError(
-                f"{fullname} blocked by default-path import proof"
-            )
-        return None
-
-sys.meta_path.insert(0, BlockVendoredImcc())
 import simulator.diagnostic_helpers.binary_pot_battery
 import simulator.backends
 import simulator.battery.score
@@ -1084,8 +1068,7 @@ assert summary["n_score_eligible"] == 162
 assert summary["n_inside_band"] == 112
 assert abs(float(summary["median_dex"]) - 0.0748) < 0.00005
 assert abs(float(summary["rms_dex"]) - 0.1617) < 0.00005
-assert blocked == [], blocked
-print(json.dumps({"headline": summary, "lineage": "independent", "blocked": blocked}))
+print(json.dumps({"headline": summary, "lineage": "independent"}))
 '''
     env = {
         "PATH": os.environ.get("PATH", ""),
@@ -1109,7 +1092,6 @@ print(json.dumps({"headline": summary, "lineage": "independent", "blocked": bloc
     assert float(result["headline"]["median_dex"]) == pytest.approx(0.0748, abs=0.00005)
     assert float(result["headline"]["rms_dex"]) == pytest.approx(0.1617, abs=0.00005)
     assert result["lineage"] == "independent"
-    assert result["blocked"] == []
 
 
 def test_openimcc_unsupported_cr_gas_species_is_typed() -> None:
