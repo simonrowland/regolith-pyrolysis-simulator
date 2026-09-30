@@ -15,12 +15,15 @@ are not collapsed. ``transition_temperature`` series are not expanded.
 
 from __future__ import annotations
 
+import hashlib
 import os
 import re
+import subprocess
 from collections import defaultdict
 from dataclasses import dataclass, replace
 from decimal import Decimal
 from fractions import Fraction
+from pathlib import Path
 from typing import Callable, Mapping, Sequence
 
 from simulator.battery.enums import (
@@ -298,6 +301,40 @@ def _phase_compatible(product: _Product, identity: Identity) -> bool:
     if identity_name is None:
         return False
     return identity_name == product.polymorph
+
+
+def _vaporock_gas_provenance(equil_module) -> str:
+    """Identify the loaded JANAF table and checkout once per process."""
+    cached = getattr(_vaporock_gas_provenance, "_identity", None)
+    if cached is None:
+        module_path = Path(equil_module.__file__).resolve()
+        table_path = (
+            module_path.parent / "data" / "JANAF-vapor-data-full.csv"
+        ).resolve(strict=True)
+        table_sha256 = hashlib.sha256(table_path.read_bytes()).hexdigest()
+        checkout = module_path.parents[2]
+        git_sha = subprocess.run(
+            ["git", "-C", str(checkout), "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout.strip()
+        dirty = bool(
+            subprocess.run(
+                ["git", "-C", str(checkout), "status", "--porcelain"],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=10,
+            ).stdout.strip()
+        )
+        cached = (
+            f"janaf_csv_path={table_path}:janaf_csv_sha256={table_sha256}:"
+            f"vaporock_git_sha={git_sha}:vaporock_git_dirty={str(dirty).lower()}"
+        )
+        setattr(_vaporock_gas_provenance, "_identity", cached)
+    return cached
 
 
 def _refuse(
@@ -802,6 +839,9 @@ def _vaporock_gas_attempt(
 
             vapor = Vapor(database="JANAF")
             setattr(_vaporock_gas_attempt, "_janaf_vapor", vapor)
+        import vaporock.equil as vaporock_equil
+
+        provenance = _vaporock_gas_provenance(vaporock_equil)
     except Exception as exc:  # noqa: BLE001 - optional engine import boundary
         return _refuse(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
@@ -809,10 +849,15 @@ def _vaporock_gas_attempt(
             quantity=quantity,
             origin=origin,
             extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
+            call_evidence="vaporock-janaf-provenance-unavailable",
         )
 
     formula = identity.species.formula
     species_name = formula if formula.endswith("(g)") else f"{formula}(g)"
+    call_evidence = (
+        f"vaporock-janaf-implementation-fidelity:{species_name}:"
+        f"T={temperature_K}:{provenance}"
+    )
     try:
         rows = vapor.vapor_coefs.loc[species_name]
     except KeyError:
@@ -822,6 +867,7 @@ def _vaporock_gas_attempt(
             quantity=quantity,
             origin=origin,
             extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            call_evidence=call_evidence,
         )
     except Exception as exc:  # noqa: BLE001 - optional engine data boundary
         return _refuse(
@@ -830,6 +876,7 @@ def _vaporock_gas_attempt(
             quantity=quantity,
             origin=origin,
             extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
+            call_evidence=call_evidence,
         )
 
     table_rows = (
@@ -850,6 +897,7 @@ def _vaporock_gas_attempt(
             quantity=quantity,
             origin=origin,
             extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            call_evidence=call_evidence,
         )
     if len(matching_rows) != 1:
         return _refuse(
@@ -858,6 +906,7 @@ def _vaporock_gas_attempt(
             quantity=quantity,
             origin=origin,
             extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            call_evidence=call_evidence,
         )
     row = matching_rows[0]
 
@@ -892,6 +941,7 @@ def _vaporock_gas_attempt(
             quantity=quantity,
             origin=origin,
             extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
+            call_evidence=call_evidence,
         )
     if not value.is_finite():
         return _refuse(
@@ -900,6 +950,7 @@ def _vaporock_gas_attempt(
             quantity=quantity,
             origin=origin,
             extra={"engine": Engine.VAPOROCK.value},
+            call_evidence=call_evidence,
         )
     return ThermoAttempt(
         value=value,
@@ -908,7 +959,7 @@ def _vaporock_gas_attempt(
         notices=(),
         refusal_reason=None,
         refusal_detail={},
-        call_evidence=f"vaporock-janaf-implementation-fidelity:{species_name}:T={temperature_K}",
+        call_evidence=call_evidence,
     )
 
 

@@ -349,6 +349,9 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
 
 
 def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
+    import hashlib
+    from pathlib import Path
+
     import pytest
 
     pytest.importorskip("vaporock.equil")
@@ -376,6 +379,23 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
         assert "implementation-fidelity" in attempt.call_evidence
         attempts[quantity] = attempt
 
+    evidence = attempts[Quantity.CP].call_evidence
+    fields = dict(
+        item.split("=", 1)
+        for item in evidence.split(":")
+        if "=" in item
+    )
+    table_path = Path(fields["janaf_csv_path"])
+    assert table_path.is_file()
+    table_sha256 = hashlib.sha256(table_path.read_bytes()).hexdigest()
+    assert fields["janaf_csv_sha256"] == table_sha256
+    assert len(fields["vaporock_git_sha"]) == 40
+    assert fields["vaporock_git_dirty"] in {"true", "false"}
+    assert all(
+        all(f"{name}=" in attempt.call_evidence for name in fields)
+        for attempt in attempts.values()
+    )
+
     assert attempts[Quantity.CP].unit == "J_per_declared_mol_basis_per_K"
     assert attempts[Quantity.S].unit == "J_per_declared_mol_basis_per_K"
     assert attempts[Quantity.H_MINUS_H298].unit == "kJ_per_declared_mol_basis"
@@ -396,6 +416,9 @@ def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
     )
     assert candidate is not None
     assert residual.source_relation is SourceRelation.SAME_INPUT
+    assert all(
+        f"{name}=" in residual.execution.call_evidence for name in fields
+    )
     assert any(
         notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
         for notice in residual.notices
