@@ -1313,6 +1313,8 @@ def test_openimcc_plante_candidates_match_mole_basis_package() -> None:
     experiment = F.kems_experiment(experiment_id="openimcc-plante-test")
     deltas: list[float] = []
     measured_residuals: list[float] = []
+    # The independent per-row gate versus e87f906 is 5e-5 dex; a 1.3 J/mol
+    # fit residual gives 1.3 / (8.314 * 1259 * 2.303) = 5.4e-5 dex at 1259 K.
     for row in hand_rows:
         composition_wt = {
             "K2O": float(row["K2O_wt_pct"]),
@@ -1515,31 +1517,137 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
     row = json.loads(scratch.read_text(encoding="utf-8"))["hand_rows"][0]
     composition_wt = {"K2O": float(row["K2O_wt_pct"]), "SiO2": float(row["SiO2_wt_pct"])}
     composition_kg, composition_mol = composition_kg_and_mol(composition_wt)
+    import openimcc
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
 
     monkeypatch.delenv("OPENIMCC_VAPOROCK_ROOT", raising=False)
     packaged = _OpenImccBatteryBackend("openimcc")
+    monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(VAPOROCK_ROOT))
+    mutated = _OpenImccBatteryBackend("openimcc")
+    temperature_K = float(row["T_K"])
+    evaluate_gas = openimcc.evaluate_gas
+    gas_results = []
+
+    def record_gas_result(*args, **kwargs):
+        result = evaluate_gas(*args, **kwargs)
+        gas_results.append(result)
+        return result
+
+    monkeypatch.setattr(openimcc, "evaluate_gas", record_gas_result)
+
     packaged_result = packaged.equilibrate(
-        temperature_C=float(row["T_K"]) - 273.15,
+        temperature_C=temperature_K - 273.15,
         composition_kg=composition_kg,
         composition_mol=composition_mol,
         fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
     )
-    packaged_pressure = float(packaged_result.vapor_pressures_Pa["K"])
-    assert packaged_pressure > 0.0
-
-    monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(VAPOROCK_ROOT))
-    mutated = _OpenImccBatteryBackend("openimcc")
     mutated_result = mutated.equilibrate(
-        temperature_C=float(row["T_K"]) - 273.15,
+        temperature_C=temperature_K - 273.15,
         composition_kg=composition_kg,
         composition_mol=composition_mol,
         fO2_log=math.log10(0.226 * float(row["measured_P_K_Pa"]) / 1.0e5),
     )
     assert "VapoRock" in mutated._identity["gas_table_source"]
+    assert len(gas_results) == 2
+    _packaged_gas_result, mutated_gas_result = gas_results
+    packaged_melt = openimcc.evaluate(
+        composition_mol,
+        temperature_K,
+        packaged._pack,
+        basis_type="mol",
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    from openimcc.gas import _default_reactions
+
+    _packaged_channels, packaged_omissions = _default_reactions(
+        packaged_melt.parent_oxides, packaged._gas
+    )
+    assert packaged_omissions == {}
+    expected_omissions = {
+        "Na2O": "Na2O(g)",
+        "K2O": "K2O(g)",
+        "Ti": "TiO2(l)",
+        "TiO": "TiO2(l)",
+        "TiO2": "TiO2(l)",
+    }
+    assert set(expected_omissions) <= set(mutated_gas_result.omitted_channels)
+    for channel, missing_row in expected_omissions.items():
+        reason = mutated_gas_result.omitted_channels[channel]
+        assert "missing from active table" in reason
+        assert missing_row in reason
+        if missing_row.endswith("(g)"):
+            assert missing_row not in mutated._gas.gas_df.index
+        else:
+            assert missing_row not in mutated._gas.oxide_df.index
+    packaged_pressure = float(packaged_result.vapor_pressures_Pa["K"])
+    mutated_pressure = float(mutated_result.vapor_pressures_Pa["K"])
+    assert packaged_pressure > 0.0
+    assert mutated_pressure > 0.0
     assert abs(
-        math.log10(float(mutated_result.vapor_pressures_Pa["K"]) / packaged_pressure)
+        math.log10(mutated_pressure / packaged_pressure)
     ) > 1.0e-9
+
+    inert_balance_result = mutated.equilibrate(
+        temperature_C=temperature_K - 273.15,
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        po2_request=Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material=None,
+        ),
+    )
+    reactive_result = mutated.equilibrate(
+        temperature_C=temperature_K - 273.15,
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        po2_request=Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material="W",
+        ),
+    )
+    from types import SimpleNamespace
+
+    from simulator.battery.score import cell_notices
+
+    for path, path_result in (
+        ("explicit pO2", mutated_result),
+        ("inert balance", inert_balance_result),
+        ("reactive/cell-oxide balance", reactive_result),
+    ):
+        omission_notices = [
+            notice
+            for notice in path_result.diagnostics["imcc_notices"]
+            if notice["kind"] == NoticeKind.INPUT_OMITTED.value
+            and notice["reason"].startswith("gas channel ")
+        ]
+        assert len(omission_notices) == len(expected_omissions), path
+        for channel, missing_row in expected_omissions.items():
+            notice = next(
+                item
+                for item in omission_notices
+                if item["reason"].startswith(f"gas channel {channel} omitted:")
+            )
+            assert "missing from active table" in notice["reason"], path
+            assert missing_row in notice["reason"], path
+            assert str(mutated._gas.gas_path) in notice["reason"], path
+
+        typed_notices = cell_notices(
+            Quantity.P_PARTIAL,
+            Engine.OPENIMCC,
+            SimpleNamespace(notices=path_result.diagnostics["imcc_notices"]),
+        )
+        typed_omissions = [
+            notice
+            for notice in typed_notices
+            if notice.reason.startswith("gas channel ")
+        ]
+        assert len(typed_omissions) == len(expected_omissions), path
+        assert all(notice.kind is NoticeKind.INPUT_OMITTED for notice in typed_omissions)
+        assert all(notice.origin == "engine:openimcc" for notice in typed_omissions)
+        assert all(Quantity.P_PARTIAL in notice.affected_quantities for notice in typed_omissions)
 
 
 

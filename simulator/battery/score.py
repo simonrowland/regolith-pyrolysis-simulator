@@ -1734,6 +1734,15 @@ def cell_notices(
                     ),
                 )
             )
+        elif kind == NoticeKind.INPUT_OMITTED.value:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
+                )
+            )
         elif kind == "openimcc_notice":
             notices.append(
                 Notice(

@@ -41,6 +41,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.battery.enums import NoticeKind
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
@@ -78,6 +79,29 @@ IMCC_DATAPACK_LABELS: dict[str, str] = {
 OPENIMCC_MODEL_IDS: dict[str, str] = {"openimcc": "IMCC-SF04"}
 ALL_IMCC_MODEL_IDS: dict[str, str] = {**IMCC_MODEL_IDS, **OPENIMCC_MODEL_IDS}
 MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
+
+
+def _openimcc_gas_channels_and_omission_notices(
+    parent_oxides: Sequence[str], datapack: Any, gas_result: Any | None = None
+) -> tuple[list[Any], tuple[dict[str, Any], ...]]:
+    """Return the active gas reactions and typed notices for omitted channels."""
+
+    from openimcc.gas import _default_reactions
+
+    channels, default_omissions = _default_reactions(parent_oxides, datapack)
+    omitted_channels = getattr(gas_result, "omitted_channels", default_omissions)
+    table_path = str(datapack.gas_path)
+    notices = tuple(
+        {
+            "kind": NoticeKind.INPUT_OMITTED.value,
+            "authority": None,
+            "reason": (
+                f"gas channel {name} omitted: {reason}; table: {table_path}"
+            ),
+        }
+        for name, reason in omitted_channels.items()
+    )
+    return channels, notices
 ARM_HEADLINE = "headline"
 ARM_QUALIFICATION = "qualification"
 
@@ -2232,7 +2256,6 @@ class _OpenImccBatteryBackend:
                         oxygen_balance_from_pressure_model,
                         oxygen_balance_species_metadata,
                     )
-                    from openimcc.gas import _default_reactions
                 except (ImportError, AttributeError) as exc:
                     raise _OxygenBalanceRefusal(
                         "openimcc_oxygen_balance_unavailable",
@@ -2240,7 +2263,11 @@ class _OpenImccBatteryBackend:
                         "model and oxygen-balance core needed for a reactive cell",
                     ) from exc
 
-                channels = _default_reactions(result.parent_oxides, self._gas)
+                channels, _omission_notices = (
+                    _openimcc_gas_channels_and_omission_notices(
+                        result.parent_oxides, self._gas
+                    )
+                )
                 base_species = oxygen_balance_species_metadata(
                     {name: parent or None for name, (parent, _ng, _no2) in channels}
                 )
@@ -2290,6 +2317,12 @@ class _OpenImccBatteryBackend:
                 gas_pressures.update(
                     {name: all_gas[name] for name in cell_info["cell_oxide_janaf_sources"] if name != "buffer_phase"}
                 )
+            _channels, omission_notices = (
+                _openimcc_gas_channels_and_omission_notices(
+                    result.parent_oxides, self._gas, gas_result
+                )
+            )
+            notices.extend(omission_notices)
             gas_diagnostics = {
                 "domain_flags": dict(getattr(gas_result, "domain_flags", {})),
                 "provenance_class": dict(getattr(gas_result, "provenance_class", {})),
@@ -2364,6 +2397,12 @@ class _OpenImccBatteryBackend:
                     parent_oxides=result.parent_oxides,
                     allow_extrapolation=True,
                 )
+                _channels, omission_notices = (
+                    _openimcc_gas_channels_and_omission_notices(
+                        result.parent_oxides, self._gas, gas_result
+                    )
+                )
+                notices.extend(omission_notices)
                 gas_diagnostics = {
                     "domain_flags": dict(gas_result.domain_flags),
                     "provenance_class": dict(gas_result.provenance_class),
