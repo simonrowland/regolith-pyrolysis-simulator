@@ -5592,8 +5592,13 @@ def test_the_run_execution_authority_reader_also_refuses_a_string():
     assert f(SimpleNamespace(backend_authoritative=False)) is False
 
 
-def test_lunar_highland_60_hour_horizon_changes_extracted_metals() -> None:
-    profile = load_profile("lunar_highland")
+def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
+    profile = copy.deepcopy(dict(load_profile("lunar_highland")))
+    # C0's extraction ends by hour 19, so 24 hours exercises the cap-derived
+    # metal difference without simulating the unused remainder of the 60-hour profile.
+    profile["run"]["hours"] = 24
+    for fidelity_options in profile["fidelities"].values():
+        fidelity_options["hours"] = 24
 
     def product_summary(patch: RecipePatch):
         result = evaluate(

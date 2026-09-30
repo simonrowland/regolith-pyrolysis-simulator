@@ -54,9 +54,10 @@ from simulator.optimize.strategy.bayesian import (
     _constraint_values,
     OPTUNA_REQUIRED_MESSAGE,
     OptunaUnavailableError,
+    _require_optuna,
 )
 from simulator.optimize.strategy.protocol import WarmStartSeed
-from simulator.optimize.study import _profile_warm_start_seeds
+from simulator.optimize.study import _profile_warm_start_seeds, resolve_strategy
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -310,6 +311,28 @@ def test_tpe_strategy_implements_protocol_and_round_trips() -> None:
     assert all(scored.candidate_id == candidate.id for candidate, scored in strategy.results)
 
 
+def test_tpe_constant_liar_tracks_study_parallelism(monkeypatch: pytest.MonkeyPatch) -> None:
+    optuna = _require_optuna()
+    real_sampler = optuna.samplers.TPESampler
+    observed: list[bool] = []
+
+    def capture_sampler(*args: Any, **kwargs: Any) -> Any:
+        observed.append(bool(kwargs["constant_liar"]))
+        return real_sampler(*args, **kwargs)
+
+    monkeypatch.setattr(optuna.samplers, "TPESampler", capture_sampler)
+    for parallel in (1, 2):
+        resolve_strategy(
+            "bayes",
+            profile=PROFILE,
+            seed=29,
+            schema=_simple_schema(),
+            parallel=parallel,
+        )
+
+    assert observed == [False, True]
+
+
 def test_tpe_ask_returns_schema_valid_unique_deterministic_candidates() -> None:
     schema = RecipeSchema()
 
@@ -348,6 +371,8 @@ def test_tpe_ask_batch_after_startup_does_not_duplicate_parameters() -> None:
         seed=0,
         objective_profile=PROFILE,
         n_startup_trials=10,
+        # This test requests two suggestions together, so exercise the batch sampler path.
+        parallel=2,
     )
     startup_candidates = strategy.ask(10)
     strategy.tell(

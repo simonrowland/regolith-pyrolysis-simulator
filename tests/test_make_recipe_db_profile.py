@@ -448,6 +448,10 @@ def test_target_menu_generation_constructs_hold_under_campaign_cap(
 
     assert profile["run"]["hours"] == pytest.approx(expected_hold_hours)
     assert profile["fidelities"]["high"]["hours"] == pytest.approx(expected_hold_hours)
+    assert all(
+        options["hours"] == pytest.approx(expected_hold_hours)
+        for options in profile["fidelities"].values()
+    )
     assert target["maturity"]["hours"] == pytest.approx(expected_hold_hours)
     assert target["hold_construction"] == expected_provenance
 

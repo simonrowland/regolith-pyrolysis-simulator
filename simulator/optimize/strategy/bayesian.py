@@ -71,6 +71,7 @@ class OptunaTPEStrategy:
         profile: Mapping[str, Any] | None = None,
         n_startup_trials: int = 10,
         n_ei_candidates: int = 24,
+        parallel: int = 1,
         warm_start_seeds: Sequence[WarmStartSeed] | None = None,
     ) -> None:
         if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
@@ -82,6 +83,7 @@ class OptunaTPEStrategy:
             raise ValueError("objective_profile is required")
         _validate_non_negative_int("n_startup_trials", n_startup_trials)
         _validate_positive_int("n_ei_candidates", n_ei_candidates)
+        _validate_positive_int("parallel", parallel)
 
         self.schema = schema or RecipeSchema()
         self._seed = seed
@@ -101,7 +103,8 @@ class OptunaTPEStrategy:
             n_startup_trials=n_startup_trials,
             n_ei_candidates=n_ei_candidates,
             constraints_func=_constraints_for_trial,
-            constant_liar=True,
+            # Penalize pending trials only when concurrent suggestions can be in flight.
+            constant_liar=(parallel > 1),
         )
         self._study = optuna.create_study(
             directions=self._directions,

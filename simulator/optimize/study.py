@@ -652,6 +652,7 @@ def run(
             profile=resolved_profile,
             seed=config.seed,
             schema=active_schema,
+            parallel=config.parallel,
             warm_start_seeds=warm_start_seeds,
         )
         staged_strategies: tuple[StagedStrategy, ...] = ()
@@ -1826,6 +1827,7 @@ def _load_study_journal(
             profile=resolved_profile,
             seed=config.seed,
             schema=active_schema,
+            parallel=config.parallel,
             warm_start_seeds=warm_start_seeds,
         )
         staged_strategies: tuple[StagedStrategy, ...] = ()
@@ -2919,6 +2921,7 @@ def resolve_strategy(
     profile: Mapping[str, Any],
     seed: int,
     schema: RecipeSchema,
+    parallel: int = 1,
     warm_start_seeds: Sequence[WarmStartSeed] = (),
 ) -> Strategy:
     if not isinstance(strategy, str):
@@ -2941,6 +2944,7 @@ def resolve_strategy(
             schema,
             seed=seed,
             objective_profile=profile,
+            parallel=parallel,
             warm_start_seeds=warm_start_seeds,
         )
     if strategy == "nsga2":
