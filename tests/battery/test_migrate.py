@@ -2781,7 +2781,10 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # run-labelled series: p_partial 75->136 and n_numeric 356->417.
     # Re-pinned for t998: Zhang Table 4 Na/K alpha points add four printed
     # cells, evaporation_coefficient_alpha 30->34 and n_numeric 450->454.
-    assert census.get("p_partial") == 136
+    # DeMaria 1971 Table 1 adds seven split-sample O2 partial-pressure cells.
+    # The counts move because the rows now carry a supported p_partial identity.
+    # mismatches stays 0.
+    assert census.get("p_partial") == 143
     assert census.get("p_sat") == 21
     assert census.get("evaporation_coefficient_alpha") == 34
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
@@ -2805,8 +2808,9 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # Re-pinned for the loader-survival batch: Richter 2007 +50 printed mass-loss cells
     # (starting-material initial compositions now survive migration), on top of the
     # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; t-998 adds
-    # four Zhang Table 4 alpha cells, so the merged total is 504; mismatches remains 0.
-    assert n_numeric == 504, (n_numeric, census, n_unavailable)
+    # four Zhang Table 4 alpha cells and DeMaria's seven O2 cells, so the merged total is 511;
+    # mismatches remains 0.
+    assert n_numeric == 511, (n_numeric, census, n_unavailable)
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:

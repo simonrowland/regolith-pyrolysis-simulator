@@ -41,15 +41,51 @@ def test_demaria_12022_catalogue_composition_uses_kushiro_and_keeps_engel() -> N
     """Pin the first complete compendium analysis and its printed provenance."""
 
     doc = yaml.safe_load((EXTRACTS / "kems-022-demaria-1971.yaml").read_text())
-    o2 = next(
+    bench = next(item for item in doc["benches"] if item["id"] == "demaria-1971-kems")
+    assert bench["cell_materials"][0]["state"] == {
+        "tag": "value",
+        "value": "Re",
+    }
+    experiment = next(
+        item
+        for item in doc["experiments"]
+        if item["experiment_id"] == "kems-022-demaria-1971"
+    )
+    assert experiment["bench_id"] == "demaria-1971-kems"
+    o2_12022 = next(
         item
         for item in doc["species"]["O2"]["observations"]
-        if item["observation_id"] == "demaria_1971_o2_psat_table1_alkali_range"
+        if item["observation_id"]
+        == "demaria_1971_o2_psat_table1_alkali_range_12022"
     )
-    assert all(
-        "composition_from_sample_catalog" not in point
-        for point in o2["values"]["points"]
+    o2_12065 = next(
+        item
+        for item in doc["species"]["O2"]["observations"]
+        if item["observation_id"]
+        == "demaria_1971_o2_psat_table1_alkali_range_12065"
     )
+    for observation in (o2_12022, o2_12065):
+        assert observation["experiment"] == "kems-022-demaria-1971"
+        assert observation["phase"] == "lunar_samples_12022_12065"
+        assert observation["condensed_form"] == {
+            "state": "condensed_lunar_sample",
+            "metastable": False,
+            "basis": "explicit_author",
+            "note": observation["condensed_form"]["note"],
+        }
+        assert observation["values"]["quantity"] == "partial_pressure"
+        assert all(
+            point["run"] == observation["values"]["sample"]
+            for point in observation["values"]["series"]
+        )
+    assert o2_12022["values"]["sample"] == "12022"
+    assert o2_12022["values"]["composition_from_sample_catalog"] is True
+    assert o2_12022["values"]["composition_source_locator"]["source_id"] == (
+        "lpi-compendium-12022"
+    )
+    assert o2_12065["values"]["sample"] == "12065"
+    assert "composition_from_sample_catalog" not in o2_12065["values"]
+    assert "sample_oxide_composition_wt_pct" not in o2_12065["values"]
     na = next(
         item
         for item in doc["species"]["Na"]["observations"]
