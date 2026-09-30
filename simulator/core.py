@@ -398,6 +398,7 @@ from simulator.physical_constants import MELT_DISSOCIATION_PO2_MAX_BAR
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
     KRESS91_LN_FO2_COEFFICIENT,
+    _Kress91Evaluator,
     _kress91_ln_ratio,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
@@ -4271,17 +4272,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         gas_pO2_bar: float,
         melt_pO2_bar: float,
-        T_K: float,
         gas_temperature_K: float,
         k_g: float,
         k_m: float,
         surface_area_m2: float,
         h_eff_m: float,
-        mol_fractions: Mapping[str, float],
-        pressure_bar: float,
+        kress91_evaluator: _Kress91Evaluator | None,
         n_feo_mol: float,
         n_fe2o3_mol: float,
         capacity_mol_per_ln_fO2: float,
+        diagnostics: bool = True,
     ) -> Dict[str, Any]:
         """Solve the finite-inventory two-film interface without mutation.
 
@@ -4311,7 +4311,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt_conductance = (
             float(k_m) * capacity_mol_per_ln_fO2 / melt_volume_m3
         )
-        if total_fe_mol <= OXYGEN_RESERVOIR_NOOP_MOL or not mol_fractions:
+        if total_fe_mol <= OXYGEN_RESERVOIR_NOOP_MOL or kress91_evaluator is None:
             return {
                 'interface_pO2_bar': gas_pO2_bar,
                 'interface_flux_mol_m2_s': 0.0,
@@ -4328,12 +4328,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
 
         def equilibrium_o2_mol(interface_log: float) -> float:
-            q_eq = float(kress91_split(
-                fO2_log=interface_log / math.log(10.0),
-                mol_fractions=mol_fractions,
-                T_K=float(T_K),
-                pressure_bar=float(pressure_bar),
-            )['fe3'])
+            q_eq = float(
+                kress91_evaluator.fe3_over_sigma_fe_from_ln_pO2(
+                    interface_log
+                )
+            )
             if not math.isfinite(q_eq):
                 raise OxygenInterfaceConfigurationError(
                     'invalid_oxygen_interface_transport',
@@ -4394,6 +4393,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             interface_log
         )
         interface_pO2_bar = math.exp(interface_log)
+        if not diagnostics:
+            return {
+                'interface_pO2_bar': interface_pO2_bar,
+                'interface_flux_mol_m2_s': float(gas_flux),
+                'finite_melt_driving_force_mol': float(
+                    equilibrium_mol - ledger_o2_mol
+                ),
+            }
         log_pressure_delta = gas_log - interface_log
         if abs(log_pressure_delta) > 1.0e-15:
             gas_reference_concentration = (
@@ -4446,9 +4453,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         n_feo_mol: float,
         n_fe2o3_mol: float,
-        T_K: float,
-        pressure_bar: float,
-        comp: Mapping[str, float],
+        kress91_evaluator: _Kress91Evaluator | None,
         fallback_pO2_bar: float,
     ) -> float:
         total_fe_mol = max(0.0, float(n_feo_mol)) + 2.0 * max(
@@ -4457,18 +4462,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if total_fe_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
             return max(self._vacuum_floor_bar(), float(fallback_pO2_bar))
-        mol_fractions = melt_mol_fractions_for_kress91(comp)
-        if not mol_fractions:
+        if kress91_evaluator is None:
             return max(self._vacuum_floor_bar(), float(fallback_pO2_bar))
         q = (
             2.0 * max(0.0, float(n_fe2o3_mol))
             / total_fe_mol
         )
-        fO2_log = kress91_log_fO2_from_fe3_over_sigma_fe(
+        fO2_log = kress91_evaluator.log_fO2_from_fe3_over_sigma_fe(
             fe3_over_sigma_fe=q,
-            mol_fractions=mol_fractions,
-            T_K=float(T_K),
-            pressure_bar=float(pressure_bar),
         )
         from engines.builtin.vapor_pressure import (
             physical_melt_dissociation_pO2_bar,
@@ -4729,17 +4730,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_reference_concentration_mol_m3_per_ln = (
                 float(melt_capacity_mol_per_ln_fO2) / melt_volume_m3
             )
+            mol_fractions = melt_mol_fractions_for_kress91(comp)
+            kress91_evaluator = (
+                _Kress91Evaluator(
+                    mol_fractions=mol_fractions,
+                    T_K=T_K,
+                    pressure_bar=pressure_bar,
+                )
+                if mol_fractions
+                else None
+            )
             finite_root = self._oxygen_finite_interface_root(
                 gas_pO2_bar=transport_pO2_bar,
                 melt_pO2_bar=melt_pO2_bar,
-                T_K=T_K,
                 gas_temperature_K=gas_temperature_K,
                 k_g=k_g,
                 k_m=k_O,
                 surface_area_m2=surface_area_m2,
                 h_eff_m=self._oxygen_exchange_effective_melt_depth_m(),
-                mol_fractions=melt_mol_fractions_for_kress91(comp),
-                pressure_bar=pressure_bar,
+                kress91_evaluator=kress91_evaluator,
                 n_feo_mol=n_feo_mol,
                 n_fe2o3_mol=n_fe2o3_mol,
                 capacity_mol_per_ln_fO2=float(
@@ -5203,17 +5212,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         initial_gas_pressure_bar = gas_pressure_from_headspace(head_o2_mol)
         mol_fractions = melt_mol_fractions_for_kress91(comp)
+        kress91_evaluator = (
+            _Kress91Evaluator(
+                mol_fractions=mol_fractions,
+                T_K=T_K,
+                pressure_bar=pressure_bar,
+            )
+            if mol_fractions
+            else None
+        )
         initial_root = self._oxygen_finite_interface_root(
             gas_pO2_bar=initial_gas_pressure_bar,
             melt_pO2_bar=melt_pO2_bar,
-            T_K=T_K,
             gas_temperature_K=gas_temperature_K,
             k_g=k_g,
             k_m=k_m,
             surface_area_m2=surface_area_m2,
             h_eff_m=h_eff_m,
-            mol_fractions=mol_fractions,
-            pressure_bar=pressure_bar,
+            kress91_evaluator=kress91_evaluator,
             n_feo_mol=n_feo_mol,
             n_fe2o3_mol=n_fe2o3_mol,
             capacity_mol_per_ln_fO2=capacity_mol_per_ln_fO2,
@@ -5297,9 +5313,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 provisional_melt_pO2 = self._oxygen_melt_pO2_bar_for_inventory(
                     n_feo_mol=provisional_feo,
                     n_fe2o3_mol=provisional_fe2o3,
-                    T_K=T_K,
-                    pressure_bar=pressure_bar,
-                    comp=comp,
+                    kress91_evaluator=kress91_evaluator,
                     fallback_pO2_bar=melt_pO2_bar,
                 )
                 root = self._oxygen_finite_interface_root(
@@ -5307,17 +5321,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         n_head_mol + amount_mol
                     ),
                     melt_pO2_bar=provisional_melt_pO2,
-                    T_K=T_K,
                     gas_temperature_K=gas_temperature_K,
                     k_g=k_g,
                     k_m=k_m,
                     surface_area_m2=surface_area_m2,
                     h_eff_m=h_eff_m,
-                    mol_fractions=mol_fractions,
-                    pressure_bar=pressure_bar,
+                    kress91_evaluator=kress91_evaluator,
                     n_feo_mol=provisional_feo,
                     n_fe2o3_mol=provisional_fe2o3,
                     capacity_mol_per_ln_fO2=capacity_mol_per_ln_fO2,
+                    diagnostics=False,
                 )
                 flux = float(root['interface_flux_mol_m2_s'])
                 return amount_mol + step_dt_s * surface_area_m2 * flux, root
@@ -5326,42 +5339,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 lower_bound: float,
                 upper_bound: float,
             ) -> tuple[float, Dict[str, Any]]:
+                accepted_root: Dict[str, Any] | None = None
                 if lower_bound == upper_bound:
                     amount = lower_bound
                 else:
                     lo = lower_bound
                     hi = upper_bound
-                    lo_residual, _ = residual_for_amount(lo)
-                    hi_residual, _ = residual_for_amount(hi)
+                    lo_residual, lo_root = residual_for_amount(lo)
+                    hi_residual, hi_root = residual_for_amount(hi)
                     if lo_residual == 0.0:
                         amount = lo
+                        accepted_root = lo_root
                     elif hi_residual == 0.0:
                         amount = hi
+                        accepted_root = hi_root
                     elif lo_residual * hi_residual < 0.0:
                         for _ in range(80):
                             mid = 0.5 * (lo + hi)
-                            mid_residual, _ = residual_for_amount(mid)
+                            mid_residual, mid_root = residual_for_amount(mid)
                             if abs(mid_residual) <= 1.0e-14:
                                 lo = hi = mid
+                                accepted_root = mid_root
                                 break
                             if lo_residual * mid_residual <= 0.0:
                                 hi = mid
                                 hi_residual = mid_residual
+                                hi_root = mid_root
                             else:
                                 lo = mid
                                 lo_residual = mid_residual
+                                lo_root = mid_root
                         amount = 0.5 * (lo + hi)
                     elif lo_residual > 0.0 and hi_residual > 0.0:
                         amount = lo
+                        accepted_root = lo_root
                     elif lo_residual < 0.0 and hi_residual < 0.0:
                         amount = hi
+                        accepted_root = hi_root
                     else:
-                        amount = (
-                            lo
-                            if abs(lo_residual) <= abs(hi_residual)
-                            else hi
-                        )
+                        if abs(lo_residual) <= abs(hi_residual):
+                            amount = lo
+                            accepted_root = lo_root
+                        else:
+                            amount = hi
+                            accepted_root = hi_root
                 amount = max(lower_bound, min(upper_bound, amount))
+                if accepted_root is not None:
+                    return amount, accepted_root
                 _, root = residual_for_amount(amount)
                 return amount, root
 

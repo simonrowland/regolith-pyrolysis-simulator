@@ -699,7 +699,7 @@ def _kress91_fe2o3_over_feo_molar(
             pressure_bar=pressure_bar,
         )
     )
-    return math.exp(max(-745.0, min(709.0, ln_ratio)))
+    return _kress91_ratio_from_ln_ratio(ln_ratio)
 
 
 def _kress91_ln_ratio(
@@ -717,8 +717,6 @@ def _kress91_ln_ratio(
     partial pressure.
     """
 
-    x = mol_fractions
-    p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
     # Keep the additions left-associated in the same order as the pre-existing
     # forward expression.  Besides documenting the algebra, this preserves
     # the published floating-point golden values while the inverse reuses the
@@ -728,24 +726,135 @@ def _kress91_ln_ratio(
         ln_ratio = (
             KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
         )
-    ln_ratio += KRESS91_INV_T_COEFFICIENT_K / float(T_K)
-    ln_ratio += -6.675
-    ln_ratio += -2.243 * x.get('Al2O3', 0.0)
-    ln_ratio += -1.828 * x.get('FeOt', 0.0)
-    ln_ratio += 3.201 * x.get('CaO', 0.0)
-    ln_ratio += 5.854 * x.get('Na2O', 0.0)
-    ln_ratio += 6.215 * x.get('K2O', 0.0)
-    ln_ratio += KRESS91_NONLINEAR_COEFFICIENT * (
-        1.0
-        - (KRESS91_NONLINEAR_REFERENCE_T_K / T_K)
-        - math.log(T_K / KRESS91_NONLINEAR_REFERENCE_T_K)
-    )
-    ln_ratio += KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K)
-    ln_ratio += KRESS91_PRESSURE_D_T_COEFFICIENT * (
-        ((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K
-    )
-    ln_ratio += KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
+    for term in _kress91_ln_ratio_terms(
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    ):
+        ln_ratio += term
     return ln_ratio
+
+
+def _kress91_ln_ratio_terms(
+    *,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> tuple[float, ...]:
+    x = mol_fractions
+    p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
+    return (
+        KRESS91_INV_T_COEFFICIENT_K / float(T_K),
+        -6.675,
+        -2.243 * x.get('Al2O3', 0.0),
+        -1.828 * x.get('FeOt', 0.0),
+        3.201 * x.get('CaO', 0.0),
+        5.854 * x.get('Na2O', 0.0),
+        6.215 * x.get('K2O', 0.0),
+        KRESS91_NONLINEAR_COEFFICIENT * (
+            1.0
+            - (KRESS91_NONLINEAR_REFERENCE_T_K / T_K)
+            - math.log(T_K / KRESS91_NONLINEAR_REFERENCE_T_K)
+        ),
+        KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K),
+        KRESS91_PRESSURE_D_T_COEFFICIENT * (
+            ((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K
+        ),
+        KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K),
+    )
+
+
+def _kress91_ratio_from_ln_ratio(ln_ratio: float) -> float:
+    return math.exp(max(-745.0, min(709.0, ln_ratio)))
+
+
+def _kress91_fe3_from_ratio(ratio: float) -> float:
+    return 2.0 * ratio / (2.0 * ratio + 1.0)
+
+
+def _kress91_ferric_ln_ratio(fe3_over_sigma_fe: float) -> float:
+    q = float(fe3_over_sigma_fe)
+    if not math.isfinite(q):
+        raise Kress91InvalidControls(
+            f'Kress91 invalid control fe3_over_sigma_fe: expected finite value, got {fe3_over_sigma_fe!r}'
+        )
+    q = max(
+        KRESS91_FERRIC_FRACTION_EPSILON,
+        min(1.0 - KRESS91_FERRIC_FRACTION_EPSILON, q),
+    )
+    ratio = q / (2.0 * (1.0 - q))
+    return math.log(ratio)
+
+
+def _kress91_inverse_from_ln_ratios(
+    ferric_ln_ratio: float,
+    base_ln_ratio: float,
+    inverse_denominator: float,
+) -> float:
+    return (ferric_ln_ratio - base_ln_ratio) / inverse_denominator
+
+
+class _Kress91Evaluator:
+    """Cache Kress91 composition/T/P terms for one oxygen-transfer solve."""
+
+    __slots__ = ('_terms', '_base_ln_ratio', '_ln10', '_inverse_denominator')
+
+    def __init__(
+        self,
+        *,
+        mol_fractions: Mapping[str, float],
+        T_K: float,
+        pressure_bar: float,
+    ) -> None:
+        _validate_kress91_controls(
+            fO2_log=0.0,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )
+        self._terms = _kress91_ln_ratio_terms(
+            mol_fractions=mol_fractions,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )
+        base_ln_ratio = 0.0
+        for term in self._terms:
+            base_ln_ratio += term
+        self._base_ln_ratio = base_ln_ratio
+        self._ln10 = math.log(10.0)
+        self._inverse_denominator = KRESS91_LN_FO2_COEFFICIENT * self._ln10
+
+    def fe3_over_sigma_fe_from_ln_pO2(self, ln_pO2: float) -> float:
+        value = float(ln_pO2) / self._ln10
+        if not math.isfinite(value):
+            raise Kress91InvalidControls(
+                'Kress91 invalid control fO2_log: expected finite value, '
+                f'got {value!r}'
+            )
+        ln_ratio = KRESS91_LN_FO2_COEFFICIENT * value * self._ln10
+        terms = self._terms
+        ln_ratio += terms[0]
+        ln_ratio += terms[1]
+        ln_ratio += terms[2]
+        ln_ratio += terms[3]
+        ln_ratio += terms[4]
+        ln_ratio += terms[5]
+        ln_ratio += terms[6]
+        ln_ratio += terms[7]
+        ln_ratio += terms[8]
+        ln_ratio += terms[9]
+        ln_ratio += terms[10]
+        ratio = math.exp(max(-745.0, min(709.0, ln_ratio)))
+        return 2.0 * ratio / (2.0 * ratio + 1.0)
+
+    def log_fO2_from_fe3_over_sigma_fe(
+        self,
+        fe3_over_sigma_fe: float,
+    ) -> float:
+        return _kress91_inverse_from_ln_ratios(
+            _kress91_ferric_ln_ratio(fe3_over_sigma_fe),
+            self._base_ln_ratio,
+            self._inverse_denominator,
+        )
 
 
 def kress91_log_fO2_from_fe3_over_sigma_fe(
@@ -770,25 +879,17 @@ def kress91_log_fO2_from_fe3_over_sigma_fe(
         T_K=T_K,
         pressure_bar=pressure_bar,
     )
-    q = float(fe3_over_sigma_fe)
-    if not math.isfinite(q):
-        raise Kress91InvalidControls(
-            f'Kress91 invalid control fe3_over_sigma_fe: expected finite value, got {fe3_over_sigma_fe!r}'
-        )
-    q = max(
-        KRESS91_FERRIC_FRACTION_EPSILON,
-        min(1.0 - KRESS91_FERRIC_FRACTION_EPSILON, q),
+    ferric_ln_ratio = _kress91_ferric_ln_ratio(fe3_over_sigma_fe)
+    base_ln_ratio = _kress91_ln_ratio(
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
     )
-    ratio = q / (2.0 * (1.0 - q))
-    ln_ratio = math.log(ratio)
-    return (
-        ln_ratio
-        - _kress91_ln_ratio(
-            mol_fractions=mol_fractions,
-            T_K=T_K,
-            pressure_bar=pressure_bar,
-        )
-    ) / (KRESS91_LN_FO2_COEFFICIENT * math.log(10.0))
+    return _kress91_inverse_from_ln_ratios(
+        ferric_ln_ratio,
+        base_ln_ratio,
+        KRESS91_LN_FO2_COEFFICIENT * math.log(10.0),
+    )
 
 
 def kress91_fe3_over_sigma_fe(
@@ -804,7 +905,7 @@ def kress91_fe3_over_sigma_fe(
         T_K=T_K,
         pressure_bar=pressure_bar,
     )
-    return 2.0 * ratio / (2.0 * ratio + 1.0)
+    return _kress91_fe3_from_ratio(ratio)
 
 
 def _kress91_ferrous_feo_activity_raw(
@@ -1124,7 +1225,7 @@ def kress91_split(
         T_K=T_K,
         pressure_bar=pressure_bar,
     )
-    fe3 = 2.0 * ratio / (2.0 * ratio + 1.0)
+    fe3 = _kress91_fe3_from_ratio(ratio)
     x_fe2o3 = ratio * mol_fractions['FeOt'] / (2.0 * ratio + 1.0)
     x_feo = max(0.0, mol_fractions['FeOt'] - 2.0 * x_fe2o3)
     temperature_band = kress91_temperature_band_case(float(T_K) - 273.15)

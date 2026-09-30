@@ -442,21 +442,41 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
             if row["vapor_species_kg_hr"].get("SiO", 0.0) > 0.0
         ]
         assert active_sio_rows
-        # Source-side flux has no molecular P0; until that boundary lands,
-        # the P0-gated model and its species notices are inapplicable. Check
-        # the reported regime against the geometry-derived Kn classification;
-        # C3_K's narrower pipe can put valid rows in transitional flow, but
-        # this fixture does not justify free-molecular flow.
+        # Source-side flux has no molecular P0, so its formula remains
+        # not-applicable. Rows with a species transport notice independently
+        # derive Kn from its pressure, carrier, and pipe plus row temperature.
         from simulator.transport_regime import classify_knudsen_regime
 
-        assert all(
-            math.isfinite(row["Kn"])
-            and row["Kn"] >= 0.0
-            and classify_knudsen_regime(row["Kn"]).value in {"viscous", "transitional"}
-            and row["regime"] == classify_knudsen_regime(row["Kn"]).value
-            and row["transport_formula_id"] == "not_applicable_until_p0"
-            for row in active_sio_rows
-        )
+        derived_hours = set()
+        for row in active_sio_rows:
+            row_kn = row["Kn"]
+            assert math.isfinite(row_kn) and row_kn >= 0.0
+            assert row["regime"] == classify_knudsen_regime(row_kn).value
+            assert row["transport_formula_id"] == "not_applicable_until_p0"
+            wall_authority = row["vapour_batch_summary"]["metadata"].get(
+                "wall_deposit_sticking_authority", {}
+            )
+            species_notices = wall_authority.get(
+                "evaporation_transport_notices_by_species", {}
+            ).get("SiO", {})
+            if not species_notices:
+                continue
+            notice = species_notices["evaporation"]
+            diagnostic = condensation.knudsen_regime_diagnostic(
+                overhead_pressure_mbar=notice["overhead_pressure_mbar"],
+                gas_temperature_C=row["T_C"],
+                pipe_diameter_m=notice["pipe_diameter_m"],
+                carrier_gas=notice["carrier_gas"],
+            )
+            derived_kn = (
+                diagnostic["mean_free_path_m"]
+                / notice["pipe_diameter_m"]
+            )
+            assert math.isfinite(derived_kn) and derived_kn >= 0.0
+            assert row_kn == pytest.approx(derived_kn, rel=1e-12, abs=0.0)
+            assert row["regime"] == classify_knudsen_regime(derived_kn).value
+            derived_hours.add(row["hour"])
+        assert {21, 24} <= derived_hours
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
     assert pareto["Na"]["authority_level"] == "extrapolated"

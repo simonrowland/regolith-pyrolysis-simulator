@@ -558,20 +558,23 @@ def test_finite_interface_root_conserves_flux_for_interior_inventory():
     sim._melt_headspace_composition_mbar = {'N2': 1.0}
     T_K = sim.melt.temperature_C + 273.15
     comp = sim._melt_oxide_wt_pct()
+    mol_fractions = core_module.melt_mol_fractions_for_kress91(comp)
+    kress91_evaluator = core_module._Kress91Evaluator(
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=0.1,
+    )
     k_m, _, _ = sim._oxygen_exchange_k_m_s(T_K)
     k_g, _ = sim._oxygen_interface_gas_side_k_m_s(T_K)
     melt_pO2_bar = sim._oxygen_melt_pO2_bar_for_inventory(
         n_feo_mol=2.0,
         n_fe2o3_mol=1.0,
-        T_K=T_K,
-        pressure_bar=0.1,
-        comp=comp,
+        kress91_evaluator=kress91_evaluator,
         fallback_pO2_bar=1.0e-4,
     )
     root = sim._oxygen_finite_interface_root(
         gas_pO2_bar=1.0e-9,
         melt_pO2_bar=melt_pO2_bar,
-        T_K=T_K,
         gas_temperature_K=T_K,
         k_g=k_g,
         k_m=k_m,
@@ -579,8 +582,7 @@ def test_finite_interface_root_conserves_flux_for_interior_inventory():
         h_eff_m=sim.setpoints['sso_r']['oxygen_exchange'][
             'effective_melt_depth_m'
         ],
-        mol_fractions=core_module.melt_mol_fractions_for_kress91(comp),
-        pressure_bar=0.1,
+        kress91_evaluator=kress91_evaluator,
         n_feo_mol=2.0,
         n_fe2o3_mol=1.0,
         capacity_mol_per_ln_fO2=1.0,
