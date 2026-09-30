@@ -61,7 +61,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError
-from simulator.optimize.recipe import RecipePatch
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import (
     ResultStore,
     _deserialize_run_reference,
@@ -3357,6 +3357,39 @@ def test_recipe_value_error_raised_by_executor_is_scored_with_artifacts(
     assert result.eval_spec is not None
     assert result.cache_key == cache_key(result.eval_spec)
     assert result.notes
+
+
+def test_scalar_c0_temperature_range_patch_is_scored_by_c1() -> None:
+    schema = RecipeSchema()
+    path = ("campaigns", "C0", "temp_range_C")
+    scalar = schema.spec_for(path).low
+
+    class MalformedRangeExecutor:
+        calls = 0
+        config: object | None = None
+
+        def execute(self, config: object) -> object:
+            self.calls += 1
+            self.config = config
+            raise ValueError("Malformed campaign temperature range: C0.temp_range_C")
+
+    executor = MalformedRangeExecutor()
+    result = evaluate(
+        RecipePatch({path: scalar}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=executor,
+        schema=schema,
+    )
+
+    assert executor.calls == 1
+    assert executor.config is not None
+    assert executor.config.setpoints["campaigns"]["C0"]["temp_range_C"] == scalar
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INVALID_RECIPE
+    assert result.eval_spec is not None
+    assert result.cache_key == cache_key(result.eval_spec)
 
 
 def test_unknown_value_error_still_aborts_as_engine_bug() -> None:

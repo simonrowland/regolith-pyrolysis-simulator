@@ -559,8 +559,12 @@ class RecipeSchema:
         )
     )
     PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT: Mapping[KeyPath, KeyPath] = MappingProxyType({
+        tuple("campaigns.C0b_p_cleanup.pO2_mbar".split(".")):
+            tuple("campaigns.C0b_p_cleanup.p_total_mbar_default".split(".")),
         tuple("campaigns.C0b_p_cleanup.pO2_mbar_default".split(".")):
             tuple("campaigns.C0b_p_cleanup.p_total_mbar_default".split(".")),
+        tuple("campaigns.C2B.pO2_mbar".split(".")):
+            tuple("campaigns.C2B.p_total_mbar_default".split(".")),
         tuple("campaigns.C2B.pO2_mbar_default".split(".")):
             tuple("campaigns.C2B.p_total_mbar_default".split(".")),
         tuple("campaigns.C3.pO2_mbar_default".split(".")):
@@ -601,6 +605,7 @@ class RecipeSchema:
             high=950,
             units="C",
             bounds_source="setpoints:campaigns.C0.temp_range_C",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C0.dT_dt_C_per_hr",
@@ -718,6 +723,7 @@ class RecipeSchema:
             high=20,
             units="C/hr",
             bounds_source="setpoints:campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.p_total_mbar",
@@ -2673,8 +2679,19 @@ def _validate_pressure_default_pairs(
             po2 = float(values[po2_path])
             po2_source = "patched"
         else:
-            po2 = float(_default_setpoint_value(po2_path))
-            po2_source = "YAML default"
+            # Searchable scalar paths hold bounds in YAML; loaders use the
+            # sibling default value until the optimizer writes a scalar.
+            fallback_po2_path = (
+                po2_path[:-1] + ("pO2_mbar_default",)
+                if po2_path[-1] == "pO2_mbar"
+                else po2_path
+            )
+            if fallback_po2_path in values:
+                po2 = float(values[fallback_po2_path])
+                po2_source = "patched loader fallback"
+            else:
+                po2 = float(_default_setpoint_value(fallback_po2_path))
+                po2_source = "YAML default"
         if total_path in values:
             total = float(values[total_path])
             total_source = "patched"
