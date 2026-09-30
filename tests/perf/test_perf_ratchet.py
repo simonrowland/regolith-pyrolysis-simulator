@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import copy
 import json
+import math
+import statistics
 import subprocess
 import sys
 
@@ -66,12 +68,56 @@ RESPONSE_POLICY = (
 )
 
 
+def _assert_optimizer_stage_measurement(measurement: dict) -> None:
+    trials = measurement["details"]["trial_records"]
+    cpu_values = [float(trial["cpu_seconds"]) for trial in trials]
+    median_cpu = float(measurement["cpu_seconds_median"])
+    assert len(trials) >= 5
+    assert math.isfinite(median_cpu)
+    # The plan's measured 24 h analytical run is 7.42 CPU-s; a 1 h stage
+    # cannot satisfy this derived lower bound, while the 60 h C4 path can.
+    assert median_cpu > 7.42
+    assert median_cpu == pytest.approx(statistics.median(cpu_values))
+    assert measurement["cpu_seconds_spread"] == pytest.approx(
+        max(cpu_values) - min(cpu_values)
+    )
+    assert measurement["work_units"] == (
+        bench.OPTIMIZER_STAGE_HORIZON_HOURS * len(trials)
+    )
+    assert measurement["hot_path_calls"] == measurement["work_units"]
+    assert math.isfinite(float(measurement["wall_seconds_median"]))
+    assert math.isfinite(float(measurement["wall_cpu_ratio_median"]))
+    for trial in trials:
+        assert trial["date"] and trial["hostname"]
+        assert trial["work_units"] == bench.OPTIMIZER_STAGE_HORIZON_HOURS
+        assert trial["hot_path_calls"] == trial["work_units"]
+        assert trial["cold_cache_miss"] is True
+        assert trial["same_patch_cache_hit"] is True
+        assert trial["cache_hit_counted"] is False
+        assert trial["cache_hit_work_units"] == 0
+        assert math.isfinite(float(trial["wall_seconds"]))
+        assert math.isfinite(float(trial["wall_cpu_ratio"]))
+
+
+def test_optimizer_60h_stage_records_real_cold_work() -> None:
+    assert bench.OPTIMIZER_STAGE_NAME in STAGE_NAMES, (
+        "optimizer stage missing from STAGE_NAMES"
+    )
+    _assert_optimizer_stage_measurement(
+        bench._measure_one(bench.OPTIMIZER_STAGE_NAME)
+    )
+
+
 def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
     """Catch the multi-hour CI incident class before full-run tests wedge.
 
     FIX THE CODE, DO NOT WEAKEN OR DELETE THIS TEST.
     """
 
+    assert bench.OPTIMIZER_STAGE_NAME in STAGE_NAMES, (
+        "optimizer stage missing from STAGE_NAMES"
+    )
+    assert bench.PROTOCOL["aggregation"] == "max_trial_rate"
     baseline = load_baselines(BASELINE_PATH)
     # Milestone review F1 (HIGH): without this pin, a one-line edit to the
     # baselines JSON machine_class field made the gate skip green forever
@@ -100,19 +146,39 @@ def test_perf_ratchet_guards_call_volume_and_cpu_cost() -> None:
 
     bench.require_measurement_power_state()
     measurements = measure_all()
+    _assert_optimizer_stage_measurement(
+        measurements[bench.OPTIMIZER_STAGE_NAME]
+    )
+
     margin = float(baseline["margin_frac"])
     collapse_factor = float(baseline["collapse_factor"])
     for stage in STAGE_NAMES:
         measured = measurements[stage]
         observed = float(measured["rate"])
         ratchet = float(baseline["stages"][stage]["ratchet_rate"])
+        stage_trials = int(
+            baseline["protocol"].get("stage_trial_counts", {}).get(
+                stage,
+                baseline["protocol"]["trials"],
+            )
+        )
+        # Protocol counts are per trial; multiplying by the declared trial
+        # count derives the expected aggregate work in this measurement.
         expected_hot_path_calls = (
             baseline["protocol"]["hot_path_calls_per_trial"][stage]
-            * baseline["protocol"]["trials"]
+            * stage_trials
         )
         assert measured["hot_path_calls"] == expected_hot_path_calls, (
             f"{stage}: intended hot-path counter="
             f"{measured['hot_path_calls']}, expected={expected_hot_path_calls}"
+        )
+        expected_work_units = (
+            baseline["protocol"]["stage_work_units_per_trial"][stage]
+            * stage_trials
+        )
+        assert measured["work_units"] == expected_work_units, (
+            f"{stage}: measured work units={measured['work_units']}, "
+            f"expected={expected_work_units}"
         )
         # Premise: a 10x collapse means one tenth the ratcheted throughput.
         # Algebra: floor = ratchet/10. Units: work/CPU-s. Sanity: the floor

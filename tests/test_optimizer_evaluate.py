@@ -60,7 +60,7 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
-from simulator.optimize.profiles import ProfileValidationError
+from simulator.optimize.profiles import ProfileValidationError, load_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import (
     ResultStore,
@@ -5589,3 +5589,43 @@ def test_the_run_execution_authority_reader_also_refuses_a_string():
     assert f(SimpleNamespace(backend_authoritative=None)) is None
     assert f(SimpleNamespace(backend_authoritative=True)) is True
     assert f(SimpleNamespace(backend_authoritative=False)) is False
+
+
+def test_lunar_highland_60_hour_horizon_changes_extracted_metals() -> None:
+    profile = load_profile("lunar_highland")
+
+    def product_summary(patch: RecipePatch):
+        result = evaluate(
+            patch,
+            "lunar_highland",
+            "fast",
+            profile=profile,
+        )
+        assert result.run_reference is not None
+        return result.run_reference.product_summary
+
+    baseline_patch = RecipePatch({})
+    baseline = product_summary(baseline_patch)
+    repeated = product_summary(baseline_patch)
+    capped = product_summary(RecipePatch({("furnace_max_T_C",): 1200.0}))
+
+    assert baseline == repeated
+    baseline_metals = float(
+        baseline["product_classes"]["metals_plus_O2"]["metals_total_kg"]
+    )
+    repeated_metals = float(
+        repeated["product_classes"]["metals_plus_O2"]["metals_total_kg"]
+    )
+    capped_metals = float(
+        capped["product_classes"]["metals_plus_O2"]["metals_total_kg"]
+    )
+    assert all(
+        math.isfinite(value)
+        for value in (baseline_metals, repeated_metals, capped_metals)
+    )
+
+    # Same-patch repeat delta captures run variation; a larger cap delta proves
+    # the trajectory reaches extraction without pinning a copied output value.
+    assert abs(baseline_metals - capped_metals) > abs(
+        baseline_metals - repeated_metals
+    ), "C4_HORIZON_RELATION: cap must change extracted metals beyond repeat variation"

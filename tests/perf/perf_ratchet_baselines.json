@@ -11,6 +11,7 @@
     "hot_path_calls_per_trial": {
       "condensation_route_hour": 164,
       "internal_analytical_equilibrium": 500,
+      "optimizer_60h_eval": 60,
       "runner_fixture_replay": 24,
       "sim_step_c2a_hour": 1,
       "vapor_pressure_eval": 36000
@@ -21,13 +22,18 @@
     "stage_process_repeats": {
       "condensation_route_hour": 5,
       "internal_analytical_equilibrium": 1,
+      "optimizer_60h_eval": 1,
       "runner_fixture_replay": 3,
       "sim_step_c2a_hour": 1,
       "vapor_pressure_eval": 1
     },
+    "stage_trial_counts": {
+      "optimizer_60h_eval": 5
+    },
     "stage_work_units_per_trial": {
       "condensation_route_hour": 4,
       "internal_analytical_equilibrium": 500,
+      "optimizer_60h_eval": 60,
       "runner_fixture_replay": 1,
       "sim_step_c2a_hour": 1,
       "vapor_pressure_eval": 36000
@@ -47,6 +53,11 @@
     "internal_analytical_equilibrium": {
       "hot_path": "PyrolysisSimulator._internal_analytical_equilibrium",
       "ratchet_rate": 9530.889613236483,
+      "rate_unit": "work_units_per_cpu_second"
+    },
+    "optimizer_60h_eval": {
+      "hot_path": "PyrolysisSimulator.step during optimizer evaluate",
+      "ratchet_rate": 3.212723412786125,
       "rate_unit": "work_units_per_cpu_second"
     },
     "runner_fixture_replay": {
