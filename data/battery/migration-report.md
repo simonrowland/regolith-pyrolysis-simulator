@@ -4,7 +4,7 @@ rows in: 47306
 records out (observations): 109982
 works: 257
 experiments: 3502
-queue size: 76639
+queue size: 76636
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -18030,7 +18030,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-041-sossi-fegley-2018.yaml` | 155 | 155 | 777 |
 | `data/literature/extracts/kems-042-plante-1979.yaml` | 383 | 383 | 0 |
 | `data/literature/extracts/kems-044-robinot-2026.yaml` | 19 | 20 | 68 |
-| `data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml` | 25 | 56 | 160 |
+| `data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml` | 25 | 56 | 158 |
 | `data/literature/extracts/kems-046-van-limpt-2007.yaml` | 12 | 24 | 84 |
 | `data/literature/extracts/kems-047-turkdogan-1984-isij.yaml` | 6 | 14 | 61 |
 | `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` | 18 | 18 | 107 |
@@ -18103,7 +18103,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/metsoc-2024-6224.yaml` | 5 | 5 | 20 |
 | `data/literature/extracts/mogul-2023-pioneer-venus-co2-icarus.yaml` | 3 | 6 | 24 |
 | `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 115 | 225 |
-| `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 44 | 84 |
+| `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 44 | 83 |
 | `data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml` | 10 | 14 | 58 |
 | `data/literature/extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml` | 5 | 16 | 6 |
 | `data/literature/extracts/nakamura-2022-science-ryugu-thermal.yaml` | 3 | 18 | 29 |
@@ -18271,8 +18271,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 216353
+advisory issues: 216363
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 216353 |
+| `identity_incomplete` | 216363 |
