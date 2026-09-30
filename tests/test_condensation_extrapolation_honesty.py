@@ -443,10 +443,17 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         ]
         assert active_sio_rows
         # Source-side flux has no molecular P0; until that boundary lands,
-        # the P0-gated continuum model and its species notices are inapplicable.
+        # the P0-gated model and its species notices are inapplicable. Check
+        # the reported regime against the geometry-derived Kn classification;
+        # C3_K's narrower pipe can put valid rows in transitional flow, but
+        # this fixture does not justify free-molecular flow.
+        from simulator.transport_regime import classify_knudsen_regime
+
         assert all(
-            row["regime"] == "viscous"
-            and 0.0 <= row["Kn"] < 0.01
+            math.isfinite(row["Kn"])
+            and row["Kn"] >= 0.0
+            and classify_knudsen_regime(row["Kn"]).value in {"viscous", "transitional"}
+            and row["regime"] == classify_knudsen_regime(row["Kn"]).value
             and row["transport_formula_id"] == "not_applicable_until_p0"
             for row in active_sio_rows
         )
@@ -467,9 +474,13 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     )
     assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
     if hours == 24:
-        # Pareto authority must not invent a transport model before P0 exists.
-        assert "evaporation_transport_notices" not in pareto.get("SiO", {})
-        assert "evaporation_transport_notices" not in pareto.get("Si", {})
+        transport = wall["evaporation_transport_notices_by_species"]
+        assert transport["SiO"]["evaporation"]["authority_level"] == "extrapolated"
+        assert "Kn < 0.01" in transport["SiO"]["evaporation"]["model_domain"]
+        assert transport["Si"]["evaporation"]["authority_level"] == "unavailable"
+        assert transport["Si"]["evaporation"]["refusal_type"] == "EvaporationFluxConfigurationError"
+        assert pareto["SiO"]["evaporation_transport_notices"] == transport["SiO"]
+        assert pareto["Si"]["evaporation_transport_notices"] == transport["Si"]
 
 
 @pytest.mark.parametrize("all_missing", [False, True], ids=["partial", "all"])

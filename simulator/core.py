@@ -142,6 +142,9 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
     history = getattr(model, 'operating_history', None)
     if isinstance(history, _RefusalSnapshotHistoryPrefix):
         model.operating_history = history.materialize()
+    history = getattr(model, 'cold_spot_history', None)
+    if isinstance(history, _RefusalSnapshotHistoryPrefix):
+        model.cold_spot_history = history.materialize()
 
 
 _REFUSAL_MISSING = object()
@@ -4274,7 +4277,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         k_m: float,
         surface_area_m2: float,
         h_eff_m: float,
-        comp: Mapping[str, float],
+        mol_fractions: Mapping[str, float],
         pressure_bar: float,
         n_feo_mol: float,
         n_fe2o3_mol: float,
@@ -4308,7 +4311,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt_conductance = (
             float(k_m) * capacity_mol_per_ln_fO2 / melt_volume_m3
         )
-        mol_fractions = melt_mol_fractions_for_kress91(comp)
         if total_fe_mol <= OXYGEN_RESERVOIR_NOOP_MOL or not mol_fractions:
             return {
                 'interface_pO2_bar': gas_pO2_bar,
@@ -4326,12 +4328,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
 
         def equilibrium_o2_mol(interface_log: float) -> float:
-            q_eq = self._fe3_over_sigma_fe_at_fO2(
-                comp,
+            q_eq = float(kress91_split(
                 fO2_log=interface_log / math.log(10.0),
+                mol_fractions=mol_fractions,
                 T_K=float(T_K),
                 pressure_bar=float(pressure_bar),
-            )
+            )['fe3'])
             if not math.isfinite(q_eq):
                 raise OxygenInterfaceConfigurationError(
                     'invalid_oxygen_interface_transport',
@@ -4736,7 +4738,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 k_m=k_O,
                 surface_area_m2=surface_area_m2,
                 h_eff_m=self._oxygen_exchange_effective_melt_depth_m(),
-                comp=comp,
+                mol_fractions=melt_mol_fractions_for_kress91(comp),
                 pressure_bar=pressure_bar,
                 n_feo_mol=n_feo_mol,
                 n_fe2o3_mol=n_fe2o3_mol,
@@ -5200,6 +5202,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
 
         initial_gas_pressure_bar = gas_pressure_from_headspace(head_o2_mol)
+        mol_fractions = melt_mol_fractions_for_kress91(comp)
         initial_root = self._oxygen_finite_interface_root(
             gas_pO2_bar=initial_gas_pressure_bar,
             melt_pO2_bar=melt_pO2_bar,
@@ -5209,7 +5212,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             k_m=k_m,
             surface_area_m2=surface_area_m2,
             h_eff_m=h_eff_m,
-            comp=comp,
+            mol_fractions=mol_fractions,
             pressure_bar=pressure_bar,
             n_feo_mol=n_feo_mol,
             n_fe2o3_mol=n_fe2o3_mol,
@@ -5310,7 +5313,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     k_m=k_m,
                     surface_area_m2=surface_area_m2,
                     h_eff_m=h_eff_m,
-                    comp=comp,
+                    mol_fractions=mol_fractions,
                     pressure_bar=pressure_bar,
                     n_feo_mol=provisional_feo,
                     n_fe2o3_mol=provisional_fe2o3,
@@ -17631,6 +17634,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         operating_history = getattr(
             getattr(self, '_condensation_model', None), 'operating_history', None,
         )
+        cold_spot_history = getattr(
+            getattr(self, '_condensation_model', None), 'cold_spot_history', None,
+        )
+        if defer_committed_history and isinstance(cold_spot_history, list):
+            memo[id(cold_spot_history)] = _RefusalSnapshotHistoryPrefix(
+                cold_spot_history, memo,
+            )
         if defer_committed_history and isinstance(operating_history, list):
             from simulator.trace import _freeze_value
 
@@ -17761,6 +17771,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(
                 terminal_refusal_state.get('_condensation_model'),
                 'operating_history', None,
+            ),
+            getattr(
+                terminal_refusal_state.get('_condensation_model'),
+                'cold_spot_history', None,
             ),
         )
         try:

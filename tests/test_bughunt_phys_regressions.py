@@ -801,8 +801,10 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     sim.record = BatchRecord(snapshots=[committed])
     operating_prefix = {"pressures": {"Na": 1.0}}
     operating_tail = {"pressures": {"Na": 2.0}}
+    cold_spot_prefix = {"species": "SiO", "hour": 2}
     sim._condensation_model = SimpleNamespace(
         operating_history=[operating_prefix, operating_tail],
+        cold_spot_history=[cold_spot_prefix],
         last_sticking_alpha_provenance_notice={},
     )
     sim.runtime_state = {"nested": {"temperature_C": 25.0}}
@@ -820,6 +822,9 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
         operating_prefix["pressures"]["Na"] = 888.0
         sim._condensation_model.operating_history[-1]["pressures"]["Na"] = 999.0
         sim._condensation_model.operating_history.append({"pressures": {"Na": 3.0}})
+        sim._condensation_model.cold_spot_history.append(
+            {"species": "SiO", "hour": 4}
+        )
         raise refusal
 
     sim._step_one_hour = refuse_after_mutation
@@ -842,6 +847,9 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     assert sim.record.snapshots[0].composition_wt_pct is not (
         committed.composition_wt_pct
     )
+    cold_spot_history = sim._condensation_model.cold_spot_history
+    assert cold_spot_history == [{"species": "SiO", "hour": 2}]
+    assert cold_spot_history[0] is not cold_spot_prefix
 
 
 def test_unsupported_refusal_snapshot_graph_raises_typed_error() -> None:

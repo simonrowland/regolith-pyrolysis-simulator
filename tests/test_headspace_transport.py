@@ -579,7 +579,7 @@ def test_finite_interface_root_conserves_flux_for_interior_inventory():
         h_eff_m=sim.setpoints['sso_r']['oxygen_exchange'][
             'effective_melt_depth_m'
         ],
-        comp=comp,
+        mol_fractions=core_module.melt_mol_fractions_for_kress91(comp),
         pressure_bar=0.1,
         n_feo_mol=2.0,
         n_fe2o3_mol=1.0,
