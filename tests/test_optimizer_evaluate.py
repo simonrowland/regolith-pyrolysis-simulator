@@ -2882,6 +2882,24 @@ def test_terminal_rump_completed_best_tap_uses_terminal_slag_not_cleaned_melt() 
     assert payload["resolved_composition"]["oxide_wt_pct"]["CaO"] == pytest.approx(0.0)
 
 
+def test_undeclared_thermal_window_leaves_campaign_schedule_in_control(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        evaluate_module,
+        "_furnace_ceiling_C",
+        lambda *args, **kwargs: (950.0, "test_ceiling"),
+    )
+
+    assert evaluate_module._profile_thermal_window_schedule(
+        PROFILE["run"],
+        profile=PROFILE,
+        recipe_patch=RecipePatch({}),
+        constraints=None,
+        setpoints={},
+    ) is None
+
+
 def test_warm_start_mid_window_best_tap_is_absolute_truncated_with_preheat() -> None:
     target_id = "pc-warm-mid-window"
     result = evaluate(

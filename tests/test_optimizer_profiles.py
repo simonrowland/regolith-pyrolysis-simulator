@@ -512,7 +512,7 @@ def test_runtime_loader_allows_knudsen_gate_on_melt_pool_targets() -> None:
     assert "knudsen_viscous" in constraints.active_gates
 
 
-def test_runtime_loader_refuses_over_cap_stored_thermal_window_profile() -> None:
+def test_runtime_loader_refuses_declared_over_cap_thermal_window_profile() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["run"].update({"campaign": "C4", "hours": 18})
     profile["fidelities"] = {"internal-analytical": {"backend_name": "internal-analytical"}}
@@ -520,7 +520,14 @@ def test_runtime_loader_refuses_over_cap_stored_thermal_window_profile() -> None
         {
             "id": "stale-c4-window",
             "source_campaign": "C4",
-            "patch": {"campaigns": {"C4": {"temp_range_C": [1580.0, 1670.0]}}},
+            "patch": {
+                "campaigns": {
+                    "C4": {
+                        "temp_range_C": [1580.0, 1670.0],
+                        "duration_h": 18,
+                    }
+                }
+            },
         }
     ]
 
@@ -594,7 +601,22 @@ def test_explicit_duration_above_campaign_cap_is_still_refused() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
-def test_undeclared_zero_preheat_window_does_not_compare_cap_to_itself() -> None:
+def test_undeclared_zero_preheat_window_skips_campaign_cap_comparison(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class CapComparisonSpy:
+        compared = False
+
+        def __ge__(self, requested_hours: float) -> bool:
+            self.compared = True
+            return True
+
+    campaign_cap = CapComparisonSpy()
+    monkeypatch.setattr(
+        profiles,
+        "_thermal_window_max_hold_bound",
+        lambda *args, **kwargs: (campaign_cap, "campaign_max_hold_hr"),
+    )
     profile = _profile_copy("lunar_mare_low_ti")
     profile["run"].update({"campaign": "C0", "hours": 60})
     profile["fidelities"] = {
@@ -614,6 +636,7 @@ def test_undeclared_zero_preheat_window_does_not_compare_cap_to_itself() -> None
     validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
     assert validated["run"]["hours"] == 60
+    assert not campaign_cap.compared
 
 
 def test_undeclared_zero_preheat_window_obeys_tighter_recipe_local_cap() -> None:

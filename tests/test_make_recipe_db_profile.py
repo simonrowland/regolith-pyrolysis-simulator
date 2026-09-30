@@ -361,7 +361,7 @@ def test_target_menu_extraction_minima_reach_physics_constraints(
 
 
 @pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
-def test_target_menu_windowed_campaigns_emit_runtime_schedule(
+def test_target_menu_windows_follow_duration_declaration(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
     target_id: str,
@@ -385,19 +385,22 @@ def test_target_menu_windowed_campaigns_emit_runtime_schedule(
     campaign = profile["run"]["campaign"]
     cfg = _setpoint_campaign_config(campaign)
     expected_temp_range = cfg.get("temp_range_C")
+    campaign_settings = [
+        seed.get("patch", {}).get("campaigns", {}).get(campaign, {})
+        for seed in profile.get("seed_recipes", [])
+    ]
+    duration_declared = any("duration_h" in settings for settings in campaign_settings)
 
-    if expected_temp_range is None:
+    if expected_temp_range is None or not duration_declared:
         assert campaign not in spec.runtime_campaign_overrides
+        assert campaign not in run_config.runtime_campaign_overrides
+        assert run_config.hours == int(profile["run"]["hours"])
         return
 
     overrides = spec.runtime_campaign_overrides[campaign]
     assert run_config.runtime_campaign_overrides[campaign] == overrides
-    assert overrides["thermal_window_low_C"] == pytest.approx(
-        expected_temp_range[0]
-    )
-    assert overrides["thermal_window_high_C"] == pytest.approx(
-        expected_temp_range[1]
-    )
+    assert overrides["thermal_window_low_C"] == pytest.approx(expected_temp_range[0])
+    assert overrides["thermal_window_high_C"] == pytest.approx(expected_temp_range[1])
     assert overrides["thermal_window_preheat_hours"] >= 0.0
     campaign_max_hold_hr = cfg.get("max_hold_hr")
     max_hold_hr, _ = _thermal_window_max_hold_bound(
@@ -456,7 +459,7 @@ def test_target_menu_generation_constructs_hold_under_campaign_cap(
     assert target["hold_construction"] == expected_provenance
 
 
-def test_runtime_loader_refuses_stale_window_profile_over_campaign_cap(
+def test_runtime_loader_accepts_undeclared_generated_window_sequence_horizon(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -469,16 +472,13 @@ def test_runtime_loader_refuses_stale_window_profile_over_campaign_cap(
         source=out,
     )
     profile["run"]["hours"] = 18
+    validated = validate_profile(
+        profile,
+        expected_feedstock="lunar_mare_low_ti",
+        source=out,
+    )
 
-    with pytest.raises(
-        ProfileValidationError,
-        match=r"thermal_window_campaign_max_hold_hr refusal.*FORCE_PROFILES=1",
-    ):
-        validate_profile(
-            profile,
-            expected_feedstock="lunar_mare_low_ti",
-            source=out,
-        )
+    assert validated["run"]["hours"] == 18
 
 
 def test_target_menu_generation_refuses_impossible_constructed_window(
