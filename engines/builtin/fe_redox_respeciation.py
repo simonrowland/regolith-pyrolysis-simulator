@@ -21,9 +21,9 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
+    OXYGEN_RESERVOIR_NOOP_MOL,
     floor_vacuum_pressure_bar,
     kress91_fe3_over_sigma_fe,
     kress91_temperature_band_case,

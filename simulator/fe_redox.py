@@ -6,6 +6,8 @@ from typing import Literal, NotRequired, TypedDict
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 
+OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
+
 
 class Kress91InvalidControls(ValueError):
     """Invalid finite-control input for the Kress91 Fe-redox relation."""

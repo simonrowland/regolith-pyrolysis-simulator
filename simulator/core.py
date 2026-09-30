@@ -398,6 +398,7 @@ from simulator.physical_constants import MELT_DISSOCIATION_PO2_MAX_BAR
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
     KRESS91_LN_FO2_COEFFICIENT,
+    OXYGEN_RESERVOIR_NOOP_MOL,
     _Kress91Evaluator,
     _kress91_ln_ratio,
     calphad_ferrous_feo_activity_diagnostic,
@@ -823,7 +824,6 @@ CHAR_SPECIES = 'C'
 CHAR_LANCE_BASIS_CO2 = 'C_plus_O2_to_CO2'
 CHAR_LANCE_BASIS_CO = 'C_plus_half_O2_to_CO'
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
-OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
 OXYGEN_RESERVOIR_REDOX_SOURCE_MIN_FO2_LOG10_BAR = -1.0e11
 OXYGEN_RESERVOIR_REDOX_SOURCE_MAX_FO2_LOG10_BAR = 1.0e11
 # Coarse absolute ferric-fraction tripwire until SSO-R ch2 re-speciation
