@@ -13,6 +13,7 @@ from fractions import Fraction
 
 from simulator.battery.compilation_tier import (
     _parse_product,
+    compilation_family,
     compilation_series_points,
     predict_thermo_attempt,
 )
@@ -468,6 +469,32 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     assert "## Measured tier" in report
     assert "## Compilation tier" in report
     assert "never added" in report
+    compilation_report = report.split("## Compilation tier", 1)[1].split(
+        "## Refusal census", 1
+    )[0]
+    assert "implementation fidelity, not" in compilation_report
+    assert (
+        "| compilation | rail | engine | quantity | unit | n | median abs(C−R) | "
+        "RMS (C−R) | n match | "
+        "n mismatch | n no band | n same-source |"
+    ) in compilation_report
+    assert (
+        f"`compilations-janaf` | `delta_fG` | 1 | 1 | 0 | "
+        f"{abs(residual.numeric.value)}"
+    ) in compilation_report
+    summary = next(
+        row
+        for row in compilation_report.splitlines()
+        if row.startswith(
+            "| compilations-janaf | thermochemistry | internal-analytical | delta_fG |"
+        )
+    )
+    summary_cells = [cell.strip() for cell in summary.strip("|").split("|")]
+    assert summary_cells[4] == "kJ/mol"
+    assert summary_cells[5] == "1"
+    assert summary_cells[6] == str(abs(residual.numeric.value))
+    assert summary_cells[8:] == ["0", "1", "0", "1"]
+    assert compilation_family("ATcT.yaml", None) == "ATcT"
     measured = [
         row
         for row in headline_rows((residual, independent), context=both)
