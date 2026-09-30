@@ -442,6 +442,9 @@ QUANTITY_ALIASES = {
     "Fig. 4. Ion current ratios for the Fe-P system at 1600 C": Quantity.ION_INTENSITY_RATIO,
     "Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.": Quantity.ION_INTENSITY_RATIO,
     "second_law_enthalpy_of_vaporization": Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW,
+    "stable_isotope_delta": Quantity.ISOTOPE_DELTA,
+    "delta_53Cr_average": Quantity.ISOTOPE_DELTA,
+    "delta_53Cr_reference_material": Quantity.ISOTOPE_DELTA,
 }
 
 # guard_09_05: legacy rail names including underscored aliases.
