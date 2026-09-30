@@ -448,6 +448,30 @@ def test_binary_complement_wt_percent_relation_normalizes_generically():
     assert "printed binary oxide wt% composition" in selected.notice
 
 
+def test_binary_complement_relation_refuses_printed_trace_third_component():
+    experiment, bench, observation = case()
+    sample = replace(experiment.sample, initial_composition=None, printed_composition=Located(
+        State.of({"K2O": Decimal("50"), "SiO2": Decimal("50"), "Cl": Decimal("0.01")}),
+        locator=f.loc(),
+        inference=Derivation(
+            relation="SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction",
+            inputs=("printed K2O wt%", "SiO2=100-K2O", "original_unit=wt_pct"),
+            parameters=(), output_unit="mole_fraction",
+        ),
+    ))
+
+    result = collect_consumer_inputs(replace(experiment, sample=sample), bench, observation)
+    composition = result.waypoints["normalized_composition"]
+
+    assert composition.selected is None
+    assert composition.absence is not None
+    assert composition.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert any(
+        "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction" in path
+        for path in composition.absence.missing
+    )
+
+
 def test_production_wt_pct_relation_reaches_engine_notice():
     experiment, bench, observation = case()
     composition = Composition("printed_oxides", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)

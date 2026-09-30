@@ -867,19 +867,12 @@ def normalized_composition(
                     input_species = input_species.removesuffix(
                         ";wt_pct_to_mole_fraction"
                     ).removesuffix("_wt_pct")
-                    composition_species = (
-                        {species for species, _amount in raw.components}
-                        if isinstance(raw, Composition)
-                        else {str(species) for species in raw}
-                        if isinstance(raw, Mapping)
-                        else set()
-                    )
                     if (
                         is_binary_complement
                         and output_species != input_species
                         and output_species in _OXIDE_COMPONENT_KEYS
                         and input_species in _OXIDE_COMPONENT_KEYS
-                        and composition_species == {output_species, input_species}
+                        and printed_species == {output_species, input_species}
                     ):
                         origin = "printed binary oxide wt% composition"
                     else:
