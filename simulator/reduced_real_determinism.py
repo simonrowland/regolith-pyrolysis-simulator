@@ -1295,7 +1295,7 @@ class PT1PersistentEquilibriumStore:
                     None,
                     _none_or_str(engine_version_provenance),
                     "{}",
-                    str(physics_bucket_key.get("schema_version")),
+                    PHYSICS_BUCKET_SCHEMA_VERSION,
                     physics_bucket_hash,
                     _replay_scope_hash(physics_bucket_key),
                     sqlite3.Binary(physics_bucket_bytes),
@@ -1353,7 +1353,7 @@ class PT1PersistentEquilibriumStore:
             """
         params = (
             artifact,
-            str(physics_bucket_key.get("schema_version")),
+            PHYSICS_BUCKET_SCHEMA_VERSION,
             physics_bucket_hash,
             _replay_scope_hash(physics_bucket_key),
         )
@@ -1709,7 +1709,7 @@ class PT1PersistentEquilibriumStore:
               )
             """,
             (
-                str(physics_bucket_key.get("schema_version")),
+                PHYSICS_BUCKET_SCHEMA_VERSION,
                 physics_bucket_hash,
                 _replay_scope_hash(physics_bucket_key),
                 sqlite3.Binary(physics_bucket_bytes),
@@ -1834,13 +1834,11 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_hash: str,
     ) -> dict[str, Any]:
         row_physics_bytes = _sqlite_bytes(row["physics_key_bytes"])
-        if row["physics_bucket_schema_version"] != str(
-            physics_bucket_key.get("schema_version")
-        ):
+        if row["physics_bucket_schema_version"] != PHYSICS_BUCKET_SCHEMA_VERSION:
             raise PT1PersistentStoreCorrupt(
                 "PT-1 row physics bucket schema drift: "
                 f"{row['physics_bucket_schema_version']} != "
-                f"{physics_bucket_key.get('schema_version')}"
+                f"{PHYSICS_BUCKET_SCHEMA_VERSION}"
             )
         if row["physics_bucket_sha256"] != physics_bucket_hash:
             raise PT1PersistentStoreCorrupt(
@@ -2300,7 +2298,6 @@ def canonical_physics_bucket_key_from_replay_key(
         replay_scope["sulfsat"] = _sulfsat_scope_from_key(key)
 
     return {
-        "schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
         "physics_bucket": {
             "namespace_id": str(key.get("namespace_id")),
             "composition_mol_fraction": _json_ready(
@@ -2348,7 +2345,6 @@ def canonical_physics_ladder_bucket_key_from_replay_key(
         ),
     }
     return {
-        "schema_version": bucket["schema_version"],
         "physics_bucket": physics_bucket,
         "replay_scope": copy.deepcopy(dict(bucket["replay_scope"])),
     }

@@ -24,6 +24,7 @@ from simulator.corpus_version import (  # noqa: E402
 )
 from simulator.engine_local_config import is_legacy_cache_version  # noqa: E402
 from simulator.reduced_real_determinism import (  # noqa: E402
+    PHYSICS_BUCKET_SCHEMA_VERSION,
     PT1_EQUILIBRIUM_TABLE,
     _physics_ladder_values_from_replay_key,
     _replay_scope_hash,
@@ -170,7 +171,7 @@ def _physics_columns(key: dict[str, Any]) -> dict[str, Any]:
     physics_bytes = canonical_json_bytes(physics_key)
     ladder_values = _physics_ladder_values_from_replay_key(key)
     return {
-        "physics_bucket_schema_version": str(physics_key.get("schema_version")),
+        "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
         "physics_bucket_sha256": hashlib.sha256(physics_bytes).hexdigest(),
         "replay_scope_sha256": _replay_scope_hash(physics_key),
         "physics_key_bytes": sqlite3.Binary(physics_bytes),

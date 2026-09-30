@@ -126,6 +126,43 @@ def test_cache_identity_migration_fixture_uses_real_converter_path(monkeypatch):
     assert outcomes["quarantine_rows"] == 3
 
 
+def test_new_physics_key_shape_without_schema_version_converts():
+    row = cache_convert._load_cache_conversion_fixture_row()
+    physics = json.loads(row["physics_key_bytes"])
+    del physics["schema_version"]
+    row["physics_key_bytes"] = json.dumps(
+        physics, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+    ).encode()
+    row["physics_bucket_sha256"] = cache_convert.sha256_bytes(
+        row["physics_key_bytes"]
+    )
+
+    materialized = cache_convert.materialize_legacy_row(row, "0" * 64)
+
+    assert materialized.source_rowid == row["legacy_rowid"]
+    assert materialized.source_key_bytes == row["key_bytes"]
+    assert materialized.source_payload_bytes == row["payload_bytes"]
+
+
+def test_legacy_physics_key_shape_with_schema_version_still_converts():
+    row = cache_convert._load_cache_conversion_fixture_row()
+    materialized = cache_convert.materialize_legacy_row(row, "0" * 64)
+
+    assert materialized.source_rowid == row["legacy_rowid"]
+    assert materialized.source_key_bytes == row["key_bytes"]
+    assert materialized.source_payload_bytes == row["payload_bytes"]
+
+
+def test_physics_key_schema_column_mismatch_is_rejected():
+    row = cache_convert._load_cache_conversion_fixture_row()
+    row["physics_bucket_schema_version"] = "mismatched-store-schema"
+
+    with pytest.raises(
+        cache_convert.ConversionError, match="physics bucket schema version mismatch"
+    ):
+        cache_convert.materialize_legacy_row(row, "0" * 64)
+
+
 @pytest.mark.parametrize("first_kind", ["absent", "empty"])
 def test_collision_policy_coalesces_absent_and_empty_backend_diagnostics(
     first_kind,
