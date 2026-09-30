@@ -14,6 +14,7 @@ import math
 import re
 import socket
 import subprocess
+import sys
 import time
 import warnings
 from dataclasses import dataclass, field, replace
@@ -2762,10 +2763,23 @@ def predict_with_engine(
                 requested_composition=requested,
             )
 
-    handle_map = handles or {}
+    handle_map = handles if handles is not None else {}
     handle = handle_map.get(engine.value)
+    if handle is not None and (
+        not getattr(handle, "available", False)
+        or getattr(handle, "backend", None) is None
+    ):
+        if isinstance(handle_map, dict):
+            handle_map.pop(engine.value, None)
+        handle = None
     if handle is None:
         handle = open_battery_engine(engine.value)
+        if (
+            isinstance(handle_map, dict)
+            and getattr(handle, "available", False)
+            and getattr(handle, "backend", None) is not None
+        ):
+            handle_map[engine.value] = handle
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
     if engine is Engine.OPENIMCC:
@@ -3747,6 +3761,8 @@ def score_store(
         if engines is not None
         else SCORE_ENGINE_SET
     )
+    provided_handles = dict(handles or {})
+    resolved_handles = dict(provided_handles)
     refs = list(comparison_candidates(context))
     fusion_diagnostic_ids: set[str] = set()
     admitted_model_derived_ids: set[str] = set()
@@ -3824,90 +3840,119 @@ def score_store(
 
     table_index = build_printed_thermo_index(observations)
     kems_band = derive_kems_partial_pressure_band(observations, context.experiments)
-    with bound_work_inputs(context.works, observations, context.experiments):
-        for obs, points in expanded_refs:
-            origin = origins.get(obs.observation_id)
-            for point in points:
-                if point.observation_id not in origins:
-                    origins[point.observation_id] = origin or ""
-                point_origin = origins.get(point.observation_id)
-                diagnostic = (
-                    obs.observation_id not in empirical_ids
-                    or is_internal_consistency(point_origin)
-                    or is_compilation_source(point.source_id, point_origin)
-                    or is_compilation_evidence(point)
-                    or is_sf04_workbook(point)
-                )
-                quantity = (
-                    quantity_token(point.identity)
-                    if isinstance(point.identity, Identity)
-                    else None
-                )
-                thermo = quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO
-                compilation_thermo = (
-                    thermo
-                    and (
-                        is_compilation_evidence(point)
+    try:
+        with bound_work_inputs(context.works, observations, context.experiments):
+            for obs, points in expanded_refs:
+                origin = origins.get(obs.observation_id)
+                for point in points:
+                    if point.observation_id not in origins:
+                        origins[point.observation_id] = origin or ""
+                    point_origin = origins.get(point.observation_id)
+                    diagnostic = (
+                        obs.observation_id not in empirical_ids
+                        or is_internal_consistency(point_origin)
                         or is_compilation_source(point.source_id, point_origin)
+                        or is_compilation_evidence(point)
+                        or is_sf04_workbook(point)
                     )
-                    and not is_internal_consistency(point_origin)
-                    and not is_sf04_workbook(point)
-                )
-                for engine in engine_set:
-                    prediction = None
-                    if (
-                        diagnostic
-                        and obs.observation_id not in admitted_model_derived_ids
-                        and point.observation_id not in fusion_diagnostic_ids
-                        and predict is None
-                        and not compilation_thermo
-                    ):
-                        prediction = EnginePrediction(
-                            engine=engine,
-                            channel=ENGINE_CHANNELS[engine],
-                            execution=Execution(state=ExecutionState.NOT_PROBED),
-                            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
-                            lineage_complete=False,
-                            refusal_reason=RefusalReason.UNSUPPORTED,
-                            refusal_detail={"reason": "diagnostic_population"},
-                            identity=point.identity if isinstance(point.identity, Identity) else None,
-                        )
-                    residual, candidate = compile_residual(
-                        point,
-                        engine,
-                        context=live_context,
-                        prediction=prediction,
-                        comparison_ids=comparison_ids,
-                        predict=predict,
-                        handles=handles,
-                        lineage_observation_id=(
-                            obs.observation_id
-                            if point.observation_id != obs.observation_id
-                            else None
-                        ),
-                        table_index=table_index,
-                        derived_band=kems_band,
+                    quantity = (
+                        quantity_token(point.identity)
+                        if isinstance(point.identity, Identity)
+                        else None
                     )
-                    residuals.append(residual)
-                    if candidate is not None:
-                        candidates[candidate.observation_id] = candidate
-                    done += 1
-                    now = time.monotonic()
-                    if now - last_progress >= 60:
-                        print(
-                            f"score progress {done}/{total} residuals "
-                            f"{int(now - started)}s host={context.hostname}",
-                            flush=True,
+                    thermo = quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO
+                    compilation_thermo = (
+                        thermo
+                        and (
+                            is_compilation_evidence(point)
+                            or is_compilation_source(point.source_id, point_origin)
                         )
-                        last_progress = now
-    residuals.sort(
-        key=lambda r: (
-            "" if r.rail is None else r.rail.value,
-            r.reference,
-            r.key,
+                        and not is_internal_consistency(point_origin)
+                        and not is_sf04_workbook(point)
+                    )
+                    for engine in engine_set:
+                        prediction = None
+                        if (
+                            diagnostic
+                            and obs.observation_id not in admitted_model_derived_ids
+                            and point.observation_id not in fusion_diagnostic_ids
+                            and predict is None
+                            and not compilation_thermo
+                        ):
+                            prediction = EnginePrediction(
+                                engine=engine,
+                                channel=ENGINE_CHANNELS[engine],
+                                execution=Execution(state=ExecutionState.NOT_PROBED),
+                                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                                lineage_complete=False,
+                                refusal_reason=RefusalReason.UNSUPPORTED,
+                                refusal_detail={"reason": "diagnostic_population"},
+                                identity=point.identity if isinstance(point.identity, Identity) else None,
+                            )
+                        residual, candidate = compile_residual(
+                            point,
+                            engine,
+                            context=live_context,
+                            prediction=prediction,
+                            comparison_ids=comparison_ids,
+                            predict=predict,
+                            handles=resolved_handles,
+                            lineage_observation_id=(
+                                obs.observation_id
+                                if point.observation_id != obs.observation_id
+                                else None
+                            ),
+                            table_index=table_index,
+                            derived_band=kems_band,
+                        )
+                        residuals.append(residual)
+                        if candidate is not None:
+                            candidates[candidate.observation_id] = candidate
+                        done += 1
+                        now = time.monotonic()
+                        if now - last_progress >= 60:
+                            print(
+                                f"score progress {done}/{total} residuals "
+                                f"{int(now - started)}s host={context.hostname}",
+                                flush=True,
+                            )
+                            last_progress = now
+        residuals.sort(
+            key=lambda r: (
+                "" if r.rail is None else r.rail.value,
+                r.reference,
+                r.key,
+            )
         )
-    )
-    return tuple(residuals), candidates
+        return tuple(residuals), candidates
+    finally:
+        active_error = sys.exc_info()[1]
+        close_errors: list[BaseException] = []
+        for name, handle in resolved_handles.items():
+            if provided_handles.get(name) is handle:
+                continue
+            backend = getattr(handle, "backend", None)
+            close = getattr(backend, "close", None)
+            if callable(close):
+                try:
+                    close()
+                except BaseException as exc:  # noqa: BLE001 - close every owned handle
+                    close_errors.append(exc)
+        if close_errors:
+            if active_error is not None:
+                for error in close_errors:
+                    add_note = getattr(active_error, "add_note", None)
+                    if callable(add_note):
+                        add_note(f"engine handle cleanup failed: {error!r}")
+                if not callable(getattr(active_error, "add_note", None)):
+                    raise active_error from close_errors[0]
+            else:
+                first_error = close_errors[0]
+                for error in close_errors[1:]:
+                    add_note = getattr(first_error, "add_note", None)
+                    if callable(add_note):
+                        add_note(f"additional engine handle cleanup failure: {error!r}")
+                raise first_error
 
 
 def residual_to_plain(
