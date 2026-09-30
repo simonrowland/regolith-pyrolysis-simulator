@@ -31,6 +31,7 @@ from simulator.chemistry.kernel import (
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.config import load_config_bundle
 from simulator.core import PoisonedHourError, PoisonedHourState
+from simulator.recipe_errors import MalformedRecipeError
 from simulator.electrolysis import (
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
@@ -3322,23 +3323,23 @@ def test_invalid_patch_rejected_before_run() -> None:
 @pytest.mark.parametrize(
     "exc",
     [
-        ValueError("Malformed campaign temperature range: C0.temp_range_C"),
-        ValueError("Malformed campaign rate band C2A.early: expected [low, high]"),
+        MalformedRecipeError("C0 recipe temperature endpoints no longer parse"),
+        MalformedRecipeError("C2A recipe ramp shape is malformed"),
         PoisonedHourError(
             PoisonedHourState(
                 hour=18,
                 committed_transition_count=1,
                 aborting_exception_summary=(
-                    "ValueError: melt_pressure_partial_exceeds_total: "
-                    "pO2_mbar=6.628 > p_total_mbar=4.108"
+                    "MalformedRecipeError: melt pressure config changed shape"
                 ),
+                aborting_exception_type=MalformedRecipeError,
             )
         ),
     ],
     ids=(
-        "malformed-temperature-range",
-        "malformed-rate-band",
-        "poisoned-hour-pressure-total",
+    "malformed-temperature-new-wording",
+    "malformed-rate-new-wording",
+    "poisoned-hour-new-wording",
     ),
 )
 def test_recipe_value_error_raised_by_executor_is_scored_with_artifacts(
@@ -3371,7 +3372,7 @@ def test_scalar_c0_temperature_range_patch_is_scored_by_c1() -> None:
         def execute(self, config: object) -> object:
             self.calls += 1
             self.config = config
-            raise ValueError("Malformed campaign temperature range: C0.temp_range_C")
+            raise MalformedRecipeError("unrecognized temperature-range payload")
 
     executor = MalformedRangeExecutor()
     result = evaluate(

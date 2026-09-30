@@ -116,37 +116,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     identity_digest = hashlib.sha256(
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
-    c3_list_shaped_paths = {
-        ("campaigns", "C0", "temp_range_C"),
-        (
-            "campaigns",
-            "C2A_continuous",
-            "dT_dt_C_per_hr",
-            "early_ramp_1050_1320C",
-        ),
-    }
-    legacy_identity = dict(identity)
-    legacy_identity["search_knob_paths"] = [
-        ".".join(spec.path)
-        for spec in schema.allowlist
-        if spec.search_enabled or spec.path in c3_list_shaped_paths
-    ]
-    assert identity["search_knob_paths"] == [
-        path
-        for path in legacy_identity["search_knob_paths"]
-        if tuple(path.split(".")) not in c3_list_shaped_paths
-    ]
-    legacy_identity_digest = hashlib.sha256(
-        canonical_json_dumps(legacy_identity).encode()
-    ).hexdigest()
-    # Reconstruct the C2 search surface so its identity remains pinned while
-    # C3's two removed list-shaped paths derive the current identity movement.
-    assert legacy_identity_digest == (
-        "ca70bad3a0f62a72d0bb470b08ce742ecbd04614187e2953cba094f7ed952b44"
-    )
-    assert identity_digest != legacy_identity_digest
-    assert identity_digest != (
-        "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
+    # Pin the live search identity directly; retired list-shaped paths stay out.
+    assert identity_digest == (
+        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -589,32 +561,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     schema = RecipeSchema()
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
-    c3_list_shaped_paths = {
-        ("campaigns", "C0", "temp_range_C"),
-        (
-            "campaigns",
-            "C2A_continuous",
-            "dT_dt_C_per_hr",
-            "early_ramp_1050_1320C",
-        ),
-    }
-    legacy_paths = [
-        ".".join(spec.path)
-        for spec in unpinned.allowlist
-        if spec.search_enabled or spec.path in c3_list_shaped_paths
-    ]
-
     assert unpinned is schema
-    assert len(legacy_paths) == 67
-    assert len(paths) == len(legacy_paths) - len(c3_list_shaped_paths)
-    assert paths == [
-        path
-        for path in legacy_paths
-        if tuple(path.split(".")) not in c3_list_shaped_paths
-    ]
+    assert len(paths) == 65
     assert (
-        hashlib.sha256(canonical_json_dumps(legacy_paths).encode("utf-8")).hexdigest()
-        == "1bc920bf1a0c96b9d4dd0f9679cf9d5495478f79fa6d56294d53a9cd6e7d5c78"
+        hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
+        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),

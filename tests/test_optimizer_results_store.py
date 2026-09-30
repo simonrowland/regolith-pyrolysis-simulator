@@ -38,6 +38,7 @@ from simulator.optimize.results_store import (
     _deserialize_margins,
     _serialize_margins,
     grounded_result_feasible,
+    reground_scored_result,
 )
 from web.routes import _coating_readout
 
@@ -377,6 +378,34 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
         "oxygen_kg": 10.0,
         "wall_deposit_kg": {},
     }
+
+
+def test_lookup_preserves_finite_objectives_on_infeasible_rows(tmp_path) -> None:
+    spec = _base_spec()
+    objectives = _objectives(oxygen=3.5, energy=8.25)
+    scored = replace(_infeasible(spec), objectives=objectives)
+    store = ResultStore(tmp_path / "infeasible-objectives.sqlite")
+
+    store.store(spec, scored, created_at="2026-09-30T00:00:00Z")
+
+    cached = store.lookup(spec)
+    assert cached is not None
+    assert cached.feasible is False
+    assert cached.objectives == objectives
+
+
+def test_regrounding_preserves_finite_objectives_when_it_flips_to_infeasible() -> None:
+    spec = _base_spec()
+    objectives = _objectives(oxygen=4.0, energy=7.0)
+    scored = replace(
+        _scored(spec, objectives=objectives),
+        feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
+    )
+
+    regrounded = reground_scored_result(scored)
+
+    assert regrounded.feasible is False
+    assert regrounded.objectives == objectives
 
 
 def test_thermoengine_version_identity_is_optimizer_key_neutral(
@@ -1102,8 +1131,21 @@ def test_lookup_fails_closed_for_ungroundable_feasibility_margins(
 
     assert loaded is not None
     assert loaded.feasible is False
-    assert loaded.objectives is None
+    # Bad feasibility evidence cannot invalidate a separately stored yield vector.
+    assert loaded.objectives == _objectives()
     assert loaded.feasibility_margins == {}
+
+
+def test_lookup_leaves_empty_objectives_empty_for_infeasible_rows(tmp_path) -> None:
+    spec = _base_spec(recipe_id="infeasible-empty-objectives")
+    store = ResultStore(tmp_path / "infeasible-empty.sqlite")
+    store.store(spec, _infeasible(spec), created_at="2026-09-30T00:00:00Z")
+
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.feasible is False
+    assert loaded.objectives is None
 
 
 @pytest.mark.parametrize(

@@ -2196,6 +2196,44 @@ def test_finite_infeasible_objectives_guide_stage_archive_below_feasible_results
     ]
 
 
+def test_staged_backward_parenting_matches_live_and_cached_infeasible_results(
+    tmp_path,
+) -> None:
+    seed_strategy = StagedStrategy(SCHEMA, seed=53, objective_profile=PROFILE)
+    candidate = seed_strategy.ask(1)[0]
+    live = replace(
+        _scored(
+            candidate.patch,
+            candidate_id=candidate.id,
+            oxygen=20.0,
+            energy=1.0,
+            margin=replace(_margin(), feasible=False, margin=-1.0),
+        ),
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        failing_gates=("delivered_stream_purity",),
+    )
+    store = ResultStore(tmp_path / "staged-parent.sqlite")
+    store.store(live.eval_spec, live, created_at="2026-09-30T00:00:00Z")
+    cached = store.lookup(live.eval_spec)
+    assert cached is not None
+
+    def backward_parents(scored: ScoredResult) -> tuple[str, ...]:
+        strategy = StagedStrategy(SCHEMA, seed=53, objective_profile=PROFILE)
+        strategy._mode = "backward"
+        strategy._pending = []
+        strategy._expected_stage_ids = {candidate.id}
+        strategy._stage_results = {candidate.id: (candidate, scored)}
+        strategy._stage_joint_refine_trace_signals = {}
+        strategy._archive = ()
+        strategy._advance_completed_backward_pass()
+        return tuple(member.candidate.id for member in strategy._archive)
+
+    # Rehydration must keep the same finite objectives used by live backward parents.
+    assert cached.objectives == live.objectives
+    assert backward_parents(live) == backward_parents(cached) == (candidate.id,)
+
+
 def test_child_cache_key_duplicate_parent_raises() -> None:
     strategy = StagedStrategy(
         SCHEMA,

@@ -747,6 +747,22 @@ def _journal_any_id_evaluator(
     )
 
 
+def _infeasible_journal_cache_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    **kwargs: Any,
+) -> ScoredResult:
+    scored = _journal_cache_evaluator(patch, feedstock, fidelity, **kwargs)
+    return replace(
+        scored,
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
+        failing_gates=("delivered_stream_purity",),
+    )
+
+
 def test_finished_study_artifact_records_cpu_and_hostname(tmp_path: Path) -> None:
     out = tmp_path / "cpu-provenance"
     study.run(
@@ -816,6 +832,59 @@ def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
     assert state_rows[-1]["strategy_state"]["strategies"][0]["ask_cursor"] == 4
 
 
+def test_infeasible_objectives_survive_cache_hits_and_journal_replay(
+    tmp_path: Path,
+) -> None:
+    store = ResultStore(tmp_path / "infeasible-cache.sqlite")
+    live = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=tmp_path / "cache-live",
+        seed=37,
+        evaluator=_infeasible_journal_cache_evaluator,
+        result_store=store,
+    )
+    cached = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=tmp_path / "cache-replay",
+        seed=37,
+        evaluator=_infeasible_journal_cache_evaluator,
+        result_store=store,
+    )
+
+    assert cached.records[0].cache_hit is True
+    assert cached.records[0].feasible is False
+    assert cached.records[0].objectives == live.records[0].objectives
+    assert cached.records[0].objectives["oxygen_kg"] == 10.0
+
+    journal_out = tmp_path / "infeasible-journal"
+    journal_live = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=journal_out,
+        seed=41,
+        evaluator=_infeasible_journal_cache_evaluator,
+    )
+    journal_replay = study.replay_study(journal_out)
+
+    assert journal_replay.records[0].feasible is False
+    assert journal_replay.records[0].objectives == journal_live.records[0].objectives
+    assert journal_replay.records[0].objectives["oxygen_kg"] == 10.0
+
+
 def test_study_stops_after_scalar_and_pareto_stalls(tmp_path: Path) -> None:
     definitions = study.objective_definitions(PROFILE)
     budget = 8
@@ -850,7 +919,12 @@ def test_study_stops_after_scalar_and_pareto_stalls(tmp_path: Path) -> None:
         def tell(self, results) -> None:
             self.told_batches.append(tuple(results))
 
-    def run_case(name: str, objective_values_for: Any) -> tuple[Any, ProgressStrategy]:
+    def run_case(
+        name: str,
+        objective_values_for: Any,
+        *,
+        feasible_for: Any | None = None,
+    ) -> tuple[Any, ProgressStrategy]:
         strategy = ProgressStrategy()
 
         def scored_evaluator(
@@ -892,9 +966,20 @@ def test_study_stops_after_scalar_and_pareto_stalls(tmp_path: Path) -> None:
                     for ordinal, definition in enumerate(definitions)
                 }
             )
+            feasible = True if feasible_for is None else bool(feasible_for(_sequence(candidate_id)))
             return replace(
                 scored,
+                feasible=feasible,
+                failure_category=(
+                    None if feasible else FailureCategory.INFEASIBLE_RECIPE
+                ),
                 objectives=objectives,
+                feasibility_margins={
+                    "delivered_stream_purity": _margin(feasible=feasible)
+                },
+                failing_gates=(
+                    () if feasible else ("delivered_stream_purity",)
+                ),
                 run_reference=replace(reference, product_summary=product_summary),
             )
 
@@ -920,6 +1005,15 @@ def test_study_stops_after_scalar_and_pareto_stalls(tmp_path: Path) -> None:
     )
     assert len(improving.records) == budget
     assert len(improving_strategy.told_batches) == budget
+
+    outlier_then_improving, _ = run_case(
+        "infeasible-outlier",
+        lambda index: ((1.0e9, 0.0) if index == 0 else (float(index), 100.0)),
+        feasible_for=lambda index: index != 0,
+    )
+    assert outlier_then_improving.records[0].feasible is False
+    assert all(record.feasible for record in outlier_then_improving.records[1:])
+    assert len(outlier_then_improving.records) == budget
 
     pareto_values = ((1.0, 1.0), (2.0, 3.0), (3.0, 5.0))
     pareto, pareto_strategy = run_case(

@@ -785,7 +785,9 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
         cache_key=row["cache_key"],
         feasible=feasible,
         failure_category=failure,
-        objectives=objectives if feasible else None,
+        # Preserve measured objectives on infeasible rows so cache replay tells
+        # the optimizer the same finite values as the live evaluation.
+        objectives=objectives,
         feasibility_margins=margins,
         failing_gates=grounded_failing_gates(
             tuple(_json_load(row["failing_gates"])),
@@ -881,7 +883,8 @@ def reground_scored_result(scored_result: ScoredResult) -> ScoredResult:
         cache_key=scored_result.cache_key,
         feasible=feasible,
         failure_category=None if feasible else scored_result.failure_category,
-        objectives=scored_result.objectives if feasible else None,
+        # Re-grounding feasibility must not erase finite measured objectives.
+        objectives=scored_result.objectives,
         feasibility_margins=scored_result.feasibility_margins,
         failing_gates=failing_gates,
         run_reference=scored_result.run_reference,

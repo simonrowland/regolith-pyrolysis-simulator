@@ -131,6 +131,7 @@ from simulator.pumping_cost import (
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor
+from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import PyrolysisRun, RunnerError
 from simulator.transport_regime import TransportRegimeRefusal
@@ -914,7 +915,7 @@ def evaluate(
             message,
         )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
-        if _is_malformed_recipe_value_error(exc):
+        if _is_malformed_recipe_error(exc):
             return _malformed_recipe_result(
                 candidate_id,
                 spec,
@@ -943,7 +944,7 @@ def evaluate(
     error_message = str(getattr(run_execution, "error_message", ""))
     if status == "failed":
         failure_exc = getattr(run_execution, "failure_exception", None)
-        if _is_malformed_recipe_value_error(failure_exc):
+        if _is_malformed_recipe_error(failure_exc):
             return _malformed_recipe_result(
                 candidate_id,
                 spec,
@@ -3656,6 +3657,8 @@ def _campaign_max_hold_hr(
 
 
 def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float:
+    # The caller includes preheat before checking the campaign cap; clamping here
+    # could hide an over-cap declared window.
     interval = _numeric_interval(value)
     if interval is None:
         return float(run_hours)
@@ -5662,24 +5665,14 @@ def _invalid_recipe_result(
     )
 
 
-def _is_malformed_recipe_value_error(exc: BaseException) -> bool:
+def _is_malformed_recipe_error(exc: BaseException | None) -> bool:
     if isinstance(exc, (*_TYPED_ABSENCE_EXCEPTION_CLASSES, EngineBugAbort)):
         return False
-    if isinstance(exc, PoisonedHourError):
-        summary = exc.state.aborting_exception_summary
-        if not summary.startswith("ValueError: "):
-            return False
-        message = summary.removeprefix("ValueError: ")
-    elif isinstance(exc, ValueError):
-        message = str(exc)
-    else:
-        return False
-    return message.startswith(
-        (
-            "melt_pressure_partial_exceeds_total:",
-            "Malformed campaign temperature range:",
-            "Malformed campaign rate band ",
-        )
+    if isinstance(exc, MalformedRecipeError):
+        return True
+    return (
+        isinstance(exc, PoisonedHourError)
+        and exc.state.aborting_exception_type is MalformedRecipeError
     )
 
 

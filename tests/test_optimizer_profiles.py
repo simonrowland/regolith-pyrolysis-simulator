@@ -594,6 +594,56 @@ def test_explicit_duration_above_campaign_cap_is_still_refused() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+def test_undeclared_zero_preheat_window_does_not_compare_cap_to_itself() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"].update({"campaign": "C0", "hours": 60})
+    profile["fidelities"] = {
+        "internal-analytical": {
+            "backend_name": "internal-analytical",
+            "hours": 60,
+        }
+    }
+    profile["seed_recipes"] = [
+        {
+            "id": "undeclared-c0-window",
+            "source_campaign": "C0",
+            "patch": {"campaigns": {"C0": {"temp_range_C": [20.0, 900.0]}}},
+        }
+    ]
+
+    validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+    assert validated["run"]["hours"] == 60
+
+
+def test_undeclared_zero_preheat_window_obeys_tighter_recipe_local_cap() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"].update({"campaign": "C0", "hours": 60})
+    profile["fidelities"] = {
+        "internal-analytical": {
+            "backend_name": "internal-analytical",
+            "hours": 60,
+        }
+    }
+    profile["seed_recipes"] = [
+        {
+            "id": "undeclared-c0-window-with-local-cap",
+            "source_campaign": "C0",
+            "patch": {
+                "campaigns": {
+                    "C0": {"temp_range_C": [20.0, 900.0], "max_hold_hr": 20}
+                }
+            },
+        }
+    ]
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"recipe_local_max_hold_hr refusal.*requested 25 h.*recipe_local_max_hold_hr 20 h",
+    ):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
 def test_canonical_c2a_profile_accepts_148_hours_under_recipe_local_cap() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["run"].update({"campaign": "C2A_continuous", "hours": 24})

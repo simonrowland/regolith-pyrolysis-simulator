@@ -751,6 +751,7 @@ def run(
         definitions,
         objective_weights,
     )
+    progress_has_feasible = any(record.feasible for record in records)
     use_pareto_stall = len(best_pareto_signature) > 1
     stalled_batches = 0
     engine_worker_pool = None
@@ -895,7 +896,16 @@ def run(
                 definitions,
                 objective_weights,
             )
-            if not use_pareto_stall and len(pareto_signature) > 1:
+            has_feasible = any(record.feasible for record in records)
+            if has_feasible and not progress_has_feasible:
+                # The first feasible row starts a new stall baseline; do not
+                # compare its score with the infeasible-only scalar.
+                best_scalarized_score = scalarized_score
+                best_pareto_signature = pareto_signature
+                use_pareto_stall = len(pareto_signature) > 1
+                stalled_batches = 0
+                progress_has_feasible = True
+            elif not use_pareto_stall and len(pareto_signature) > 1:
                 # Multiple distinct non-dominated score vectors mean at least two
                 # objectives now provide separate ranking signals.
                 use_pareto_stall = True
@@ -2234,7 +2244,9 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
         cache_key=str(payload["cache_key"]) if payload.get("cache_key") is not None else None,
         feasible=bool(payload.get("feasible", False)),
         failure_category=failure,
-        objectives=objectives if bool(payload.get("feasible", False)) else None,
+        # Journal replay keeps finite infeasible objectives so cached and live
+        # rows tell the optimizer the same measured yield vector.
+        objectives=objectives,
         feasibility_margins=_deserialize_margins(
             _mapping_of_mappings(payload.get("feasibility_margins", {}))
         ),
@@ -4844,7 +4856,14 @@ def _study_progress(
     scored_records: list[StudyRecord] = []
     scores_by_candidate: dict[str, tuple[float, ...]] = {}
     scalarized_scores: list[float] = []
-    for record in records:
+    # Once a feasible result exists, infeasible outliers cannot pin the stall
+    # baseline or Pareto signature while the feasible front keeps improving.
+    progress_records = (
+        tuple(record for record in records if record.feasible)
+        if any(record.feasible for record in records)
+        else records
+    )
+    for record in progress_records:
         scores = _record_objective_scores(record, definitions)
         if len(scores) != len(weights) or any(score is None for score in scores):
             continue

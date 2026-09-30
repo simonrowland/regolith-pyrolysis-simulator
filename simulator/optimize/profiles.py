@@ -1102,9 +1102,10 @@ def _validate_run_thermal_window_caps(
             f"{source}: {campaign}.temp_range_C must be ascending"
         )
     run_hours = int(float(run_options.get("hours", 24)))
+    duration_value = _profile_campaign_setting(profile, campaign, "duration_h")
     campaign_max_hold_hr = _campaign_max_hold_hr_for_profile(source, campaign)
     duration_h = _thermal_window_duration_h(
-        _profile_campaign_setting(profile, campaign, "duration_h"),
+        duration_value,
         run_hours=run_hours,
         campaign_max_hold_hr=campaign_max_hold_hr,
     )
@@ -1241,8 +1242,8 @@ def _thermal_window_duration_h(
     if interval is None:
         if campaign_max_hold_hr is None:
             return float(run_hours)
-        # run.hours is the sequence horizon; the runner advances past a
-        # campaign at its hold cap, so an undeclared window cannot exceed it.
+        # run.hours is the sequence horizon, while an undeclared hold cannot
+        # exceed the campaign cap; preheat is added before the resolved cap check.
         return float(min(run_hours, campaign_max_hold_hr))
     low, high = interval
     if high < low:
