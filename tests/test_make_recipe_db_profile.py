@@ -385,13 +385,7 @@ def test_target_menu_windows_follow_duration_declaration(
     campaign = profile["run"]["campaign"]
     cfg = _setpoint_campaign_config(campaign)
     expected_temp_range = cfg.get("temp_range_C")
-    campaign_settings = [
-        seed.get("patch", {}).get("campaigns", {}).get(campaign, {})
-        for seed in profile.get("seed_recipes", [])
-    ]
-    duration_declared = any("duration_h" in settings for settings in campaign_settings)
-
-    if expected_temp_range is None or not duration_declared:
+    if expected_temp_range is None:
         assert campaign not in spec.runtime_campaign_overrides
         assert campaign not in run_config.runtime_campaign_overrides
         assert run_config.hours == int(profile["run"]["hours"])
@@ -416,6 +410,10 @@ def test_target_menu_windows_follow_duration_declaration(
         assert overrides["max_hours"] <= float(max_hold_hr)
     else:
         assert run_config.hours >= int(profile["run"]["hours"])
+    if target_id == "pc-extract-mg":
+        assert profile["run"]["hours"] == 17
+        assert overrides["thermal_window_preheat_hours"] == 3
+        assert run_config.hours == 20
 
 
 def test_target_menu_generation_constructs_hold_under_campaign_cap(
@@ -459,7 +457,7 @@ def test_target_menu_generation_constructs_hold_under_campaign_cap(
     assert target["hold_construction"] == expected_provenance
 
 
-def test_runtime_loader_accepts_undeclared_generated_window_sequence_horizon(
+def test_runtime_loader_refuses_over_cap_undeclared_generated_window_hold(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -472,13 +470,15 @@ def test_runtime_loader_accepts_undeclared_generated_window_sequence_horizon(
         source=out,
     )
     profile["run"]["hours"] = 18
-    validated = validate_profile(
-        profile,
-        expected_feedstock="lunar_mare_low_ti",
-        source=out,
-    )
-
-    assert validated["run"]["hours"] == 18
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"thermal_window_campaign_max_hold_hr refusal.*requested 21 h.*20 h",
+    ):
+        validate_profile(
+            profile,
+            expected_feedstock="lunar_mare_low_ti",
+            source=out,
+        )
 
 
 def test_target_menu_generation_refuses_impossible_constructed_window(

@@ -182,9 +182,11 @@ def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
             RecipePatch.from_nested(seed["patch"]).validated(RecipeSchema())
 
 
-def test_all_optimizer_profiles_load_at_60_hour_horizon() -> None:
+def test_optimizer_window_profiles_fit_caps_and_sequences_load_at_60_hours() -> None:
     loaded_profiles = {}
     failures = {}
+    window_profiles = set()
+    sequence_profiles = set()
     profile_dir = DEFAULT_DATA_DIR / "optimize_profiles"
     for path in sorted(profile_dir.glob("*.yaml")):
         feedstock = path.stem
@@ -196,10 +198,30 @@ def test_all_optimizer_profiles_load_at_60_hour_horizon() -> None:
     assert not failures, f"failed profile ids: {', '.join(sorted(failures))}"
     assert len(loaded_profiles) == 24
     for feedstock, profile in loaded_profiles.items():
-        assert profile["run"]["hours"] == 60, feedstock
+        campaign = str(profile["run"]["campaign"])
+        if profiles._profile_campaign_setting(profile, campaign, "temp_range_C") is not None:
+            window_profiles.add(feedstock)
+            assert profile["run"]["hours"] == 25, feedstock
+            expected_fidelity_hours = {25}
+        else:
+            sequence_profiles.add(feedstock)
+            assert profile["run"]["hours"] == 60, feedstock
+            expected_fidelity_hours = {60}
         assert {
             options["hours"] for options in profile["fidelities"].values()
-        } == {60}, feedstock
+        } == expected_fidelity_hours, feedstock
+
+    assert window_profiles == {
+        "ceres_regolith",
+        "ci_carbonaceous_chondrite",
+        "cm_carbonaceous_chondrite",
+        "comet_nucleus",
+        "mars_basalt",
+        "mars_perchlorate_rich",
+        "mars_phyllosilicate_clay",
+        "mars_sulfate_rich",
+    }
+    assert len(sequence_profiles) == 16
 
 
 def test_seed_source_campaigns_rejects_non_list_and_bad_entries() -> None:
@@ -512,7 +534,7 @@ def test_runtime_loader_allows_knudsen_gate_on_melt_pool_targets() -> None:
     assert "knudsen_viscous" in constraints.active_gates
 
 
-def test_runtime_loader_refuses_declared_over_cap_thermal_window_profile() -> None:
+def test_runtime_loader_refuses_over_cap_stored_thermal_window_profile() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["run"].update({"campaign": "C4", "hours": 18})
     profile["fidelities"] = {"internal-analytical": {"backend_name": "internal-analytical"}}
@@ -524,7 +546,6 @@ def test_runtime_loader_refuses_declared_over_cap_thermal_window_profile() -> No
                 "campaigns": {
                     "C4": {
                         "temp_range_C": [1580.0, 1670.0],
-                        "duration_h": 18,
                     }
                 }
             },
@@ -601,28 +622,13 @@ def test_explicit_duration_above_campaign_cap_is_still_refused() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
-def test_undeclared_zero_preheat_window_skips_campaign_cap_comparison(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    class CapComparisonSpy:
-        compared = False
-
-        def __ge__(self, requested_hours: float) -> bool:
-            self.compared = True
-            return True
-
-    campaign_cap = CapComparisonSpy()
-    monkeypatch.setattr(
-        profiles,
-        "_thermal_window_max_hold_bound",
-        lambda *args, **kwargs: (campaign_cap, "campaign_max_hold_hr"),
-    )
+def test_undeclared_zero_preheat_window_hold_above_cap_is_refused() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
-    profile["run"].update({"campaign": "C0", "hours": 60})
+    profile["run"].update({"campaign": "C0", "hours": 26})
     profile["fidelities"] = {
         "internal-analytical": {
             "backend_name": "internal-analytical",
-            "hours": 60,
+            "hours": 26,
         }
     }
     profile["seed_recipes"] = [
@@ -633,10 +639,14 @@ def test_undeclared_zero_preheat_window_skips_campaign_cap_comparison(
         }
     ]
 
-    validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
-
-    assert validated["run"]["hours"] == 60
-    assert not campaign_cap.compared
+    with pytest.raises(
+        ProfileValidationError,
+        match=(
+            r"thermal_window_campaign_max_hold_hr refusal.*"
+            r"requested 26 h \(preheat 0 h \+ hold 26 h\).*25 h"
+        ),
+    ):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
 def test_undeclared_zero_preheat_window_obeys_tighter_recipe_local_cap() -> None:
@@ -662,7 +672,7 @@ def test_undeclared_zero_preheat_window_obeys_tighter_recipe_local_cap() -> None
 
     with pytest.raises(
         ProfileValidationError,
-        match=r"recipe_local_max_hold_hr refusal.*requested 25 h.*recipe_local_max_hold_hr 20 h",
+        match=r"recipe_local_max_hold_hr refusal.*requested 60 h.*recipe_local_max_hold_hr 20 h",
     ):
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 

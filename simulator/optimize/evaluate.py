@@ -3594,10 +3594,6 @@ def _profile_thermal_window_schedule(
         _profile_campaign_setting(profile, campaign, "duration_h"),
         run_hours=int(run_options.get("hours", 24)),
     )
-    if duration_h is None:
-        # run.hours budgets the whole campaign sequence; without a declared
-        # window duration, let the campaign scheduler apply its own hold cap.
-        return None
     if duration_h <= 0.0:
         raise EvaluationInputError(
             f"{campaign}.duration_h must be positive for thermal window scheduling"
@@ -3660,10 +3656,12 @@ def _campaign_max_hold_hr(
     return amount
 
 
-def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float | None:
+def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float:
     interval = _numeric_interval(value)
     if interval is None:
-        return None
+        # For a single-campaign window, run.hours is the measured hold; only
+        # profiles without a window use it as a campaign-sequence horizon.
+        return float(run_hours)
     low, high = interval
     if high < low:
         raise EvaluationInputError(f"duration_h must be ascending; got {value!r}")

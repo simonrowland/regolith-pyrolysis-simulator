@@ -1119,14 +1119,6 @@ def _validate_run_thermal_window_caps(
         campaign,
         campaign_max_hold_hr=campaign_max_hold_hr,
     )
-    if duration_h is None:
-        if max_hold_bound != "recipe_local_max_hold_hr":
-            # No declared window hold exists to compare with the campaign cap.
-            return
-        if campaign_max_hold_hr is None:
-            return
-        # A recipe-local cap still must accommodate the campaign's natural hold.
-        duration_h = float(campaign_max_hold_hr)
     total_hours = int(math.ceil(preheat_hours + duration_h))
     if max_hold_hr is None or float(total_hours) <= max_hold_hr:
         return
@@ -1243,10 +1235,12 @@ def _thermal_window_duration_h(
     value: Any,
     *,
     run_hours: int,
-) -> float | None:
+) -> float:
     interval = _numeric_interval_optional(value)
     if interval is None:
-        return None
+        # A single-campaign thermal window uses run.hours as its hold; sequence
+        # profiles have no temp_range_C and never enter this cap check.
+        return float(run_hours)
     low, high = interval
     if high < low:
         raise ProfileValidationError(f"duration_h must be ascending; got {value!r}")
