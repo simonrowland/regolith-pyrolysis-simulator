@@ -135,8 +135,9 @@ def test_score_eligible_conjunct_red_then_green(conjunct: str) -> None:
 
 def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
     assert Engine.OPENIMCC in SCORE_ENGINE_SET
-    assert Engine.IMCC_SF04 not in SCORE_ENGINE_SET
-    assert Engine.IMCC_SF04_EXT not in SCORE_ENGINE_SET
+    assert {engine.value for engine in SCORE_ENGINE_SET}.isdisjoint(
+        {"imcc_sf04", "imcc_sf04_ext"}
+    )
     from simulator.battery import score as score_mod
 
     tree = ast.parse(inspect.getsource(score_mod))
@@ -157,12 +158,12 @@ def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
         engines_from_names(["nasa_cea_9"])
 
 
-@pytest.mark.parametrize("engine", (Engine.IMCC_SF04, Engine.IMCC_SF04_EXT))
-def test_retired_imcc_engines_cannot_be_selected_for_scoring(engine: Engine) -> None:
+@pytest.mark.parametrize("name", ("imcc_sf04", "imcc_sf04_ext"))
+def test_retired_imcc_engines_cannot_be_selected_for_scoring(name: str) -> None:
     from simulator.battery.score import engines_from_names
 
     with pytest.raises(ValueError, match="retired; use 'openimcc'"):
-        engines_from_names((engine.value,))
+        engines_from_names((name,))
 
 
 def _context(work=None, experiment=None, *observations, review=None) -> ScoreContext:

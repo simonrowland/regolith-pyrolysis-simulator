@@ -434,7 +434,7 @@ Do not pass a lower `--timeout` unless you also mean to skip that test (`-k 'not
 - [Process Model](docs/process-model.md) · [Chemistry Methods](docs/chemistry-methods.md)
 - [Feedstocks](docs/feedstocks.md)
 - [Citation Policy](docs/citation-policy.md) · [Lab Validation Whitepaper](docs/lab-validation-whitepaper.md)
-- [IMCC SF-04 Spec](docs/imcc-sf04-spec.md) · [MD Target List](docs/md-target-list.md)
+- [IMCC SF-04 (retired)](docs/imcc-sf04-spec.md) · [MD Target List](docs/md-target-list.md)
 
 **Running it**
 

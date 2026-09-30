@@ -1,4 +1,4 @@
-"""IMCC-SF04 adapter behavior and retired backend resolution aliases."""
+"""Retired backend resolution aliases and openimcc behavior."""
 
 from __future__ import annotations
 
@@ -22,7 +22,6 @@ from simulator.backends import (
 )
 from simulator.engine_local_config import identity_for
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.melt_backend.imcc_sf04.backend import ImccSf04Backend
 from simulator.melt_backend.openimcc_bridge import OpenImccMeltBackend
 from openimcc.kernel import _PUBLISHED_DATAPACK_SHA256
 
@@ -119,22 +118,6 @@ def test_resolve_backend_rejects_retired_imcc_spellings(name: str) -> None:
     assert getattr(excinfo.value, "reason_code", None) == "backend_unavailable"
 
 
-@pytest.mark.parametrize(
-    ("x_k2o", "expected_status"),
-    ((0.500002, "out_of_domain"), (0.5, "ok"), (0.500006, "out_of_domain")),
-)
-def test_backend_uses_strict_composition_envelope(
-    x_k2o: float, expected_status: str
-) -> None:
-    backend = ImccSf04Backend()
-    assert backend.initialize({})
-    result = backend.equilibrate(
-        temperature_C=1800.0 - 273.15,
-        composition_mol={"K2O": x_k2o, "SiO2": 1.0 - x_k2o},
-    )
-    assert result.status == expected_status
-
-
 @pytest.mark.parametrize("name", ["imcc-sf04", "imcc-sf04-ext", "imcc_sf04"])
 def test_resolve_retired_imcc_as_active_is_typed_refusal(name: str) -> None:
     with pytest.raises(
@@ -206,9 +189,8 @@ def test_one_pot_equilibrate_returns_finite_activities() -> None:
 
 def test_engine_identity_digest_is_datapack_hash_not_engines_local_toml() -> None:
     # identity_for reads compiled-engine receipts from engines.local.toml
-    # (alphamelts / magemin / thermoengine binaries). IMCC-SF04 is in-tree
-    # Python plus a hashed JSON datapack, so that table has no IMCC row.
-    # The published digest lives on the kernel constant.
+    # (alphamelts / magemin / thermoengine binaries). OpenIMCC is a pinned
+    # package, so its published digest lives on the kernel constant.
     assert identity_for("imcc-sf04") is None
     assert identity_for("imcc-sf04-ext") is None
     assert len(_PUBLISHED_DATAPACK_SHA256) == 64

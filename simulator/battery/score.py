@@ -246,7 +246,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
 # - validation-data/vapour_rail_sf04_high_t_DECISION.md 0.5 dex is an SF04
 #   high-T species-disagreement check, "NOT evidence for a physical or
 #   numerical ceiling".
-# - docs/imcc-sf04-spec.md ±0.01 dex vs JANAF is an IMCC own-input pin.
+# - openimcc's published-pack SHA-256 pins the package data, not an accuracy band.
 # - engines/builtin/melt_effect_adjustment.py ±0.3 dex is a mixed-matte
 #   error estimate, not an activity agreement band.
 # - evaporation-α envelopes and the Robinot O2 error budget are value
@@ -444,20 +444,17 @@ class EligibleConjuncts:
         return tuple(name for name, ok in self.as_mapping().items() if not ok)
 
 
+_RETIRED_SCORE_ENGINE_NAMES = frozenset({"imcc_sf04", "imcc_sf04_ext"})
+
+
 def parse_engine(name: str) -> Engine:
-    return Engine(str(name).strip())
-
-
-_RETIRED_SCORE_ENGINES: frozenset[Engine] = frozenset(
-    {Engine.IMCC_SF04, Engine.IMCC_SF04_EXT}
-)
-
-
-def _require_score_engine(engine: Engine) -> None:
-    if engine in _RETIRED_SCORE_ENGINES:
+    value = str(name).strip()
+    if value in _RETIRED_SCORE_ENGINE_NAMES:
         raise ValueError(
-            f"engine {engine.value!r} is retired; use {Engine.OPENIMCC.value!r}"
+            f"engine {value!r} is retired; use {Engine.OPENIMCC.value!r}"
         )
+    return Engine(value)
+def _require_score_engine(engine: Engine) -> None:
     if engine not in SCORE_ENGINE_SET:
         raise ValueError(
             f"engine {engine.value!r} is not in the explicit SCORE_ENGINE_SET"

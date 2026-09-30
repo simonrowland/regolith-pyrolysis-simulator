@@ -71,11 +71,9 @@ def test_per_mol_o2_rescaling_cao() -> None:
     assert rescale_energy_per_basis(per_species, PerBasis.MOL_SPECIES, PerBasis.MOL_O2, doubled) == Decimal("200")
 
 
-def test_engine_enum_keeps_retired_imcc_identities() -> None:
-    """Retired IMCC values remain available for historical ledgers."""
+def test_engine_enum_excludes_retired_imcc_identities() -> None:
+    """Retired IMCC names are not first-class engine tokens."""
 
-    assert Engine.IMCC_SF04.value == "imcc_sf04"
-    assert Engine.IMCC_SF04_EXT.value == "imcc_sf04_ext"
     assert {e.value for e in Engine} == {
         "internal-analytical",
         "nasa_cea_9",
@@ -86,8 +84,6 @@ def test_engine_enum_keeps_retired_imcc_identities() -> None:
         "thermoengine",
         "vaporock",
         "magemin",
-        "imcc_sf04",
-        "imcc_sf04_ext",
         "openimcc",
     }
     import ast
