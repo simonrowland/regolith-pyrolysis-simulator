@@ -17,6 +17,8 @@ import logging
 import math
 from pathlib import Path
 import re
+import resource
+import socket
 from types import MappingProxyType
 from typing import Any
 
@@ -558,6 +560,10 @@ def run(
 ) -> StudyResult:
     """Run one ask/evaluate/tell study and write Phase-O artifacts."""
 
+    study_cpu_start = (
+        resource.getrusage(resource.RUSAGE_SELF),
+        resource.getrusage(resource.RUSAGE_CHILDREN),
+    )
     fidelity = str(canonical_backend_name(fidelity))
     base_schema = schema or RecipeSchema()
     config = StudyConfig(
@@ -936,6 +942,7 @@ def run(
             constraints=active_constraints,
             write_store=store,
             prefix_evals_run=prefix_evals_run,
+            process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
         )
         raise
     finally:
@@ -967,6 +974,7 @@ def run(
             constraints=active_constraints,
             write_store=store,
             prefix_evals_run=prefix_evals_run,
+            process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
         )
         raise StudyNoFeasibleError("no candidates were evaluated")
     if records and non_finite_count == len(records):
@@ -981,6 +989,7 @@ def run(
             constraints=active_constraints,
             write_store=store,
             prefix_evals_run=prefix_evals_run,
+            process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
         )
         raise StudyNoFeasibleError(
             "all candidates failed with non_finite_payload; "
@@ -999,6 +1008,7 @@ def run(
                 constraints=active_constraints,
                 write_store=store,
                 prefix_evals_run=prefix_evals_run,
+                process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
             )
             raise StudyNoFeasibleError(
                 "no feasible candidates due to config/runtime failure; "
@@ -1028,6 +1038,7 @@ def run(
             study_status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
             write_store=store,
             prefix_evals_run=prefix_evals_run,
+            process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
         )
         artifacts["provenance"] = provenance_path
         artifacts["store"] = store.path
@@ -1111,6 +1122,7 @@ def run(
         study_status=result_status,
         write_store=store,
         prefix_evals_run=prefix_evals_run,
+        process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -4885,6 +4897,7 @@ def _write_artifacts(
     study_status: str | None = None,
     write_store: ResultStore | None = None,
     prefix_evals_run: int = 0,
+    process_cpu_seconds: float | None = None,
 ) -> dict[str, Path]:
     created_at = datetime.now(UTC).isoformat()
     resolved_study_status = study_status or (
@@ -4959,6 +4972,7 @@ def _write_artifacts(
         config=config,
         strategy_name=resolved_strategy,
         prefix_evals_run=prefix_evals_run,
+        process_cpu_seconds=process_cpu_seconds,
     )
     winner_written = False
     tap_sidecar_written = False
@@ -5105,6 +5119,7 @@ def _study_summary_payload(
     config: StudyConfig | None,
     strategy_name: str,
     prefix_evals_run: int = 0,
+    process_cpu_seconds: float | None = None,
 ) -> Mapping[str, Any]:
     feasible_count = sum(1 for record in leaderboard if record.feasible)
     infeasible_count = sum(int(value) for value in failure_counts.values())
@@ -5116,7 +5131,7 @@ def _study_summary_payload(
     if study_status == ABORTED_STATUS:
         source_record, products_source = None, "none"
     best_non_seeded = _best_non_seeded_lineage(leaderboard)
-    return {
+    payload = {
         "save_schema_version": SAVE_SCHEMA_VERSION,
         "member_schema_version": MEMBER_SCHEMA_VERSION,
         "study_id": study_id,
@@ -5166,6 +5181,10 @@ def _study_summary_payload(
         "origin": "local",
         "verification": None,
     }
+    if process_cpu_seconds is not None:
+        payload["process_cpu_seconds"] = process_cpu_seconds
+        payload["hostname"] = socket.gethostname()
+    return payload
 
 
 def _lineage_fields(config: StudyConfig | None) -> tuple[str | None, str | None]:
@@ -5400,6 +5419,22 @@ def _summary_honesty_payload(
     if evidence_rank is not None:
         payload["evidence_rank"] = evidence_rank
     return payload
+
+
+def _process_cpu_seconds(
+    start: tuple[Any, Any],
+) -> float:
+    self_usage = resource.getrusage(resource.RUSAGE_SELF)
+    children_usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+    # CPU elapsed is the sum of user and system deltas for this process and its reaped children.
+    return math.fsum(
+        (
+            self_usage.ru_utime - start[0].ru_utime,
+            self_usage.ru_stime - start[0].ru_stime,
+            children_usage.ru_utime - start[1].ru_utime,
+            children_usage.ru_stime - start[1].ru_stime,
+        )
+    )
 
 
 def _summary_evidence_rank(label: Mapping[str, Any]) -> str | None:
@@ -5868,6 +5903,7 @@ def _write_aborted_artifacts_from_cache(
     constraints: Any = None,
     write_store: ResultStore | None = None,
     prefix_evals_run: int = 0,
+    process_cpu_seconds: float | None = None,
 ) -> bool:
     records = _records_from_cache_sqlite(
         out,
@@ -5923,6 +5959,7 @@ def _write_aborted_artifacts_from_cache(
         study_status=ABORTED_STATUS,
         write_store=write_store,
         prefix_evals_run=prefix_evals_run,
+        process_cpu_seconds=process_cpu_seconds,
     )
     return True
 
@@ -6012,6 +6049,7 @@ def _write_empty_artifacts(
     constraints: Any = None,
     write_store: ResultStore | None = None,
     prefix_evals_run: int = 0,
+    process_cpu_seconds: float | None = None,
 ) -> None:
     fidelity = str(canonical_backend_name(fidelity))
     schema = RecipeSchema()
@@ -6036,6 +6074,7 @@ def _write_empty_artifacts(
         constraints=constraints,
         write_store=write_store,
         prefix_evals_run=prefix_evals_run,
+        process_cpu_seconds=process_cpu_seconds,
     ):
         return
 
@@ -6077,6 +6116,7 @@ def _write_empty_artifacts(
                     config=config,
                     strategy_name=strategy_name,
                     prefix_evals_run=prefix_evals_run,
+                    process_cpu_seconds=process_cpu_seconds,
                 ),
                 indent=2,
                 sort_keys=True,

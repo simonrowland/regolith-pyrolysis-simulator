@@ -747,6 +747,26 @@ def _journal_any_id_evaluator(
     )
 
 
+def test_finished_study_artifact_records_cpu_and_hostname(tmp_path: Path) -> None:
+    out = tmp_path / "cpu-provenance"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_any_id_evaluator,
+    )
+
+    summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
+    assert math.isfinite(summary["process_cpu_seconds"])
+    assert summary["process_cpu_seconds"] >= 0
+    assert isinstance(summary["hostname"], str) and summary["hostname"].strip()
+
+
 def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
     out = tmp_path / "journal-round-trip"
     result = study.run(
