@@ -1731,7 +1731,9 @@ species:
           cell-calibration offset across all points of a series (in addition to 0.30 dex/pt independent).
           Authors also state ≥factor 2 absolute-P uncertainty from calibration.'
         note: pre-registered digitization σ; do not retune Pref/γ to close residuals. dex=0.3 is the
-          already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune.
+          already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune. The sample
+          catalogue Na2O proxy uses Kushiro71 0.29 wt%; Engel71 prints 0.47 wt%, a 0.18 wt percentage
+          point spread retained as the Na composition uncertainty.
       values:
         gas_species: Na(g)
         quantity: partial_pressure_figure_digitization_rejected
@@ -1742,31 +1744,42 @@ species:
         sample: '12022'
         sample_Na2O_wt_pct: 0.36
         sample_K2O_wt_pct: 0.068
-        composition_source: 'DeMaria 1971 text (Sample 12022,57 alkaline components paragraph): "0.36
-          and 0.068 wt. % of Na2O and K2O, respectively"; full oxide suite reported elsewhere (Smales
-          1971). Test fixture matches Na2O=0.36.'
+        composition_source: >-
+          Lunar Sample Compendium entry lpi-compendium-12022, Table 1a, Kushiro71 conventional-wet
+          complete whole-sample bulk analysis. Selection rule: use the first complete named
+          whole-sample bulk-analysis column after the reference summary, excluding preliminary
+          LSPET and component analyses; do not average analyses. This composition is a cross-source
+          same-sample proxy, not a composition printed by DeMaria 1971. Both conventional-wet analyses
+          are retained here (wt%): Kushiro71 SiO2 42.33, TiO2 4.54, Al2O3 9.12, FeO
+          22.06, MnO 0.26, MgO 11.58, CaO 9.37, Na2O 0.29, K2O 0.07, P2O5 0.02, Cr 3831 ppm;
+          Engel71 SiO2 43.2, TiO2 5.16, Al2O3 9.04, FeO 21.44, MnO 0.25, MgO 10.43, CaO 9.56,
+          Na2O 0.47, K2O 0.07, P2O5 0.13, Cr 3800 ppm. Na2O spread 0.29–0.47 wt% is the stated
+          uncertainty on Na rows. Cr conversion: wt% Cr2O3 = ppm Cr × 1e-4 × (M_Cr2O3 / (2 M_Cr)),
+          with M_Cr2O3 = 151.99 and M_Cr = 51.996; factor 1.4616; 3831 ppm × 1.4616e-4 =
+          0.560 wt% Cr2O3 (Engel 3800 ppm = 0.555 wt%).
         printed_composition:
           Na2O: 0.36
           K2O: 0.068
-        printed_composition_source: DeMaria 1971, p. 1369, alkaline-components paragraph; printed alkalis take precedence for those named fields, while Smales supplies the unprinted bulk oxides.
-        composition_basis: printed_alkali_fields_plus_same_sample_catalog_major_oxides
+        printed_composition_source: DeMaria 1971, p. 1369, alkaline-components paragraph; its printed alkalis are retained separately from the sample-catalog proxy.
+        composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
         composition_from_sample_catalog: true
         composition_source_kind: published_same_sample_bulk_analysis
         sample_oxide_composition_wt_pct:
-          SiO2: 42.3
-          Al2O3: 8.2
-          FeO: 21.6
-          MgO: 11.9
-          CaO: 9.0
-          Na2O: 0.23
-          K2O: 0.061
-          TiO2: 4.9
-          MnO: 0.31
+          SiO2: 42.33
+          TiO2: 4.54
+          Al2O3: 9.12
+          FeO: 22.06
+          MnO: 0.26
+          MgO: 11.58
+          CaO: 9.37
+          Na2O: 0.29
+          K2O: 0.07
+          P2O5: 0.02
+          Cr2O3: 0.560
         composition_source_locator:
-          source_id: smales-1971-lpsc-12022
-          observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
-          published_pages: 1254–1255
-          quote: Apollo 12 rock 12022 analytical composition
+          source_id: lpi-compendium-12022
+          published_pages: 'PDF p. 4, Table 1a'
+          quote: Kushiro71 and Engel71 conventional-wet Apollo 12022 whole-sample bulk analyses
         prior_figure_digitization_present: true
         admission_status: rejected_no_figure_reading
         series: upper_line_circles

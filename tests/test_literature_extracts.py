@@ -37,6 +37,64 @@ import migrate_pilot_extracts as mig  # noqa: E402
 import validate_literature_extracts as vle  # noqa: E402
 
 
+def test_demaria_12022_catalogue_composition_uses_kushiro_and_keeps_engel() -> None:
+    """Pin the first complete compendium analysis and its printed provenance."""
+
+    doc = yaml.safe_load((EXTRACTS / "kems-022-demaria-1971.yaml").read_text())
+    o2 = next(
+        item
+        for item in doc["species"]["O2"]["observations"]
+        if item["observation_id"] == "demaria_1971_o2_psat_table1_alkali_range"
+    )
+    assert all(
+        "composition_from_sample_catalog" not in point
+        for point in o2["values"]["points"]
+    )
+    na = next(
+        item
+        for item in doc["species"]["Na"]["observations"]
+        if item["observation_id"]
+        == "demaria_1971_na_psat_figure1_sample_12022_digitized"
+    )
+    composition = na["values"]
+    assert composition["composition_from_sample_catalog"] is True
+    assert composition["composition_basis"] == (
+        "same_sample_catalog_first_complete_whole_sample_bulk_analysis"
+    )
+    assert composition["composition_source_locator"] == {
+        "source_id": "lpi-compendium-12022",
+        "published_pages": "PDF p. 4, Table 1a",
+        "quote": "Kushiro71 and Engel71 conventional-wet Apollo 12022 whole-sample bulk analyses",
+    }
+    assert composition["sample_oxide_composition_wt_pct"] == {
+        "SiO2": 42.33,
+        "TiO2": 4.54,
+        "Al2O3": 9.12,
+        "FeO": 22.06,
+        "MnO": 0.26,
+        "MgO": 11.58,
+        "CaO": 9.37,
+        "Na2O": 0.29,
+        "K2O": 0.07,
+        "P2O5": 0.02,
+        "Cr2O3": 0.560,
+    }
+    provenance = composition["composition_source"]
+    assert "Engel71 SiO2 43.2" in provenance
+    assert "Na2O 0.47" in provenance
+    assert "3831 ppm × 1.4616e-4 = 0.560 wt% Cr2O3" in provenance
+    na_12065 = next(
+        item
+        for item in doc["species"]["Na"]["observations"]
+        if item["observation_id"]
+        == "demaria_1971_na_psat_figure1_sample_12065_digitized"
+    )
+    assert "0.18 wt percentage point spread" in na["uncertainty"]["note"]
+    assert na_12065["values"]["composition_source_locator"]["source_id"] == (
+        "smales-1971-lpsc-12022"
+    )
+
+
 def test_norris_starting_composition_is_pinned_to_online_extended_table() -> None:
     doc = yaml.safe_load(
         (EXTRACTS / "norris-2017-earth-volatiles-nature.yaml").read_text()

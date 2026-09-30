@@ -2607,28 +2607,40 @@ observations:
         basis: sample_catalog_proxy
         components:
         - - SiO2
-          - '0.4370300404472189490300406296'
-        - - Al2O3
-          - '0.04992363851472767186779541665'
-        - - FeO
-          - '0.186631857820954309618158003'
-        - - MgO
-          - '0.1832826449540607504498940327'
-        - - CaO
-          - '0.09962773800078939244754301791'
-        - - Na2O
-          - '0.00230361043344815193559034437'
-        - - K2O
-          - '0.0004019960173842589283052064581'
+          - '0.4335025764882725297924470133'
         - - TiO2
-          - '0.03808571527364136642564305475'
+          - '0.03497795226002991433886253935'
+        - - Al2O3
+          - '0.05503762785535947195871900577'
+        - - FeO
+          - '0.1889339601591357809067591961'
         - - MnO
-          - '0.002712758537775149297030294361'
+          - '0.002255253080166684709681616533'
+        - - MgO
+          - '0.1767890788866050170599714889'
+        - - CaO
+          - '0.1028134287876475408553782203'
+        - - Na2O
+          - '0.002879066460361749997214021858'
+        - - K2O
+          - '0.0004572591945550769985719096163'
+        - - P2O5
+          - '0.00008669868212260335634442454518'
+        - - Cr2O3
+          - '0.002267098145743630026050563267'
         amount_basis: mole_fraction
         proxy_flag: composition_from_sample_catalog
-        proxy_source: 'DeMaria 1971 text (Sample 12022,57 alkaline components paragraph): "0.36 and 0.068 wt. % of Na2O and
-          K2O, respectively"; full oxide suite reported elsewhere (Smales 1971). Test fixture matches Na2O=0.36.'
-        analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
+        proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12022, Table 1a, Kushiro71 conventional-wet complete whole-sample
+          bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after the reference
+          summary, excluding preliminary LSPET and component analyses; do not average analyses. This composition is a cross-source
+          same-sample proxy, not a composition printed by DeMaria 1971. Both conventional-wet analyses are retained here (wt%):
+          Kushiro71 SiO2 42.33, TiO2 4.54, Al2O3 9.12, FeO 22.06, MnO 0.26, MgO 11.58, CaO 9.37, Na2O 0.29, K2O 0.07, P2O5
+          0.02, Cr 3831 ppm; Engel71 SiO2 43.2, TiO2 5.16, Al2O3 9.04, FeO 21.44, MnO 0.25, MgO 10.43, CaO 9.56, Na2O 0.47,
+          K2O 0.07, P2O5 0.13, Cr 3800 ppm. Na2O spread 0.29–0.47 wt% is the stated uncertainty on Na rows. Cr conversion:
+          wt% Cr2O3 = ppm Cr × 1e-4 × (M_Cr2O3 / (2 M_Cr)), with M_Cr2O3 = 151.99 and M_Cr = 51.996; factor 1.4616; 3831 ppm
+          × 1.4616e-4 = 0.560 wt% Cr2O3 (Engel 3800 ppm = 0.555 wt%).'
+        analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+          excluding preliminary LSPET and component analyses; do not average analyses
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'partial_pressure_figure_digitization_rejected';
@@ -2643,7 +2655,8 @@ observations:
         offset across all points of a series (in addition to 0.30 dex/pt independent). Authors also state ≥factor 2 absolute-P
         uncertainty from calibration.'
       note: pre-registered digitization σ; do not retune Pref/γ to close residuals. dex=0.3 is the already-stated σ (log10
-        of the authors' ≥factor-2 absolute-P bound), not a retune.
+        of the authors' ≥factor-2 absolute-P bound), not a retune. The sample catalogue Na2O proxy uses Kushiro71 0.29 wt%;
+        Engel71 prints 0.47 wt%, a 0.18 wt percentage point spread retained as the Na composition uncertainty.
   evidence:
     class:
       tag: unknown
@@ -2680,28 +2693,40 @@ observations:
           basis: sample_catalog_proxy
           components:
           - - SiO2
-            - '0.4370300404472189490300406296'
-          - - Al2O3
-            - '0.04992363851472767186779541665'
-          - - FeO
-            - '0.186631857820954309618158003'
-          - - MgO
-            - '0.1832826449540607504498940327'
-          - - CaO
-            - '0.09962773800078939244754301791'
-          - - Na2O
-            - '0.00230361043344815193559034437'
-          - - K2O
-            - '0.0004019960173842589283052064581'
+            - '0.4335025764882725297924470133'
           - - TiO2
-            - '0.03808571527364136642564305475'
+            - '0.03497795226002991433886253935'
+          - - Al2O3
+            - '0.05503762785535947195871900577'
+          - - FeO
+            - '0.1889339601591357809067591961'
           - - MnO
-            - '0.002712758537775149297030294361'
+            - '0.002255253080166684709681616533'
+          - - MgO
+            - '0.1767890788866050170599714889'
+          - - CaO
+            - '0.1028134287876475408553782203'
+          - - Na2O
+            - '0.002879066460361749997214021858'
+          - - K2O
+            - '0.0004572591945550769985719096163'
+          - - P2O5
+            - '0.00008669868212260335634442454518'
+          - - Cr2O3
+            - '0.002267098145743630026050563267'
           amount_basis: mole_fraction
           proxy_flag: composition_from_sample_catalog
-          proxy_source: 'DeMaria 1971 text (Sample 12022,57 alkaline components paragraph): "0.36 and 0.068 wt. % of Na2O
-            and K2O, respectively"; full oxide suite reported elsewhere (Smales 1971). Test fixture matches Na2O=0.36.'
-          analysis_selection_rule: source-declared catalogue analysis; no separate selection rule stated
+          proxy_source: 'Lunar Sample Compendium entry lpi-compendium-12022, Table 1a, Kushiro71 conventional-wet complete
+            whole-sample bulk analysis. Selection rule: use the first complete named whole-sample bulk-analysis column after
+            the reference summary, excluding preliminary LSPET and component analyses; do not average analyses. This composition
+            is a cross-source same-sample proxy, not a composition printed by DeMaria 1971. Both conventional-wet analyses
+            are retained here (wt%): Kushiro71 SiO2 42.33, TiO2 4.54, Al2O3 9.12, FeO 22.06, MnO 0.26, MgO 11.58, CaO 9.37,
+            Na2O 0.29, K2O 0.07, P2O5 0.02, Cr 3831 ppm; Engel71 SiO2 43.2, TiO2 5.16, Al2O3 9.04, FeO 21.44, MnO 0.25, MgO
+            10.43, CaO 9.56, Na2O 0.47, K2O 0.07, P2O5 0.13, Cr 3800 ppm. Na2O spread 0.29–0.47 wt% is the stated uncertainty
+            on Na rows. Cr conversion: wt% Cr2O3 = ppm Cr × 1e-4 × (M_Cr2O3 / (2 M_Cr)), with M_Cr2O3 = 151.99 and M_Cr =
+            51.996; factor 1.4616; 3831 ppm × 1.4616e-4 = 0.560 wt% Cr2O3 (Engel 3800 ppm = 0.555 wt%).'
+          analysis_selection_rule: use the first complete named whole-sample bulk-analysis column after the reference summary,
+            excluding preliminary LSPET and component analyses; do not average analyses
       locator:
         page: 1369
         figure: '1'
@@ -2718,7 +2743,7 @@ observations:
         - - original_SiO2_wt_pct
           - state:
               tag: value
-              value: '42.3'
+              value: '42.33'
             locator:
               page: 1369
               figure: '1'
@@ -2737,10 +2762,32 @@ observations:
                 only (Na first ~1250 K; rapid depletion)
               note: figure-digitized absolute P series; not tabulated in source
               source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '4.54'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 circles = sample 12022 (upper line); open=BC, full=NAA; pre-depletion / first-observed points
+                only (Na first ~1250 K; rapid depletion)
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 circles = sample 12022 (upper line); open=BC, full=NAA; pre-depletion / first-observed points
+                only (Na first ~1250 K; rapid depletion)
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         - - original_Al2O3_wt_pct
           - state:
               tag: value
-              value: '8.2'
+              value: '9.12'
             locator:
               page: 1369
               figure: '1'
@@ -2762,7 +2809,7 @@ observations:
         - - original_FeO_wt_pct
           - state:
               tag: value
-              value: '21.6'
+              value: '22.06'
             locator:
               page: 1369
               figure: '1'
@@ -2781,10 +2828,32 @@ observations:
                 only (Na first ~1250 K; rapid depletion)
               note: figure-digitized absolute P series; not tabulated in source
               source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - original_MnO_wt_pct
+          - state:
+              tag: value
+              value: '0.26'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 circles = sample 12022 (upper line); open=BC, full=NAA; pre-depletion / first-observed points
+                only (Na first ~1250 K; rapid depletion)
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+        - - M_MnO_g_mol
+          - state:
+              tag: value
+              value: '70.937044'
+            locator:
+              page: 1369
+              figure: '1'
+              paragraph: Fig. 1 circles = sample 12022 (upper line); open=BC, full=NAA; pre-depletion / first-observed points
+                only (Na first ~1250 K; rapid depletion)
+              note: figure-digitized absolute P series; not tabulated in source
+              source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         - - original_MgO_wt_pct
           - state:
               tag: value
-              value: '11.9'
+              value: '11.58'
             locator:
               page: 1369
               figure: '1'
@@ -2806,7 +2875,7 @@ observations:
         - - original_CaO_wt_pct
           - state:
               tag: value
-              value: '9'
+              value: '9.37'
             locator:
               page: 1369
               figure: '1'
@@ -2828,7 +2897,7 @@ observations:
         - - original_Na2O_wt_pct
           - state:
               tag: value
-              value: '0.23'
+              value: '0.29'
             locator:
               page: 1369
               figure: '1'
@@ -2850,7 +2919,7 @@ observations:
         - - original_K2O_wt_pct
           - state:
               tag: value
-              value: '0.061'
+              value: '0.07'
             locator:
               page: 1369
               figure: '1'
@@ -2869,10 +2938,10 @@ observations:
                 only (Na first ~1250 K; rapid depletion)
               note: figure-digitized absolute P series; not tabulated in source
               source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-        - - original_TiO2_wt_pct
+        - - original_P2O5_wt_pct
           - state:
               tag: value
-              value: '4.9'
+              value: '0.02'
             locator:
               page: 1369
               figure: '1'
@@ -2880,10 +2949,10 @@ observations:
                 only (Na first ~1250 K; rapid depletion)
               note: figure-digitized absolute P series; not tabulated in source
               source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-        - - M_TiO2_g_mol
+        - - M_P2O5_g_mol
           - state:
               tag: value
-              value: '79.865'
+              value: '141.942523996'
             locator:
               page: 1369
               figure: '1'
@@ -2891,10 +2960,10 @@ observations:
                 only (Na first ~1250 K; rapid depletion)
               note: figure-digitized absolute P series; not tabulated in source
               source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-        - - original_MnO_wt_pct
+        - - original_Cr2O3_wt_pct
           - state:
               tag: value
-              value: '0.31'
+              value: '0.56'
             locator:
               page: 1369
               figure: '1'
@@ -2902,10 +2971,10 @@ observations:
                 only (Na first ~1250 K; rapid depletion)
               note: figure-digitized absolute P series; not tabulated in source
               source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
-        - - M_MnO_g_mol
+        - - M_Cr2O3_g_mol
           - state:
               tag: value
-              value: '70.937044'
+              value: '151.98919999999998'
             locator:
               page: 1369
               figure: '1'
