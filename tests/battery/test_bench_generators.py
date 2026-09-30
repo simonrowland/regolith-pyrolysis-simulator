@@ -310,14 +310,14 @@ def test_gas_couple_route_obeys_mass_action(reduced, oxidized):
     assert values[1] - values[0] == pytest.approx(4)
 
 
-def test_engine_inputs_all_eight_and_provenance():
+def test_engine_inputs_active_set_and_provenance():
     experiment, bench, observation = case()
     bench = replace(bench, identity=BenchIdentity(BenchIdentityBasis.CITED_BY_AUTHOR,
         ref=BenchReference("cited", "Earlier apparatus paper", ("apparatus",), f.loc(source_path="cited.pdf", page=7))))
     inputs = collect_consumer_inputs(experiment, bench, observation)
     results = engine_point_requests(inputs)
     assert {item.payload["engine"] for item in results} == {
-        "internal-analytical", "alphamelts", "thermoengine", "vaporock", "magemin", "cached-real", "imcc_sf04", "imcc_sf04_ext", "openimcc"}
+        "internal-analytical", "alphamelts", "thermoengine", "vaporock", "magemin", "cached-real", "openimcc"}
     for result in results:
         assert result.payload["temperature_C"] == 1126.85
         assert result.payload["pressure_bar"] == 1e-5

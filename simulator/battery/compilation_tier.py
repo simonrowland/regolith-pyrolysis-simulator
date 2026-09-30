@@ -1158,6 +1158,7 @@ def compilation_tier_census(
     from simulator.battery.score import (
         ENGINE_COEFFICIENT_SOURCES,
         SCORE_ENGINE_SET,
+        _validated_score_engines,
         comparison_candidates,
         decision_band_for,
         expand_coefficient_sources,
@@ -1171,7 +1172,11 @@ def compilation_tier_census(
     )
     from simulator.battery.validity import run_validity_gates
 
-    engine_set = tuple(engines) if engines is not None else SCORE_ENGINE_SET
+    engine_set = (
+        _validated_score_engines(tuple(engines))
+        if engines is not None
+        else SCORE_ENGINE_SET
+    )
     buckets: dict[tuple[str, str], dict[str, object]] = {}
     measured: dict[str, int] = defaultdict(int)
     for obs in comparison_candidates(context):

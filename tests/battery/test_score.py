@@ -133,9 +133,10 @@ def test_score_eligible_conjunct_red_then_green(conjunct: str) -> None:
     assert score_eligible_from_conjuncts(green) is True
 
 
-def test_imcc_present_in_engine_set_by_construction() -> None:
-    assert Engine.IMCC_SF04 in SCORE_ENGINE_SET
-    assert Engine.IMCC_SF04_EXT in SCORE_ENGINE_SET
+def test_retired_imcc_engines_are_excluded_from_score_set() -> None:
+    assert Engine.OPENIMCC in SCORE_ENGINE_SET
+    assert Engine.IMCC_SF04 not in SCORE_ENGINE_SET
+    assert Engine.IMCC_SF04_EXT not in SCORE_ENGINE_SET
     from simulator.battery import score as score_mod
 
     tree = ast.parse(inspect.getsource(score_mod))
@@ -154,6 +155,14 @@ def test_imcc_present_in_engine_set_by_construction() -> None:
     assert "Call" not in src
     with pytest.raises(ValueError, match="explicit SCORE_ENGINE_SET"):
         engines_from_names(["nasa_cea_9"])
+
+
+@pytest.mark.parametrize("engine", (Engine.IMCC_SF04, Engine.IMCC_SF04_EXT))
+def test_retired_imcc_engines_cannot_be_selected_for_scoring(engine: Engine) -> None:
+    from simulator.battery.score import engines_from_names
+
+    with pytest.raises(ValueError, match="retired; use 'openimcc'"):
+        engines_from_names((engine.value,))
 
 
 def _context(work=None, experiment=None, *observations, review=None) -> ScoreContext:
@@ -674,6 +683,18 @@ def test_solved_effusion_lifts_only_derived_oxygen_provenance_blocker() -> None:
         reason='fo2_oxygen_balance_effusion_solved: {"pO2_bar":0.12}',
         origin="engine:openimcc",
     )
+    from simulator.battery.oxygen_balance import (
+        IMCC_ENGINES,
+        has_own_engine_solved_oxygen_balance,
+    )
+
+    assert IMCC_ENGINES == frozenset({Engine.OPENIMCC})
+    assert has_own_engine_solved_oxygen_balance(Engine.OPENIMCC, (solved,))
+    assert not has_own_engine_solved_oxygen_balance(Engine.ALPHAMELTS, (solved,))
+    foreign_origin = replace(solved, origin="engine:imcc_sf04")
+    assert not has_own_engine_solved_oxygen_balance(
+        Engine.OPENIMCC, (foreign_origin,)
+    )
     unsolved_prediction = replace(
         _partial_prediction(Engine.OPENIMCC, reference),
         notices=(),
@@ -688,6 +709,21 @@ def test_solved_effusion_lifts_only_derived_oxygen_provenance_blocker() -> None:
     assert unsolved_candidate is not None
     assert unsolved.score_eligible is False
     assert "no_blocking_qualification" in unsolved.exclusions
+
+    foreign_origin_prediction = replace(
+        _partial_prediction(Engine.OPENIMCC, reference),
+        notices=(foreign_origin,),
+    )
+    foreign_origin_residual, foreign_origin_candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference),
+        prediction=foreign_origin_prediction,
+        comparison_ids={reference.observation_id},
+    )
+    assert foreign_origin_candidate is not None
+    assert foreign_origin_residual.score_eligible is False
+    assert "no_blocking_qualification" in foreign_origin_residual.exclusions
 
     prediction = replace(
         _partial_prediction(Engine.OPENIMCC, reference),
@@ -2942,7 +2978,7 @@ def test_imcc_complex_saturation_routes_only_own_prediction() -> None:
     )
     notice = cell_notices(
         Quantity.ACTIVITY,
-        Engine.IMCC_SF04,
+        Engine.OPENIMCC,
         SimpleNamespace(
             notices=(
                 {
@@ -2957,26 +2993,26 @@ def test_imcc_complex_saturation_routes_only_own_prediction() -> None:
     context = _context(F.work(), experiment, reference, review="reviewed")
     saturated_prediction = replace(
         _predict(Decimal("0.3"), identity),
-        engine=Engine.IMCC_SF04,
-        channel=Engine.IMCC_SF04.value,
+        engine=Engine.OPENIMCC,
+        channel=Engine.OPENIMCC.value,
         unit="dimensionless",
         notices=notice,
     )
     unaffected_prediction = replace(
         _predict(Decimal("0.3"), identity),
-        engine=Engine.OPENIMCC,
-        channel=Engine.OPENIMCC.value,
+        engine=Engine.ALPHAMELTS,
+        channel=Engine.ALPHAMELTS.value,
         unit="dimensionless",
     )
     saturated, _ = compile_residual(
         reference,
-        Engine.IMCC_SF04,
+        Engine.OPENIMCC,
         context=context,
         prediction=saturated_prediction,
     )
     unaffected, _ = compile_residual(
         reference,
-        Engine.OPENIMCC,
+        Engine.ALPHAMELTS,
         context=context,
         prediction=unaffected_prediction,
     )
@@ -2995,16 +3031,16 @@ def test_imcc_complex_saturation_routes_only_own_prediction() -> None:
     headline = headline_rows(
         (saturated, unaffected),
         context=context,
-        engines=(Engine.IMCC_SF04, Engine.OPENIMCC),
+        engines=(Engine.OPENIMCC, Engine.ALPHAMELTS),
     )
     by_engine = {
         row["engine"]: row for row in headline if row["rail"] == saturated.rail.value
     }
-    assert by_engine[Engine.IMCC_SF04.value]["n"] == 0
-    assert by_engine[Engine.OPENIMCC.value]["n"] == 1
-    assert by_engine[Engine.OPENIMCC.value]["n_score_eligible"] == 1
+    assert by_engine[Engine.OPENIMCC.value]["n"] == 0
+    assert by_engine[Engine.ALPHAMELTS.value]["n"] == 1
+    assert by_engine[Engine.ALPHAMELTS.value]["n_score_eligible"] == 1
 
-    flagged = flagged_stratum_rows((saturated,), engines=(Engine.IMCC_SF04,))
+    flagged = flagged_stratum_rows((saturated,), engines=(Engine.OPENIMCC,))
     assert [(row["stratum"], row["n"]) for row in flagged] == [
         ("imcc_complex_saturation", 1)
     ]
@@ -3013,7 +3049,7 @@ def test_imcc_complex_saturation_routes_only_own_prediction() -> None:
         row["kind"] == "imcc_complex_saturation" for row in payload["notices"]
     )
     assert [(row["stratum"], row["n"]) for row in flagged_stratum_payloads(
-        (payload,), (Engine.IMCC_SF04,)
+        (payload,), (Engine.OPENIMCC,)
     )] == [("imcc_complex_saturation", 1)]
 
 
@@ -3564,7 +3600,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             identity=point.identity if isinstance(point.identity, Identity) else None,
         )
 
-    engines = (Engine.IMCC_SF04, Engine.OPENIMCC)
+    engines = (Engine.OPENIMCC,)
     residuals, _ = score_store(
         filtered,
         engines=engines,
@@ -3575,9 +3611,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         for residual in residuals
         if residual.reference in headline_diagnostic_references
     ]
-    assert len(headline_diagnostic_residuals) == 2 * len(
-        headline_diagnostic_references
-    )
+    assert len(headline_diagnostic_residuals) == len(headline_diagnostic_references)
     assert all(
         "reference_measured_evidence" in residual.exclusions
         for residual in headline_diagnostic_residuals
@@ -3766,7 +3800,7 @@ def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Pa
         assert "bulk_composition_in_two_phase_region" in (
             observation.identity.species.phase.reason or ""
         )
-        for engine in (Engine.IMCC_SF04, Engine.OPENIMCC):
+        for engine in (Engine.OPENIMCC,):
             residual, _candidate = compile_residual(
                 observation,
                 engine,

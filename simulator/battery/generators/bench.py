@@ -158,15 +158,6 @@ _ENGINE_REPORTED_ACTIVITY = {
     )
     for engine in ("alphamelts", "thermoengine")
 }
-_ENGINE_REPORTED_ACTIVITY.update({
-    engine: EngineReportedActivity(
-        "raoultian_pure_liquid_oxide_parent",
-        ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
-        Phase.L,
-        _PARENT_OXIDE_COMPONENT_BASES,
-    )
-    for engine in ("imcc_sf04", "imcc_sf04_ext")
-})
 _ENGINE_REPORTED_ACTIVITY["openimcc"] = EngineReportedActivity(
     "raoultian_pure_liquid_oxide_parent",
     ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
@@ -277,7 +268,7 @@ def _imcc_reports_parent_oxide(formula: str) -> tuple[bool, str]:
 def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
     if engine in ("alphamelts", "thermoengine"):
         return _melts_reports_oxide_endmember(formula)
-    if engine in ("imcc_sf04", "imcc_sf04_ext", "openimcc"):
+    if engine == "openimcc":
         return _imcc_reports_parent_oxide(formula)
     return False, "typed-refusal:engine_does_not_report_parent_oxide_activity"
 
@@ -507,7 +498,7 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
         reported_activity = _ENGINE_REPORTED_ACTIVITY[engine]
         single_cation = (
             inputs.activity_quantity == "activity_coefficient"
-            and engine in {"imcc_sf04", "imcc_sf04_ext", "openimcc"}
+            and engine == "openimcc"
             and state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
             and phase_token(state.endmember) is Phase.L
             and state.component_basis == state.endmember.formula

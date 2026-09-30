@@ -7,9 +7,7 @@ from typing import Sequence
 from simulator.battery.enums import Engine, NoticeKind
 from simulator.battery.records import Notice
 
-IMCC_ENGINES: frozenset[Engine] = frozenset(
-    {Engine.IMCC_SF04, Engine.IMCC_SF04_EXT, Engine.OPENIMCC}
-)
+IMCC_ENGINES: frozenset[Engine] = frozenset({Engine.OPENIMCC})
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
 
 

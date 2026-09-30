@@ -71,8 +71,8 @@ def test_per_mol_o2_rescaling_cao() -> None:
     assert rescale_energy_per_basis(per_species, PerBasis.MOL_SPECIES, PerBasis.MOL_O2, doubled) == Decimal("200")
 
 
-def test_engine_enum_is_closed_and_includes_imcc_sf04() -> None:
-    """Owner steer: first-class engines, never derived from resolve_backend."""
+def test_engine_enum_keeps_retired_imcc_identities() -> None:
+    """Retired IMCC values remain available for historical ledgers."""
 
     assert Engine.IMCC_SF04.value == "imcc_sf04"
     assert Engine.IMCC_SF04_EXT.value == "imcc_sf04_ext"
