@@ -745,6 +745,173 @@ def _pure_phase_attempt(
     )
 
 
+def _vaporock_gas_attempt(
+    identity: Identity,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    *,
+    origin: str,
+) -> ThermoAttempt:
+    phase = identity.species.phase
+    if (
+        not isinstance(phase, State)
+        or not phase.is_value
+        or phase.value is not Phase.G
+        or quantity not in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    ):
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "engine-thermo-does-not-emit",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value},
+        )
+    if (
+        not isinstance(identity.per, State)
+        or not identity.per.is_value
+        or identity.per.value is not PerBasis.MOL_SPECIES
+    ):
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "vaporock-gas-thermo-requires-mol-species-basis",
+            quantity=quantity,
+            origin=origin,
+        )
+
+    charge = identity.species.charge
+    if not isinstance(charge, State) or not charge.is_value:
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "vaporock-gas-charge-unknown",
+            quantity=quantity,
+            origin=origin,
+        )
+    if as_decimal(charge.value) != 0:
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "vaporock-charged-species-not-in-janaf-table",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "charge": str(charge.value)},
+        )
+
+    try:
+        vapor = getattr(_vaporock_gas_attempt, "_janaf_vapor", None)
+        if vapor is None:
+            from vaporock.equil import Vapor
+
+            vapor = Vapor(database="JANAF")
+            setattr(_vaporock_gas_attempt, "_janaf_vapor", vapor)
+    except Exception as exc:  # noqa: BLE001 - optional engine import boundary
+        return _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "vaporock-janaf-unavailable",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
+        )
+
+    formula = identity.species.formula
+    species_name = formula if formula.endswith("(g)") else f"{formula}(g)"
+    try:
+        rows = vapor.vapor_coefs.loc[species_name]
+    except KeyError:
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "vaporock-species-not-in-janaf-table",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+        )
+    except Exception as exc:  # noqa: BLE001 - optional engine data boundary
+        return _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "vaporock-janaf-unavailable",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
+        )
+
+    table_rows = (
+        (rows,)
+        if getattr(rows, "ndim", 1) == 1
+        else tuple(rows.iloc[index] for index in range(len(rows)))
+    )
+    temperature = float(temperature_K)
+    matching_rows = tuple(
+        row
+        for row in table_rows
+        if temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
+    )
+    if not matching_rows:
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "vaporock-temperature-outside-janaf-row",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+        )
+    if len(matching_rows) != 1:
+        return _refuse(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            "vaporock-janaf-interval-ambiguous",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+        )
+    row = matching_rows[0]
+
+    # Shomate forms use t=T/1000: Cp=A+Bt+Ct²+Dt³+E/t² and
+    # S=A ln(t)+Bt+Ct²/2+Dt³/3−E/(2t²)+G, both J/(mol·K);
+    # H−H298=At+Bt²/2+Ct³/3+Dt⁴/4−E/t+F−H, in kJ/mol. Cp uses
+    # the selected VapoRock row; its native evaluators supply S and
+    # _janaf_dH's apparent H(T) terms through +F, not H−H298. Subtract the
+    # selected row's H coefficient per the Shomate form. Unit check: kJ/mol
+    # remains kJ/mol.
+    # Sanity: K(g), 1200 K gives 18.7461926 kJ/mol vs printed JANAF
+    # K-005 H−H298 = 18.746 kJ/mol.
+    try:
+        t = temperature / 1000.0
+        if quantity is Quantity.CP:
+            raw = (
+                row["A"]
+                + row["B"] * t
+                + row["C"] * t**2
+                + row["D"] * t**3
+                + row["E"] / t**2
+            )
+        elif quantity is Quantity.S:
+            raw = vapor._janaf_S(temperature, row)
+        else:
+            raw = vapor._janaf_dH(temperature, row) - row["H"]
+        value = as_decimal(str(float(raw)))
+    except Exception as exc:  # noqa: BLE001 - optional engine evaluator boundary
+        return _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "vaporock-janaf-evaluation-unavailable",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
+        )
+    if not value.is_finite():
+        return _refuse(
+            RefusalReason.METRIC_DOMAIN,
+            "nonfinite-engine-value",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value},
+        )
+    return ThermoAttempt(
+        value=value,
+        unit=QUANTITY_UNITS[quantity],
+        authority=Authority.BRIDGE,
+        notices=(),
+        refusal_reason=None,
+        refusal_detail={},
+        call_evidence=f"vaporock-janaf-implementation-fidelity:{species_name}:T={temperature_K}",
+    )
+
+
 def predict_thermo_attempt(
     engine: Engine,
     observation: Observation,
@@ -795,6 +962,8 @@ def predict_thermo_attempt(
         )
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
+    if engine is Engine.VAPOROCK:
+        return _vaporock_gas_attempt(identity, quantity, temperature_K, origin=origin)
     if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
         return _pure_phase_attempt(
             engine,
@@ -1348,13 +1517,22 @@ def compilation_tier_census(
                             and temperature_state.value is not None
                             and as_decimal(temperature_state.value) <= 0
                         )
+                        vaporock_gas_table = (
+                            engine is Engine.VAPOROCK
+                            and isinstance(point.identity, Identity)
+                            and isinstance(point.identity.species.phase, State)
+                            and point.identity.species.phase.is_value
+                            and point.identity.species.phase.value is Phase.G
+                        )
                         # A 0 K refusal is not reused. A pure-phase value
                         # depends on T, so an invoked call is not reused either.
-                        # The uninvoked refusal does not depend on T.
+                        # VapoRock gas-table values depend on T even when
+                        # pure-phase invocation is disabled.
                         reuse = (
                             not nonpositive
                             and engine is not Engine.INTERNAL_ANALYTICAL
                             and not invoke_pure_phase
+                            and not vaporock_gas_table
                         )
                         if reuse and engine in reused:
                             attempt = reused[engine]
