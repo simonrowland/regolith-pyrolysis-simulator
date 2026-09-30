@@ -1588,6 +1588,16 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
         math.log10(mutated_pressure / packaged_pressure)
     ) > 1.0e-9
 
+    inert_balance_result = mutated.equilibrate(
+        temperature_C=temperature_K - 273.15,
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        po2_request=Po2Request(
+            mode=PO2_OXYGEN_BALANCE_EFFUSION,
+            po2_bar=None,
+            cell_material=None,
+        ),
+    )
     reactive_result = mutated.equilibrate(
         temperature_C=temperature_K - 273.15,
         composition_kg=composition_kg,
@@ -1598,31 +1608,46 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
             cell_material="W",
         ),
     )
-    omission_notices = [
-        notice
-        for notice in reactive_result.diagnostics["imcc_notices"]
-        if notice["kind"] == "openimcc_notice"
-        and "gas channel K2O omitted" in notice["reason"]
-    ]
-    assert len(omission_notices) == 1
-    assert "missing from active table: K2O(g)" in omission_notices[0]["reason"]
-    assert str(mutated._gas.gas_path) in omission_notices[0]["reason"]
     from types import SimpleNamespace
 
     from simulator.battery.score import cell_notices
 
-    typed_notice = next(
-        notice
-        for notice in cell_notices(
+    for path, path_result in (
+        ("explicit pO2", mutated_result),
+        ("inert balance", inert_balance_result),
+        ("reactive/cell-oxide balance", reactive_result),
+    ):
+        omission_notices = [
+            notice
+            for notice in path_result.diagnostics["imcc_notices"]
+            if notice["kind"] == NoticeKind.INPUT_OMITTED.value
+            and notice["reason"].startswith("gas channel ")
+        ]
+        assert len(omission_notices) == len(expected_omissions), path
+        for channel, missing_row in expected_omissions.items():
+            notice = next(
+                item
+                for item in omission_notices
+                if item["reason"].startswith(f"gas channel {channel} omitted:")
+            )
+            assert "missing from active table" in notice["reason"], path
+            assert missing_row in notice["reason"], path
+            assert str(mutated._gas.gas_path) in notice["reason"], path
+
+        typed_notices = cell_notices(
             Quantity.P_PARTIAL,
             Engine.OPENIMCC,
-            SimpleNamespace(notices=reactive_result.diagnostics["imcc_notices"]),
+            SimpleNamespace(notices=path_result.diagnostics["imcc_notices"]),
         )
-        if "gas channel K2O omitted" in notice.reason
-    )
-    assert typed_notice.kind is NoticeKind.SOURCE_DISAGREEMENT
-    assert typed_notice.origin == "engine:openimcc"
-    assert Quantity.P_PARTIAL in typed_notice.affected_quantities
+        typed_omissions = [
+            notice
+            for notice in typed_notices
+            if notice.reason.startswith("gas channel ")
+        ]
+        assert len(typed_omissions) == len(expected_omissions), path
+        assert all(notice.kind is NoticeKind.INPUT_OMITTED for notice in typed_omissions)
+        assert all(notice.origin == "engine:openimcc" for notice in typed_omissions)
+        assert all(Quantity.P_PARTIAL in notice.affected_quantities for notice in typed_omissions)
 
 
 
