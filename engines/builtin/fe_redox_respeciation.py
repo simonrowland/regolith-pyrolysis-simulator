@@ -21,6 +21,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
     floor_vacuum_pressure_bar,
@@ -43,7 +44,6 @@ BUFFER_BACKED_OXYGEN_SOURCES = frozenset({
     OXYGEN_SOURCE_FO2_BUFFER,
     OXYGEN_SOURCE_INTERNAL_EVAPORATIVE_METAL_LOSS,
 })
-NOOP_MOL = 1.0e-12
 TRANSITION_NAME = "fe_redox_respeciation"
 
 
@@ -141,7 +141,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         feo_mol = max(0.0, float(cleaned_melt.get("FeO", 0.0) or 0.0))
         fe2o3_mol = max(0.0, float(cleaned_melt.get("Fe2O3", 0.0) or 0.0))
         total_fe_mol = feo_mol + 2.0 * fe2o3_mol
-        if total_fe_mol <= NOOP_MOL:
+        if total_fe_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
             return IntentResult(
                 intent=ChemistryIntent.FE_REDOX_RESPECIATION,
                 status="ok",
@@ -275,7 +275,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                 else "authoritative"
             ),
         }
-        if abs(delta_fe2o3_mol) <= NOOP_MOL:
+        if abs(delta_fe2o3_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
             return IntentResult(
                 intent=ChemistryIntent.FE_REDOX_RESPECIATION,
                 status="ok",
@@ -309,9 +309,9 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             feo_debit_mol = 2.0 * applied_delta_fe2o3_mol
             o2_debit_mol = 0.5 * applied_delta_fe2o3_mol
             if (
-                applied_delta_fe2o3_mol <= NOOP_MOL
-                or feo_debit_mol > feo_mol + NOOP_MOL
-                or o2_debit_mol > available_o2_mol + NOOP_MOL
+                applied_delta_fe2o3_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                or feo_debit_mol > feo_mol + OXYGEN_RESERVOIR_NOOP_MOL
+                or o2_debit_mol > available_o2_mol + OXYGEN_RESERVOIR_NOOP_MOL
             ):
                 return IntentResult(
                     intent=ChemistryIntent.FE_REDOX_RESPECIATION,
@@ -334,8 +334,9 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                                 else "fe_redox_respeciation_o2_unavailable"
                             )
                             if (
-                                applied_delta_fe2o3_mol <= NOOP_MOL
-                                or o2_debit_mol > available_o2_mol + NOOP_MOL
+                                applied_delta_fe2o3_mol
+                                <= OXYGEN_RESERVOIR_NOOP_MOL
+                                or o2_debit_mol > available_o2_mol + OXYGEN_RESERVOIR_NOOP_MOL
                             )
                             else "fe_redox_respeciation_feo_unavailable"
                         ),
@@ -345,7 +346,10 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                         "unfunded_o2_mol": required_o2_mol,
                     },
                 )
-            partial = applied_delta_fe2o3_mol < delta_fe2o3_mol - NOOP_MOL
+            partial = (
+                applied_delta_fe2o3_mol
+                < delta_fe2o3_mol - OXYGEN_RESERVOIR_NOOP_MOL
+            )
             debits = {
                 CLEANED_MELT_ACCOUNT: {"FeO": feo_debit_mol},
                 o2_account: {OXYGEN_SPECIES: o2_debit_mol},
@@ -370,7 +374,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             })
         else:
             fe2o3_debit_mol = -delta_fe2o3_mol
-            if fe2o3_debit_mol > fe2o3_mol + NOOP_MOL:
+            if fe2o3_debit_mol > fe2o3_mol + OXYGEN_RESERVOIR_NOOP_MOL:
                 return IntentResult(
                     intent=ChemistryIntent.FE_REDOX_RESPECIATION,
                     status="refused",

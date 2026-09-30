@@ -69,6 +69,28 @@ def test_provider_declares_fe_redox_respeciation_authority_and_accounts():
     assert profile.declared_accounts == DECLARED_ACCOUNTS
 
 
+def test_provider_uses_shared_noop_for_trace_iron(formula_registry):
+    provider = BuiltinFeRedoxRespeciationProvider()
+
+    trace_oxidized = provider.dispatch(
+        _request(
+            formula_registry,
+            {"process.cleaned_melt": {"Fe2O3": 5.0e-14}},
+            fO2_log=-10.0,
+        )
+    )
+    assert trace_oxidized.diagnostic["respeciation_status"] != "no_oxidized_iron"
+
+    noop_total_iron = provider.dispatch(
+        _request(
+            formula_registry,
+            {"process.cleaned_melt": {"FeO": 1.0e-15}},
+            fO2_log=-10.0,
+        )
+    )
+    assert noop_total_iron.diagnostic["respeciation_status"] == "no_oxidized_iron"
+
+
 def test_fe_redox_respeciation_intent_authority_is_registered(
     vapor_pressure_data,
     feedstocks_data,
