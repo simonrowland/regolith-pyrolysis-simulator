@@ -31,6 +31,7 @@ from simulator.battery.enums import (
     Authority,
     Engine,
     EvidenceClass,
+    IdentityEqualKind,
     NoticeKind,
     PerBasis,
     Phase,
@@ -43,6 +44,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    identity_equal,
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
 )
@@ -693,7 +695,7 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value, "detail": str(exc)},
         )
-    except (ValueError, OSError, RuntimeError) as exc:
+    except (ImportError, ValueError, OSError, RuntimeError) as exc:
         return _refuse(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
             "pure-phase-unavailable",
@@ -1149,10 +1151,12 @@ def compilation_tier_census(
     thermochemistry refusal does not depend on which printed temperature
     it is, so it is computed once per series when pure-phase is not
     invoked. An invoked pure-phase value depends on T and is not reused.
-    ``invoke_pure_phase`` false records ``pure-phase-call-required``
-    instead of opening MAGEMin or ThermoEngine. Relation and validity gates are the same functions
-    ``compile_residual`` uses. A sample of points is checked against
-    ``compile_residual`` when ``audit_compile_residual`` is set.
+    Pure-phase access runs only after the formula and validity gates pass;
+    the existing resolver limits calls to mapped crystals. Setting
+    ``invoke_pure_phase`` false records ``pure-phase-call-required``.
+    Relation and validity gates are the same functions ``compile_residual``
+    uses. A sample of points is checked against ``compile_residual`` when
+    ``audit_compile_residual`` is set.
     """
 
     from simulator.battery.score import (
@@ -1182,7 +1186,10 @@ def compilation_tier_census(
     for obs in comparison_candidates(context):
         quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
         formula = obs.identity.species.formula if isinstance(obs.identity, Identity) else ""
-        measured[rail_for_quantity(quantity, species_formula=formula).value] += 1
+        rail = getattr(
+            rail_for_quantity(quantity, species_formula=formula), "value", None
+        )
+        measured["none" if rail is None else rail] += 1
 
     series_cells = 0
     banded_series_cells = 0
@@ -1332,6 +1339,26 @@ def compilation_tier_census(
                 row["reachable"] += 1
                 reachable += 1
                 reference = point.value.point
+                temperature_state = (
+                    point.identity.temperature_K
+                    if isinstance(point.identity, Identity)
+                    else None
+                )
+                nonpositive = (
+                    isinstance(temperature_state, State)
+                    and temperature_state.is_value
+                    and temperature_state.value is not None
+                    and as_decimal(temperature_state.value) <= 0
+                )
+                identity_outcome = (
+                    identity_equal(point.identity, point.identity)
+                    if isinstance(point.identity, Identity)
+                    else None
+                )
+                identity_equal_cell = (
+                    identity_outcome is not None
+                    and identity_outcome.kind is IdentityEqualKind.EQUAL
+                )
                 for engine in engine_set:
                     attempt: ThermoAttempt | None
                     if token not in _THERMO_QUANTITIES:
@@ -1341,17 +1368,59 @@ def compilation_tier_census(
                             quantity=token or Quantity.DELTA_FG,
                             origin=point.observation_id,
                         )
-                    else:
-                        temperature_state = (
-                            point.identity.temperature_K
-                            if isinstance(point.identity, Identity)
-                            else None
+                    elif nonpositive:
+                        attempt = predict_thermo_attempt(
+                            engine, point, invoke_pure_phase=False
                         )
-                        nonpositive = (
+                    elif (
+                        not identity_equal_cell
+                        and not formula_bad
+                        and gate is None
+                    ):
+                        kind = (
+                            IdentityEqualKind.IDENTITY_UNKNOWN
+                            if identity_outcome is None
+                            else identity_outcome.kind
+                        )
+                        reason = (
+                            RefusalReason.IDENTITY_MISMATCH
+                            if kind is IdentityEqualKind.IDENTITY_MISMATCH
+                            else RefusalReason.INVALID_IDENTITY
+                            if kind is IdentityEqualKind.INVALID_IDENTITY
+                            else RefusalReason.IDENTITY_UNKNOWN
+                        )
+                        attempt = _refuse(
+                            reason,
+                            "identity_equal",
+                            quantity=token,
+                            origin=point.observation_id,
+                            extra={
+                                "fields": []
+                                if identity_outcome is None
+                                else list(identity_outcome.fields),
+                                "detail": None
+                                if identity_outcome is None
+                                else identity_outcome.detail,
+                            },
+                        )
+                    else:
+                        positive = (
                             isinstance(temperature_state, State)
                             and temperature_state.is_value
                             and temperature_state.value is not None
-                            and as_decimal(temperature_state.value) <= 0
+                            and as_decimal(temperature_state.value) > 0
+                        )
+                        invoke_point = (
+                            invoke_pure_phase
+                            and not formula_bad
+                            and gate is None
+                            and reference is not None
+                            and positive
+                            and token in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+                            and engine in {Engine.THERMOENGINE, Engine.MAGEMIN}
+                            and isinstance(point.identity, Identity)
+                            and identity_equal_cell
+                            and _resolve_symbol(engine, point.identity)[0] is not None
                         )
                         # A 0 K refusal is not reused. A pure-phase value
                         # depends on T, so an invoked call is not reused either.
@@ -1359,7 +1428,7 @@ def compilation_tier_census(
                         reuse = (
                             not nonpositive
                             and engine is not Engine.INTERNAL_ANALYTICAL
-                            and not invoke_pure_phase
+                            and not invoke_point
                         )
                         if reuse and engine in reused:
                             attempt = reused[engine]
@@ -1367,7 +1436,7 @@ def compilation_tier_census(
                             attempt = predict_thermo_attempt(
                                 engine,
                                 point,
-                                invoke_pure_phase=invoke_pure_phase,
+                                invoke_pure_phase=invoke_point,
                             )
                             if reuse:
                                 reused[engine] = attempt
