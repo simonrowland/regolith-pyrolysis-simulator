@@ -895,15 +895,15 @@ class _TierCell:
 def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
     by_engine: dict[str, list[_TierCell]] = defaultdict(list)
     by_source: dict[tuple[str, str], list[_TierCell]] = defaultdict(list)
-    by_rail_engine_quantity: dict[
-        tuple[str, str, str, str], list[_TierCell]
+    by_family_rail_engine_quantity: dict[
+        tuple[str, str, str, str, str], list[_TierCell]
     ] = defaultdict(list)
     for cell in cells:
         by_engine[cell.engine].append(cell)
         by_source[(cell.family, cell.quantity)].append(cell)
         if cell.numeric is not None and cell.operation is MetricOperation.ABSOLUTE:
-            by_rail_engine_quantity[
-                (cell.rail, cell.engine, cell.quantity, cell.unit)
+            by_family_rail_engine_quantity[
+                (cell.family, cell.rail, cell.engine, cell.quantity, cell.unit)
             ].append(cell)
     lines = [
         "## Compilation tier",
@@ -917,16 +917,18 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
         "unchanged. Printed uncertainty is the reference observation's",
         "uncertainty (often none on a grid).",
         "",
-        "| rail | engine | quantity | unit | n | median |C−R| | RMS (C−R) | n match | "
+        "| compilation | rail | engine | quantity | unit | n | median abs(C−R) | "
+        "RMS (C−R) | n match | "
         "n mismatch | n no band | n same-source |",
-        "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
+        "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
-    if not by_rail_engine_quantity:
+    if not by_family_rail_engine_quantity:
         lines.append(
-            "| (none) | (none) | (none) | (none) | 0 | — | — | 0 | 0 | 0 | 0 |"
+            "| (none) | (none) | (none) | (none) | (none) | 0 | — | — | "
+            "0 | 0 | 0 | 0 |"
         )
-    for (rail, engine, quantity, unit), bucket in sorted(
-        by_rail_engine_quantity.items()
+    for (family, rail, engine, quantity, unit), bucket in sorted(
+        by_family_rail_engine_quantity.items()
     ):
         values = [row.numeric for row in bucket if row.numeric is not None]
         rms = (
@@ -944,7 +946,8 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
             "kJ/mol" if unit == "kJ_per_declared_mol_basis" else unit
         )
         lines.append(
-            f"| {rail} | {engine} | {quantity} | {display_unit} | {len(values)} | "
+            f"| {family} | {rail} | {engine} | {quantity} | {display_unit} | "
+            f"{len(values)} | "
             f"{_median_abs(values)} | {rms} | {len(matches)} | {len(mismatches)} | "
             f"{sum(1 for row in bucket if row.status is ResidualStatus.NO_BAND)} | "
             f"{len(same_source)} |"

@@ -474,7 +474,8 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     )[0]
     assert "implementation fidelity, not" in compilation_report
     assert (
-        "| rail | engine | quantity | unit | n | median |C−R| | RMS (C−R) | n match | "
+        "| compilation | rail | engine | quantity | unit | n | median abs(C−R) | "
+        "RMS (C−R) | n match | "
         "n mismatch | n no band | n same-source |"
     ) in compilation_report
     assert (
@@ -484,12 +485,15 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     summary = next(
         row
         for row in compilation_report.splitlines()
-        if row.startswith("| thermochemistry | internal-analytical | delta_fG |")
+        if row.startswith(
+            "| compilations-janaf | thermochemistry | internal-analytical | delta_fG |"
+        )
     )
     summary_cells = [cell.strip() for cell in summary.strip("|").split("|")]
-    assert summary_cells[3] == "kJ/mol"
-    assert summary_cells[4] == "2"
-    assert summary_cells[7:] == ["1", "1", "0", "1"]
+    assert summary_cells[4] == "kJ/mol"
+    assert summary_cells[5] == "1"
+    assert summary_cells[6] == str(abs(residual.numeric.value))
+    assert summary_cells[8:] == ["0", "1", "0", "1"]
     assert compilation_family("ATcT.yaml", None) == "ATcT"
     measured = [
         row
