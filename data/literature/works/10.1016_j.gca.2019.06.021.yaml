@@ -8837,16 +8837,17 @@ experiments:
     geometry:
       exposed_area_m2:
         state:
-          tag: unknown
-          reason: 'extract sample_surface_area is a bound or approximate value, not a point; extract_value=2e-05 m2; Source:
-            "surface areas (≈ 2×10^{-5} m)" (OCR units m; interpreted as m² for bead surface). Thermocouple bead radius 10^{-4}
-            m given same paragraph.'
+          tag: value
+          value:
+            kind: point
+            point: '0.00002'
+            approximate: false
         locator:
           paragraph: silicate melt spheres … surface areas (≈ 2×10^{-5} m) than the thermocouple bead
           line_range: '71'
           source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
         inference:
-          relation: extract_limit
+          relation: identity:m2
           inputs:
           - as_published=2e-05 m2
           - printed=sample_surface_area

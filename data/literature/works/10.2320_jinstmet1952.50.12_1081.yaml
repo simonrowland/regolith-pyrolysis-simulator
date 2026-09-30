@@ -137,22 +137,17 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00003'
-          approximate: false
+        tag: unknown
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        figure: '3'
-        section: II
-        note: ANELVA NAG-531 quadrupole MS; Y2O3 cell; orifice 0.5-0.8 mm; 0.9-1.2 g; 3e-5 Pa
+        note: ultimate vacuum during measurement about 3e-5 Pa
       inference:
-        relation: identity:Pa
+        relation: extract_limit
         inputs:
-        - as_published=3e-05 Pa
-        - printed=chamber_pressure_Pa_about
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -161,9 +156,7 @@ experiments:
             locator:
               published_page: 1082
               pdf_page_index: 2
-              figure: '3'
-              section: II
-              note: ANELVA NAG-531 quadrupole MS; Y2O3 cell; orifice 0.5-0.8 mm; 0.9-1.2 g; 3e-5 Pa
+              note: ultimate vacuum during measurement about 3e-5 Pa
         output_unit: Pa
     sweep_gas:
       state:
@@ -408,12 +401,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -657,12 +664,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -906,12 +927,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -1155,12 +1190,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -1404,12 +1453,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -1653,12 +1716,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -1902,12 +1979,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -2151,12 +2242,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -2400,12 +2505,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -2649,12 +2768,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -2898,12 +3031,26 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: 'extract chamber_pressure is a bound or approximate value, not a point; extract_value=about 3 x 10^-5 Pa; '
       locator:
         published_page: 1082
         pdf_page_index: 2
-        section: II.1 Experimental apparatus and sample
-        note: Ultimate vacuum before heating is printed, not a run pressure
+        note: ultimate vacuum during measurement about 3e-5 Pa
+      inference:
+        relation: extract_limit
+        inputs:
+        - as_published=about 3 x 10^-5 Pa
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00003'
+            locator:
+              published_page: 1082
+              pdf_page_index: 2
+              note: ultimate vacuum during measurement about 3e-5 Pa
+        output_unit: Pa
     sweep_gas:
       state:
         tag: not_applicable
@@ -3054,6 +3201,14 @@ benches:
       section: II.1 Experimental apparatus and sample
   cell_material_and_liner:
     state:
+      tag: value
+      value: Y2O3
+    locator:
+      published_page: 1082
+      pdf_page_index: 2
+      section: II.1 Experimental apparatus and sample
+  cell_materials:
+  - state:
       tag: value
       value: Y2O3
     locator:

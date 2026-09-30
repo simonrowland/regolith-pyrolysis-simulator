@@ -115,35 +115,15 @@ experiments:
           approximate: false
       locator:
         table: '1'
-        note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
+        note: Printed footnote atm=atmospheric air; SI definition conversion only (1 atm = 101325 Pa). Numeral 101325 is not
+          printed.
       inference:
         relation: extract_inference
         inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
         - inferred=true
-        - Numeral 1.0 is not printed. Table 1 / S1 footnote prints atm=atmospheric air. Table 1 Ex 7 prints log10 fO2=-0.68,
-          the air value (fO2 approx 0.21) at 1 atm total. The 1.0 atm scalar is inferred from that printed air token, not
-          a table-cell 1.0.
-        - extract_value=1.0 atm
-        - extract_field=chamber_pressure
-        - unit_conversion=atm_to_Pa
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              table: '1'
-              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              table: '1'
-              note: footnote atm=atmospheric air; Ex 7 log10 fO2=-0.68 air row
-        output_unit: Pa
+        - Printed footnote atm=atmospheric air; SI definition conversion only (1 atm = 101325 Pa). Numeral 101325 is not printed.
+        parameters: []
+        output_unit: as_published
     sweep_gas:
       state:
         tag: unknown

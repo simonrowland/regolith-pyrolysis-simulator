@@ -19,6 +19,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'post_run_composition_measurement'; refusing to
@@ -44,6 +47,12 @@ observations:
     section: 2.3 Analytical methods
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
   read_from: unknown:ta-flemetakis-2024
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-flemetakis-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants::rows:h=2e78aff879b4
   experiment_id: 10.5194/ejm-36-173-2024::ta-flemetakis-2024
   identity:
@@ -64,6 +73,9 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier constant does not name a reference_state
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -109,6 +121,9 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier constant does not name a reference_state
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -154,6 +169,9 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier constant does not name a reference_state
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -199,6 +217,9 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier constant does not name a reference_state
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -241,6 +262,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'boron_gas_phase_speciation'; refusing to pick
@@ -267,6 +291,12 @@ observations:
     section: 4.2 Evaporation reactions
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
   read_from: unknown:ta-flemetakis-2024
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-flemetakis-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=0a73b91662a4
   experiment_id: 10.5194/ejm-36-173-2024::ta-flemetakis-2024
   identity:
@@ -287,6 +317,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -367,6 +400,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -447,6 +483,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -527,6 +566,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -607,6 +649,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -687,6 +732,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -767,6 +815,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -847,6 +898,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -927,6 +981,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1007,6 +1064,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1087,6 +1147,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1167,6 +1230,9 @@ observations:
     temperature_K:
       tag: value
       value: '1623.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1244,6 +1310,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'open_system_evaporation_apparatus'; refusing to
@@ -1269,6 +1338,12 @@ observations:
     section: 2.2 Experimental techniques
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
   read_from: unknown:ta-flemetakis-2024
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-flemetakis-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-flemetakis-2024::flemetakis_2024_starting_glass_composition
   experiment_id: 10.5194/ejm-36-173-2024::ta-flemetakis-2024
   identity:
@@ -1342,6 +1417,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1382,6 +1460,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1422,6 +1503,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1462,6 +1546,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1502,6 +1589,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1542,6 +1632,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1582,6 +1675,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1622,6 +1718,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1662,6 +1761,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1702,6 +1804,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1742,6 +1847,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1782,6 +1890,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1822,6 +1933,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1862,6 +1976,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1902,6 +2019,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1942,6 +2062,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -1982,6 +2105,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2022,6 +2148,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2062,6 +2191,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2102,6 +2234,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2142,6 +2277,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2182,6 +2320,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2222,6 +2363,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2262,6 +2406,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2302,6 +2449,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2342,6 +2492,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2382,6 +2535,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2422,6 +2578,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2462,6 +2621,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2501,6 +2663,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2540,6 +2705,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2579,6 +2747,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2618,6 +2789,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2657,6 +2831,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2696,6 +2873,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2735,6 +2915,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2774,6 +2957,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2813,6 +2999,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2852,6 +3041,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2891,6 +3083,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2930,6 +3125,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -2969,6 +3167,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3008,6 +3209,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3047,6 +3251,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3086,6 +3293,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3125,6 +3335,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3164,6 +3377,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3203,6 +3419,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3242,6 +3461,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3281,6 +3503,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3320,6 +3545,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values
@@ -3359,6 +3587,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
   value:
     kind: unavailable
     unavailable_reason: empty values

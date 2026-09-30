@@ -19,6 +19,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'isotope_ratio'; refusing to pick a number
@@ -40,6 +43,12 @@ observations:
     figure: '3'
     note: range stated for container-gas 40Ar/36Ar measurements
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_helium_isotope_ratio
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -57,6 +66,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'isotope_ratio'; refusing to pick a number
@@ -80,6 +92,12 @@ observations:
     figure: '2'
     note: weighted arithmetic mean of measured container-gas 3He/4He ratios
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_ne_isotope_ratios
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -97,6 +115,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'isotope_ratios'; refusing to pick a number
@@ -121,6 +142,12 @@ observations:
     figure: '2'
     note: weighted mean container-gas neon isotope ratios
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_pressure_direct
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -138,6 +165,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'container_gas_pressure'; refusing to pick a number
@@ -159,6 +189,12 @@ observations:
     section: Results
     note: Pirani-gauge measurement 30 hours after atmospheric entry
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_pressure_increase_and_leak
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -176,6 +212,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'pressure_change_and_leak_rate'; refusing to pick
@@ -199,6 +238,12 @@ observations:
     note: pressure increase and inferred continuing leak rate are both printed; no reconciliation with the separate 1.9-2.3
       Pa/hour range attempted
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_fragmentation_assumptions_and_model_output
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -216,6 +261,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'solar_wind_layer_fragmentation_model'; refusing
@@ -241,6 +289,12 @@ observations:
     note: numerical assumptions and outputs are author geometric/abundance calculations; table S2 is cited but not present
       in the supplied PDF, so only values printed in the prose are recorded
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_maximum_temperature_history
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -258,6 +312,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'maximum_temperature_history'; refusing to pick
@@ -281,6 +338,12 @@ observations:
     note: temperature values used to assess thermal release; the TD-site maximum is attributed to cited prior work, while
       the container monitor value is reported as an observed upper bound
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_methane_detection_limit
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -298,6 +361,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'detection_limit_and_abundance_bound'; refusing
@@ -320,6 +386,12 @@ observations:
     section: Analysis procedures of the volatile compositions in the sample gas pipettes, At JAMSTEC
     note: methane and ethane were not detected; the detection limit and abundance bound are printed
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_nitrogen_delta15_range
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -420,6 +492,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'recovered_sample_mass_density_and_size_distribution';
@@ -443,6 +518,12 @@ observations:
     note: recovered sample mass, bulk density, and particle-size distribution are sample provenance/characterisation values;
       cited size distribution and density are retained as quoted literature
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_solar_wind_helium_abundance
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -460,6 +541,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'released_gas_abundance'; refusing to pick a number
@@ -481,6 +565,12 @@ observations:
     section: Origin of the He and Ne stored in the sample container
     note: blank-corrected abundance after subtracting terrestrial-atmosphere contribution
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_solar_wind_neon_abundance
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -498,6 +588,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'released_gas_abundance'; refusing to pick a number
@@ -519,6 +612,12 @@ observations:
     section: Origin of the He and Ne stored in the sample container
     note: blank-corrected abundance after subtracting terrestrial-atmosphere contribution
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa
 - observation_id: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_surface_pulverization_model
   experiment_id: 10.1126/sciadv.abo7239::okazaki-2022-ryugu-gas-treasure-box
   identity:
@@ -536,6 +635,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '68'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'pulverized_surface_area_estimate'; refusing to
@@ -560,3 +662,9 @@ observations:
     note: author estimate from measured SW-4He abundance and assumed grain population; printed quantities retained as assumptions/model
       outputs
   read_from: unknown:okazaki-2022-ryugu-gas-treasure-box
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:okazaki-2022-ryugu-gas-treasure-box
+    parameters: []
+    output_unit: Pa

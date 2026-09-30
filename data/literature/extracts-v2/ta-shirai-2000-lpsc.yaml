@@ -158,8 +158,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -273,8 +273,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -388,8 +388,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -503,8 +503,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -617,8 +617,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -731,8 +731,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '101325'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -817,6 +817,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -849,6 +852,12 @@ observations:
         page: 2
         figure: 1a
         note: Triangle series; p(O2)=10^-10 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
   identity:
@@ -869,6 +878,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -901,6 +913,12 @@ observations:
         page: 2
         figure: 1a
         note: Triangle series; p(O2)=10^-10 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
   identity:
@@ -921,6 +939,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -953,6 +974,12 @@ observations:
         page: 2
         figure: 1a
         note: Triangle series; p(O2)=10^-10 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
   identity:
@@ -973,6 +1000,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1005,6 +1035,12 @@ observations:
         page: 2
         figure: 1a
         note: Triangle series; p(O2)=10^-10 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1025,6 +1061,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1057,6 +1096,12 @@ observations:
         page: 2
         figure: 1a
         note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1077,6 +1122,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1109,6 +1157,12 @@ observations:
         page: 2
         figure: 1a
         note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1129,6 +1183,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1161,6 +1218,12 @@ observations:
         page: 2
         figure: 1a
         note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1181,6 +1244,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1213,6 +1279,12 @@ observations:
         page: 2
         figure: 1a
         note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1233,6 +1305,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1265,6 +1340,12 @@ observations:
         page: 2
         figure: 1a
         note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1285,6 +1366,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1317,6 +1401,12 @@ observations:
         page: 2
         figure: 1a
         note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1337,6 +1427,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1369,6 +1462,12 @@ observations:
         page: 2
         figure: 1a
         note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:7
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -1389,6 +1488,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1421,6 +1523,12 @@ observations:
         page: 2
         figure: 1a
         note: Solid-circle series; p(O2)=10^-8 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
@@ -1441,6 +1549,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1473,6 +1584,12 @@ observations:
         page: 2
         figure: 1a
         note: Square series; p(O2)=10^-9 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
@@ -1493,6 +1610,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1525,6 +1645,12 @@ observations:
         page: 2
         figure: 1a
         note: Square series; p(O2)=10^-9 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
@@ -1545,6 +1671,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1577,6 +1706,12 @@ observations:
         page: 2
         figure: 1a
         note: Square series; p(O2)=10^-9 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
@@ -1597,6 +1732,9 @@ observations:
     temperature_K:
       tag: value
       value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1629,6 +1767,12 @@ observations:
         page: 2
         figure: 1a
         note: Square series; p(O2)=10^-9 bar, T=1300 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1649,6 +1793,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1681,6 +1828,12 @@ observations:
         page: 2
         figure: 1b
         note: Triangle series; p(O2)=10^-10 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1701,6 +1854,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1733,6 +1889,12 @@ observations:
         page: 2
         figure: 1b
         note: Triangle series; p(O2)=10^-10 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1753,6 +1915,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1785,6 +1950,12 @@ observations:
         page: 2
         figure: 1b
         note: Triangle series; p(O2)=10^-10 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1805,6 +1976,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1837,6 +2011,12 @@ observations:
         page: 2
         figure: 1b
         note: Triangle series; p(O2)=10^-10 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:4
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -1857,6 +2037,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1889,6 +2072,12 @@ observations:
         page: 2
         figure: 1b
         note: Triangle series; p(O2)=10^-10 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
@@ -1909,6 +2098,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1941,6 +2133,12 @@ observations:
         page: 2
         figure: 1b
         note: Solid-circle series; p(O2)=10^-8 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
@@ -1961,6 +2159,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -1993,6 +2194,12 @@ observations:
         page: 2
         figure: 1b
         note: Solid-circle series; p(O2)=10^-8 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
@@ -2013,6 +2220,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2045,6 +2255,12 @@ observations:
         page: 2
         figure: 1b
         note: Solid-circle series; p(O2)=10^-8 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
@@ -2065,6 +2281,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2097,6 +2316,12 @@ observations:
         page: 2
         figure: 1b
         note: Solid-circle series; p(O2)=10^-8 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
   identity:
@@ -2117,6 +2342,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2149,6 +2377,12 @@ observations:
         page: 2
         figure: 1b
         note: Square series; p(O2)=10^-9 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
   identity:
@@ -2169,6 +2403,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2201,6 +2438,12 @@ observations:
         page: 2
         figure: 1b
         note: Square series; p(O2)=10^-9 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
   identity:
@@ -2221,6 +2464,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2253,6 +2499,12 @@ observations:
         page: 2
         figure: 1b
         note: Square series; p(O2)=10^-9 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
   identity:
@@ -2273,6 +2525,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2305,6 +2560,12 @@ observations:
         page: 2
         figure: 1b
         note: Square series; p(O2)=10^-9 bar, T=1400 C
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-shirai-2000-lpsc
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:

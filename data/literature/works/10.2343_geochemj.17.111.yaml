@@ -7928,16 +7928,17 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: extract chamber_pressure is a bound or approximate value, not a point; extract_value=0.0001 Torr; Hashimoto
-          printed during-run nominal. Fedkin's 1.3e-8 bar is the before-throw reading (about 10^{-5} Torr), not the run pressure;
-          it is not stored here.
+        tag: value
+        value:
+          kind: point
+          point: '0.01333223684210526315789473684'
+          approximate: false
       locator:
         published_page: 118
         pdf_page_index: 8
-        paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+        paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
       inference:
-        relation: extract_limit
+        relation: Torr_to_Pa
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
@@ -7951,7 +7952,7 @@ experiments:
             locator:
               published_page: 118
               pdf_page_index: 8
-              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
         - - factor
           - state:
               tag: value
@@ -7959,7 +7960,7 @@ experiments:
             locator:
               published_page: 118
               pdf_page_index: 8
-              paragraph: The vacuum level in the chamber was about 10^{-4} Torr during the experiments
+              paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
         output_unit: Pa
     sweep_gas:
       state:

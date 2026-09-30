@@ -37,6 +37,93 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.6028/nbs.ir.81-2279
 experiments:
+- experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-kms
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 53
+    pdf_page_index: 59
+    figure: '20'
+    note: 'Figure 20 caption: "KMS data with Pt-cell orifice diameter of 0.34 mm."'
+  apparatus:
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00000009079226'
+            approximate: false
+        locator:
+          page: 28
+          paragraph: relatively small effusion orifice (0.34 mm diameter)
+        inference:
+          relation: extract_inference
+          inputs:
+          - inferred=true
+          - area = π (d/2)^2 from stated 0.34 mm effusion orifice
+          - extract_value=9.079226e-08 m2
+          - extract_field=orifice_area
+          - unit_conversion=identity:m2
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00000009079226'
+              locator:
+                page: 28
+                paragraph: relatively small effusion orifice (0.34 mm diameter)
+          output_unit: m2
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.00034'
+            approximate: false
+        locator:
+          page: 28
+          paragraph: relatively small effusion orifice (0.34 mm diameter)
+        inference:
+          relation: identity:m
+          inputs:
+          - as_published=0.00034 m
+          - printed=diameter_m
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00034'
+              locator:
+                page: 28
+                paragraph: relatively small effusion orifice (0.34 mm diameter)
+          output_unit: m
+  bench_id: 10.6028/nbs.ir.81-2279::bench::hastie-1981-kms
 - experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   kind: literature
   method:
@@ -150,46 +237,11 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        page: 43
-        published_page: 43
-        pdf_page_index: 49
-        table: '3'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=1.0 atm
-        - printed=total_pressure_atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              page: 43
-              published_page: 43
-              pdf_page_index: 49
-              table: '3'
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 43
-              published_page: 43
-              pdf_page_index: 49
-              table: '3'
-              source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
-        output_unit: Pa
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
     sweep_gas:
       state:
         tag: unknown
@@ -210,38 +262,11 @@ experiments:
     cell_material_and_liner:
       state:
         tag: value
-        value: platinum TMS/KMS (Bonnell and Hastie 1979)
+        value: platinum TMS reactor (boat, carrier, probe)
       locator:
-        page: 12
-        paragraph: from our TMS and KMS second-law data (see Bonnell and Hastie, 1979)
+        page: 9
+        paragraph: all of these components were fabricated from platinum metal
     geometry:
-      orifice_area_m2:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.00000009079226'
-            approximate: false
-        locator:
-          page: 28
-          paragraph: relatively small effusion orifice (0.34 mm diameter)
-        inference:
-          relation: extract_inference
-          inputs:
-          - inferred=true
-          - area = π (d/2)^2 from stated 0.34 mm effusion orifice
-          - extract_value=9.079226e-08 m2
-          - extract_field=orifice_area
-          - unit_conversion=identity:m2
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00000009079226'
-              locator:
-                page: 28
-                paragraph: relatively small effusion orifice (0.34 mm diameter)
-          output_unit: m2
       orifice_diameter_m:
         state:
           tag: value
@@ -250,19 +275,62 @@ experiments:
             point: '0.00034'
             approximate: false
         locator:
-          page: 28
-          paragraph: relatively small effusion orifice (0.34 mm diameter)
+          page: 51
+          section: '15'
+          note: figure captions report pp. 51-53; figures PDF 61-81
         inference:
-          relation: identity:m
+          relation: mm_to_m
           inputs:
-          - as_published=0.00034 m
-          - printed=diameter_m
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          - as_published=0.34 mm
+          - printed=orifice_mm
           parameters:
           - - original
             - state:
                 tag: value
-                value: '0.00034'
+                value: '0.34'
               locator:
-                page: 28
-                paragraph: relatively small effusion orifice (0.34 mm diameter)
+                page: 51
+                section: '15'
+                note: figure captions report pp. 51-53; figures PDF 61-81
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 51
+                section: '15'
+                note: figure captions report pp. 51-53; figures PDF 61-81
           output_unit: m
+benches:
+- id: 10.6028/nbs.ir.81-2279::bench::hastie-1981-kms
+  work_id: 10.6028/nbs.ir.81-2279
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen mass spectrometry
+    locator:
+      page: 9
+      paragraph: primary experimental methods KMS and TMS
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: platinum KMS cell
+    locator:
+      page: 53
+      pdf_page_index: 59
+      figure: '20'
+      note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
+  cell_materials:
+  - state:
+      tag: value
+      value: Pt
+    locator:
+      page: 53
+      pdf_page_index: 59
+      figure: '20'
+      note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
+  other_facts: []

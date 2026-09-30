@@ -127,6 +127,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1800.0, 2400.0]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '0.001'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'kems_geometry_package'; refusing to pick a number
@@ -154,6 +157,12 @@ observations:
     paragraph: Ir Knudsen cell geometry; explicitly not HKL α
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: unknown:kems-031-halwax-2024
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-031-halwax-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_quoted
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -221,6 +230,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1850.0, 2100.0]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '0.001'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'pure_MgO_KEMS_geometry_and_vaporization'; refusing
@@ -255,6 +267,12 @@ observations:
     note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: unknown:kems-031-halwax-2024
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-031-halwax-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-031-halwax-2024::halwax_2024_mgo_third_law_formation_enthalpy
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -275,6 +293,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1850.0, 2100.0]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '0.001'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298_15K'; refusing
@@ -310,6 +331,12 @@ observations:
     note: Third-law standard formation enthalpy for pure solid MgO
     source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
   read_from: unknown:kems-031-halwax-2024
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-031-halwax-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses::point:0
   experiment_id: 10.1007/s11663-024-02995-6::experiment::cao-series
   identity:
@@ -490,6 +517,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1675.0, 2075.0]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '0.001'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -550,6 +580,12 @@ observations:
               pdf_page_index: 5
               table: I
         output_unit: kg
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - tables:kems-031-halwax-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses::point:1
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -570,6 +606,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1675.0, 2075.0]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '0.001'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -630,6 +669,12 @@ observations:
               pdf_page_index: 5
               table: I
         output_unit: kg
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - tables:kems-031-halwax-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_literature
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -1042,6 +1087,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.001'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298K'; refusing to
@@ -1074,6 +1122,12 @@ observations:
     note: row=1st measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - tables:kems-031-halwax-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_2nd_measurement
   experiment_id: 10.1007/s11663-024-02995-6::experiment::mgo-series
   identity:
@@ -1091,6 +1145,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.001'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298K'; refusing to
@@ -1123,6 +1180,12 @@ observations:
     note: row=2nd measurement
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - tables:kems-031-halwax-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_literature_and_factps
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:
@@ -1215,6 +1278,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '0.001'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'standard_formation_enthalpy_298K'; refusing to
@@ -1249,6 +1315,12 @@ observations:
     note: row=mean
     source_path: tables/kems-031-halwax-2024/t4.csv
   read_from: tables:kems-031-halwax-2024
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - tables:kems-031-halwax-2024
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-031-halwax-2024::halwax_2024_table_v_huber_holley_ca_composition
   experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
   identity:

@@ -3079,8 +3079,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '20000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -3150,6 +3150,12 @@ observations:
               table: '2'
               note: r_calc, 0.2 bar row, 1400 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1400c_0p4bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_0p4bar
   identity:
@@ -3199,8 +3205,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '40000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -3270,6 +3276,12 @@ observations:
               table: '2'
               note: r_calc, 0.4 bar row, 1400 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1400c_1bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_1bar
   identity:
@@ -3319,8 +3331,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '100000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -3390,6 +3402,12 @@ observations:
               table: '2'
               note: r_calc, 1.0 bar row, 1400 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1500c_0p2bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_0p2bar
   identity:
@@ -3439,8 +3457,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '20000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -3510,6 +3528,12 @@ observations:
               table: '2'
               note: r_calc, 0.2 bar row, 1500 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1500c_0p4bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_0p4bar
   identity:
@@ -3559,8 +3583,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '40000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -3630,6 +3654,12 @@ observations:
               table: '2'
               note: r_calc, 0.4 bar row, 1500 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1500c_1bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_1bar
   identity:
@@ -3679,8 +3709,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '100000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -3750,6 +3780,12 @@ observations:
               table: '2'
               note: r_calc, 1.0 bar row, 1500 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1600c_0p2bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_0p2bar
   identity:
@@ -3799,8 +3835,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '20000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -3870,6 +3906,12 @@ observations:
               table: '2'
               note: r_calc, 0.2 bar row, 1600 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1600c_0p4bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_0p4bar
   identity:
@@ -3919,8 +3961,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '40000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -3990,6 +4032,12 @@ observations:
               table: '2'
               note: r_calc, 0.4 bar row, 1600 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_calc_1600c_1bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_1bar
   identity:
@@ -4039,8 +4087,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '100000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -4110,6 +4158,12 @@ observations:
               table: '2'
               note: r_calc, 1.0 bar row, 1600 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1400c_0p2bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_0p2bar
   identity:
@@ -4159,8 +4213,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '20000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -4230,6 +4284,12 @@ observations:
               table: '2'
               note: r_exp, 0.2 bar row, 1400 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1400c_0p4bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_0p4bar
   identity:
@@ -4279,8 +4339,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '40000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -4350,6 +4410,12 @@ observations:
               table: '2'
               note: r_exp, 0.4 bar row, 1400 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1400c_1bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1400c_1bar
   identity:
@@ -4399,8 +4465,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '100000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -4470,6 +4536,12 @@ observations:
               table: '2'
               note: r_exp, 1.0 bar row, 1400 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1500c_0p2bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_0p2bar
   identity:
@@ -4519,8 +4591,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '20000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -4590,6 +4662,12 @@ observations:
               table: '2'
               note: r_exp, 0.2 bar row, 1500 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1500c_0p4bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_0p4bar
   identity:
@@ -4639,8 +4717,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '40000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -4710,6 +4788,12 @@ observations:
               table: '2'
               note: r_exp, 0.4 bar row, 1500 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1500c_1bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1500c_1bar
   identity:
@@ -4759,8 +4843,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '100000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -4830,6 +4914,12 @@ observations:
               table: '2'
               note: r_exp, 1.0 bar row, 1500 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1600c_0p2bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_0p2bar
   identity:
@@ -4879,8 +4969,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '20000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -4950,6 +5040,12 @@ observations:
               table: '2'
               note: r_exp, 0.2 bar row, 1600 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1600c_0p4bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_0p4bar
   identity:
@@ -4999,8 +5095,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '40000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -5070,6 +5166,12 @@ observations:
               table: '2'
               note: r_exp, 0.4 bar row, 1600 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table2_rate_exp_1600c_1bar
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t2_1600c_1bar
   identity:
@@ -5119,8 +5221,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '100000'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -5190,6 +5292,12 @@ observations:
               table: '2'
               note: r_exp, 1.0 bar row, 1600 C column
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table5_200hpa_1400c
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t5_200hpa_1400c_1h
   identity:
@@ -5210,6 +5318,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '20000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
@@ -5267,6 +5378,12 @@ observations:
               table: '5'
               note: Part b, 200 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table5_200hpa_1600c
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t5_200hpa_1600c_1h
   identity:
@@ -5287,6 +5404,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873.15'
+    total_pressure_Pa:
+      tag: value
+      value: '20000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
@@ -5344,6 +5464,12 @@ observations:
               table: '5'
               note: Part b, 200 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table5_400hpa_1400c
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t5_400hpa_1400c_1h
   identity:
@@ -5364,6 +5490,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '40000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
@@ -5421,6 +5550,12 @@ observations:
               table: '5'
               note: Part a, 400 hPa, 1 h, 1400 C row; columns T, A, delta mB, delta mNa, B/Na
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-dacko-conradt-low-p-transpiration::dacko_2004_table5_400hpa_1600c
   experiment_id: 6464b27a81073c0e1e340b1772e6520bb934e3aa294814333975c6ffe6bc8d1b::experiment::t5_400hpa_1600c_1h
   identity:
@@ -5441,6 +5576,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873.15'
+    total_pressure_Pa:
+      tag: value
+      value: '40000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
@@ -5498,3 +5636,9 @@ observations:
               table: '5'
               note: Part a, 400 hPa, 1 h, 1600 C row; columns T, A, delta mB, delta mNa, B/Na
         output_unit: K
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-dacko-conradt-low-p-transpiration
+    parameters: []
+    output_unit: Pa

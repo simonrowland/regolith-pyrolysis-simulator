@@ -111,6 +111,7 @@ from simulator.physical_constants import (
     PA_PER_BAR,
     STANDARD_ATMOSPHERE_PA,
 )
+from simulator.reference_data.janaf import formula_composition
 
 # ---------------------------------------------------------------------------
 # Unit / standard-state conversion helpers
@@ -151,6 +152,41 @@ CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 LN10 = Decimal(str(math.log(10.0)))
 R_J_PER_MOL_K = Decimal(str(GAS_CONSTANT))
 R_KJ_PER_MOL_K = R_J_PER_MOL_K / Decimal("1000")
+
+# Fixed-valence domain for condensed oxide-activity comparison. Roy &
+# Navrotsky (1984, J. Am. Ceram. Soc. 67, 606–610,
+# doi:10.1111/j.1151-2916.1984.tb19603.x) study charge-balanced AlO2–SiO2
+# glasses with Li, Na, K, Mg, Ca, Sr, and Ba; oxygen is the oxide anion.
+# Premise: at fixed T and composition, fO2 affects activity through changes
+# in multivalent-cation redox state. O'Neill & Eggins (1997, Chem. Geol. 139,
+# 21–38, doi:10.1016/S0009-2541(97)00030-2) report fO2-independent activity
+# coefficients where Fe, Ni, and Co remain divalent. Algebra: with no
+# multivalent cation present, d ln(a)/d ln(fO2) = 0. Inference for this
+# closed composition domain: the allowlisted components provide no redox
+# channel. Units:
+# dimensionless/dimensionless. Limit: an all-fixed-valence system has no
+# fO2 activity dependence; any unlisted element keeps fO2 required. Fe, Ti,
+# Cr, V, Mn, Ce, Eu, P, S, Ni, Co, Cu, and Zn stay outside this closed list.
+FIXED_VALENCE_ELEMENTS = frozenset(
+    {"O", "Si", "Al", "Ca", "Mg", "Na", "K", "Li", "Sr", "Ba"}
+)
+
+# Pressure threshold for condensed activities only. Premise: at fixed T and
+# composition, d ln(a)/dP = ΔV/(RT), so Δlog10(a) = ΔV·ΔP/(RT ln 10).
+# Bound |ΔV| by 30 cm³/mol (3e-5 m³/mol), larger than the 24.01 cm³/mol span
+# between the 12.66 and 36.67 cm³/mol MgO, CaO, Al2O3, and SiO2 melt
+# partial-molar volumes from Courtial & Dingwell (1999, Am. Mineral. 84,
+# 465–476, doi:10.2138/am-1999-0401). The smallest scorer decision band is
+# log10(1.40) = 0.1461 dex, so 1% is 0.00146 dex. The scored store's lowest
+# condensed-activity temperature is 1073 K; therefore
+# ΔPmax = 0.00146·ln(10)·R·1073/3e-5 = 999726 Pa = 9.997 bar.
+# Unit check: (m³/mol·Pa)/(J/mol) is dimensionless. At the largest known
+# activity-bench pressure in the store (101325 Pa = 1.01325 bar), the bound
+# gives |Δlog10(a)| = 0.000148 dex, one tenth of the tolerance. Thus unknown
+# or at/below-threshold pressure is omitted; known pressure above the limit
+# remains required. In the limiting case ΔP → 0, Δlog10(a) → 0. Re-derive if
+# the scored activity store gains a lower T.
+_MELT_ACTIVITY_PRESSURE_LIMIT_PA = Decimal("999726.4829")
 
 # Per-mol-O2 rescaling.
 # Premise: Ellingham / mol-O2 tables report ΔG for the reaction written on
@@ -400,8 +436,9 @@ class IdentityEqualOutcome:
 def profile_for(identity: Identity) -> QuantityProfile:
     """Closed compared-axis profile for the declared quantity.
 
-    Applicability is determined by the quantity (and reaction where the
-    spec says so), never by whether a field happens to be filled.
+    Applicability is determined by the quantity and its typed inputs, never
+    by whether an axis happens to be filled. Paired activity comparisons
+    combine both identities' profiles below.
     """
 
     q = quantity_token(identity)
@@ -557,9 +594,11 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "per",
             "reference_state",
             "composition",
-            "fO2_Pa",
-            "total_pressure_Pa",
         )
+        omitted_axes = _melt_activity_uncompared_axes((identity,))
+        for axis in ("fO2_Pa", "total_pressure_Pa"):
+            if axis not in omitted_axes:
+                req(axis)
         if q is Quantity.INTERACTION_PARAMETER:
             req("subtype")
         else:
@@ -672,6 +711,93 @@ def profile_for(identity: Identity) -> QuantityProfile:
         req("temperature_K")
 
     # Axes neither required nor permitted-n/a are forbidden-as-value.
+    return QuantityProfile(
+        required=frozenset(required),
+        permitted_not_applicable=frozenset(permitted_na),
+    )
+
+
+def _composition_is_fixed_valence(identity: Identity) -> bool:
+    state = identity.composition
+    if (
+        state is None
+        or not state.is_value
+        or not isinstance(state.value, Composition)
+    ):
+        return False
+    if (
+        state.value.proxy_flag is not None
+        or state.value.basis == "sample_catalog_proxy"
+    ):
+        return False
+
+    present: set[str] = set()
+    for name, amount in state.value.components:
+        if amount <= 0:
+            continue
+        parsed = formula_composition(str(name))
+        if parsed is None:
+            return False
+        elements = {element for element, count in parsed if count > 0}
+        if not elements or not elements.issubset(FIXED_VALENCE_ELEMENTS):
+            return False
+        present.update(elements)
+    return bool(present)
+
+
+def _activity_pressure_above_limit(identity: Identity) -> bool:
+    pressure = identity.total_pressure_Pa
+    return (
+        pressure is not None
+        and pressure.is_value
+        and pressure.value is not None
+        and pressure.value.is_finite()
+        and pressure.value > _MELT_ACTIVITY_PRESSURE_LIMIT_PA
+    )
+
+
+def _melt_activity_uncompared_axes(
+    identities: tuple[Identity, ...],
+) -> frozenset[str]:
+    if not identities or any(
+        quantity_token(identity) not in MELT_ACTIVITY_QUANTITIES
+        for identity in identities
+    ):
+        return frozenset()
+
+    omitted: set[str] = set()
+    if all(_composition_is_fixed_valence(identity) for identity in identities):
+        omitted.add("fO2_Pa")
+    pressure_is_nonfinite = any(
+        pressure is not None
+        and pressure.is_value
+        and pressure.value is not None
+        and not pressure.value.is_finite()
+        for pressure in (identity.total_pressure_Pa for identity in identities)
+    )
+    if not pressure_is_nonfinite and not any(
+        _activity_pressure_above_limit(identity) for identity in identities
+    ):
+        omitted.add("total_pressure_Pa")
+    return frozenset(omitted)
+
+
+def _comparison_profile(left: Identity, right: Identity) -> QuantityProfile:
+    left_profile = profile_for(left)
+    right_profile = profile_for(right)
+    required = set(left_profile.required | right_profile.required)
+    permitted_na = set(
+        left_profile.permitted_not_applicable
+        & right_profile.permitted_not_applicable
+    )
+    if quantity_token(left) in MELT_ACTIVITY_QUANTITIES:
+        omitted = _melt_activity_uncompared_axes((left, right))
+        for axis in ("fO2_Pa", "total_pressure_Pa"):
+            if axis in omitted:
+                required.discard(axis)
+            else:
+                required.add(axis)
+                permitted_na.discard(axis)
     return QuantityProfile(
         required=frozenset(required),
         permitted_not_applicable=frozenset(permitted_na),
@@ -935,15 +1061,20 @@ def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
     if quantity_token(identity) is None:
         return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
     profile = profile_for(identity)
+    uncompared_axes = _melt_activity_uncompared_axes((identity,))
     bad: list[str] = []
     for name in _AXIS_NAMES:
         state = _axis_state(identity, name)
         if state is None:
             continue
         # permitted_not_applicable means N/A or absent — a VALUE is invalid,
-        # not an extra equality key (v2.1: supplied inapplicable value is
-        # invalid, not an override).
-        if state.is_value and name not in profile.required:
+        # not an extra equality key. The two physically omitted axes for melt
+        # activities may still carry printed values; they remain un-compared.
+        if (
+            state.is_value
+            and name not in profile.required
+            and name not in uncompared_axes
+        ):
             bad.append(name)
         if (
             state.is_not_applicable
@@ -1031,7 +1162,7 @@ def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
     if species_outcome.kind is not IdentityEqualKind.EQUAL:
         return species_outcome
 
-    profile = profile_for(left)
+    profile = _comparison_profile(left, right)
     mismatch: list[str] = []
     unknown: list[str] = []
     invalid: list[str] = []

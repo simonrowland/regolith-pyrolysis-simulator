@@ -183,12 +183,12 @@ def test_inferred_area_reaches_experiment_with_derivation(tmp_path: Path) -> Non
 @pytest.mark.parametrize("qualification", [
     {"upper_bound": True},
     {"lower_bound": True},
-    {"inference": "1e-6 Torr * 133.322 Pa/Torr; source states pressure was less than this value"},
-    {"note": "vacuum better than 1e-6 Torr"},
-    {"note": "background pressure during evaporation did not exceed 1e-9 mbar; base UHV <1e-10 mbar"},
+    {"qualifier": "<"},
+    {"qualifier": "less than"},
+    {"qualifier": "did not exceed"},
     {"qualifier": "~"},
-    {"note": "KC chamber (~10^-6 mbar) as printed; other compartments ~10^-9 mbar"},
-    {"inference": "about 1e-6 Torr converted to Pa"},
+    {"as_printed": "KC chamber (~10^-6 mbar)"},
+    {"as_printed": "about 1e-6 Torr"},
 ])
 @pytest.mark.parametrize("inferred", [True, False])
 def test_labparam_limit_is_not_a_point(tmp_path: Path, qualification: dict, inferred: bool) -> None:
@@ -212,6 +212,27 @@ def test_labparam_limit_is_not_a_point(tmp_path: Path, qualification: dict, infe
     assert ("inferred=true" in pressure.inference.inputs) is inferred
     assert dict(pressure.inference.parameters)["original"].state.value == as_decimal("1.33322e-4")
     assert experiment_from_plain(to_plain(experiment)) == experiment
+
+
+def test_pressure_value_mapping_note_does_not_demote_its_printed_point(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "chamber_pressure": {
+            "value": {
+                "chamber_pressure_Pa_as_printed": 18.7,
+                "as_printed": "18.7 Pa",
+                "note": "other rows were <1e-9 bar",
+            },
+            "units": "Pa",
+        }
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    pressure = next(iter(result.experiments.values())).pressure_environment.total_pressure_Pa
+
+    assert pressure.state.is_value
+    assert pressure.state.value.point == as_decimal("18.7")
 
 
 @pytest.mark.parametrize("reverse", [False, True])

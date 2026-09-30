@@ -82,9 +82,13 @@ from simulator.battery.records import (
     SweepGasComponent,
     Value,
     Work,
+    _is_source_internally_inconsistent,
     as_decimal,
     phase_token,
     union_notices,
+)
+from simulator.battery.oxygen_balance import (
+    has_own_engine_solved_oxygen_balance,
 )
 from simulator.battery.source_lineage import coefficient_lineage_sources
 from simulator.accounting.formulas import parse_formula
@@ -113,6 +117,7 @@ _PRESSURE_BLOCKING_NOTICES = frozenset(
         NoticeKind.FLOOR_INVERSION,
         NoticeKind.FALLBACK,
         NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        NoticeKind.UNVERIFIED_APPARATUS,
     }
 )
 _CERTIFICATION_DOWNGRADE_NOTICES = frozenset(
@@ -388,16 +393,23 @@ def _table_payloads(
     return tuple(payloads)
 
 
-def _pressure_blocking_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
+def _pressure_blocking_notices(
+    *groups: tuple[Notice, ...] | None,
+    oxygen_balance_effusion_solved: bool = False,
+) -> tuple[Notice, ...]:
+    notices = tuple(notice for group in groups if group for notice in group)
     found: list[Notice] = []
-    for group in groups:
-        if not group:
+    for notice in notices:
+        if notice.kind not in _PRESSURE_BLOCKING_NOTICES:
             continue
-        for notice in group:
-            if notice.kind not in _PRESSURE_BLOCKING_NOTICES:
-                continue
-            if any(q in _VAPOUR_EQUILIBRIUM for q in notice.affected_quantities):
-                found.append(notice)
+        if (
+            oxygen_balance_effusion_solved
+            and notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            and notice.reason.startswith("fO2_Pa is a DERIVED condition")
+        ):
+            continue
+        if any(q in _VAPOUR_EQUILIBRIUM for q in notice.affected_quantities):
+            found.append(notice)
     return tuple(found)
 
 
@@ -1443,6 +1455,10 @@ def validate_residual(
                 gate_reason = gates.reason or RefusalReason.INVALID_SOURCE
                 refusal = residual.refusal
                 primary_check = gates.primary_check
+                apparatus_flagged = any(
+                    notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                    for notice in residual.notices
+                )
                 wrong_shape = (
                     residual.score_eligible
                     or residual.status is not ResidualStatus.REFUSED
@@ -1459,6 +1475,9 @@ def validate_residual(
                     refusal is not None
                     and refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
                 ):
+                    wrong_evidence = False
+                if apparatus_flagged:
+                    wrong_shape = False
                     wrong_evidence = False
                 if wrong_shape or wrong_evidence:
                     issues.append(
@@ -1586,10 +1605,17 @@ def validate_residual(
             if isinstance(reference.identity, Identity):
                 quantity = quantity_token(reference.identity)
             if quantity in _VAPOUR_EQUILIBRIUM:
+                oxygen_balance_effusion_solved = has_own_engine_solved_oxygen_balance(
+                    None
+                    if candidate is None or candidate.engine is None
+                    else candidate.engine.name,
+                    () if candidate is None else candidate.notices,
+                )
                 blocking = _pressure_blocking_notices(
                     residual.notices,
                     reference.notices,
                     None if candidate is None else candidate.notices,
+                    oxygen_balance_effusion_solved=oxygen_balance_effusion_solved,
                 )
                 if blocking:
                     issues.append(
@@ -1601,6 +1627,22 @@ def validate_residual(
                             "diagnostic numeric residuals keep score_eligible=false",
                         )
                     )
+            if any(
+                notice.kind
+                in {
+                    NoticeKind.UNVERIFIED_APPARATUS,
+                    NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+                }
+                or _is_source_internally_inconsistent(notice.kind, notice.reason)
+                for notice in residual.notices
+            ):
+                issues.append(
+                    _issue(
+                        f"{path}.score_eligible",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "flagged stratum residuals are diagnostic only and cannot be score_eligible",
+                    )
+                )
     endpoint_notices = union_notices(
         None if reference is None else reference.notices,
         None if candidate is None else candidate.notices,

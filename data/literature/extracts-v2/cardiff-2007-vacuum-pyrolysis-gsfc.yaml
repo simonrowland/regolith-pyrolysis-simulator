@@ -249,6 +249,9 @@ observations:
     temperature_K:
       tag: value
       value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '0.001333223684210526315789473684'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'complete_vaporization'; refusing to pick a number
@@ -281,6 +284,12 @@ observations:
         pdf_page_index: 7
         figure: '8'
         note: 'Figure 8 caption: pyrolysis in vacuum to 10^{-5} Torr and 1400 C at PSU; 10 g MLS-1A'
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:cardiff-2007-vacuum-pyrolysis-gsfc
+    parameters: []
+    output_unit: Pa
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_table1_fresnel_pyrolysis_log::T=1345.15:row=mgsio3:h=3a6e3bff9a42
   experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
   identity:

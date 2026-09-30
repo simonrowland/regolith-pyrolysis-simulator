@@ -61,6 +61,9 @@ observations:
     temperature_K:
       tag: value
       value: '2849.15'
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -130,6 +133,9 @@ observations:
     temperature_K:
       tag: value
       value: '2946.15'
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -199,6 +205,9 @@ observations:
     temperature_K:
       tag: value
       value: '2966.15'
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -268,6 +277,9 @@ observations:
     temperature_K:
       tag: value
       value: '3051.15'
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -337,6 +349,9 @@ observations:
     temperature_K:
       tag: value
       value: '3138.15'
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -406,6 +421,9 @@ observations:
     temperature_K:
       tag: value
       value: '3156.15'
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -475,6 +493,9 @@ observations:
     temperature_K:
       tag: value
       value: '3177.15'
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -544,6 +565,9 @@ observations:
     temperature_K:
       tag: value
       value: '3361.15'
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -610,6 +634,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
@@ -632,6 +659,12 @@ observations:
     section: Characteristics of the droplets and the condensed particles
     note: figures=2-3
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters: []
+    output_unit: Pa
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs
   experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
@@ -649,6 +682,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'assembly_mass_loss_relative_to_initial_mass';
@@ -670,6 +706,12 @@ observations:
     page: 6
     table: '2'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters: []
+    output_unit: Pa
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_relative_volatility_fe
   experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
@@ -687,6 +729,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_volatility_ZFe_over_ZSi'; refusing to
@@ -708,6 +753,12 @@ observations:
     page: 12
     table: '4'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters: []
+    output_unit: Pa
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_relative_volatility_k
   experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
@@ -725,6 +776,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_volatility_ZK_over_ZSi'; refusing to
@@ -746,6 +800,12 @@ observations:
     page: 12
     table: '4'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters: []
+    output_unit: Pa
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_relative_volatility_na
   experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
@@ -763,6 +823,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_volatility_ZNa_over_ZSi'; refusing to
@@ -784,6 +847,12 @@ observations:
     page: 12
     table: '4'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters: []
+    output_unit: Pa
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_relative_volatility_table4
   experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
@@ -801,6 +870,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'relative_volatility_Zj_over_ZSi'; refusing to
@@ -822,6 +894,12 @@ observations:
     page: 12
     table: '4'
   read_from: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters: []
+    output_unit: Pa
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_starting_compositions
   experiment_id: 10.1186/s40645-020-00354-0::nakano-hashimoto-2020-bubbles-to-chondrites-i
   identity:

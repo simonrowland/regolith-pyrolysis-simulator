@@ -69,3 +69,27 @@ experiments:
     pdf_page_index: 1
     section: body
     note: Knudsen-cell mass spectrometric investigations of 10017 and 12073; method similar to De Maria et al. 1971 (ref 4)
+benches:
+- id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::bench::demaria-1973-kems
+  work_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen-cell mass spectrometry
+    locator:
+      published_page: 175
+      pdf_page_index: 1
+      section: body
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      published_page: 175
+      pdf_page_index: 1
+      section: body
+      note: Cell material is not stated; method is said to be similar to De Maria et al. 1971, whose Re cell is not inferred
+        here.
+  other_facts: []

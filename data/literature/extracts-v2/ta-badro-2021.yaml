@@ -22,6 +22,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'isotopic_fractionation_factor'; refusing to pick
@@ -128,6 +131,12 @@ observations:
   - ta-badro-2021::badro_2021_vp4_delta25mg
   - ta-badro-2021::badro_2021_vp5_delta25mg
   - ta-badro-2021::badro_2021_vp6_delta25mg
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-badro-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_fit_26mg_24mg
   experiment_id: 10.5802/crgeos.56::experiment::vp-series
   identity:
@@ -148,6 +157,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'isotopic_fractionation_factor'; refusing to pick
@@ -254,6 +266,12 @@ observations:
   - ta-badro-2021::badro_2021_vp4_delta26mg
   - ta-badro-2021::badro_2021_vp5_delta26mg
   - ta-badro-2021::badro_2021_vp6_delta26mg
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-badro-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_fit_29si_28si
   experiment_id: 10.5802/crgeos.56::experiment::vp-series
   identity:
@@ -274,6 +292,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'isotopic_fractionation_factor'; refusing to pick
@@ -380,6 +401,12 @@ observations:
   - ta-badro-2021::badro_2021_vp4_delta29si
   - ta-badro-2021::badro_2021_vp5_delta29si
   - ta-badro-2021::badro_2021_vp6_delta29si
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-badro-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_fit_30si_28si
   experiment_id: 10.5802/crgeos.56::experiment::vp-series
   identity:
@@ -400,6 +427,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'isotopic_fractionation_factor'; refusing to pick
@@ -506,6 +536,12 @@ observations:
   - ta-badro-2021::badro_2021_vp4_delta30si
   - ta-badro-2021::badro_2021_vp5_delta30si
   - ta-badro-2021::badro_2021_vp6_delta30si
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:ta-badro-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: ta-badro-2021::badro_2021_vp1_delta25mg
   experiment_id: 10.5802/crgeos.56::experiment::vp1
   identity:

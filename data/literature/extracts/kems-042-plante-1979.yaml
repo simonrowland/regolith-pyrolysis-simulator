@@ -83,6 +83,13 @@ benches:
   apparatus_family:
     state: {tag: value, value: Modulated-beam quadrupole Knudsen-effusion mass spectrometer}
     locator: {page: 266, section: '2. Description of Mass Spectrometric System'}
+  cell_materials:
+    - state:
+        tag: value
+        value: Pt
+      locator:
+        page: 268
+        section: 2. Description of Mass Spectrometric System
   cell_material_and_liner:
     state: {tag: value, value: Platinum effusion cell}
     locator: {page: 268, section: '2. Description of Mass Spectrometric System'}

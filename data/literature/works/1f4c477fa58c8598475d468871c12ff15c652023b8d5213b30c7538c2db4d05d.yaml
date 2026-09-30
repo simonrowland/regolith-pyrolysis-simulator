@@ -18,17 +18,17 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::metsoc-2019-6005
+- experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::experiment::shornikov-2019-mo-kems
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'knudsen_cell_mass_spectrometry_CaO_TiO2' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:
       state:
         tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+        reason: experiment temperature not published
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -49,7 +49,37 @@ experiments:
   locator:
     pdf_page_index: 1
     section: Results and discussion
-    note: formation enthalpy from oxide activities / partial pressures
+    note: Method section identifies a Knudsen molybdenum effusion cell.
+  bench_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::bench::shornikov-yakovlev-2019-kems
+benches:
+- id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::bench::shornikov-yakovlev-2019-kems
+  work_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen-cell mass spectrometry
+    locator:
+      pdf_page_index: 1
+      section: Results and discussion
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Knudsen molybdenum effusion cell
+    locator:
+      pdf_page_index: 1
+      section: Results and discussion
+      note: Method section identifies a Knudsen molybdenum effusion cell.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      pdf_page_index: 1
+      section: Results and discussion
+      note: Method section identifies a Knudsen molybdenum effusion cell.
+  other_facts: []
 context:
 - observation_id: shornikov_yakovlev_2019_metsoc6005_method_T_ranges
   type: method

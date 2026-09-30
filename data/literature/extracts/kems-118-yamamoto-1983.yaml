@@ -66,6 +66,14 @@ benches:
   apparatus_family:
     state: {tag: value, value: Hitachi RM-6E mass spectrometer combined with Knudsen cell}
     locator: &yam_apparatus {page: 2, published_page: 56, section: 'II.1 Experimental Apparatus and Specimen'}
+  cell_materials:
+    - state:
+        tag: value
+        value: Al2O3
+      locator:
+        page: 2
+        published_page: 56
+        section: II.1 Experimental Apparatus and Specimen
   cell_material_and_liner:
     state: {tag: value, value: High-purity alumina SSA-S Knudsen-cell crucible}
     locator: *yam_apparatus

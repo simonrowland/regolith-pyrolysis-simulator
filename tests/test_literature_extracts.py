@@ -119,8 +119,17 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
 
     doc = yaml.safe_load((EXTRACTS / "kems-042-plante-1979.yaml").read_text())
     bench_ids = {bench["id"] for bench in doc["benches"]}
+    kems_bench = next(bench for bench in doc["benches"] if bench["id"] == "kems-system")
     experiments = {item["experiment_id"]: item for item in doc["experiments"]}
 
+    assert kems_bench["cell_material_and_liner"]["state"] == {
+        "tag": "value",
+        "value": "Platinum effusion cell",
+    }
+    assert kems_bench["cell_material_and_liner"]["locator"] == {
+        "page": 268,
+        "section": "2. Description of Mass Spectrometric System",
+    }
     assert set(experiments) == {"k2o-sio2-effusion-series"}
     assert all(item["bench_id"] in bench_ids for item in experiments.values())
 
@@ -151,6 +160,266 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
             "k2o-sio2-s1214": 37,
         }
     )
+
+
+@pytest.mark.parametrize(
+    ("extract", "bench_id", "expected_material", "expected_codes", "expected_class"),
+    (
+        (
+            "kems-020-hastie-1981-nbsir.yaml",
+            "hastie-1981-kms",
+            "platinum KMS cell",
+            ("Pt",),
+            "inert",
+        ),
+        ("kems-023-demaria-1973.yaml", "demaria-1973-kems", None, None, "unknown"),
+        ("kems-025-markova-1983.yaml", "markova-1983-kems", None, None, "unknown"),
+        ("kems-026-markova-1984.yaml", "markova-1984-kems", None, None, "unknown"),
+        ("kems-028-yakovlev-1984.yaml", "yakovlev-1984-kems", None, None, "unknown"),
+        ("kems-051-allibert-1981.yaml", "allibert-1981-kems", "molybdenum", ("Mo",), "reactive"),
+        ("kems-114-nichols-1995.yaml", "nichols-1995-kems", None, None, "unknown"),
+        ("kems-201-ichise-1986.yaml", "ichise-1986-kems", None, None, "unknown"),
+        (
+            "bencze-yazhenskikh-2016.yaml",
+            "bencze-2016-supplement-kems",
+            "iridium cell with graphite-coated lid; later graphite disc",
+            ("Ir", "C_graphite"),
+            "reactive",
+        ),
+        (
+            "metsoc-2019-6005.yaml",
+            "shornikov-yakovlev-2019-kems",
+            "Knudsen molybdenum effusion cell",
+            ("Mo",),
+            "reactive",
+        ),
+        (
+            "kems-021-plante-1992-feo.yaml",
+            "tungsten-iridium-kems",
+            "tungsten cell with iridium inner cup",
+            ("W", "Ir"),
+            "reactive",
+        ),
+        (
+            "kems-027-plante-hastie-1983.yaml",
+            "kms",
+            "Welded platinum cell; 0.025 cm Pt sheet",
+            ("Pt",),
+            "inert",
+        ),
+        (
+            "kems-029-yakovlev-shornikov-2011.yaml",
+            "yakovlev-ms1301-kems",
+            "Tungsten effusion cell with rhenium boat",
+            ("W", "Re"),
+            "reactive",
+        ),
+        (
+            "kems-031-halwax-2024.yaml",
+            "julich-ir-kems",
+            "Iridium Knudsen cell in a molybdenum container with tantalum radiation shields",
+            ("Ir", "Mo", "Ta"),
+            "reactive",
+        ),
+        ("kems-042-plante-1979.yaml", "kems-system", "Platinum effusion cell", ("Pt",), "inert"),
+        ("kems-053-stolyarova-1991.yaml", "stolyarova-kems", "tungsten", ("W",), "reactive"),
+        (
+            "kems-057-kambayashi-1985.yaml",
+            "rm6e",
+            "High-purity alumina SSA-S cell; tantalum susceptor",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-058-ohara-1987.yaml",
+            "ohara-kems",
+            "Alumina Knudsen cell with electrolytic-iron inner crucible",
+            ("Al2O3", "Fe"),
+            "not_inert",
+        ),
+        (
+            "kems-066-ichise-1977.yaml",
+            "rm6k",
+            "Alumina Knudsen cell; tantalum cell holder",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-067-yamada-1980.yaml",
+            "rm6k",
+            "homemade thoria (ThO2) Knudsen cell",
+            ("ThO2",),
+            "not_inert",
+        ),
+        (
+            "kems-069-furukawa-1976.yaml",
+            "thoria-kems",
+            "Laboratory-made thoria Knudsen cell",
+            ("ThO2",),
+            "not_inert",
+        ),
+        (
+            "kems-087-yamada-kato-1980.yaml",
+            "yamada-kato-rm6k",
+            "High-purity alumina Knudsen cell with tantalum susceptor and radiation shields",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-088-ichise-1975.yaml",
+            "ichise-rm6k",
+            "Alumina Knudsen cell and tantalum cell holder",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        ("kems-095-ueda-1986.yaml", "ueda-kems", "Y2O3", ("Y2O3",), "not_inert"),
+        (
+            "kems-105-yamada-1983.yaml",
+            "yamada-kato-rm6k",
+            "Beryllia Knudsen cells for Fe-P-Al and Fe-P-Ti; alumina "
+            "Knudsen cells for other Fe-P-i systems",
+            ("BeO", "Al2O3"),
+            "not_inert",
+        ),
+        (
+            "kems-111-ichise-1982.yaml",
+            "rm6k",
+            "Sintered alumina crucible",
+            ("Al2O3",),
+            "not_inert",
+        ),
+        (
+            "kems-112-ichise-1989.yaml",
+            "ichise-kems",
+            "sintered alumina crucible and tantalum holder",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-116-nunoue-1987.yaml",
+            "rm6e",
+            "High-purity alumina SSA-S Knudsen cell",
+            ("Al2O3",),
+            "not_inert",
+        ),
+        (
+            "kems-118-yamamoto-1983.yaml",
+            "rm-6e",
+            "High-purity alumina SSA-S Knudsen-cell crucible",
+            ("Al2O3",),
+            "not_inert",
+        ),
+        (
+            "kems-119-furukawa-1975.yaml",
+            "rm6k",
+            "High-purity alumina SSA-S; tantalum susceptor",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+        ("kems-120-ueshima-1984.yaml", "rm6k", "Alumina Knudsen cell", ("Al2O3",), "not_inert"),
+        (
+            "kems-137-bischof-2023.yaml",
+            "finnigan-mat-271-ir",
+            "Iridium Knudsen cell in tungsten housing with three nested tantalum heat shields",
+            ("Ir", "W", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-138-bischof-2023.yaml",
+            "finnigan-mat-271-ir",
+            "Iridium Knudsen cell in tungsten container with three tantalum heat shields",
+            ("Ir", "W", "Ta"),
+            "reactive",
+        ),
+        (
+            "kems-169-nakazawa-1976.yaml",
+            "nag-530",
+            "Molybdenum lid, container, and orifice plate; alumina inner crucible",
+            ("Mo", "Al2O3"),
+            "reactive",
+        ),
+        (
+            "kems-184-behrens-1979.yaml",
+            "elfs-quadrupole",
+            "graphite",
+            ("C_graphite",),
+            "reactive",
+        ),
+        ("kems-188-nanjo-1976.yaml", "nanjo-kems", "Quartz Knudsen cell", ("SiO2",), "not_inert"),
+        (
+            "kems-ms2000-044.yaml",
+            "alkali-silicate-kems",
+            "Nb, Ta, Mo, or Ni cell material; aluminium powder sometimes mixed with test substance",
+            ("Nb", "Ta", "Mo", "Ni"),
+            "reactive",
+        ),
+        (
+            "ueshima-1982-fe-mo-thermal.yaml",
+            "ueshima-rm6k",
+            "Gas-tight high-purity Al2O3 crucible (Nippon Kagaku Togyo SSA-S) in a Ta container",
+            ("Al2O3", "Ta"),
+            "reactive",
+        ),
+    ),
+)
+def test_kems_cell_material_state_survives_migration(
+    tmp_path: Path,
+    extract: str,
+    bench_id: str,
+    expected_material: str | None,
+    expected_codes: tuple[str, ...] | None,
+    expected_class: str,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.migrate import bench_from_plain, to_plain
+    from simulator.battery.score import _cell_material_class
+
+    result = _migrate_real_extract(tmp_path, extract)
+    bench = next(
+        bench for bench in result.benches.values()
+        if bench.id.endswith(f"::bench::{bench_id}")
+    )
+    cell = bench.cell_material_and_liner
+    assert cell is not None and cell.locator is not None
+    if expected_material is None:
+        assert cell.state.is_unknown
+        assert cell.state.reason == "not_published"
+    else:
+        assert cell.state.is_value
+        assert cell.state.value == expected_material
+
+    if expected_codes is None:
+        assert bench.cell_materials is None
+    else:
+        assert bench.cell_materials is not None
+        assert tuple(item.state.value.value for item in bench.cell_materials) == expected_codes
+        assert all(item.locator == cell.locator for item in bench.cell_materials)
+    assert bench_from_plain(to_plain(bench)) == bench
+    assert _cell_material_class(bench.cell_materials) == expected_class
+
+
+def test_plante_cell_materials_round_trip_through_work_store(tmp_path: Path) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.migrate import load_migrated_benches, write_outputs
+
+    root = tmp_path / "tree"
+    result = _migrate_real_extract(tmp_path, "kems-042-plante-1979.yaml")
+    source_bench = next(
+        bench
+        for bench in result.benches.values()
+        if bench.id.endswith("::bench::kems-system")
+    )
+    assert source_bench.cell_materials is not None
+    assert [item.state.value.value for item in source_bench.cell_materials] == ["Pt"]
+    assert all(item.locator is not None for item in source_bench.cell_materials)
+
+    write_outputs(result, root)
+    stored_bench = load_migrated_benches(root)[source_bench.id]
+
+    assert stored_bench.cell_materials == source_bench.cell_materials
+    assert [item.locator for item in stored_bench.cell_materials or ()] == [
+        item.locator for item in source_bench.cell_materials
+    ]
 
 
 def test_tsukihashi_split_temperature_locators_use_figure7() -> None:
@@ -961,6 +1230,7 @@ def test_stolyarova_wilson_numbers_are_gibbs_model_parameters_only():
 
 def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
     from tests.battery.test_migrate import _migrate_real_extract
+    from simulator.battery.enums import NoticeKind
 
     atomic_source = _repo_observation(
         "kems-053-stolyarova-1991.yaml",
@@ -986,6 +1256,16 @@ def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
         tmp_path, "kems-053-stolyarova-1991.yaml"
     )
     source = "kems-053-stolyarova-1991"
+    stolyarova_benches = [
+        bench for bench in result.benches.values()
+        if bench.id.endswith("::bench::stolyarova-kems")
+    ]
+    assert len(stolyarova_benches) == 1
+    cell = stolyarova_benches[0].cell_material_and_liner
+    assert cell is not None and cell.state.is_value
+    assert cell.state.value == "tungsten"
+    assert cell.locator.published_page == 3710
+    assert cell.locator.section == "Experimental"
     atomic_rows = [
         observation
         for observation in result.observations.values()
@@ -1002,8 +1282,30 @@ def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
             f"{source}::stolyarova_1991_o2_pressure_fig4::"
         )
     ]
+    cao_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == source
+        and observation.observation_id.startswith(
+            f"{source}::stolyarova_1991_cao_partial_pressure"
+        )
+    ]
     assert len(atomic_rows) == 9
     assert len(figure_rows) == 8
+    assert len(cao_rows) == 22
+    assert sum("complete_evaporation" in row.observation_id for row in cao_rows) == 11
+    assert sum("ion_comparison" in row.observation_id for row in cao_rows) == 11
+    for observation in cao_rows:
+        flags = [
+            notice for notice in observation.notices
+            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+        ]
+        assert len(flags) == 1
+        assert flags[0].reason.startswith("source_internally_inconsistent:")
+        assert "3.70 dex below the printed value" in flags[0].reason
+        assert "141 kJ/mol" in flags[0].reason
+        assert observation.value.point is not None
+        assert observation.admission.status.value == "admitted"
 
     for observation in atomic_rows:
         reaction = observation.identity.reaction
@@ -1030,6 +1332,16 @@ def test_stolyarova_printed_binary_compositions_survive_migration(tmp_path: Path
     from tests.battery.test_migrate import _migrate_real_extract
 
     rows = _repo_point_rows("kems-053-stolyarova-1991.yaml")
+    activity_source = {
+        observation["observation_id"]: observation["standard_state"]
+        for observation, _row in rows
+        if observation.get("values", {}).get("quantity") == "activity"
+    }
+    assert len(activity_source) == 6
+    assert all(
+        "p. 3711" in standard_state and "not stated" in standard_state
+        for standard_state in activity_source.values()
+    )
     typed_source = [
         (observation, row)
         for observation, row in rows
@@ -1072,12 +1384,39 @@ def test_stolyarova_printed_binary_compositions_survive_migration(tmp_path: Path
         == "mole_fraction"
         for observation in typed_migrated
     )
+    from simulator.battery.identity import quantity_token
+
+    activity_migrated = []
+    for observation in result.observations.values():
+        token = quantity_token(observation.identity)
+        if (
+            observation.source_id == "kems-053-stolyarova-1991"
+            and token is not None
+            and token.value == "activity"
+        ):
+            activity_migrated.append(observation)
+    assert len(activity_migrated) == 54
+    assert all(
+        observation.identity.reference_state is not None
+        and observation.identity.reference_state.is_unknown
+        for observation in activity_migrated
+    )
 
 
 def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
     from tests.battery.test_migrate import _migrate_real_extract
 
     rows = _repo_point_rows("kems-051-allibert-1981.yaml")
+    activity_source = {
+        observation["observation_id"]: observation["standard_state"]
+        for observation, _row in rows
+        if observation.get("values", {}).get("quantity") == "activity"
+    }
+    assert len(activity_source) == 5
+    assert all(
+        "p. 309" in standard_state and "solid " in standard_state
+        for standard_state in activity_source.values()
+    )
     typed_source = [
         (observation, row)
         for observation, row in rows
@@ -1114,7 +1453,7 @@ def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
     assert figure2_rows
     assert all("composition" not in (row.get("point_conditions") or {}) for row in figure2_rows)
 
-    result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    result = _migrate_real_extract(tmp_path / "allibert-unlinked", "kems-051-allibert-1981.yaml")
     typed_migrated = [
         observation
         for observation in result.observations.values()
@@ -1127,6 +1466,95 @@ def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
         observation.point_conditions["composition"].state.value.amount_basis.value
         == "mole_fraction"
         for observation in typed_migrated
+    )
+    from simulator.battery.enums import Phase
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.records import phase_token
+
+    activity_migrated = []
+    for observation in result.observations.values():
+        token = quantity_token(observation.identity)
+        if (
+            observation.source_id == "kems-051-allibert-1981"
+            and token is not None
+            and token.value == "activity"
+        ):
+            activity_migrated.append(observation)
+    assert activity_migrated
+    assert all(
+            observation.identity.reference_state is not None
+            and observation.identity.reference_state.is_value
+            and phase_token(
+                observation.identity.reference_state.value.endmember
+            ) is Phase.CR
+        for observation in activity_migrated
+    )
+
+
+
+
+def test_allibert_printed_point_phases_are_typed_at_migration(tmp_path: Path):
+    from decimal import Decimal
+    from simulator.battery.enums import Phase
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.migrate import _printed_point_phase_kind
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    assert _printed_point_phase_kind("melt") == "liquid"
+    assert _printed_point_phase_kind("CaO + melt") == "two_phase"
+    assert _printed_point_phase_kind("melt + CaO") == "two_phase"
+    assert (
+        _printed_point_phase_kind(
+            "liquid CaO-Al2O3 melt; final row is printed as CaO + melt"
+        )
+        is None
+    )
+    assert _printed_point_phase_kind("saturated vapour") is None
+
+    result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    source = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-051-allibert-1981"
+    ]
+    liquid = [
+        observation
+        for observation in source
+        if observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.L
+    ]
+    two_phase = [
+        observation
+        for observation in source
+        if observation.identity.species.phase.is_unknown
+        and "bulk_composition_in_two_phase_region"
+        in (observation.identity.species.phase.reason or "")
+    ]
+    assert len(liquid) == 14
+    assert len(two_phase) == 2
+    assert {observation.identity.species.formula for observation in two_phase} == {
+        "CaO",
+        "Al2O3",
+    }
+    marker = "two_phase_bulk_composition_not_liquid_composition"
+    assert all(
+        any(notice.band == marker for notice in observation.notices)
+        for observation in two_phase
+    )
+    assert all(
+        observation.identity.composition is not None
+        and observation.identity.composition.is_value
+        and any(
+            name == "CaO" and amount == Decimal("0.8")
+            for name, amount in observation.identity.composition.value.components
+        )
+        for observation in two_phase
+    )
+    assert all(
+        str(getattr(observation.locator, "table", None)) == "II"
+        and quantity_token(observation.identity) is not None
+        and quantity_token(observation.identity).value == "activity"
+        for observation in liquid
     )
 
 
@@ -2614,3 +3042,89 @@ def test_singleton_series_disagreement_is_none():
     view = em.build_by_species(extracts, source_priority={"alpha": ["only-src"]})
     g = view["species"]["Fe"]["observable_groups"][0]
     assert g["disagreement_dex"] is None
+
+
+def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
+    """Experiment.bench_id is the printed cell assignment, with its locator.
+
+    A sole typed bench is not enough: Hastie Table 2 and Allibert EMF stay
+    unlinked because those rows are not the printed cell experiment.
+    """
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    def experiment_named(result, local):
+        rows = [
+            item
+            for item in result.experiments.values()
+            if item.experiment_id.endswith("::experiment::" + local)
+        ]
+        assert len(rows) == 1, local
+        return rows[0]
+
+    def observations_named(result, local):
+        rows = [
+            item
+            for item in result.observations.values()
+            if local in item.observation_id.split("::")
+        ]
+        assert rows, local
+        return rows
+
+    linked = (
+        (
+            "kems-053-stolyarova-1991.yaml",
+            "stolyarova-1991-w-cell",
+            "stolyarova-kems",
+            "Samples evaporated from tungsten effusion cells.",
+            "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
+        ),
+        (
+            "kems-051-allibert-1981.yaml",
+            "allibert-1981-mo-kems",
+            "allibert-1981-kems",
+            "Six effusion cells were drilled in a molybdenum block.",
+            "allibert_1981_table2_cao_activity_kems",
+        ),
+        (
+            "kems-020-hastie-1981-nbsir.yaml",
+            "hastie-1981-pt-kms",
+            "hastie-1981-kms",
+            "KMS data with Pt-cell orifice diameter of 0.34 mm.",
+            "hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906",
+        ),
+        (
+            "metsoc-2019-6005.yaml",
+            "shornikov-2019-mo-kems",
+            "shornikov-yakovlev-2019-kems",
+            "Method section identifies a Knudsen molybdenum effusion cell.",
+            "shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fH",
+        ),
+        (
+            "bencze-yazhenskikh-2016.yaml",
+            "bencze-2016-ir-kems",
+            "bencze-2016-supplement-kems",
+            "there is a thin graphite coating on the inner surface of the lid of the iridium cell",
+            "bencze_2016_table_s1_na_all_subsamples",
+        ),
+    )
+    for filename, exp_local, bench_local, quote, obs_local in linked:
+        result = _migrate_real_extract(tmp_path / Path(filename).stem, filename)
+        experiment = experiment_named(result, exp_local)
+        assert experiment.bench_id is not None
+        assert experiment.bench_id.endswith("::bench::" + bench_local)
+        assert experiment.locator is not None
+        assert quote in (experiment.locator.note or "")
+        assert experiment.bench_id in result.benches
+        for observation in observations_named(result, obs_local):
+            assert observation.experiment_id == experiment.experiment_id
+
+    hastie = _migrate_real_extract(tmp_path / "hastie-unlinked", "kems-020-hastie-1981-nbsir.yaml")
+    table2 = observations_named(hastie, "hastie_1981_table2_k_logP_coefficients")
+    table2_experiment = hastie.experiments[table2[0].experiment_id]
+    assert table2_experiment.bench_id is None
+
+    allibert = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    emf = observations_named(allibert, "allibert_1981_table3_emf_solid_cells")
+    mo = experiment_named(allibert, "allibert-1981-mo-kems")
+    assert all(item.experiment_id != mo.experiment_id for item in emf)
+    assert allibert.experiments[emf[0].experiment_id].bench_id is None

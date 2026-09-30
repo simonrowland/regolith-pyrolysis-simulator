@@ -53,10 +53,12 @@ experiments:
       state:
         tag: value
         value:
-          kind: point
-          point: '1.333223684210526315789473684'
+          kind: interval
+          interval_low: '0.1333223684210526315789473684'
+          interval_high: '1.333223684210526315789473684'
           approximate: false
       locator:
+        page: 1164
         paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
         source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
       inference:
@@ -64,21 +66,17 @@ experiments:
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
-        - as_published=0.01 mmHg
+        - as_published=$10^{-2} \sim 10^{-3}$ mmHg
         - printed=chamber_pressure
+        - as_printed=$10^{-2} \sim 10^{-3}$ mmHg
+        - original_interval=0.001..0.01 mmHg
         parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.01'
-            locator:
-              paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
-              source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         - - factor
           - state:
               tag: value
               value: '133.3223684210526315789473684'
             locator:
+              page: 1164
               paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
               source_path: docs-private/research/ocr-artifacts/kems-002-ohno-1967/spool/out/kems-002-ohno-1967/vlm/kems-002-ohno-1967.md
         output_unit: Pa

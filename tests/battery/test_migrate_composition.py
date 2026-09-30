@@ -12,9 +12,11 @@ from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.enums import AmountBasis
 from simulator.battery.migrate import (
     REPO_ROOT,
+    _catalogue_composition_located_from_values,
     _sample_from_plain,
     migrate,
     oxide_molar_mass,
+    sample_from_equipment,
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import as_decimal
@@ -94,6 +96,34 @@ def test_typed_printed_composition_is_readable_and_gets_canonical_sibling() -> N
     assert sample.initial_composition.state.is_value
     assert sample.initial_composition.inference is not None
     assert sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
+
+
+def test_sample_catalogue_composition_is_typed_proxy_not_printed() -> None:
+    values = {
+        "composition_from_sample_catalog": True,
+        "composition_source": (
+            "Lunar Sample Compendium entry 10017. "
+            "Selection rule: first complete named whole-sample analysis."
+        ),
+        "sample_oxide_composition_wt_pct": {"SiO2": 50, "CaO": 50},
+    }
+
+    located = _catalogue_composition_located_from_values(values, None)
+    assert located is not None
+    composition = located.state.value
+    assert composition.basis == "sample_catalog_proxy"
+    assert composition.proxy_flag == "composition_from_sample_catalog"
+    assert composition.proxy_source.startswith("Lunar Sample Compendium")
+    assert composition.analysis_selection_rule == (
+        "first complete named whole-sample analysis"
+    )
+
+    sample = sample_from_equipment({}, values=values)
+    assert sample.printed_composition is None
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.value.proxy_flag == (
+        "composition_from_sample_catalog"
+    )
 
 
 def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:

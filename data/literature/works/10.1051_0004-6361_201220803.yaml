@@ -88,38 +88,16 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: unknown
-        reason: extract chamber_pressure is a bound or approximate value, not a point; extract_value=1e-09 mbar; background
-          pressure during evaporation did not exceed 1e-9 mbar; base UHV <1e-10 mbar
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '0.0000001'
+          approximate: false
       locator:
-        paragraph: background pressure measured during evaporation
-        line_range: 51-53
-        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-      inference:
-        relation: extract_limit
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        - as_published=1e-09 mbar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000000001'
-            locator:
-              paragraph: background pressure measured during evaporation
-              line_range: 51-53
-              source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              paragraph: background pressure measured during evaporation
-              line_range: 51-53
-              source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-        output_unit: Pa
+        page: 2
+        section: '2.1'
+        note: Background pressure during evaporation did not exceed 1 x 10^-9 mbar; unit conversion only
     sweep_gas:
       state:
         tag: not_applicable

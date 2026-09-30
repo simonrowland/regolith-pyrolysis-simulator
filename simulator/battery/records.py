@@ -34,6 +34,7 @@ from simulator.battery.enums import (
     Authority,
     BenchAbsenceReason,
     BenchIdentityBasis,
+    CellMaterial,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -349,6 +350,9 @@ class Composition:
     basis: str
     components: tuple[tuple[str, Decimal], ...]
     amount_basis: AmountBasis
+    proxy_flag: str | None = None
+    proxy_source: str | None = None
+    analysis_selection_rule: str | None = None
 
     def __post_init__(self) -> None:
         if not self.basis:
@@ -365,6 +369,13 @@ class Composition:
                     f"Composition component {key!r} must be a nonnegative finite amount"
                 )
         object.__setattr__(self, "components", canonical)
+        for name in ("proxy_flag", "proxy_source", "analysis_selection_rule"):
+            value = getattr(self, name)
+            if value is not None:
+                value = str(value).strip()
+                if not value:
+                    raise ValueError(f"Composition.{name} cannot be blank")
+                object.__setattr__(self, name, value)
 
     def as_map(self) -> dict[str, Decimal]:
         return dict(self.components)
@@ -442,6 +453,20 @@ class Notice:
             object.__setattr__(
                 self, "dropped_mass_fraction", as_decimal(self.dropped_mass_fraction)
             )
+
+
+SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX = "source_internally_inconsistent:"
+
+
+def _is_source_internally_inconsistent(
+    kind: NoticeKind | str, reason: object
+) -> bool:
+    kind_value = kind.value if isinstance(kind, NoticeKind) else str(kind)
+    return (
+        kind_value == NoticeKind.SOURCE_DISAGREEMENT.value
+        and isinstance(reason, str)
+        and reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
+    )
 
 
 _VALUE_PAYLOAD = {
@@ -805,6 +830,7 @@ class Bench:
     apparatus_family: Located[str] | None = None
     method: Located[str] | None = None
     cell_material_and_liner: Located[str] | None = None
+    cell_materials: tuple[Located[CellMaterial], ...] | None = None
     geometry: ApparatusGeometry | None = None
     pumping_type: Located[str] | None = None
     pumping_speed_m3_s: Located[Value] | None = None

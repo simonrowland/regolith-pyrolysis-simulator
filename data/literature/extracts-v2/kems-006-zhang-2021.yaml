@@ -44,6 +44,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -79,6 +82,12 @@ observations:
         table: '1'
         note: row=Bas1200C0h2
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c10h
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c10h
   identity:
@@ -121,6 +130,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -156,6 +168,12 @@ observations:
         table: '1'
         note: row=Bas1200C10h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c1h
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c1h
   identity:
@@ -198,6 +216,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -233,6 +254,12 @@ observations:
         table: '1'
         note: row=Bas1200C1h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c40h
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c40h
   identity:
@@ -275,6 +302,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -310,6 +340,12 @@ observations:
         table: '1'
         note: row=Bas1200C40h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1200c4h
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1200c4h
   identity:
@@ -352,6 +388,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -387,6 +426,12 @@ observations:
         table: '1'
         note: row=Bas1200C4h
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c0m1
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c0m1
   identity:
@@ -429,6 +474,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -464,6 +512,12 @@ observations:
         table: '1'
         note: row=Bas1400C0m1
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c15m
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c15m
   identity:
@@ -506,6 +560,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -541,6 +598,12 @@ observations:
         table: '1'
         note: row=Bas1400C15m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c30m
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c30m
   identity:
@@ -583,6 +646,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -618,6 +684,12 @@ observations:
         table: '1'
         note: row=Bas1400C30m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c60m
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c60m
   identity:
@@ -660,6 +732,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -695,6 +770,12 @@ observations:
         table: '1'
         note: row=Bas1400C60m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions_bas1400c0m1_bas1400c90m
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::experiment::basalt-bas1400c90m
   identity:
@@ -737,6 +818,9 @@ observations:
         - - K2O
           - '0.01726225080549124870357434797'
         amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '0.1'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'epma_residue_composition_vs_time'; refusing to
@@ -772,6 +856,12 @@ observations:
         table: '1'
         note: row=Bas1400C90m
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-006-zhang-2021
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-006-zhang-2021::zhang_2021_table3_diffusion_limitation
   experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::kems-006-zhang-2021
   identity:

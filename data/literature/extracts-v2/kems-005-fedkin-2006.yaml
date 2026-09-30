@@ -538,8 +538,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '0.0013'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -588,6 +588,12 @@ observations:
         figure: '4'
         line_range: 241-243
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -636,8 +642,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '0.0013'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -685,6 +691,12 @@ observations:
         figure: '4'
         line_range: 241-243
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-005-fedkin-2006::fedkin_2006_mg_class_b1
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -1229,8 +1241,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '0.0013'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1278,6 +1290,12 @@ observations:
         figure: '4'
         line_range: 241-243
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-005-fedkin-2006::fedkin_2006_na_yu_langmuir
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -1326,8 +1344,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '0.0013'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1374,6 +1392,12 @@ observations:
         figure: '4'
         line_range: 241-243
         source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - unknown:kems-005-fedkin-2006
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_langmuir_table3
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -1464,8 +1488,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '0.0013'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1568,8 +1592,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '0.0013'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1672,8 +1696,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '0.0013'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -1776,8 +1800,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
+      tag: value
+      value: '0.0013'
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -2134,6 +2158,9 @@ observations:
     temperature_K:
       tag: value
       value: '2073'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0013'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2186,6 +2213,12 @@ observations:
         table: '4'
         note: row=SiO; Alexander (2001)
         source_path: tables/kems-005-fedkin-2006/t4.csv
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - tables:kems-005-fedkin-2006
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_alexander_2001_inverse::T=2273.0:h=fd9b0e3f9877
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -2206,6 +2239,9 @@ observations:
     temperature_K:
       tag: value
       value: '2273'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0013'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2258,6 +2294,12 @@ observations:
         table: '4'
         note: row=SiO; Alexander (2001)
         source_path: tables/kems-005-fedkin-2006/t4.csv
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - tables:kems-005-fedkin-2006
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_this_work_inverse::T=2073.0:h=5f67b9012f83
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -2278,6 +2320,9 @@ observations:
     temperature_K:
       tag: value
       value: '2073'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0013'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2327,6 +2372,12 @@ observations:
         table: '4'
         note: row=SiO; This work
         source_path: tables/kems-005-fedkin-2006/t4.csv
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - tables:kems-005-fedkin-2006
+    parameters: []
+    output_unit: Pa
 - observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_this_work_inverse::T=2273.0:h=55b2531c6b39
   experiment_id: 10.1016/j.gca.2005.08.014::kems-005-fedkin-2006
   identity:
@@ -2347,6 +2398,9 @@ observations:
     temperature_K:
       tag: value
       value: '2273'
+    total_pressure_Pa:
+      tag: value
+      value: '0.0013'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number
@@ -2396,3 +2450,9 @@ observations:
         table: '4'
         note: row=SiO; This work
         source_path: tables/kems-005-fedkin-2006/t4.csv
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - tables:kems-005-fedkin-2006
+    parameters: []
+    output_unit: Pa
