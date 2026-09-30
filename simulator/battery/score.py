@@ -230,6 +230,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.INTERACTION_PARAMETER: MetricOperation.ABSOLUTE,
     Quantity.CONDENSATE_COMPOSITION: MetricOperation.ABSOLUTE,
     Quantity.LIQUIDUS_COMPOSITION: MetricOperation.ABSOLUTE,
+    Quantity.RESIDUE_COMPONENT_COMPOSITION: MetricOperation.ABSOLUTE,
     Quantity.EVOLVED_GAS_YIELD: MetricOperation.RELATIVE,
     Quantity.ISOTOPE_DELTA: MetricOperation.ABSOLUTE,
 }
@@ -534,6 +535,8 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
     does not fall through onto SiO_evolution.
     """
 
+    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        return Rail.RESIDUE_COMPOSITION
     if quantity in _VAPOUR_EQUILIBRIUM:
         if species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
@@ -2376,6 +2379,20 @@ def predict_with_engine(
             lineage_complete=False,
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
+        )
+    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "quantity_not_predicted",
+                "quantity": quantity.value,
+            },
+            identity=identity,
         )
     formula = identity.species.formula
     if parse_species_formula(formula) is None:

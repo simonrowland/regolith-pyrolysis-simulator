@@ -42,7 +42,7 @@ class Engine(StrEnum):
 
 
 class Rail(StrEnum):
-    """Eight owner-bound residual reporting rails (v2.1 guard_09_05)."""
+    """Owner-bound residual reporting rails."""
 
     VAPOUR = "vapour"
     MELT_ACTIVITY = "melt_activity"
@@ -52,6 +52,7 @@ class Rail(StrEnum):
     WALL_DEPOSITION = "wall_deposition"
     REDOX = "redox"
     ALKALI_SHUTTLE = "alkali_shuttle"
+    RESIDUE_COMPOSITION = "residue_composition"
 
 
 class Quantity(StrEnum):
@@ -91,6 +92,7 @@ class Quantity(StrEnum):
     ISOTOPE_DELTA = "isotope_delta"
     CONDENSATE_COMPOSITION = "condensate_composition"
     LIQUIDUS_COMPOSITION = "liquidus_composition"
+    RESIDUE_COMPONENT_COMPOSITION = "residue_component_composition"
     EVOLVED_GAS_YIELD = "evolved_gas_yield"
     ION_INTENSITY = "ion_intensity"
     INTERACTION_PARAMETER = "interaction_parameter"
@@ -472,6 +474,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.ISOTOPE_DELTA: "per_mil",
     Quantity.CONDENSATE_COMPOSITION: "component_mole_fraction_vector",
     Quantity.LIQUIDUS_COMPOSITION: "component_mole_fraction_vector",
+    Quantity.RESIDUE_COMPONENT_COMPOSITION: "subtype_defined",
     Quantity.EVOLVED_GAS_YIELD: "mol_species_per_initial_kg",
     Quantity.ION_INTENSITY: "subtype_defined",
     Quantity.INTERACTION_PARAMETER: "subtype_defined",

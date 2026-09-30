@@ -665,6 +665,8 @@ def profile_for(identity: Identity) -> QuantityProfile:
         else:
             na("composition")
         na("fO2_Pa")
+    elif q is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        req("temperature_K", "subtype")
     elif q in {
         Quantity.VISCOSITY,
         Quantity.DENSITY,
