@@ -862,8 +862,10 @@ def compilation_row_observation(
 
 def compilation_family(source_id: str | None, origin: str | None) -> str:
     if origin:
-        return origin.replace("\\", "/").split("/", 1)[0]
-    return source_id or "unknown"
+        family = origin.replace("\\", "/").split("/", 1)[0]
+    else:
+        family = source_id or "unknown"
+    return family.removesuffix(".yaml")
 
 
 def _median_abs(values: Sequence[Decimal]) -> str | None:
@@ -884,6 +886,7 @@ class _TierCell:
     relation: SourceRelation
     numeric: Decimal | None
     operation: MetricOperation | None
+    unit: str
     family: str
     quantity: str
     uncertainty: str
@@ -892,54 +895,59 @@ class _TierCell:
 def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
     by_engine: dict[str, list[_TierCell]] = defaultdict(list)
     by_source: dict[tuple[str, str], list[_TierCell]] = defaultdict(list)
-    by_rail_engine: dict[tuple[str, str], list[_TierCell]] = defaultdict(list)
+    by_rail_engine_quantity: dict[
+        tuple[str, str, str, str], list[_TierCell]
+    ] = defaultdict(list)
     for cell in cells:
         by_engine[cell.engine].append(cell)
         by_source[(cell.family, cell.quantity)].append(cell)
-        by_rail_engine[(cell.rail, cell.engine)].append(cell)
+        if cell.numeric is not None and cell.operation is MetricOperation.ABSOLUTE:
+            by_rail_engine_quantity[
+                (cell.rail, cell.engine, cell.quantity, cell.unit)
+            ].append(cell)
     lines = [
         "## Compilation tier",
         "",
         "Compilation comparisons: assessed tables and quoted rows stored",
         "under a compilation. Not part of the measured tier and not added",
-        "to it. same-source means the engine coefficients resolve to this",
+        "to it. Same-source residuals measure implementation fidelity, not",
+        "independent physics; the engine coefficients resolve to this",
         "compilation (JANAF-4th refit versus JANAF; NASA CEA thermo.inp",
         "versus the Glenn coefficient database). Pending admission is",
         "unchanged. Printed uncertainty is the reference observation's",
         "uncertainty (often none on a grid).",
         "",
-        "| rail | engine | n | RMS dex | median abs dex | n no band | match rate |",
-        "|---|---|---:|---:|---:|---:|---:|",
+        "| rail | engine | quantity | unit | n | median |C−R| | RMS (C−R) | n match | "
+        "n mismatch | n no band | n same-source |",
+        "|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
-    if not by_rail_engine:
-        lines.append("| (none) | (none) | 0 | — | — | 0 | — |")
-    for (rail, engine), bucket in sorted(by_rail_engine.items()):
-        numeric = [row for row in bucket if row.numeric is not None]
-        dex = [
-            row.numeric
-            for row in numeric
-            if row.operation is MetricOperation.DEX and row.numeric is not None
-        ]
-        banded = [
-            row
-            for row in numeric
-            if row.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}
-        ]
-        matches = [row for row in banded if row.status is ResidualStatus.MATCH]
-        rms = None
-        if dex:
-            rms = (
-                sum((value * value for value in dex), Decimal(0))
-                / Decimal(len(dex))
-            ).sqrt()
-        median = _median_abs(dex)
-        rate = None if not banded else len(matches) / len(banded)
+    if not by_rail_engine_quantity:
         lines.append(
-            f"| {rail} | {engine} | {len(numeric)} | "
-            f"{rms if rms is not None else '—'} | "
-            f"{median or '—'} | "
-            f"{sum(1 for row in numeric if row.status is ResidualStatus.NO_BAND)} | "
-            f"{rate if rate is not None else '—'} |"
+            "| (none) | (none) | (none) | (none) | 0 | — | — | 0 | 0 | 0 | 0 |"
+        )
+    for (rail, engine, quantity, unit), bucket in sorted(
+        by_rail_engine_quantity.items()
+    ):
+        values = [row.numeric for row in bucket if row.numeric is not None]
+        rms = (
+            sum((value * value for value in values), Decimal(0))
+            / Decimal(len(values))
+        ).sqrt()
+        matches = [row for row in bucket if row.status is ResidualStatus.MATCH]
+        mismatches = [row for row in bucket if row.status is ResidualStatus.MISMATCH]
+        same_source = [
+            row
+            for row in bucket
+            if row.relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}
+        ]
+        display_unit = (
+            "kJ/mol" if unit == "kJ_per_declared_mol_basis" else unit
+        )
+        lines.append(
+            f"| {rail} | {engine} | {quantity} | {display_unit} | {len(values)} | "
+            f"{_median_abs(values)} | {rms} | {len(matches)} | {len(mismatches)} | "
+            f"{sum(1 for row in bucket if row.status is ResidualStatus.NO_BAND)} | "
+            f"{len(same_source)} |"
         )
     lines.extend(
         [
@@ -992,6 +1000,7 @@ def _cell_from_observation(
     relation: SourceRelation,
     numeric: Decimal | None,
     operation: MetricOperation | None,
+    unit: str,
     observation: Observation,
     origin: str | None,
 ) -> _TierCell:
@@ -1015,6 +1024,7 @@ def _cell_from_observation(
         relation=relation,
         numeric=numeric,
         operation=operation,
+        unit=unit,
         family=compilation_family(observation.source_id, origin),
         quantity=quantity,
         uncertainty=uncertainty_text(observation.uncertainty),
@@ -1048,6 +1058,7 @@ def compilation_tier_lines(
                 operation=None
                 if residual.numeric is None
                 else residual.numeric.operation,
+                unit="" if residual.numeric is None else residual.numeric.unit,
                 observation=observation,
                 origin=compilation_origin(residual.reference, origins),
             )
@@ -1081,6 +1092,11 @@ def compilation_tier_lines_from_payloads(
             numeric = as_decimal(raw_numeric["value"])
             if raw_numeric.get("operation") is not None:
                 operation = MetricOperation(str(raw_numeric["operation"]))
+        unit = (
+            str(raw_numeric.get("unit") or "")
+            if isinstance(raw_numeric, Mapping)
+            else ""
+        )
         cells.append(
             _cell_from_observation(
                 engine=engine or "unknown",
@@ -1088,6 +1104,7 @@ def compilation_tier_lines_from_payloads(
                 relation=SourceRelation(str(row.get("source_relation") or SourceRelation.UNKNOWN.value)),
                 numeric=numeric,
                 operation=operation,
+                unit=unit,
                 observation=observation,
                 origin=compilation_origin(reference, origins),
             )
