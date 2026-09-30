@@ -17,7 +17,6 @@ from simulator.chemistry.kernel import (
     ChemistryIntent,
     ProviderUnavailableError,
 )
-from simulator.corpus_version import current_corpus_version
 from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
     KRESS91_LIQUID_CALIBRATION_MAX_T_C,
@@ -2311,96 +2310,7 @@ class EvaporationMixin:
             round(pressure_bucket, 6),
             round(fO2_bucket, 6),
             tuple(sorted(composition_key)),
-            self._freeze_gate_engine_cache_identity(),
         )
-
-    def _freeze_gate_engine_cache_identity(self) -> tuple:
-        cached = getattr(self, '_freeze_gate_engine_identity_cache', None)
-        if isinstance(cached, tuple):
-            return cached
-
-        register_gate_providers = getattr(
-            self,
-            '_register_freeze_gate_liquid_fraction_providers',
-            None,
-        )
-        if callable(register_gate_providers):
-            register_gate_providers()
-
-        def provider_identity(provider: Any) -> tuple | None:
-            if provider is None:
-                return None
-            profile = provider.capability_profile()
-            version_getter = getattr(provider, '_engine_version', None)
-            version = 'unavailable'
-            if callable(version_getter):
-                try:
-                    version = str(version_getter()).strip() or 'unavailable'
-                except Exception:  # noqa: BLE001 - cache provenance boundary
-                    version = 'unavailable'
-            return (str(profile.provider_id), version)
-
-        registry = getattr(self, '_chem_registry', None)
-        authoritative = (
-            registry.authoritative_for(ChemistryIntent.GATE_LIQUID_FRACTION)
-            if registry is not None
-            else None
-        )
-        fallback = (
-            registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
-            if registry is not None
-            else None
-        )
-
-        backend = getattr(self, 'backend', None)
-        config = getattr(backend, 'config', None)
-        configured_name = str(
-            getattr(config, 'authorized_backend_name', '')
-        ).strip()
-        configured_version = str(
-            getattr(config, 'authorized_backend_version', '')
-        ).strip()
-        effective_backend = getattr(backend, '_live_backend', None) or backend
-        backend_name = (
-            configured_name
-            or str(
-                getattr(effective_backend, 'backend_name', None)
-                or getattr(effective_backend, 'name', None)
-                or type(effective_backend).__name__
-            ).strip()
-        )
-        backend_class = configured_name or (
-            f'{type(effective_backend).__module__}.'
-            f'{type(effective_backend).__qualname__}'
-        )
-        backend_version = configured_version
-        if not backend_version:
-            version_getter = getattr(
-                effective_backend,
-                'get_engine_version',
-                None,
-            )
-            if callable(version_getter):
-                try:
-                    backend_version = (
-                        str(version_getter()).strip() or 'unavailable'
-                    )
-                except Exception:  # noqa: BLE001 - cache provenance boundary
-                    backend_version = 'unavailable'
-        identity = (
-            'freeze_gate_engine_identity_v1',
-            ('authoritative', provider_identity(authoritative)),
-            ('fallback', provider_identity(fallback)),
-            (
-                'backend',
-                backend_name,
-                backend_class,
-                backend_version or 'unavailable',
-            ),
-            ('corpus_version', current_corpus_version()),
-        )
-        self._freeze_gate_engine_identity_cache = identity
-        return identity
 
     def _freeze_gate_curve_from_gate_dispatch(
         self,
