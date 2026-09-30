@@ -4807,6 +4807,118 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, tight) is None
 
 
+def test_feasible_analytical_cache_hit_skips_evaluation_and_splits_keys(
+    tmp_path: Path,
+) -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch({})
+    constraints = physics_constraints_from_profile(PROFILE)
+    spec, _ = _build_eval_inputs(
+        patch.validated(schema),
+        FEEDSTOCK,
+        "internal-analytical",
+        PROFILE,
+        schema,
+        constraints=constraints,
+    )
+    trace = {
+        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "backend_status": "diagnostic_stub",
+        "backend_authoritative": False,
+        "evidence_class": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "certification_allowed": False,
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
+    }
+    reference = _run_reference(
+        status="ok",
+        trace=trace,
+        product_summary={
+            "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            "oxygen_kg": 10.0,
+            "mass_closure": {"status": "closed", "mass_balance_error_pct": 0.0},
+        },
+        backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        backend_status="diagnostic_stub",
+        backend_authoritative=False,
+        evidence_class=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        certification_allowed=False,
+    )
+    objectives = ObjectiveVector(
+        (
+            ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),
+            ObjectiveValue(
+                ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+                "minimize",
+                1.0,
+                "kWh",
+                ordinal=1,
+            ),
+        )
+    )
+    scored = ScoredResult(
+        candidate_id="first-eval",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=objectives,
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=reference,
+    )
+    store = ResultStore(tmp_path / "cache.sqlite")
+    store.store(spec, scored, created_at="2026-09-29T00:00:00Z")
+    candidate = Candidate(id="second-eval", patch=patch)
+    evaluator_calls = 0
+
+    def unexpected_evaluation(*args: Any, **kwargs: Any) -> ScoredResult:
+        nonlocal evaluator_calls
+        evaluator_calls += 1
+        raise AssertionError("a cache hit must not evaluate the candidate")
+
+    results, prefix_evals_run = study._evaluate_candidates(
+        [candidate],
+        profile=PROFILE,
+        feedstock=FEEDSTOCK,
+        fidelity="internal-analytical",
+        parallel=1,
+        out_dir=tmp_path,
+        evaluator=unexpected_evaluation,
+        schema=schema,
+        constraints=constraints,
+        store=store,
+        definitions=study.objective_definitions(PROFILE),
+        prefix_replay_cache={},
+    )
+
+    assert evaluator_calls == 0
+    assert prefix_evals_run == 0
+    assert len(results) == 1
+    replayed_candidate, replayed, cache_hit = results[0]
+    assert replayed_candidate.id == candidate.id
+    assert cache_hit is True
+    assert replayed.objectives == scored.objectives
+
+    high_spec = replace(spec, fidelity="high")
+    certifying_spec = replace(spec, backend_name="thermoengine")
+    assert cache_key(high_spec) != cache_key(spec)
+    assert cache_key(certifying_spec) != cache_key(spec)
+    assert store.lookup(high_spec) is None
+    assert store.lookup(certifying_spec) is None
+
+    infeasible_spec = replace(spec, recipe_id=f"{spec.recipe_id}-infeasible")
+    infeasible = ScoredResult(
+        candidate_id="infeasible-eval",
+        eval_spec=infeasible_spec,
+        cache_key=cache_key(infeasible_spec),
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
+        failing_gates=("delivered_stream_purity",),
+        run_reference=reference,
+    )
+    store.store(infeasible_spec, infeasible, created_at="2026-09-29T00:00:01Z")
+    assert store.lookup(infeasible_spec) is not None
+
+
 def test_profile_constraint_threshold_change_changes_cache_digest() -> None:
     schema = RecipeSchema()
     patch = RecipePatch({})
