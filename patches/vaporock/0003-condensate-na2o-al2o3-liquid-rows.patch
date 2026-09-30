@@ -32,7 +32,7 @@ Defect 1: Na2O(l), line 7
   now: Na2O(l),l,Na,2,1,1405,3000,-50.17,7.67,6.193,0,0,0,LAM1984
 
 The anchor -50.17 kK is correct: Lamoreaux & Hildenbrand (1984), Table 4, printed
-p.158, Na2O(s) dfH298/R = -50.17 +/- 0.50 kK. The coefficients
+p.157, Na2O(s) dfH298/R = -50.17 +/- 0.50 kK. The coefficients
 (4.82, 19.292, -5.267, 0.623) and the 825 K lower bound belong to a different
 species: they are LH84 Table 2 (printed p.154), row "NaO2(l)", 825-3000 K. The
 Na2O(l) row of the same table is A = 7.67, 10^3 B = 6.193, 10^6 C = 0.000,
@@ -42,7 +42,8 @@ Na2O(l) row of the same table is A = 7.67, 10^3 B = 6.193, 10^6 C = 0.000,
   low. With the correction, the Schaefer & Fegley (2004) Table 9 Na anchor at 1900 K
   goes from a -1.42 dex residual to +0.17 dex.
 - Residual source difference, not part of this fix: corrected LH84 Na2O(l) is still
-  +23 to +29 kJ/mol less stable than JANAF Na-013 at 1900-2600 K.
+  less stable than JANAF Na-013 at every liquid node from 1600 to 3000 K: +13.4 kJ/mol
+  at 1600 K, rising to +29.6 kJ/mol at 2400 K, and +17.7 kJ/mol at 3000 K.
 
 Defect 2: Al2O3(l), line 4
 --------------------------
@@ -50,9 +51,9 @@ Defect 2: Al2O3(l), line 4
   now: Al2O3(l),l,Al,2,3,2327,3000,-201.54,...,LAM1987
 
 -188.14 = -201.54 + 13.40. That is the Lamoreaux, Hildenbrand & Brewer (1987)
-Table 3 Al2O3(s) anchor dfH298/R = -201.54 +/- 0.15 kK (printed pp.421-424) with
+Table 3 Al2O3(s) anchor dfH298/R = -201.54 +/- 0.15 kK (printed p.424) with
 the Table 1 fusion enthalpy dfusH/R = 13.40 +/- 0.36 kK added a second time. The
-LH87 Table 2 liquid function already carries the fusion terms at Tm = 2327 K, so
+LH87 Table 2 (printed p.422) liquid function already carries the fusion terms at Tm = 2327 K, so
 the anchor must be the solid value. The coefficients and the 2327-3000 K range are
 correct as printed.
 - Check: with -201.54, the row reproduces JANAF Al-100 liquid
@@ -70,7 +71,7 @@ Sources
 -------
 - R. H. Lamoreaux, D. L. Hildenbrand, "High Temperature Vaporization Behavior of
   Oxides. I. Alkali Metal Binary Oxides", J. Phys. Chem. Ref. Data 13, 151 (1984),
-  doi:10.1063/1.555706. Tables 1, 2 and 4, printed pp.153, 154 and 158.
+  doi:10.1063/1.555706. Tables 1, 2 and 4, printed pp.153, 154 and 157.
   NIST reprint: https://srd.nist.gov/JPCRD/jpcrd241.pdf
   (sha256 3ecb3e3e9a5ee2487c92fdc185ef6b9e82d17c11bfe3e9969bb67abee943ba8a;
   scanned, no text layer; read visually).
