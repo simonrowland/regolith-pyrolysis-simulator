@@ -2240,7 +2240,9 @@ class _OpenImccBatteryBackend:
                         "model and oxygen-balance core needed for a reactive cell",
                     ) from exc
 
-                channels = _default_reactions(result.parent_oxides, self._gas)
+                channels, _omitted_channels = _default_reactions(
+                    result.parent_oxides, self._gas
+                )
                 base_species = oxygen_balance_species_metadata(
                     {name: parent or None for name, (parent, _ng, _no2) in channels}
                 )
