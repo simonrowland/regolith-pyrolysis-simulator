@@ -62,6 +62,7 @@ from simulator.battery.records import (
     as_decimal,
 )
 from simulator.physical_constants import BOLTZMANN
+from simulator.reference_data.janaf import formula_composition
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
 # Printed-precision self-check floor. Same constant as
@@ -767,32 +768,58 @@ def _point_temperature(observation: Observation) -> Decimal | None:
     return value if value.is_finite() and value > 0 else None
 
 
+# Do not mistake nonmetal components such as sulfur in a sulfide for cations.
+_NON_METAL_ELEMENTS = frozenset(
+    {
+        "H",
+        "He",
+        "C",
+        "N",
+        "O",
+        "F",
+        "Ne",
+        "P",
+        "S",
+        "Cl",
+        "Ar",
+        "Se",
+        "Br",
+        "Kr",
+        "I",
+        "Xe",
+        "Rn",
+        "At",
+        "Ts",
+        "Og",
+    }
+)
+
+
 def _expected_dominant_vapours(
     composition: tuple[tuple[str, Decimal], ...] | None,
-    printed_species: Iterable[str],
 ) -> tuple[str, ...] | None:
-    """Define narrow coverage from the composition and printed gas species.
+    """Return composition cations covered by at least one measured vapour.
 
-    Require SiO when SiO2 is a largest component. Require O2 over an oxide
-    only when the printed set contains no oxygen-bearing vapour at all; do not
-    hypothesize O2 alongside a source's printed oxide vapours. Every positive
-    printed species joins the sum, while unknown composition cannot claim
-    coverage.
+    Oxygen species may be absent: they are usually calculated rather than
+    measured and are minor in the in-cell pressure sum. Every positive printed
+    species joins the sum, while unknown composition cannot claim coverage.
     """
     if not composition:
         return None
     present = [(formula, amount) for formula, amount in composition if amount > 0]
     if not present:
         return None
-    expected: set[str] = set()
-    printed = set(printed_species)
-    oxide_melt = any("O" in formula for formula, _ in present)
-    if oxide_melt and not any("O" in formula for formula in printed):
-        expected.add("O2")
-    silica = next((amount for formula, amount in present if formula == "SiO2"), None)
-    if silica is not None and silica >= max(amount for _, amount in present):
-        expected.add("SiO")
-    return tuple(sorted(expected))
+    cations: set[str] = set()
+    for formula, _ in present:
+        elements = formula_composition(formula)
+        if elements is None:
+            return None
+        cations.update(
+            element for element, _ in elements if element not in _NON_METAL_ELEMENTS
+        )
+    if not cations:
+        return None
+    return tuple(sorted(cations))
 
 
 def _printed_in_cell_pressure_sum(
@@ -841,14 +868,19 @@ def _printed_in_cell_pressure_sum(
             )
     if not printed:
         return None, {"reason": "no admitted printed partial pressures at this exact point"}
-    expected = _expected_dominant_vapours(composition, printed)
+    expected = _expected_dominant_vapours(composition)
     if expected is None:
         return None, {
             "reason": "composition does not establish which vapour species could dominate",
             "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
             "printed_species": sorted(printed),
         }
-    missing = sorted(set(expected) - printed.keys())
+    covered = set()
+    for formula in printed:
+        elements = formula_composition(formula)
+        if elements is not None:
+            covered.update(element for element, _ in elements)
+    missing = sorted(set(expected) - covered)
     if missing:
         return None, {
             "reason": "incomplete printed species coverage; pressure sum is only a lower bound",

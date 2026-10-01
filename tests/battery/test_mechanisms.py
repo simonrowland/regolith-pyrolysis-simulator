@@ -3211,6 +3211,9 @@ def test_mf_f04_in_cell_pressure_sum_passes_with_unstated_background_flagged() -
             "kems-o2", experiment.experiment_id, "O2", "0.2", composition
         ),
         _printed_kems_partial_pressure(
+            "kems-ca", experiment.experiment_id, "Ca", "0.1", composition
+        ),
+        _printed_kems_partial_pressure(
             "kems-sio", experiment.experiment_id, "SiO", "0.4", composition
         ),
     )
@@ -3223,7 +3226,7 @@ def test_mf_f04_in_cell_pressure_sum_passes_with_unstated_background_flagged() -
     pressure_check = next(
         check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
     )
-    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "0.6"
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "0.7"
     assert pressure_check.detail["pressure_limit_Pa"] == "10"
     assert pressure_check.detail["flag"] == (
         "orifice not printed; regime verified from printed in-cell pressure sum "
@@ -3245,6 +3248,9 @@ def test_mf_f04_in_cell_pressure_sum_above_limit_refuses() -> None:
             "high-o2", experiment.experiment_id, "O2", "6", composition
         ),
         _printed_kems_partial_pressure(
+            "high-ca", experiment.experiment_id, "Ca", "1", composition
+        ),
+        _printed_kems_partial_pressure(
             "high-sio", experiment.experiment_id, "SiO", "5", composition
         ),
     )
@@ -3258,7 +3264,7 @@ def test_mf_f04_in_cell_pressure_sum_above_limit_refuses() -> None:
         check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
     )
     assert pressure_check.passed is False
-    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "12"
     assert pressure_check.detail["pressure_limit_Pa"] == "10"
 
 
@@ -3282,7 +3288,7 @@ def test_mf_f04_in_cell_pressure_sum_refuses_missing_dominant_species() -> None:
         check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
     )
     assert pressure_check.passed is False
-    assert pressure_check.detail["missing_species"] == ["SiO"]
+    assert pressure_check.detail["missing_species"] == ["Ca", "Si"]
     assert pressure_check.detail["reason"] == (
         "incomplete printed species coverage; pressure sum is only a lower bound"
     )
@@ -3305,8 +3311,44 @@ def test_mf_f04_in_cell_pressure_sum_refuses_missing_dominant_species() -> None:
         for check in oxygen_missing.checks
         if check.name == "in_cell_partial_pressure_sum"
     )
-    assert oxygen_missing.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    assert oxygen_check.detail["missing_species"] == ["O2"]
+    assert oxygen_missing.passed
+    assert oxygen_check.passed
+
+
+def test_mf_f04_in_cell_pressure_sum_requires_every_composition_cation() -> None:
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = _kems_without_background(F.kems_experiment(kn=None))
+    aluminium = _printed_kems_partial_pressure(
+        "incomplete-al", experiment.experiment_id, "Al", "0.1", composition
+    )
+    aluminium_oxide = _printed_kems_partial_pressure(
+        "incomplete-alo", experiment.experiment_id, "AlO", "0.2", composition
+    )
+
+    incomplete = run_validity_gates(
+        experiment,
+        aluminium,
+        point_observations=(aluminium, aluminium_oxide),
+    )
+    assert incomplete.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    incomplete_check = next(
+        check for check in incomplete.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert incomplete_check.detail["missing_species"] == ["Ca"]
+
+    calcium = _printed_kems_partial_pressure(
+        "complete-ca", experiment.experiment_id, "Ca", "0.3", composition
+    )
+    complete = run_validity_gates(
+        experiment,
+        calcium,
+        point_observations=(calcium, aluminium, aluminium_oxide),
+    )
+    assert complete.passed
 
 
 def test_mf_f04_printed_orifice_kn_path_is_unchanged() -> None:
