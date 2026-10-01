@@ -2383,10 +2383,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2398,23 +2398,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2422,10 +2422,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2436,18 +2436,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2502,7 +2502,9 @@ observations:
     note: as_published='-259.498'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -2573,10 +2575,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2588,23 +2590,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2612,10 +2614,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2626,18 +2628,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2692,7 +2694,9 @@ observations:
     note: as_published='-248.756'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -2763,10 +2767,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2778,23 +2782,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2802,10 +2806,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2816,18 +2820,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2882,7 +2886,9 @@ observations:
     note: as_published='-238.068'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -2953,10 +2959,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2968,23 +2974,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2992,10 +2998,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3006,18 +3012,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3072,7 +3078,9 @@ observations:
     note: as_published='-227.420'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -3146,7 +3154,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -3158,7 +3166,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3167,10 +3175,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3185,7 +3193,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -3196,7 +3204,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3204,10 +3212,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3262,7 +3270,9 @@ observations:
     note: as_published='-306.965'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -3336,7 +3346,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -3348,7 +3358,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3357,10 +3367,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3375,7 +3385,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -3386,7 +3396,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3394,10 +3404,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3452,7 +3462,9 @@ observations:
     note: as_published='-297.812'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -3526,7 +3538,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -3538,23 +3550,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -3565,7 +3577,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -3576,18 +3588,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3642,7 +3654,9 @@ observations:
     note: as_published='-280.719'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -3713,10 +3727,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3728,23 +3742,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -3752,10 +3766,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3766,18 +3780,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3832,7 +3846,9 @@ observations:
     note: as_published='-367.040'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -3903,10 +3919,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3918,23 +3934,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -3942,10 +3958,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3956,18 +3972,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4022,7 +4038,9 @@ observations:
     note: as_published='-366.611'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -4093,10 +4111,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4108,23 +4126,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -4132,10 +4150,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4146,18 +4164,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4212,7 +4230,9 @@ observations:
     note: as_published='-366.101'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -4283,10 +4303,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4298,23 +4318,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -4322,10 +4342,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4336,18 +4356,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4402,7 +4422,9 @@ observations:
     note: as_published='-365.510'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -4476,7 +4498,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -4488,7 +4510,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4500,7 +4522,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -4515,7 +4537,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -4526,7 +4548,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4537,7 +4559,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: orthorhombic
           charge:
             tag: value
             value: 0
@@ -4592,7 +4614,9 @@ observations:
     note: as_published='-352.131'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -4666,7 +4690,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -4678,7 +4702,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4687,10 +4711,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4705,7 +4729,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -4716,7 +4740,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4724,10 +4748,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4782,7 +4806,9 @@ observations:
     note: as_published='-352.644'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -4856,7 +4882,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -4868,7 +4894,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4877,10 +4903,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4895,7 +4921,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -4906,7 +4932,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4914,10 +4940,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4972,7 +4998,9 @@ observations:
     note: as_published='-352.723'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -5046,7 +5074,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -5058,7 +5086,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5067,10 +5095,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5085,7 +5113,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -5096,7 +5124,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5104,10 +5132,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5162,7 +5190,9 @@ observations:
     note: as_published='-352.701'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -5236,7 +5266,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5248,23 +5278,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -5275,7 +5305,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5286,18 +5316,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5352,7 +5382,9 @@ observations:
     note: as_published='-365.726'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -5426,7 +5458,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5438,23 +5470,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -5465,7 +5497,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5476,18 +5508,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5542,7 +5574,9 @@ observations:
     note: as_published='-365.435'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -5613,10 +5647,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5628,23 +5662,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -5652,10 +5686,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5666,18 +5700,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5732,7 +5766,9 @@ observations:
     note: as_published='56.713'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -5794,10 +5830,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5809,23 +5845,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -5833,10 +5869,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5847,18 +5883,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5913,7 +5949,9 @@ observations:
     note: as_published='49.423'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -5975,10 +6013,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5990,23 +6028,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -6014,10 +6052,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6028,18 +6066,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6094,7 +6132,9 @@ observations:
     note: as_published='43.358'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -6156,10 +6196,10 @@ observations:
             formula: Ba
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6171,23 +6211,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -6195,10 +6235,10 @@ observations:
         - formula: Ba
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6209,18 +6249,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6275,7 +6315,9 @@ observations:
     note: as_published='38.233'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -6340,7 +6382,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -6352,7 +6394,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6364,7 +6406,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -6379,7 +6421,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -6390,7 +6432,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6401,7 +6443,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: orthorhombic
           charge:
             tag: value
             value: 0
@@ -6456,7 +6498,9 @@ observations:
     note: as_published='238.451'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -6521,7 +6565,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -6533,7 +6577,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6542,10 +6586,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6560,7 +6604,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -6571,7 +6615,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6579,10 +6623,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6637,7 +6681,9 @@ observations:
     note: as_published='172.713'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -6702,7 +6748,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -6714,7 +6760,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6723,10 +6769,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6741,7 +6787,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -6752,7 +6798,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6760,10 +6806,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6818,7 +6864,9 @@ observations:
     note: as_published='134.174'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -6883,7 +6931,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -6895,23 +6943,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -6922,7 +6970,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -6933,18 +6981,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6999,7 +7047,9 @@ observations:
     note: as_published='76.689'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
@@ -7064,7 +7114,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -7076,23 +7126,23 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: -1/2
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -7103,7 +7153,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -7114,18 +7164,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7180,7 +7230,9 @@ observations:
     note: as_published='65.590'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ba=B1259 reference-state table p.31/PDF p.37 (phase sentence says 648 K; table break
+      643 K), O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json
     record: b1259-ht-0166-bafute
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0166-bafute.json

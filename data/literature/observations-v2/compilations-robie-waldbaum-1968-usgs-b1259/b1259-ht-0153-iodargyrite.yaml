@@ -1774,7 +1774,7 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
               value: cr
@@ -1784,7 +1784,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -1800,7 +1800,7 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
             value: cr
@@ -1861,7 +1861,9 @@ observations:
     note: as_published='-15.830'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -1943,17 +1945,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -1969,13 +1971,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2030,7 +2032,9 @@ observations:
     note: as_published='-16.137'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -2112,17 +2116,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2138,13 +2142,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2199,7 +2203,9 @@ observations:
     note: as_published='-16.080'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -2281,17 +2287,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2307,13 +2313,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2368,7 +2374,9 @@ observations:
     note: as_published='-15.024'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -2450,17 +2458,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2476,13 +2484,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2537,7 +2545,9 @@ observations:
     note: as_published='-14.234'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -2619,17 +2629,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2645,13 +2655,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2706,7 +2716,9 @@ observations:
     note: as_published='-13.489'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -2788,7 +2800,7 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
               value: cr
@@ -2798,7 +2810,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2814,7 +2826,7 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
             value: cr
@@ -2875,7 +2887,9 @@ observations:
     note: as_published='-14.780'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -2957,17 +2971,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -2983,13 +2997,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3044,7 +3058,9 @@ observations:
     note: as_published='-16.553'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -3126,17 +3142,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -3152,13 +3168,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3213,7 +3229,9 @@ observations:
     note: as_published='-16.730'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -3295,17 +3313,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -3321,13 +3339,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3382,7 +3400,9 @@ observations:
     note: as_published='-15.260'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -3464,17 +3484,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -3490,13 +3510,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3551,7 +3571,9 @@ observations:
     note: as_published='-19.803'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -3633,17 +3655,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -3659,13 +3681,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3720,7 +3742,9 @@ observations:
     note: as_published='-19.552'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -3802,17 +3826,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -3828,13 +3852,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3889,7 +3913,9 @@ observations:
     note: as_published='-19.313'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -3971,7 +3997,7 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
               value: cr
@@ -3981,7 +4007,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -3997,7 +4023,7 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
             value: cr
@@ -4058,7 +4084,9 @@ observations:
     note: as_published='11.604'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -4131,17 +4159,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -4157,13 +4185,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4218,7 +4246,9 @@ observations:
     note: as_published='8.817'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -4291,17 +4321,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -4317,13 +4347,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4378,7 +4408,9 @@ observations:
     note: as_published='8.308'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -4451,17 +4483,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -4477,13 +4509,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4538,7 +4570,9 @@ observations:
     note: as_published='5.472'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -4611,17 +4645,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -4637,13 +4671,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4698,7 +4732,9 @@ observations:
     note: as_published='4.444'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
@@ -4771,17 +4807,17 @@ observations:
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
     formation_elements:
       tag: value
       value:
@@ -4797,13 +4833,13 @@ observations:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4858,7 +4894,9 @@ observations:
     note: as_published='3.685'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ag=B1259 reference-state table p.26/PDF p.32, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json
     record: b1259-ht-0153-iodargyrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0153-iodargyrite.json

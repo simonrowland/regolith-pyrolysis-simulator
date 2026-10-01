@@ -155,16 +155,16 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
               value: cr
@@ -174,7 +174,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -182,15 +182,15 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
             value: cr
@@ -251,7 +251,8 @@ observations:
     note: as_published='-24148'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
       ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
-      formation_basis=from_the_elements
+      formation_basis=from_the_elements; elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259
+      reference-state table p.49/PDF p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0230-coccinite.json
     record: b1259-298k-0230-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0230-coccinite.json
@@ -321,16 +322,16 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
               value: cr
@@ -340,7 +341,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -348,15 +349,15 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
             value: cr
@@ -417,7 +418,8 @@ observations:
     note: as_published='-25200'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
       ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
-      formation_basis=from_the_elements
+      formation_basis=from_the_elements; elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259
+      reference-state table p.49/PDF p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0230-coccinite.json
     record: b1259-298k-0230-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0230-coccinite.json
